@@ -1,0 +1,9 @@
+include AUTHORS
+include LICENSE.txt
+include READEME.rst
+recursive-include docs *
+recursive-include mkvbatchmultiplex *
+recursive-include tests *
+recursive-exclude tests/NewFiles *
+global-exclude __pycache__
+global-exclude *.py[co]
