@@ -9,26 +9,22 @@ LOG FW025
 """
 
 import logging
-import os
 import platform
-import re
-import subprocess
 
-from PyQt5.QtCore import QMutex, QMutexLocker, Qt, pyqtSignal, pyqtSlot
+from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
 from PyQt5.QtGui import QValidator
 from PyQt5.QtWidgets import (QApplication, QGridLayout, QGroupBox, QLabel,
                              QLineEdit, QMessageBox, QPushButton,
                              QWidget)
 
-import mkvbatchmultiplex.library.VS as vs
+import mkvbatchmultiplex.library.widgets.MKVUtil as MKVUtil
 import mkvbatchmultiplex.library.qththreads as threads
 
-from mkvbatchmultiplex.library.mediafileclasses import MediaFileInfo, MKVCommand
+from mkvbatchmultiplex.library.mediafileclasses import MKVCommand
 from .MKVOutputWidget import MKVOutputWidget
 from .MKVJobsTableWidget import JobStatus
 
 
-MUTEX = QMutex()
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
@@ -457,7 +453,7 @@ class MKVFormWidget(QWidget):
             self.lstBaseFiles = []
             self.lstSourceFiles = []
 
-            _getFiles(
+            MKVUtil.getFiles(
                 self.objCommand,
                 lbf=self.lstBaseFiles,
                 lsf=self.lstSourceFiles,
@@ -497,7 +493,7 @@ class MKVFormWidget(QWidget):
 
             for lstFiles in self.lstSourceFiles:
                 self.objCommand.setFiles(lstFiles)
-                if _bVerifyStructure(self.lstBaseFiles, lstFiles, self.parent.log):
+                if MKVUtil.bVerifyStructure(self.lstBaseFiles, lstFiles, self.parent.log):
                     cbOutputMain.emit(
                         "Structure looks OK:\n" \
                         + str(lstFiles) + "\n\n",
@@ -625,7 +621,7 @@ class MKVFormWidget(QWidget):
             self.parent.jobsWidget.clearTable()
             self.leCommand.clear()
             self.leCommand.setFocus()
-            _getFiles(clear=True, log=self.parent.log)
+            MKVUtil.getFiles(clear=True, log=self.parent.log)
             self.parent.progressbar.setValues(0, 0)
 
     def qthProcessCommand(self, command=None, **kwargs):
@@ -714,8 +710,8 @@ class MKVFormWidget(QWidget):
 
             workFiles.clear()
 
-            _getFiles(objCommand, lbf=workFiles.baseFiles, lsf=workFiles.sourceFiles,
-                      log=self.parent.log)
+            MKVUtil.getFiles(objCommand, lbf=workFiles.baseFiles, lsf=workFiles.sourceFiles,
+                             log=self.parent.log)
 
             if not objCommand:
                 currentJob.outputMain.emit(
@@ -764,8 +760,8 @@ class MKVFormWidget(QWidget):
 
                     objCommand.setFiles(lstFiles)
 
-                    if _bVerifyStructure(workFiles.baseFiles, lstFiles, self.parent.log,
-                                         currentJob):
+                    if MKVUtil.bVerifyStructure(workFiles.baseFiles, lstFiles, self.parent.log,
+                                                currentJob):
                         currentJob.outputJobMain(
                             currentJob.jobID,
                             "\n\nCommand:\n" \
@@ -773,7 +769,7 @@ class MKVFormWidget(QWidget):
                             + "\n\n",
                             {'color': Qt.blue}
                         )
-                        _runCommand(
+                        MKVUtil.runCommand(
                             objCommand.lstProcessCommand,
                             currentJob,
                             lstTotal,
@@ -807,204 +803,3 @@ class MKVFormWidget(QWidget):
         self.RUNNING = False
 
         return result
-
-
-def _getBaseFiles(objCommand, log=False):
-
-    lstBaseFiles = []
-
-    if objCommand and objCommand.lstObjFiles:
-
-        # list of base source files the ones received on command line
-        lstBaseFiles = \
-            [x.fullPathName for x in objCommand.lstObjFiles]
-
-    else:
-        if log:
-            MODULELOG.error("FW018: Base files reading error")
-
-    return lstBaseFiles
-
-def _bCheckLenOfLists(lstLists, lstTypeTotal):
-
-    intTmp = None
-    bReturn = True
-
-    for lstTmp in lstLists:
-
-        lstTypeTotal.append([str(len(lstTmp)), os.path.splitext(lstTmp[0])[1]])
-
-        if not intTmp:
-            intTmp = len(lstTmp)
-        else:
-            if len(lstTmp) != intTmp:
-                if bReturn:
-                    bReturn = False
-
-    return bReturn
-
-def _getSourceFiles(objCommand, log=False):
-
-    lstMKVFiles = []
-    lstSourceFiles = []
-    lstTypeTotal = []
-
-    # Get files from any directory found in command
-    # the number of files on each directory has to be equal
-    # Filter by type in original source file
-
-    if objCommand and objCommand.lstObjFiles:
-
-        for objFile in objCommand.lstObjFiles:
-            lstMKVFiles.append(
-                vs.getFileList(
-                    objFile.directory,
-                    objFile.extension,
-                    True
-                )
-            )
-
-        if _bCheckLenOfLists(lstMKVFiles, lstTypeTotal):
-
-            # Join all source files in a list of lists each element
-            # have all source files in the order found
-            # That is the names are not used the order in the directories is
-            for i in range(len(lstMKVFiles[0])):
-                lstSourceFiles.append([x[i] for x in lstMKVFiles])
-        else:
-            objCommand.bRaiseError = True
-            error = "FW019: List of files total don't match."
-            objCommand.strError = error + "\n\n"
-            if log:
-                MODULELOG.error("FW019: List of files total don't match")
-            for lstTmp in lstTypeTotal:
-                error = lstTmp[0] + " - " + lstTmp[1]
-                objCommand.strError = objCommand.strError + error + "\n"
-                if log:
-                    MODULELOG.error("FW020: File(s): %s", error)
-
-    return lstSourceFiles
-
-def _bVerifyStructure(lstBaseFiles, lstFiles, log=False, currentJob=None):
-
-    for strSource, strFile in zip(lstBaseFiles, lstFiles):
-
-        objSource = MediaFileInfo(strSource, log)
-        objFile = MediaFileInfo(strFile, log)
-
-        if objSource != objFile:
-            if currentJob is not None:
-                currentJob.outputJobMain(
-                    currentJob.jobID,
-                    "\n\nError: In structure \n" \
-                    + str(objFile) \
-                    + "\n"
-                    + str(objSource) \
-                    + "\n\n",
-                    {'color': Qt.red}
-                )
-                currentJob.outputJobError(
-                    currentJob.jobID,
-                    "\n\nError: In structure \n"
-                    + str(objFile)
-                    + "\n"
-                    + str(objSource)
-                    + "\n\n",
-                    {'color': Qt.red}
-                )
-            return False
-
-    return True
-
-@vs.staticVars(strCommand="", lstBaseFiles=[], lstSourceFiles=[])
-def _getFiles(objCommand=None, lbf=None, lsf=None, clear=False, log=False):
-    """Get the list of files to be worked on in thread safe manner"""
-
-    with QMutexLocker(MUTEX):
-        if clear:
-            _getFiles.strCommand = ""
-            _getFiles.lstBaseFiles = []
-            _getFiles.lstSourceFiles = []
-
-        if objCommand is not None:
-            if objCommand.strShellcommand != _getFiles.strCommand:
-                # Information not in cache.
-                _getFiles.strCommand = objCommand.strShellcommand
-                _getFiles.lstBaseFiles = _getBaseFiles(objCommand, log=log)
-                _getFiles.lstSourceFiles = _getSourceFiles(objCommand, log=log)
-            else:
-                if log:
-                    MODULELOG.info("FW021: Hit cached information.")
-
-            # lbf and lsf are mutable pass information back here
-            # this approach should make it thread safe so
-            # qhtProcess command can work on a queue
-            if lbf is not None:
-                lbf.extend(_getFiles.lstBaseFiles)
-
-            if lsf is not None:
-                lsf.extend(_getFiles.lstSourceFiles)
-
-        if log:
-            MODULELOG.info("FW022: Base files: %s", str(_getFiles.lstBaseFiles))
-            MODULELOG.info("FW023: Source files: %s", str(_getFiles.lstSourceFiles))
-
-def _runCommand(command, currentJob, lstTotal, log=False):
-    """Execute command in a subprocess thread"""
-
-    regEx = re.compile(r"(\d+)")
-
-    iTotal = 0
-    rc = 1000
-
-    with subprocess.Popen(command, stdout=subprocess.PIPE, bufsize=1,
-                          universal_newlines=True) as p:
-        addNewline = False
-        iTotal = lstTotal[0]
-        n = 0
-
-        for line in p.stdout:
-
-            if line.find(u"Progress:") == 0:
-                # Deal with progress percent
-                if not addNewline:
-                    addNewline = True
-
-                m = regEx.search(line)
-
-                if m:
-                    n = int(m.group(1))
-
-                if n > 0:
-                    currentJob.outputJobMain(
-                        currentJob.jobID,
-                        line.strip(),
-                        {'color': Qt.black, 'replaceLine': True}
-                    )
-
-                    currentJob.progressBar.emit(n, iTotal + n)
-
-            else:
-
-                if addNewline:
-                    addNewline = False
-                    currentJob.outputJobMain(currentJob.jobID, "\n", {'color': Qt.black})
-
-                if not "\n" in line:
-                    line = line + "\n"
-
-                if line.find(u"Warning") == 0:
-                    currentJob.outputJobMain(currentJob.jobID, line, {'color': Qt.red})
-                    currentJob.outputJobError(currentJob.jobID, line, {'color': Qt.red})
-                else:
-                    currentJob.outputJobMain(currentJob.jobID, line, {'color': Qt.black})
-
-    if n > 0:
-        rc = p.poll()
-
-    lstTotal[0] += 100
-
-    if log:
-        MODULELOG.info("FW024: mkvmerge rc=%d - %s", rc, command)
-
-    return rc

@@ -16,7 +16,6 @@ import subprocess
 from PyQt5.QtCore import QMutex, QMutexLocker, Qt
 
 import mkvbatchmultiplex.library.VS as vs
-
 from mkvbatchmultiplex.library import MediaFileInfo
 
 
