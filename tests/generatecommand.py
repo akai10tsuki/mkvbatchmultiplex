@@ -30,7 +30,7 @@ def main():
     QApplication.clipboard().clear()
     QApplication.clipboard().setText(cmd)
 
-    sys.exit(app.exec_())
+    sys.exit()
 
 if __name__ == "__main__":
     main()
