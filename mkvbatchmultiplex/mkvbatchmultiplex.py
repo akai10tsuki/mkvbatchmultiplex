@@ -212,12 +212,25 @@ class MKVMultiplexApp(QMainWindow):
 
         self.formWidget.teOutputWindow.makeConnection(self.outputMainSignal)
 
-        result = QMessageBox.question(
-            self,
-            "Confirm Exit...",
-            "Are you sure you want to exit ?",
-            QMessageBox.Yes | QMessageBox.No
-        )
+        tmpNum = self.threadpool.activeThreadCount()
+
+        if tmpNum > 0:
+
+            result = QMessageBox.question(
+                self,
+                "Confirm Abort...",
+                "Jobs running are you sure you want to stop them ?",
+                QMessageBox.Yes | QMessageBox.No
+            )
+
+        else:
+
+            result = QMessageBox.question(
+                self,
+                "Confirm Exit...",
+                "Are you sure you want to exit ?",
+                QMessageBox.Yes | QMessageBox.No
+            )
 
         if result == QMessageBox.Yes:
             self.configuration(save=True)

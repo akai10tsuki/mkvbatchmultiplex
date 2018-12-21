@@ -57,6 +57,11 @@ class JobQueue(QObject): # pylint: disable=R0902
 
         return False
 
+    def clear(self):
+        """Clear the job queue"""
+
+        self._workQueue.clear()
+
     def connectToStatus(self, objSignal):
         """Connect to status slot"""
 

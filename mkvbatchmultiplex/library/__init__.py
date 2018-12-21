@@ -5,4 +5,6 @@ from .loghandler import QthLogRotateHandler
 from .mediafileclasses import MKVCommand, MediaFileInfo
 from .pyqtconfig import ConfigManager
 from .qththreads import GenericThread, WorkerSignals, Worker
-from .widgets import DualProgressBar, SpacerWidget, JobStatus
+from .widgets import (DualProgressBar, SpacerWidget, JobStatus,
+                      MKVFormWidget, MKVTabsWidget, MKVOutputWidget,
+                      MKVJobsTableWidget)

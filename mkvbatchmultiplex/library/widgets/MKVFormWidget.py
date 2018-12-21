@@ -344,7 +344,10 @@ class MKVFormWidget(QWidget):
                 self.parent.btnProcess.setEnabled(True)
                 self.parent.btnAddQueue.setEnabled(True)
                 if self.parent.jobs:
-                    self.parent.btnProcessQueue.setEnabled(True)
+                    tmpNum = self.parent.threadpool.activeThreadCount()
+
+                    if tmpNum == 0:
+                        self.parent.btnProcessQueue.setEnabled(True)
                 else:
                     self.parent.btnProcessQueue.setEnabled(False)
                 self.parent.btnReset.setEnabled(True)
@@ -355,7 +358,10 @@ class MKVFormWidget(QWidget):
                 self.parent.btnProcess.setEnabled(False)
                 self.parent.btnAddQueue.setEnabled(False)
                 if self.parent.jobs:
-                    self.parent.btnProcessQueue.setEnabled(True)
+                    tmpNum = self.parent.threadpool.activeThreadCount()
+
+                    if tmpNum == 0:
+                        self.parent.btnProcessQueue.setEnabled(True)
                 else:
                     self.parent.btnProcessQueue.setEnabled(False)
                 if self.parent.parent.log:
@@ -403,7 +409,9 @@ class MKVFormWidget(QWidget):
                 # Clear command
                 cbOutputCommand.emit("")
 
-                if not self.RUNNING:
+                tmpNum = self.threadpool.activeThreadCount()
+
+                if tmpNum == 0:
                     self.btnProcessQueue.setEnabled(True)
 
         return "Ok"
@@ -673,6 +681,7 @@ class MKVFormWidget(QWidget):
             self.jobs.outputJob, self.jobs.outputError
 
         workFiles = WorkFiles()
+        result = None
 
         while self.jobs:
 
@@ -749,6 +758,8 @@ class MKVFormWidget(QWidget):
                         if not self.controlQueue.empty():
                             request = self.controlQueue.get()
                             if request == JobStatus.Abort:
+                                self.jobs.clear()
+                                result = JobStatus.Abort
                                 break
 
                     objCommand.setFiles(lstFiles)
@@ -795,7 +806,7 @@ class MKVFormWidget(QWidget):
 
         self.RUNNING = False
 
-        return None
+        return result
 
 
 def _getBaseFiles(objCommand, log=False):
