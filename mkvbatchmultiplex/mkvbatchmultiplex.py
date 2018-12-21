@@ -79,7 +79,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QDesktopWidget,
 
 from .library.loghandler import QthLogRotateHandler
 from .library.widgets import (DualProgressBar, MKVFormWidget, MKVTabsWidget,
-                             MKVOutputWidget, MKVJobsTableWidget, SpacerWidget)
+                              MKVOutputWidget, MKVJobsTableWidget, SpacerWidget)
 from .library.pyqtconfig import ConfigManager
 from .library.jobs import JobQueue
 from .library.widgets import JobStatus
