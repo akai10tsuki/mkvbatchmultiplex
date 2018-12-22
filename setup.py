@@ -1,3 +1,5 @@
+"""Setup.py for mkvbatchmultiplex"""
+
 from setuptools import setup, find_packages
 
 def readme():

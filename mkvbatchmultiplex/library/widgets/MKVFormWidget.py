@@ -11,7 +11,7 @@ LOG FW025
 import logging
 import platform
 
-from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal, pyqtSlot
 from PyQt5.QtGui import QValidator
 from PyQt5.QtWidgets import (QApplication, QGridLayout, QGroupBox, QLabel,
                              QLineEdit, QMessageBox, QPushButton,
@@ -20,7 +20,7 @@ from PyQt5.QtWidgets import (QApplication, QGridLayout, QGroupBox, QLabel,
 import mkvbatchmultiplex.library.widgets.MKVUtil as MKVUtil
 import mkvbatchmultiplex.library.qththreads as threads
 
-from mkvbatchmultiplex.library.mediafileclasses import MKVCommand
+from mkvbatchmultiplex.library import MKVCommand
 from .MKVOutputWidget import MKVOutputWidget
 from .MKVJobsTableWidget import JobStatus
 
@@ -102,6 +102,11 @@ class MKVFormWidget(QWidget):
 
         self._initControls()
         self._initLayout()
+
+        self.timer = QTimer()
+        self.timer.setInterval(1000)
+        self.timer.timeout.connect(self.watchWaitingJobs)
+        self.timer.start()
 
     def _initHelper(self):
         self.objCommand = MKVCommand()
@@ -262,6 +267,17 @@ class MKVFormWidget(QWidget):
         self.leCommand.clear()
         self.leCommand.setText(strCommand)
         self.leCommand.setCursorPosition(0)
+
+    def watchWaitingJobs(self):
+        """Enable Process Jobs button when needed"""
+
+        print("Watching...")
+
+        if self.jobs.jobsAreWaiting():
+            tmpNum = self.threadpool.activeThreadCount()
+
+            if tmpNum == 0:
+                self.btnProcessQueue.setEnabled(True)
 
     def qthRunInThread(self, function, *args, **kwargs):
         """
@@ -754,7 +770,9 @@ class MKVFormWidget(QWidget):
                         if not self.controlQueue.empty():
                             request = self.controlQueue.get()
                             if request == JobStatus.Abort:
+                                self.jobs.status(currentJob.jobID, JobStatus.Aborted)
                                 self.jobs.clear()
+                                self.jobs.abortAll()
                                 result = JobStatus.Abort
                                 break
 
@@ -782,14 +800,14 @@ class MKVFormWidget(QWidget):
 
                 currentStatus = self.jobs.status(currentJob.jobID)
 
-                if currentStatus == JobStatus.Abort:
-                    self.jobs.status(int(currentJob.jobID), JobStatus.Aborted)
+                if currentStatus == JobStatus.Aborted:
+                    self.jobs.status(currentJob.jobID, JobStatus.Aborted)
                     currentJob.outputJobMain(
                         currentJob.jobID, "\n\nJob {} - Aborted.\n".format(currentJob.jobID),
                         {'color': Qt.blue}
                     )
                 else:
-                    self.jobs.status(int(currentJob.jobID), JobStatus.Done)
+                    self.jobs.status(currentJob.jobID, JobStatus.Done)
                     currentJob.outputJobMain(
                         currentJob.jobID,
                         "\n\nJob {} - Done.\n".format(currentJob.jobID),

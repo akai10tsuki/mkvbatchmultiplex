@@ -16,6 +16,19 @@ MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
 
+class JobStatus: # pylint: disable=R0903
+    """Actions for context menu"""
+
+    Abort = "Abort"
+    Aborted = "Aborted"
+    Done = "Done"
+    Running = "Running"
+    Skip = "Skip"
+    Stop = "Stop"
+    Waiting = "Waiting"
+    Error = "Error"
+
+
 class JobInfo: # pylint: disable=R0903
     """Information related to a Job"""
 
@@ -61,6 +74,22 @@ class JobQueue(QObject): # pylint: disable=R0902
         """Clear the job queue"""
 
         self._workQueue.clear()
+
+    def abortAll(self):
+        """abort any pending jobs"""
+
+        for key, value in self._jobs.items():
+            if value.status == JobStatus.Waiting:
+                self.status(key, JobStatus.Aborted)
+
+    def jobsAreWaiting(self):
+        """check for waiting jobs"""
+
+        for _, value in self._jobs.items():
+            if value.status == JobStatus.Waiting:
+                return True
+
+        return False
 
     def connectToStatus(self, objSignal):
         """Connect to status slot"""

@@ -21,6 +21,8 @@ from PyQt5.QtCore import QMutex, QMutexLocker, Qt, pyqtSlot, pyqtSignal
 from PyQt5.QtWidgets import (QVBoxLayout, QTableWidget, QMenu, QWidget,
                              QTableWidgetItem, QAbstractScrollArea)
 
+from mkvbatchmultiplex.library import JobStatus
+
 MUTEX = QMutex()
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -39,12 +41,12 @@ class MKVJobsTableWidget(QWidget):
 
         self.parent = parent
         self.ctrlQueue = ctrlQueue
-        self._initControls(ctrlQueue)
+        self._initControls()
         self._initLayout()
 
-    def _initControls(self, ctrlQueue):
+    def _initControls(self):
 
-        self.jobsTable = JobsTableWidget(self, ctrlQueue)
+        self.jobsTable = JobsTableWidget(self, self.ctrlQueue)
 
         # table selection change
         self.jobsTable.cellClicked.connect(self.onClick)
@@ -89,17 +91,6 @@ class MKVJobsTableWidget(QWidget):
         if jobID:
             self.showJobOutput.emit(jobID, status, command)
 
-class JobStatus: # pylint: disable=R0903
-    """Actions for context menu"""
-
-    Abort = "Abort"
-    Aborted = "Aborted"
-    Done = "Done"
-    Running = "Running"
-    Skip = "Skip"
-    Stop = "Stop"
-    Waiting = "Waiting"
-    Error = "Error"
 
 class JobsTableWidget(QTableWidget):
     """Jobs Table"""
@@ -199,21 +190,23 @@ class JobsTableWidget(QTableWidget):
 
             if status == self.actions.Waiting:
                 skipAction = menu.addAction(self.actions.Skip)
-            elif status == self.actions.Skip:
+            elif status in [self.actions.Skip, self.actions.Aborted,
+                            self.actions.Abort, self.actions.Done]:
                 waitingAction = menu.addAction(self.actions.Waiting)
             elif status == self.actions.Running:
                 abortAction = menu.addAction(self.actions.Abort)
 
-            action = menu.exec_(self.mapToGlobal(event.pos()))
+            if not menu.isEmpty():
+                action = menu.exec_(self.mapToGlobal(event.pos()))
 
-            if action == skipAction:
-                self.setRowStatus(row, self.actions.Skip)
-            elif action == waitingAction:
-                self.setRowStatus(row, self.actions.Waiting)
-            elif action == abortAction:
-                self.setRowStatus(row, self.actions.Abort)
-                if self.ctrQueue is not None:
-                    self.ctrQueue.put(self.actions.Abort)
+                if action == skipAction:
+                    self.setRowStatus(row, self.actions.Skip)
+                elif action == waitingAction:
+                    self.setRowStatus(row, self.actions.Waiting)
+                elif action == abortAction:
+                    self.setRowStatus(row, self.actions.Abort)
+                    if self.ctrQueue is not None:
+                        self.ctrQueue.put(self.actions.Abort)
 
 
     @pyqtSlot(int, str, str)
