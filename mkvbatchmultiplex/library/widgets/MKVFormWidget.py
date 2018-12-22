@@ -269,7 +269,10 @@ class MKVFormWidget(QWidget):
         self.leCommand.setCursorPosition(0)
 
     def watchWaitingJobs(self):
-        """Enable Process Jobs button when needed"""
+        """
+        Enable <Process Jobs> button when needed
+        Hack until job queue is reworked
+        """
 
         print("Watching...")
 
