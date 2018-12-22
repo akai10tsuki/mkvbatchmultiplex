@@ -49,6 +49,11 @@ def bCheckLenOfLists(lstLists, lstTypeTotal):
 
     for lstTmp in lstLists:
 
+        if not lstTmp:
+            bReturn = False
+            lstTypeTotal.append(("0", "Ops!!! File not found."))
+            break
+
         lstTypeTotal.append([str(len(lstTmp)), os.path.splitext(lstTmp[0])[1]])
 
         if not intTmp:
