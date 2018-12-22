@@ -10,8 +10,9 @@ LOG FW025
 
 import logging
 import platform
+import time
 
-from PyQt5.QtCore import Qt, QTimer, pyqtSignal, pyqtSlot
+from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
 from PyQt5.QtGui import QValidator
 from PyQt5.QtWidgets import (QApplication, QGridLayout, QGroupBox, QLabel,
                              QLineEdit, QMessageBox, QPushButton,
@@ -103,10 +104,11 @@ class MKVFormWidget(QWidget):
         self._initControls()
         self._initLayout()
 
-        self.timer = QTimer()
-        self.timer.setInterval(1000)
-        self.timer.timeout.connect(self.watchWaitingJobs)
-        self.timer.start()
+        self.qth = threads.GenericThread(self.watchWaitingJobs)
+        self.qth.isRunning()
+        self.qth.start()
+
+        #self.qthRunInThread(self.whatEver)
 
     def _initHelper(self):
         self.objCommand = MKVCommand()
@@ -274,13 +276,14 @@ class MKVFormWidget(QWidget):
         Hack until job queue is reworked
         """
 
-        print("Watching...")
+        while True:
+            if self.jobs.jobsAreWaiting():
+                tmpNum = self.threadpool.activeThreadCount()
 
-        if self.jobs.jobsAreWaiting():
-            tmpNum = self.threadpool.activeThreadCount()
-
-            if tmpNum == 0:
-                self.btnProcessQueue.setEnabled(True)
+                if tmpNum == 0:
+                    self.jobs.requeueWaiting()
+                    self.btnProcessQueue.setEnabled(True)
+            time.sleep(2)
 
     def qthRunInThread(self, function, *args, **kwargs):
         """
@@ -822,5 +825,162 @@ class MKVFormWidget(QWidget):
                 self.jobs.status(currentJob.jobID, JobStatus.Error)
 
         self.RUNNING = False
+
+        return result
+
+    def qthProcessCommand1(self, **kwargs):
+        """Main worker function will process the commands"""
+
+        for key in ['cbOutputCommand', 'cbOutputMain', 'cbProgress']:
+            if not key in kwargs:
+                if self.parent.log:
+                    MODULELOG.error(
+                        "FW013: No output command callback function %s.",
+                        key
+                    )
+                return "No output command callback function"
+
+        currentJob = CurrentJob()
+
+        currentJob.outputMain, currentJob.progressBar, \
+        currentJob.outputJobMain, currentJob.outputJobError = \
+            kwargs['cbOutputMain'], kwargs['cbProgress'], \
+            self.jobs.outputJob, self.jobs.outputError
+
+        MKVCommand.log = self.parent.log
+
+        currentJob.outputJobMain, \
+        currentJob.outputJobError = \
+            self.jobs.outputJob, self.jobs.outputError
+
+        workFiles = WorkFiles()
+        result = None
+
+        while True:
+
+            while self.jobs:
+
+                currentJob.jobID, currentJob.command = self.jobs.popLeft()
+
+                if currentJob.command:
+                    objCommand = MKVCommand(currentJob.command)
+                    self.jobs.status(currentJob.jobID, JobStatus.Running)
+                else:
+                    # Skip empty command
+                    self.jobs.status(currentJob.jobID, JobStatus.Error)
+                    continue
+
+                currentJob.outputMain.emit(
+                    "\n\nWorking on Command:\n" \
+                    + "Job " + str(currentJob.jobID) + " - " \
+                    + currentJob.command \
+                    + "\n\n",
+                    {'color': Qt.blue}
+                )
+
+                currentJob.outputJobMain(
+                    currentJob.jobID,
+                    "\n\n**********\nWorking on Command:\n" \
+                    + "Job " + str(currentJob.jobID) + " - " \
+                    + currentJob.command \
+                    + "\n**********\n\n",
+                    {'color': Qt.blue}
+                )
+
+                workFiles.clear()
+
+                MKVUtil.getFiles(objCommand, lbf=workFiles.baseFiles, lsf=workFiles.sourceFiles,
+                                 log=self.parent.log)
+
+                if not objCommand:
+                    currentJob.outputMain.emit(
+                        "\n" + objCommand.strError,
+                        {'color': Qt.red}
+                    )
+
+                    currentJob.outputJobMain(
+                        currentJob.jobID,
+                        "\n" + objCommand.strError,
+                        {'color': Qt.red}
+                    )
+
+                    currentJob.outputJobError(
+                        currentJob.jobID,
+                        "\n" + objCommand.strError,
+                        {'color': Qt.red}
+                    )
+
+
+                if self.parent.log:
+                    MODULELOG.info("FW016: Base files in Process: %s",
+                                   str(workFiles.baseFiles))
+                    MODULELOG.info("FW017: Source files in Process: %s",
+                                   str(workFiles.sourceFiles))
+
+                if workFiles.sourceFiles:
+
+                    nTotal = len(workFiles.sourceFiles) * 100
+                    lstTotal = [0, nTotal]
+
+                    # Set the total for progressbar to increase gradually
+                    self.parent.progressbar.pbBarTotal.setMaximum(nTotal)
+                    # Change to output queue tab
+                    #self.parent.tabs.setCurrentIndex(2)
+
+                    for lstFiles in workFiles.sourceFiles:
+
+                        if self.controlQueue is not None:
+                            if not self.controlQueue.empty():
+                                request = self.controlQueue.get()
+                                if request == JobStatus.Abort:
+                                    self.jobs.status(currentJob.jobID, JobStatus.Aborted)
+                                    self.jobs.clear()
+                                    self.jobs.abortAll()
+                                    result = JobStatus.Abort
+                                    break
+
+                        objCommand.setFiles(lstFiles)
+
+                        if MKVUtil.bVerifyStructure(workFiles.baseFiles, lstFiles, self.parent.log,
+                                                    currentJob):
+                            currentJob.outputJobMain(
+                                currentJob.jobID,
+                                "\n\nCommand:\n" \
+                                + str(objCommand.lstProcessCommand) \
+                                + "\n\n",
+                                {'color': Qt.blue}
+                            )
+                            MKVUtil.runCommand(
+                                objCommand.lstProcessCommand,
+                                currentJob,
+                                lstTotal,
+                                self.parent.log
+                            )
+                        else:
+                            lstTotal[0] += 100
+
+                    currentJob.progressBar.emit(0, nTotal)
+
+                    currentStatus = self.jobs.status(currentJob.jobID)
+
+                    if currentStatus == JobStatus.Aborted:
+                        self.jobs.status(currentJob.jobID, JobStatus.Aborted)
+                        currentJob.outputJobMain(
+                            currentJob.jobID, "\n\nJob {} - Aborted.\n".format(currentJob.jobID),
+                            {'color': Qt.blue}
+                        )
+                    else:
+                        self.jobs.status(currentJob.jobID, JobStatus.Done)
+                        currentJob.outputJobMain(
+                            currentJob.jobID,
+                            "\n\nJob {} - Done.\n".format(currentJob.jobID),
+                            {'color': Qt.blue}
+                        )
+
+                else:
+
+                    self.jobs.status(currentJob.jobID, JobStatus.Error)
+
+            time.sleep(2)
 
         return result

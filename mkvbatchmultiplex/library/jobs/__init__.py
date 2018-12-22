@@ -32,9 +32,10 @@ class JobStatus: # pylint: disable=R0903
 class JobInfo: # pylint: disable=R0903
     """Information related to a Job"""
 
-    def __init__(self, status="", errors=None, output=None):
+    def __init__(self, status="", command=None, errors=None, output=None):
 
         self.status = status
+        self.command = command
         self.errors = [] if (errors is None) else errors
         self.output = [] if (output is None) else output
 
@@ -91,6 +92,23 @@ class JobQueue(QObject): # pylint: disable=R0902
 
         return False
 
+    def jobsAreRunning(self):
+        """check for running jobs"""
+
+        for _, value in self._jobs.items():
+            if value.status == JobStatus.Running:
+                return True
+
+        return False
+
+    def requeueWaiting(self):
+        """abort any pending jobs"""
+
+        for key, value in self._jobs.items():
+            if value.status == JobStatus.Waiting:
+                if not self.inQueue(value.command):
+                    self._workQueue.append([key, value.command])
+
     def connectToStatus(self, objSignal):
         """Connect to status slot"""
 
@@ -126,6 +144,7 @@ class JobQueue(QObject): # pylint: disable=R0902
 
             self._workQueue.append([nID, command])
             jobInfo.status = status
+            jobInfo.command = command
             self._jobs[nID] = jobInfo
 
             if self.emitAddJobToTable:

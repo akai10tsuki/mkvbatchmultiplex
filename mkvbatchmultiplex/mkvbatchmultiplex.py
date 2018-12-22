@@ -102,6 +102,12 @@ class MKVMultiplexApp(QMainWindow):
         self.ctrlQueue = Queue()
         self.threadpool = QThreadPool()
         self.jobs = JobQueue(self.workQueue)
+        self.config = ConfigManager()
+
+        self._initMenu()
+        self._initHelper()
+
+    def _initHelper(self):
 
         # Create Widgets
         self.formWidget = MKVFormWidget(self, self.threadpool, self.jobs, self.ctrlQueue)
@@ -133,12 +139,10 @@ class MKVMultiplexApp(QMainWindow):
         )
 
         self.tabs = self.tabsWidget.tabs
-        self.config = ConfigManager()
         widget = QWidget()
         layout = QVBoxLayout(widget)
         layout.addWidget(self.tabsWidget)
         self.setCentralWidget(widget)
-        self._initMenu()
 
     def _initMenu(self):
 
@@ -234,9 +238,7 @@ class MKVMultiplexApp(QMainWindow):
         if result == QMessageBox.Yes:
             self.configuration(save=True)
 
-            tmpNum = self.threadpool.activeThreadCount()
-
-            if tmpNum > 0:
+            if self.jobs.jobsAreRunning() > 0:
                 self.outputMainSignal.emit("\nJobs Running Aborting jobs\n\n", {'color': Qt.blue})
                 self.ctrlQueue.put(JobStatus.Abort)
                 event.ignore()
@@ -341,7 +343,6 @@ def mainApp():
     win.show()
     app.exec_()
     logging.info("App End.")
-
 
 if __name__ == "__main__":
     sys.exit(mainApp())

@@ -31,6 +31,7 @@ class GenericThread(QThread):
 
     def run(self):
         """Override run and start function from argument"""
+
         self.function(*self.args, **self.kwargs)
 
         return
