@@ -109,3 +109,13 @@ The only setting is to enable logging.  The log will be saved one
   :align: center
 
   Enable logging.
+
+Know Issues
+^^^^^^^^^^^
+
+When a job is running and exit is requested a prompt to stop the
+job will appear and a signal will be sent to the execution thread
+to stop.  When a message is shown that the job was aborted then
+you could exit.  This will change to stop the job then exit if
+the program waits for the threadpool to stop the GUI freezes.
+The way it works now is the less problematic approach.

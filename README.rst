@@ -56,8 +56,11 @@ Usage
 =====
 
 It assumed you have working knowledge of using MKVToolNix.  Select a
-file make any operations needed copy command to clipboard.  Paste
-command on mkvbatchmultiplex push Process button and wait.
+file make any operations needed copy command to clipboard:
+
+    *Multiplexer->Show command line*
+
+Paste command on mkvbatchmultiplex push Process button and wait.
 Remember to select and output directory.
 
 Roadmap

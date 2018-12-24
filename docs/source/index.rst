@@ -8,8 +8,8 @@
    installation
    gettingstarted
    using
-   acknowledgements
    LICENSE
+   acknowledgements
    modules
 
 Indices and tables

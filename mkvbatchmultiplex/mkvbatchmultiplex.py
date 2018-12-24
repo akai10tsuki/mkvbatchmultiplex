@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 
 r"""
-mkvBatchMultiplex:
+mkvBatchMultiplex
+=================
+
 Program for batch processing mkvmerge commands
 
 The program will take command line argument from mkvtoolnix-gui
@@ -13,51 +15,15 @@ Works with either Windows (cmd.exe) or Linux/unix shells (bash, zsh, etc.)
 
 It will analyze the command and apply the same multiplex instructions to all
 the files in the same directory if more than one file is involved in the
-command they must match in numbers. That is multiplex video and subtitle:
-
-    13 - video *.avi - video files
-    13 - video *.srt - subtitle files
-
-Files of the same type involved in the same operation must be in different
-directories.
-
-    \dir1\video1v1 *.mkv
-
-    \dir2\video1v2 *.mkv
-
-This is because the program will read the source files from the directories
-found in the command line and will try to apply the instructions to all
-of them.  If the files are of different types that is a video file and a
-subtitle file this is not required, the sources are an extension pair.
-
-    \dir1\video1 *.mkv
-    \dir1\video1 *.srt
-
-
-The other condition all different sources must be of the same type.
-For example:
-
-    video01.avi->video*.avi, video01.srt->video*.srt
-
-It is been develop on Windows 10 all libraries so far exist for Windows
-macOS and Linux. Light testing shows to work for all operating systems
-mentioned as of this writing 2018-01-12 ver 0.5.1a1.
+command they must match in numbers.
 
 Libraries and programs used:
 
-python 3.6-3.7
-pymediainfo 2.2.1-3.0
-mediainfo-17.10->18.12
-PyQt5 5.10.1-5.11.3
-
-Some icons by Yusuke Kamiyamane. Licensed under a Creative Commons Attribution 3.0 License.
-
-Target program
-mkvtoolnix-v17.00->29.00
+    python 3.6-3.7
+    pymediainfo 2.2.1-3.0
+    mediainfo-17.10->18.12
+    PyQt5 5.10.1-5.11.3
 """
-
-__version__ = "0.5.3a1"
-__author__ = "Efrain Vergara"
 
 import base64
 import logging
