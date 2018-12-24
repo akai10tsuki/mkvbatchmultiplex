@@ -1,4 +1,5 @@
-from .qt import *
+
+from pyqtconfig.qt import *
 from pyqtconfig import ConfigManager
 
 
@@ -63,6 +64,7 @@ class MainWindow(QMainWindow):
         self.current_config_output.setText(str(self.config.as_dict()))
 
 def main():
+
     # Create a Qt application
     app = QApplication(sys.argv)
     app.setOrganizationName("PyQtConfig")

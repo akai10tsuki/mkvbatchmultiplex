@@ -222,7 +222,6 @@ class MKVFormWidget(QWidget):
         self.btnCheckFiles.setEnabled(False)
         self.buttonsState(False)
 
-
         self.teOutputWindow = MKVOutputWidget(self)
         self.teOutputWindow.textChanged.connect(self.clearButtonsState)
         self.teOutputWindow.setReadOnly(True)
