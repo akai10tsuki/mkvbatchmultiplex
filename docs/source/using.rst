@@ -3,6 +3,13 @@
 Using mkvbatchmultiplex
 ***********************
 
+The application has a very simple interface:
+
+.. figure:: images/mkvbatchmultiplex.png
+  :align: center
+
+  mkvbatchmultiplex
+
 Requirements
 ============
 

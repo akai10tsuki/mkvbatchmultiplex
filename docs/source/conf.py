@@ -33,7 +33,7 @@ author = 'Efrain Vergara'
 # The short X.Y version
 version = '0.5.3'
 # The full version, including alpha/beta/rc tags
-release = '0.5.3a1'
+release = '0.5.3a2.dev1'
 
 
 # -- General configuration ---------------------------------------------------

@@ -10,7 +10,7 @@ def readme():
 setup(
     name='mkvbatchmultiplex',  # Required
 
-    version='0.5.3a1.dev2',  # Required
+    version='0.5.3a2.dev1',  # Required
 
     description='A mkv media batch processor',  # Required
 
