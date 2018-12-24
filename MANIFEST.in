@@ -1,9 +1,15 @@
 include AUTHORS
 include LICENSE.txt
 include READEME.rst
-recursive-include docs *
-recursive-include mkvbatchmultiplex *
-recursive-include tests *
-recursive-exclude tests/NewFiles *
+
+graft docs
+graft mkvbatchmultiplex
+graft tests
+
+prune docs/build
+prune tests/NewFiles
+
+recursive-include tests/NewFiles *.txt
+
 global-exclude __pycache__
 global-exclude *.py[co]

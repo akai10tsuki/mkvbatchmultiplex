@@ -54,7 +54,6 @@ Some icons by Yusuke Kamiyamane. Licensed under a Creative Commons Attribution 3
 
 Target program
 mkvtoolnix-v17.00->29.00
-
 """
 
 __version__ = "0.5.3a1"

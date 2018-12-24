@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-MKVOutputWidget:
+MKVOutputWidget
 
 Output Form
 
@@ -36,7 +36,8 @@ class MKVOutputWidget(QTextEdit):
     def insertText(self, strText, kwargs):
         """
         Insert text in output window
-        Cannot use keyword argument **kwargs on emit calls, use dictionary instead
+        Cannot use keyword argument **kwargs on emit calls,
+        use dictionary instead
         """
 
         strTmp = ""

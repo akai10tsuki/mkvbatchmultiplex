@@ -19,8 +19,8 @@ class DualProgressBar(QWidget):
     """
     Dual QProgressBar for unit and total progress
 
-    :param align: Set alignment Qt.Horizontal or Qt.Vertical
-    :type align: Qt.AlignmentFlags
+    param align - Set alignment Qt.Horizontal or Qt.Vertical
+    type align - Qt.AlignmentFlags
     """
     def __init__(self, parent=None, align=Qt.Horizontal):
         super(DualProgressBar, self).__init__(parent)

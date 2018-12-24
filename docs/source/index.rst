@@ -8,6 +8,7 @@
    installation
    gettingstarted
    using
+   modules
 
 Indices and tables
 ==================

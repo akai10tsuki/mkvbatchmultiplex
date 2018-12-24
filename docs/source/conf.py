@@ -8,19 +8,24 @@
 
 # -- Path setup --------------------------------------------------------------
 
-import sys
-import os
-
-sys.path.append(os.path.abspath('../../'))
-sys.path.append(os.path.abspath('./source/'))
+#sys.path.append(os.path.abspath('../..'))
+#sys.path.append(os.path.abspath('../../mkvbatchmultiplex'))
+#sys.path.append(os.path.abspath('./source'))
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
+
+#sys.path.insert(0, os.path.abspath('../..'))
+#sys.path.insert(0, os.path.abspath('./source'))
+#sys.path.insert(0, os.path.abspath('../../mkvbatchmultiplex'))
+
+sys.path.append(os.path.abspath('../..'))
+sys.path.append(os.path.abspath('../../mkvbatchmultiplex'))
+sys.path.append(os.path.abspath('./source'))
 
 # pylint: skip-file
 
