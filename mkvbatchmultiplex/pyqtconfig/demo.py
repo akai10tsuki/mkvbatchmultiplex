@@ -1,7 +1,7 @@
 from .qt import *
 from pyqtconfig import ConfigManager
 
-    
+
 class MainWindow(QMainWindow):
 
     def __init__(self):
@@ -62,12 +62,16 @@ class MainWindow(QMainWindow):
     def show_config(self):
         self.current_config_output.setText(str(self.config.as_dict()))
 
-# Create a Qt application
-app = QApplication(sys.argv)
-app.setOrganizationName("PyQtConfig")
-app.setOrganizationDomain("martinfitzpatrick.name")
-app.setApplicationName("PyQtConfig")
+def main():
+    # Create a Qt application
+    app = QApplication(sys.argv)
+    app.setOrganizationName("PyQtConfig")
+    app.setOrganizationDomain("martinfitzpatrick.name")
+    app.setApplicationName("PyQtConfig")
 
-w = MainWindow()
-w.show()
-app.exec_()  # Enter Qt application main loop
+    w = MainWindow()
+    w.show()
+    app.exec_()  # Enter Qt application main loop
+
+if __name__ == '__main__':
+    main()

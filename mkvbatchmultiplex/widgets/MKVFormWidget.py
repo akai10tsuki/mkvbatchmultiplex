@@ -149,13 +149,13 @@ class MKVFormWidget(QWidget):
             "Paste copy of <b>mkvtoolnix-gui</b> Show command line"
         )
 
-        self.btnAddQueue = QPushButton(" Add to Job ")
+        self.btnAddQueue = QPushButton(" Add Job ")
         self.btnAddQueue.resize(self.btnAddQueue.sizeHint())
         self.btnAddQueue.clicked.connect(
             lambda: self.qthRunInThread(self.addQueue)
         )
         self.btnAddQueue.setToolTip(
-            "Add command to queue."
+            "Add command to job queue."
         )
 
         self.btnProcessQueue = QPushButton(" Process Jobs ")
@@ -163,7 +163,7 @@ class MKVFormWidget(QWidget):
         self.btnProcessQueue.clicked.connect(
             lambda: self.qthRunInThread(self.qthProcessCommand)
         )
-        self.btnProcessQueue.setToolTip("Execute batch commands on queue.")
+        self.btnProcessQueue.setToolTip("Execute commands on job queue.")
 
         self.btnPreProcess = QPushButton(" Pre-Process ")
         self.btnPreProcess.resize(self.btnPreProcess.sizeHint())

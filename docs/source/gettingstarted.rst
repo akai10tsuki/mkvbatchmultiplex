@@ -24,5 +24,7 @@ button:
 
 Now there are two options if there is only one source directory to work with
 press **<Process>** button.  To work with more than one source directory
-press **<Add Job>**.   **<Process>** intended to work immediately one
-job at a time.
+press **<Add Job>**.   **<Process>** intended to start working immediately on
+the job at a time.  Even though the jobs generally are very time consuming
+there is a very simple job queue system working **<Add Job>** adds to the
+queue when done press **<Process Jobs>**

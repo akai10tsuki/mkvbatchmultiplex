@@ -6,7 +6,12 @@ Subpackages
 
 .. toctree::
 
-    mkvbatchmultiplex.library
+    mkvbatchmultiplex.VS
+    mkvbatchmultiplex.jobs
+    mkvbatchmultiplex.loghandler
+    mkvbatchmultiplex.mediafileclasses
+    mkvbatchmultiplex.qththreads
+    mkvbatchmultiplex.widgets
 
 Submodules
 ----------
