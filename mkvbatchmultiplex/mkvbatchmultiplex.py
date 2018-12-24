@@ -76,11 +76,11 @@ from PyQt5.QtWidgets import (QAction, QApplication, QDesktopWidget,
                              QWidget)
 
 
-from .library.loghandler import QthLogRotateHandler
-from .library.widgets import (DualProgressBar, MKVFormWidget, MKVTabsWidget,
+from .loghandler import QthLogRotateHandler
+from .widgets import (DualProgressBar, MKVFormWidget, MKVTabsWidget,
                               MKVOutputWidget, MKVJobsTableWidget, SpacerWidget)
-from .library.pyqtconfig import ConfigManager
-from .library.jobs import JobQueue, JobStatus
+from .pyqtconfig import ConfigManager
+from .jobs import JobQueue, JobStatus
 
 
 class MKVMultiplexApp(QMainWindow):

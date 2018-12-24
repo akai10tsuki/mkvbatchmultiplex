@@ -1,4 +1,4 @@
-"""mkvbatchmultiplex"""
+"""mkvbatchmultiplex version info"""
 
 VERSION = (0, 5, '3a2', 'dev1')
 

@@ -1,5 +1,5 @@
 """
-logging handler
+rotating logging handler
 """
 
 import codecs

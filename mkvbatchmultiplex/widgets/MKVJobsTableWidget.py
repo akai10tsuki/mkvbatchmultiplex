@@ -21,7 +21,7 @@ from PyQt5.QtCore import QMutex, QMutexLocker, Qt, pyqtSlot, pyqtSignal
 from PyQt5.QtWidgets import (QVBoxLayout, QTableWidget, QMenu, QWidget,
                              QTableWidgetItem, QAbstractScrollArea)
 
-from mkvbatchmultiplex.library import JobStatus
+from mkvbatchmultiplex.jobs import JobStatus
 
 MUTEX = QMutex()
 MODULELOG = logging.getLogger(__name__)

@@ -18,10 +18,10 @@ from PyQt5.QtWidgets import (QApplication, QGridLayout, QGroupBox, QLabel,
                              QLineEdit, QMessageBox, QPushButton,
                              QWidget)
 
-import mkvbatchmultiplex.library.widgets.MKVUtil as MKVUtil
-import mkvbatchmultiplex.library.qththreads as threads
+import mkvbatchmultiplex.widgets.MKVUtil as MKVUtil
+import mkvbatchmultiplex.qththreads as threads
 
-from mkvbatchmultiplex.library import MKVCommand
+from mkvbatchmultiplex.mediafileclasses import MKVCommand
 from .MKVOutputWidget import MKVOutputWidget
 from .MKVJobsTableWidget import JobStatus
 
