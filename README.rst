@@ -77,6 +77,8 @@ If the the program generates interest any further changes and additions will
 depend on any user base needs.
 
 
+See https://mkvbatchmultiplex.readthedocs.io for more information.
+
 .. Hyperlinks.
 
 .. _pymediainfo: https://pypi.org/project/pymediainfo/
