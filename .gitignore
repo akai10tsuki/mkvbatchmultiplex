@@ -63,5 +63,5 @@ tests/NewFiles/
 .vscode/
 tmp/
 docs2/
-mkvbatchmultiplex.nsi
+mkvBatchMultiplex.nsi
 test.py
