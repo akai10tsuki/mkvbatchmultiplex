@@ -63,3 +63,7 @@ tests/NewFiles/
 .vscode/
 tmp/
 docs2/
+sources/
+mkvBatchMultiplex.nsi
+runApp.py
+test.py
