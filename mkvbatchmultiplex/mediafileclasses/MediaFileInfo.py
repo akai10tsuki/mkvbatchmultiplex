@@ -40,7 +40,10 @@ class MediaFileInfo(object):
 
     def _initHelper(self):
 
-        fileMediaInfo = MediaInfo.parse(self.fileName)
+        try:
+            fileMediaInfo = MediaInfo.parse(self.fileName)
+        except OSError:
+            raise OSError("MediaInfo not found.")
 
         for track in fileMediaInfo.tracks:
             if track.track_type == "General":

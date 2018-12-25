@@ -783,8 +783,18 @@ class MKVFormWidget(QWidget):
 
                     objCommand.setFiles(lstFiles)
 
-                    if MKVUtil.bVerifyStructure(workFiles.baseFiles, lstFiles, self.parent.log,
-                                                currentJob):
+                    bStructureOk = False
+
+                    try:
+                        bStructureOk = MKVUtil.bVerifyStructure(workFiles.baseFiles,
+                                                                lstFiles, self.parent.log,
+                                                                currentJob)
+                    except OSError as e:
+                        currentJob.outputMain.emit("\n\nMediaInfo not found.\n\n", {'color': Qt.red})
+                        self.jobs.status(currentJob.jobID, JobStatus.Error)
+                        return e
+
+                    if bStructureOk:
                         currentJob.outputJobMain(
                             currentJob.jobID,
                             "\n\nCommand:\n" \

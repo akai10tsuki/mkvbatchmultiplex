@@ -204,7 +204,7 @@ class MKVMultiplexApp(QMainWindow):
             self.configuration(save=True)
 
             if self.jobs.jobsAreRunning() > 0:
-                self.outputMainSignal.emit("\nJobs Running Aborting jobs\n\n", {'color': Qt.blue})
+                self.outputMainSignal.emit("\nJobs running aborting jobs...\n\n", {'color': Qt.blue})
                 self.ctrlQueue.put(JobStatus.Abort)
                 event.ignore()
 
