@@ -16,14 +16,14 @@ import os
 import sys
 from unittest.mock import MagicMock
 
-MOCK_MODULES = ['pyqt5', 'pymediainfo']
+MOCK_MODULES = ['pyqt5', 'pyqt5-sip', 'pymediainfo']
 
 class Mock(MagicMock):
     @classmethod
     def __getattr__(cls, name):
         return MagicMock()
 
-#sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 sys.path.insert(0, os.path.abspath('../../'))
 
