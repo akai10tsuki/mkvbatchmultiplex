@@ -10,7 +10,7 @@
    using
    LICENSE
    acknowledgements
-   modules
+   reference/modules
 
 Indices and tables
 ==================
