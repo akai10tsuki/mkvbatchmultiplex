@@ -36,8 +36,14 @@ class MKVOutputWidget(QTextEdit):
     def insertText(self, strText, kwargs):
         """
         Insert text in output window
-        Cannot use keyword argument **kwargs on emit calls,
-        use dictionary instead
+        Cannot use standard keyword argument kwargs
+        on emit calls, use dictionary instead
+
+        :param strText: text to insert on windows
+        :type strText: str
+        :param kwargs: dictionary for additional
+        commands for the insert operation
+        :type kwargs: dictionary
         """
 
         strTmp = ""

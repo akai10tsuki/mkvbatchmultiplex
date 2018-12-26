@@ -26,7 +26,7 @@ class MediaFileInfo(object):
     :param strMediaFile: name with fullpath of source file
     :type strMediaFile: str
     :param log: activate log
-    :type log: boolean
+    :type log: bool
     """
 
     def __init__(self, strMediaFile, log=False):

@@ -5,6 +5,7 @@
 
 from .mkvbatchmultiplex import mainApp
 
+"""
 from .VS.cipher import encrypt, decrypt
 from .VS.fileutil import findFile, findDir, pathToList, setFullPath, getFileList
 from .VS.vsdecorators import staticVars
@@ -26,3 +27,4 @@ from .widgets.MKVFormWidget import MKVFormWidget
 from .widgets.MKVTabsWidget import MKVTabsWidget
 from .widgets.MKVOutputWidget import MKVOutputWidget
 from .widgets.MKVJobsTableWidget import MKVJobsTableWidget
+"""

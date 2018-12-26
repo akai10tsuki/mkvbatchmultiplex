@@ -163,38 +163,40 @@ class DualProgressBar(QWidget):
                                                    acceptable alternative, so the widget can
                                                    never grow or shrink (e.g. the vertical
                                                    direction of a push button).
+
         QSizePolicy.Minimum            GrowFlag    The sizeHint() is minimal, and sufficient.
                                                    The widget can be expanded, but there is no
                                                    advantage to it being larger (e.g. the
                                                    horizontal direction of a push button). It
                                                    cannot be smaller than the size provided by
                                                    sizeHint().
+
         QSizePolicy.Maximum            ShrinkFlag  The sizeHint() is a maximum. The widget can
                                                    be shrunk any amount without detriment if
                                                    other widgets need the space (e.g. a separator
                                                    line). It cannot be larger than the size
                                                    provided by sizeHint().
-        QSizePolicy.Preferred          GrowFlag |
-                                       ShrinkFlag  The sizeHint() is best, but the widget can be
+
+        QSizePolicy.Preferred          GrowFlag |ShrinkFlag
+                                                   The sizeHint() is best, but the widget can be
                                                    shrunk and still be useful. The widget can be
                                                    expanded, but there is no advantage to it
                                                    being larger than sizeHint() (the default
                                                    QWidget policy).
-        QSizePolicy.Expanding          GrowFlag |
-                                       ShrinkFlag |
-                                       ExpandFlag  The sizeHint() is a sensible size, but the widget
+
+        QSizePolicy.Expanding          GrowFlag | ShrinkFlag | ExpandFlag
+                                                   The sizeHint() is a sensible size, but the widget
                                                    can be shrunk and still be useful. The widget can
                                                    make use of extra space, so it should get as much
                                                    space as possible (e.g. the horizontal direction
                                                    of a horizontal slider).
-        QSizePolicy.MinimumExpanding   GrowFlag |
-                                       ExpandFlag  The sizeHint() is minimal, and sufficient. The
+        QSizePolicy.MinimumExpanding   GrowFlag | ExpandFlag
+                                                   The sizeHint() is minimal, and sufficient. The
                                                    widget can make use of extra space, so it should
                                                    get as much pace as possible (e.g. the horizontal
                                                    direction of a horizontal slider).
-        QSizePolicy.Ignored            ShrinkFlag |
-                                       GrowFlag |
-                                       IgnoreFlag  The sizeHint() is ignored. The widget will get as
+        QSizePolicy.Ignored            ShrinkFlag | GrowFlag | IgnoreFlag
+                                                   The sizeHint() is ignored. The widget will get as
                                                    much space as possible.
 
         Method override is for documentation and use same name as parent also 'pass' did not

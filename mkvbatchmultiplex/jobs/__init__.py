@@ -30,7 +30,18 @@ class JobStatus: # pylint: disable=R0903
 
 
 class JobInfo: # pylint: disable=R0903
-    """Information related to a Job"""
+    """
+    Information related to a job
+
+    :param status: initial job status defaults to empty string
+    :type status: JobStatus
+    :param command: command to execute in job
+    :type command: str
+    :param errors: errors execution or invalidating command
+    :type errors: list
+    :param output: output produce while executing command
+    :type output: list
+    """
 
     def __init__(self, status="", command=None, errors=None, output=None):
 
@@ -41,7 +52,12 @@ class JobInfo: # pylint: disable=R0903
 
 
 class JobQueue(QObject): # pylint: disable=R0902
-    """Jobs class"""
+    """
+    Class to manage jobs
+
+    :param jobWorkQueue: set external queue for jobs
+    :type jobWorkQueue: collections.deque
+    """
 
     jobID = 1
     outputJobSignal = pyqtSignal(str, dict)
@@ -79,8 +95,11 @@ class JobQueue(QObject): # pylint: disable=R0902
 
     def jobsStatus(self, setStatus=None):
         """
-        Jobs queue status this is mantained
+        Set or get job status this is mantained
         by qthProcessCommand
+
+        :param setStatus: is value is sent set status to value
+        :type setStatus: JobStatus
         """
 
         if setStatus is None:
@@ -97,7 +116,11 @@ class JobQueue(QObject): # pylint: disable=R0902
                 self.status(key, JobStatus.Aborted)
 
     def jobsAreWaiting(self):
-        """check for waiting jobs"""
+        """
+        check for waiting jobs
+
+        :rtype: bool
+        """
 
         for _, value in self._jobs.items():
             if value.status == JobStatus.Waiting:
@@ -106,7 +129,11 @@ class JobQueue(QObject): # pylint: disable=R0902
         return False
 
     def jobsAreRunning(self):
-        """check for running jobs"""
+        """
+        check for running jobs
+
+        :rtype: bool
+        """
 
         for _, value in self._jobs.items():
             if value.status == JobStatus.Running:
@@ -115,7 +142,9 @@ class JobQueue(QObject): # pylint: disable=R0902
         return False
 
     def requeueWaiting(self):
-        """abort any pending jobs"""
+        """
+        add any Wainting jobs to the job queue
+        """
 
         for key, value in self._jobs.items():
             if value.status == JobStatus.Waiting:
@@ -123,13 +152,25 @@ class JobQueue(QObject): # pylint: disable=R0902
                     self._workQueue.append([key, value.command])
 
     def connectToStatus(self, objSignal):
-        """Connect to status slot"""
+        """
+        Connect signal to status slot
+        """
 
         objSignal.connect(self.status)
 
     @pyqtSlot(int, str, bool)
     def status(self, nID, strStatus=None, bUpdate=True):
-        """Return/Set job status"""
+        """
+        Set/Return job status
+
+        :param nID: job id
+        :type nID: int
+        :param strStatus: status to set if none return status
+        :type strStatus: JobStatus
+        :param bUpdate: update job table if True
+        :type bUpdate: bool
+        :rtype: JobStatus
+        """
 
         if strStatus is None:
             if nID in self._jobs:
@@ -147,7 +188,15 @@ class JobQueue(QObject): # pylint: disable=R0902
         return ""
 
     def append(self, command, status):
-        """Add Job to End Queue"""
+        """
+        Add Job to end queue return assigned job id
+
+        :param command: command to append
+        :type command: str
+        :param status: initial job status
+        :type status: JobStatus
+        :rtype: int
+        """
 
         with QMutexLocker(MUTEX):
 
@@ -165,8 +214,16 @@ class JobQueue(QObject): # pylint: disable=R0902
 
             return nID
 
-    def appendLeft(self, command, status=None):
-        """Add Job to Front of Queue"""
+    def appendLeft(self, command, status):
+        """
+        Add Job to front of queue
+
+        :param command: command to append
+        :type command: str
+        :param status: initial job status
+        :type status: JobStatus
+        :rtype: int
+        """
 
         with QMutexLocker(MUTEX):
 
@@ -185,7 +242,11 @@ class JobQueue(QObject): # pylint: disable=R0902
 
     # Deque is thread safe
     def pop(self):
-        """Retrieve element LIFO"""
+        """
+        Retrieve element LIFO [job id, command]
+
+        :rtype: list
+        """
 
         if self._workQueue:
             return self._workQueue.pop()
@@ -193,7 +254,11 @@ class JobQueue(QObject): # pylint: disable=R0902
         return [None, None]
 
     def popLeft(self):
-        """Retrieve element FIFO"""
+        """
+        Retrieve element FIFO [job id, command]
+
+        :rtype: list
+        """
 
         if self._workQueue:
             return self._workQueue.popleft()
@@ -201,7 +266,11 @@ class JobQueue(QObject): # pylint: disable=R0902
         return [None, None]
 
     def inQueue(self, command):
-        """Checks for command in queue"""
+        """
+        Checks for command in queue
+
+        :rtype: bool
+        """
 
         for job in self._workQueue:
             if command == job[1]:
@@ -209,10 +278,23 @@ class JobQueue(QObject): # pylint: disable=R0902
 
         return False
 
-    def setOutputSignal(self, outputJobSlot=None, outputErrorSlot=None,      # pylint: disable=R0913
+    def setOutputSignal(self, outputJobSlot=None, outputErrorSlot=None,
                         addJobToTableSlot=None, updateStatusSlot=None,
                         clearOutput=None):
-        """Setup output widget signals"""
+        """
+        Setup output widget signals
+
+        :param outputJobSlot: slot for job execution output
+        :type outputJobSlot: pyqtSlot
+        :param outputErrorSlot: slot for job execution errors
+        :type outputErrorSlot: pyqtSlot
+        :param addJobToTableSlot: slot for job table widget
+        :type addJobToTableSlot: pyqtSlot
+        :param updateStatusSlot: slot for job table status updates
+        :type updateStatusSlot: pyqtSlot
+        :param clearOutput: slot for clear output slot
+        :type clearOutput: pyqtSlot
+        """
 
         if outputJobSlot:
             outputJobSlot(self.outputJobSignal)
@@ -258,13 +340,27 @@ class JobQueue(QObject): # pylint: disable=R0902
                 self._jobs[jobID].errors.append([strMessage, dictAttributes])
 
     def makeConnection(self, objSignal):
-        """Connect to signals"""
+        """
+        Connect to signals showJobOutput slot
+
+        :param objSignal: signal to connect to
+        :type: pyqtSignal
+        """
 
         objSignal.connect(self.showJobOutput)
 
     @pyqtSlot(int, str, str)
     def showJobOutput(self, jobID, status, command): # pylint: disable=W0613
-        """Click jobsWidget Table Slot"""
+        """
+        Click jobsWidget Table job row to update job run output and job error output
+
+        :param jobID: job id
+        :type jobID: int
+        :param status: job status
+        :type status: JobStatus
+        :param command: command for job
+        :type command: str
+        """
 
         if jobID and (self.emitOutput or self.emitError):
 
