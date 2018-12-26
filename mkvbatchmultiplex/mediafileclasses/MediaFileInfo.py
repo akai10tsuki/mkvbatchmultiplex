@@ -19,6 +19,7 @@ class MediaFileInfo(object):
     Media file properties
     This class main function is to verify that the structure of the files
     is the same:
+
         Same order of tracks
         Same language if it applies
 
