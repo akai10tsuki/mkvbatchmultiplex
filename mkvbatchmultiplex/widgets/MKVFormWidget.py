@@ -12,7 +12,7 @@ import logging
 import platform
 import time
 
-from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal, pyqtSlot
 from PyQt5.QtGui import QValidator
 from PyQt5.QtWidgets import (QApplication, QGridLayout, QGroupBox, QLabel,
                              QLineEdit, QMessageBox, QPushButton,
@@ -104,9 +104,15 @@ class MKVFormWidget(QWidget):
         self._initControls()
         self._initLayout()
 
-        self.qth = threads.GenericThread(self.watchWaitingJobs)
-        self.qth.isRunning()
-        self.qth.start()
+        self.requestedClose = False
+        self.timer = QTimer()
+        self.timer.setInterval(2000)
+        self.timer.timeout.connect(self.watchJobs)
+        self.timer.start()
+
+        #self.qth = threads.GenericThread(self.watchJobs)
+        #self.qth.isRunning()
+        #self.qth.start()
 
         #self.qthRunInThread(self.whatEver)
 
@@ -269,20 +275,26 @@ class MKVFormWidget(QWidget):
         self.leCommand.setText(strCommand)
         self.leCommand.setCursorPosition(0)
 
-    def watchWaitingJobs(self):
+    def watchJobs(self):
         """
         Enable <Process Jobs> button when needed
         Hack until job queue is reworked
         """
 
-        while True:
-            if self.jobs.jobsAreWaiting():
-                tmpNum = self.threadpool.activeThreadCount()
+        #while True:
+        if self.jobs.jobsAreWaiting():
+            tmpNum = self.threadpool.activeThreadCount()
 
-                if tmpNum == 0:
-                    self.jobs.requeueWaiting()
-                    self.btnProcessQueue.setEnabled(True)
-            time.sleep(2)
+            if tmpNum == 0:
+                self.jobs.requeueWaiting()
+                self.btnProcessQueue.setEnabled(True)
+
+        js = self.jobs.jobsStatus()
+        print("Jobs Status = {}".format(js))
+        if js  == JobStatus.Aborted:
+            self.parent.close()
+
+        time.sleep(2)
 
     def qthRunInThread(self, function, *args, **kwargs):
         """
@@ -686,6 +698,7 @@ class MKVFormWidget(QWidget):
                 return "Queue empty"
 
             self.RUNNING = True  # pylint: disable=C0103
+            self.jobs.jobsStatus(JobStatus.Running)
 
         else:
             currentJob.outputMain.emit("\nProcessing Queue.\n", {'color': Qt.blue})
@@ -778,13 +791,31 @@ class MKVFormWidget(QWidget):
                                 self.jobs.status(currentJob.jobID, JobStatus.Aborted)
                                 self.jobs.clear()
                                 self.jobs.abortAll()
-                                result = JobStatus.Abort
-                                break
+                                self.jobs.jobsStatus(JobStatus.Aborted)
+                                self.RUNNING = False
+                                return JobStatus.Aborted
 
                     objCommand.setFiles(lstFiles)
 
-                    if MKVUtil.bVerifyStructure(workFiles.baseFiles, lstFiles, self.parent.log,
-                                                currentJob):
+                    bStructureOk = False
+
+                    try:
+                        bStructureOk = MKVUtil.bVerifyStructure(workFiles.baseFiles,
+                                                                lstFiles, self.parent.log,
+                                                                currentJob)
+                    except OSError as e:
+                        currentJob.outputMain.emit(
+                            "\n\nMediaInfo not found.\n\n",
+                            {'color': Qt.red}
+                        )
+                        # Error unable to continue
+                        self.jobs.status(currentJob.jobID, JobStatus.Error)
+                        self.jobs.clear()
+                        self.jobs.abortAll()
+                        self.jobs.jobsStatus(JobStatus.Error)
+                        return e
+
+                    if bStructureOk:
                         currentJob.outputJobMain(
                             currentJob.jobID,
                             "\n\nCommand:\n" \
@@ -824,5 +855,6 @@ class MKVFormWidget(QWidget):
                 self.jobs.status(currentJob.jobID, JobStatus.Error)
 
         self.RUNNING = False
+        self.jobs.jobsStatus(JobStatus.Done)
 
         return result

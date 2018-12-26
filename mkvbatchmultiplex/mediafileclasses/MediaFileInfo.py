@@ -19,6 +19,7 @@ class MediaFileInfo(object):
     Media file properties
     This class main function is to verify that the structure of the files
     is the same:
+
         Same order of tracks
         Same language if it applies
 
@@ -40,7 +41,10 @@ class MediaFileInfo(object):
 
     def _initHelper(self):
 
-        fileMediaInfo = MediaInfo.parse(self.fileName)
+        try:
+            fileMediaInfo = MediaInfo.parse(self.fileName)
+        except OSError:
+            raise OSError("MediaInfo not found.")
 
         for track in fileMediaInfo.tracks:
             if track.track_type == "General":

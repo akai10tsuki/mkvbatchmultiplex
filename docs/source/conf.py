@@ -19,9 +19,9 @@ import sys
 #sys.path.insert(0, os.path.abspath('./source'))
 #sys.path.insert(0, os.path.abspath('../../mkvbatchmultiplex'))
 
-sys.path.append(os.path.abspath('../..'))
-sys.path.append(os.path.abspath('../../mkvbatchmultiplex'))
-sys.path.append(os.path.abspath('./source'))
+sys.path.insert(0, os.path.abspath('../..'))
+#sys.path.insert(0, os.path.abspath('../../mkvbatchmultiplex'))
+#sys.path.insert(0, os.path.abspath('./source'))
 
 html_show_sourcelink=False
 

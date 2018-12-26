@@ -59,6 +59,7 @@ class JobQueue(QObject): # pylint: disable=R0902
 
         self._status = {}
         self._jobs = {}
+        self._jobsStatus = None
         self.clearOutput = None
         self.emitError = False
         self.emitOutput = False
@@ -75,6 +76,18 @@ class JobQueue(QObject): # pylint: disable=R0902
         """Clear the job queue"""
 
         self._workQueue.clear()
+
+    def jobsStatus(self, setStatus=None):
+        """
+        Jobs queue status this is mantained
+        by qthProcessCommand
+        """
+
+        if setStatus is None:
+            return self._jobsStatus
+
+        self._jobsStatus = setStatus
+
 
     def abortAll(self):
         """abort any pending jobs"""

@@ -179,39 +179,47 @@ class MKVMultiplexApp(QMainWindow):
         """
 
         self.formWidget.teOutputWindow.makeConnection(self.outputMainSignal)
+        jobsStatus = self.jobs.jobsStatus()
 
-        tmpNum = self.threadpool.activeThreadCount()
+        if jobsStatus == JobStatus.Aborted:
 
-        if tmpNum > 0:
-
-            result = QMessageBox.question(
-                self,
-                "Confirm Abort...",
-                "Jobs running are you sure you want to stop them ?",
-                QMessageBox.Yes | QMessageBox.No
-            )
+            event.accept()
 
         else:
 
-            result = QMessageBox.question(
-                self,
-                "Confirm Exit...",
-                "Are you sure you want to exit ?",
-                QMessageBox.Yes | QMessageBox.No
-            )
+            if jobsStatus == JobStatus.Running:
 
-        if result == QMessageBox.Yes:
-            self.configuration(save=True)
-
-            if self.jobs.jobsAreRunning() > 0:
-                self.outputMainSignal.emit("\nJobs Running Aborting jobs\n\n", {'color': Qt.blue})
-                self.ctrlQueue.put(JobStatus.Abort)
-                event.ignore()
+                result = QMessageBox.warning(
+                    self,
+                    "Confirm Abort...",
+                    "Jobs running are you sure you want to stop them?",
+                    QMessageBox.Yes | QMessageBox.No
+                )
 
             else:
-                event.accept()
-        else:
-            event.ignore()
+
+                result = QMessageBox.question(
+                    self,
+                    "Confirm Exit...",
+                    "Are you sure you want to exit?",
+                    QMessageBox.Yes | QMessageBox.No
+                )
+
+            if result == QMessageBox.Yes:
+                self.configuration(save=True)
+
+                if jobsStatus == JobStatus.Running:
+                    self.outputMainSignal.emit(
+                        "\nJobs running aborting jobs...\n\n",
+                        {'color': Qt.blue}
+                    )
+                    self.ctrlQueue.put(JobStatus.Abort)
+                    event.ignore()
+
+                else:
+                    event.accept()
+            else:
+                event.ignore()
 
     def enableLogging(self, state):
         """Activate logging"""
