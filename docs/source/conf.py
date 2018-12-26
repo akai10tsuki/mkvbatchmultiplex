@@ -15,13 +15,9 @@
 import os
 import sys
 
-#sys.path.insert(0, os.path.abspath('../..'))
-#sys.path.insert(0, os.path.abspath('./source'))
-#sys.path.insert(0, os.path.abspath('../../mkvbatchmultiplex'))
-
 sys.path.insert(0, os.path.abspath('../..'))
-#sys.path.insert(0, os.path.abspath('../../mkvbatchmultiplex'))
-#sys.path.insert(0, os.path.abspath('./source'))
+
+print("\n\nWhat path is been used for module search - {}\n".format(sys.path))
 
 html_show_sourcelink=False
 
@@ -89,7 +85,8 @@ pygments_style = 'sphinx'
 # a list of builtin themes.
 #
 #html_theme = 'alabaster'
-html_theme = 'sphinx_rtd_theme'
+#html_theme = 'sphinx_rtd_theme'
+html_theme = 'default'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
