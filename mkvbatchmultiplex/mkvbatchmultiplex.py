@@ -30,7 +30,7 @@ import logging
 import logging.handlers
 import sys
 import os
-import xml.etree.ElementTree as et
+import xml.etree.ElementTree as ET
 from pathlib import Path
 from queue import Queue
 from collections import deque
@@ -45,8 +45,8 @@ from PyQt5.QtWidgets import (QAction, QApplication, QDesktopWidget,
 from .loghandler import QthLogRotateHandler
 from .widgets import (DualProgressBar, MKVFormWidget, MKVTabsWidget,
                       MKVOutputWidget, MKVJobsTableWidget, SpacerWidget)
-from .pyqtconfig import ConfigManager
 from .jobs import JobQueue, JobStatus
+from .configurationsettings import ConfigurationSettings
 
 
 class MKVMultiplexApp(QMainWindow):
@@ -67,7 +67,7 @@ class MKVMultiplexApp(QMainWindow):
         self.ctrlQueue = Queue()
         self.threadpool = QThreadPool()
         self.jobs = JobQueue(self.workQueue)
-        self.config = ConfigManager()
+        self.config = ConfigurationSettings()
 
         self._initMenu()
         self._initHelper()
@@ -265,18 +265,18 @@ class MKVMultiplexApp(QMainWindow):
                 'font', font.toString()
             )
 
-            root = et.Element("VergaraSoft")
-            root = self.config.getXMLConfig(root)
-            tree = et.ElementTree(root)
-            tree.write(xmlFile)
+            root = ET.Element("VergaraSoft")
+            root = self.config.toXML(root)
+            tree = ET.ElementTree(root)
+            #tree.write(xmlFile)
 
         else:
 
             if configFile.is_file():
 
-                tree = et.ElementTree(file=xmlFile)
+                tree = ET.ElementTree(file=xmlFile)
                 root = tree.getroot()
-                self.config.setXMLConfig(root)
+                self.config.fromXML(root)
 
             else:
 

@@ -9,6 +9,7 @@ CM0001
 """
 
 import logging
+import xml
 import xml.etree.ElementTree as ET
 import xml.dom.minidom as DOM
 
@@ -77,34 +78,38 @@ class ConfigurationSettings:
 
         return self._config[key]
 
-    def toXML(self):
+    def toXML(self, root=None):
         """
         Returns the configuration in XML format
 
         :rtype: xml.etree.ElementTree.Element
         """
 
-        root = ET.Element("VergaraSoft")
         config = ET.Element("Config")
-        root.append(config)
+
+        if root is not None:
+            root.append(config)
 
         for key, value in self:
             configElement = ET.SubElement(config, "ConfigSetting")
             configElement.attrib = {"id": key, "type": type(value).__name__}
             configElement.text = str(value)
 
+        if root is None:
+            return config
+
         return root
 
-    def fromXML(self, xml):
+    def fromXML(self, xmlDoc):
         """
         Restore configuration from xml
 
-        :param xml: xml document containing configuration data
+        :param xmlDoc: xml document containing configuration data
         """
 
         self._config = {}
 
-        for setting in xml.findall('./Config/ConfigSetting'):
+        for setting in xmlDoc.findall('./Config/ConfigSetting'):
             key = setting.attrib["id"]
 
             if setting.attrib["type"] == "bool":
@@ -115,21 +120,28 @@ class ConfigurationSettings:
             self.set(key, value)
 
 
-    def xmlPrettyPrint(self):
+    def xmlPrettyPrint(self, root=None):
         """
         Returns configuration xml Pretty Printed
 
         :rtype: xml.dom.minidom
         """
 
-        xml = DOM.parseString(ET.tostring(self.toXML()))
+        if root is not None:
+            if not isinstance(root, xml.etree.ElementTree.Element):
+                return None
+        else:
+            root = self.toXML()
 
-        xmlPretty = xml.toprettyxml(indent="    ")
+        xmlDoc = DOM.parseString(ET.tostring(root))
+
+        xmlPretty = xmlDoc.toprettyxml(indent="    ")
 
         return xmlPretty
 
 def main():
     """Testing ead and write configuration to file"""
+
     configFile = Path(Path.cwd(), "configmanager.xml")
     xmlFile = str(configFile)
 
@@ -143,7 +155,8 @@ def main():
 
     print("\n\n")
 
-    xmlConfig = configuration.toXML()
+    root = ET.Element("VergaraSoft")
+    xmlConfig = configuration.toXML(root)
     tree = ET.ElementTree(xmlConfig)
     tree.write(xmlFile)
 
@@ -153,6 +166,10 @@ def main():
 
     for key, value in configuration:
         print("Key = {}, value = {}".format(key, value))
+
+    prettyXML = configuration.xmlPrettyPrint()
+
+    print(prettyXML)
 
 if __name__ == '__main__':
     main()
