@@ -5,6 +5,7 @@ import io
 import os
 
 from setuptools import setup, find_packages
+import mkvbatchmultiplex.__version__ as __version__
 
 DESCRIPTION = 'A mkv media batch multiplex.'
 KEYWORDS = 'mkv multimedia video'
@@ -21,6 +22,8 @@ ROOT = os.path.abspath(os.path.dirname(__file__))
 
 
 def readme():
+    """get README.rst"""
+
     try:
         with io.open(os.path.join(ROOT, 'README.rst'), encoding='utf-8') as f:
             long_description = '\n\n' + f.read()
@@ -28,23 +31,10 @@ def readme():
         long_description = DESCRIPTION
     return long_description
 
-def version():
-    """Load the package's __version__.py module as a dictionary."""
-
-    about = {}
-
-    if VERSION is None:
-        with io.open(os.path.join(ROOT, NAME, '__version__.py')) as f:
-            exec(f.read(), about)
-    else:
-        about['__version__'] = VERSION
-
-    return about['__version__']
-
 setup(
 
     name=NAME,  # Required
-    version=version(),  # Required
+    version=__version__.VERSION,  # Required
     description=DESCRIPTION,  # Required
     long_description=readme(),  # Optional
     author='Efrain Vergara',  # Optional

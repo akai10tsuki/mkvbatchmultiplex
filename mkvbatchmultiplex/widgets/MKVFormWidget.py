@@ -717,6 +717,25 @@ class MKVFormWidget(QWidget):
 
             currentJob.jobID, currentJob.command = self.jobs.popLeft()
 
+            status = self.jobs.status(currentJob.jobID)
+
+            if status != JobStatus.Waiting:
+                currentJob.outputMain.emit(
+                    "\n\nJob - {0} with {1} status skipping.".format(str(currentJob.jobID), status),
+                    {'color': Qt.blue}
+                )
+
+                currentJob.outputJobMain(
+                    currentJob.jobID,
+                    "\n\n**********\nSkip requested on Command:\n" \
+                    + "Job " + str(currentJob.jobID) + " - " \
+                    + currentJob.command \
+                    + "\n**********\n\n",
+                    {'color': Qt.blue}
+                )
+                continue
+
+
             if currentJob.command:
                 objCommand = MKVCommand(currentJob.command)
                 self.jobs.status(currentJob.jobID, JobStatus.Running)

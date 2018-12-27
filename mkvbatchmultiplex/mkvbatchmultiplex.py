@@ -42,6 +42,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QDesktopWidget,
                              QWidget, QFontDialog)
 
 
+import mkvbatchmultiplex.__version__ as __version__
 from .loghandler import QthLogRotateHandler
 from .widgets import (DualProgressBar, MKVFormWidget, MKVTabsWidget,
                       MKVOutputWidget, MKVJobsTableWidget, SpacerWidget)
@@ -141,13 +142,15 @@ class MKVMultiplexApp(QMainWindow):
         self.actEnableLogging.setStatusTip(
             "Enable session logging in ~/.mkvBatchMultiplex/mkvBatchMultiplex.log"
         )
+        """
         self.actEnableLogging.triggered.connect(self.enableLogging)
         self.actSelectFont = QAction("Font")
         self.actSelectFont.triggered.connect(self.selectFont)
+        """
 
         settingsMenu = menuBar.addMenu("&Settings")
         settingsMenu.addAction(self.actEnableLogging)
-        settingsMenu.addAction(self.actSelectFont)
+        #settingsMenu.addAction(self.actSelectFont)
 
         # Read configuration elements
         self.configuration()
@@ -268,7 +271,7 @@ class MKVMultiplexApp(QMainWindow):
             root = ET.Element("VergaraSoft")
             root = self.config.toXML(root)
             tree = ET.ElementTree(root)
-            #tree.write(xmlFile)
+            tree.write(xmlFile)
 
         else:
 
@@ -331,6 +334,8 @@ def mainApp():
     setupLogging()
 
     logging.info("App Start.")
+    logging.info("Python: %s", sys.version)
+    logging.info("mkvbatchmultiplex-%s", __version__.VERSION)
     app = QApplication(sys.argv)
     win = MKVMultiplexApp()
     win.show()

@@ -81,6 +81,7 @@ class ConfigurationSettings:
     def toXML(self, root=None):
         """
         Returns the configuration in XML format
+        if root is None returns the current configuration
 
         :rtype: xml.etree.ElementTree.Element
         """
