@@ -290,11 +290,11 @@ class MKVFormWidget(QWidget):
                 self.btnProcessQueue.setEnabled(True)
 
         js = self.jobs.jobsStatus()
-        print("Jobs Status = {}".format(js))
+
         if js  == JobStatus.Aborted:
             self.parent.close()
 
-        time.sleep(2)
+        #time.sleep(2)
 
     def qthRunInThread(self, function, *args, **kwargs):
         """

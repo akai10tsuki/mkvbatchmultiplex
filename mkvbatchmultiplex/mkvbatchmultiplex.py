@@ -36,10 +36,10 @@ from queue import Queue
 from collections import deque
 
 from PyQt5.QtCore import QByteArray, Qt, QThreadPool, pyqtSignal
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtWidgets import (QAction, QApplication, QDesktopWidget,
                              QMainWindow, QMessageBox, QToolBar, QVBoxLayout,
-                             QWidget)
+                             QWidget, QFontDialog)
 
 
 from .loghandler import QthLogRotateHandler
@@ -142,9 +142,12 @@ class MKVMultiplexApp(QMainWindow):
             "Enable session logging in ~/.mkvBatchMultiplex/mkvBatchMultiplex.log"
         )
         self.actEnableLogging.triggered.connect(self.enableLogging)
+        self.actSelectFont = QAction("Font")
+        self.actSelectFont.triggered.connect(self.selectFont)
 
         settingsMenu = menuBar.addMenu("&Settings")
         settingsMenu.addAction(self.actEnableLogging)
+        settingsMenu.addAction(self.actSelectFont)
 
         # Read configuration elements
         self.configuration()
@@ -230,6 +233,16 @@ class MKVMultiplexApp(QMainWindow):
             self.log = False
             logging.info("Stop logging.")
 
+    def selectFont(self):
+        """Select Font"""
+
+        fontDialog = QFontDialog(self)
+
+        font, valid = fontDialog.getFont()
+
+        if valid:
+            self.setFont(font)
+
     def configuration(self, save=False):
         """Read and write configuration"""
         configFile = Path(Path.home(), ".mkvBatchMultiplex/config.xml")
@@ -244,6 +257,12 @@ class MKVMultiplexApp(QMainWindow):
             byteGeometry = base64.b64encode(self.saveGeometry())
             self.config.set(
                 'geometry', byteGeometry.decode()
+            )
+
+            font = self.font()
+
+            self.config.set(
+                'font', font.toString()
             )
 
             root = et.Element("VergaraSoft")
@@ -267,7 +286,8 @@ class MKVMultiplexApp(QMainWindow):
         """Restore configuration if any"""
 
         bLogging = self.config.get('logging')
-        if bLogging:
+
+        if bLogging is not None:
             self.actEnableLogging.setChecked(bLogging)
             self.enableLogging(bLogging)
 
