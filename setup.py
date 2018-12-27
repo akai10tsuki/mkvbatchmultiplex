@@ -5,7 +5,7 @@ import io
 import os
 
 from setuptools import setup, find_packages
-import mkvbatchmultiplex.__version__ as __version__
+#import mkvbatchmultiplex.__version__ as __version__
 
 DESCRIPTION = 'A mkv media batch multiplex.'
 KEYWORDS = 'mkv multimedia video'
@@ -34,7 +34,8 @@ def readme():
 setup(
 
     name=NAME,  # Required
-    version=__version__.VERSION,  # Required
+    #version=__version__.VERSION,  # Required
+    version='0.5.3.a2.dev2',
     description=DESCRIPTION,  # Required
     long_description=readme(),  # Optional
     author='Efrain Vergara',  # Optional
