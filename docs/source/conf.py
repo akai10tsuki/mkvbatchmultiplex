@@ -40,6 +40,25 @@ def findFile(element, dirPath=None):
         dirPath = os.getenv('PATH')
     return _find(element, dirPath)
 
+def pathToList(pathVar):
+    """Convert a path variable to a list"""
+
+    pathList = []
+    bFound = False
+
+    paths = pathVar.split(os.pathsep)
+
+    for path in paths:
+        if os.path.isdir(path):
+            pathList.append(path)
+            if not bFound:
+                bFound = True
+
+    if bFound:
+        return pathList
+    else:
+        return None
+
 class Mock(MagicMock):
     @classmethod
     def __getattr__(cls, name):
