@@ -33,7 +33,6 @@ class Mock(MagicMock):
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 sys.path.insert(0, os.path.abspath('../..'))
 
-
 def _find(element, dirPath, matchFunc=os.path.isfile):
     if isinstance(dirPath, str):
         lstPath = pathToList(dirPath)
@@ -74,7 +73,7 @@ print("\n\nWhat path is been used for module search - {}\n".format(sys.path))
 
 html_show_sourcelink=False
 
-fn = findFile('__verify__.py', sys.path)
+fn = findFile('mkvbatchmultiplex/__verify__.py', sys.path)
 
 if fn is not None:
     print("Found {}".format(fn))
