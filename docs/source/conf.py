@@ -35,7 +35,10 @@ sys.path.insert(0, os.path.abspath('../..'))
 
 
 def _find(element, dirPath, matchFunc=os.path.isfile):
-    lstPath = pathToList(dirPath)
+    if isinstance(dirPath, str):
+        lstPath = pathToList(dirPath)
+    else:
+        lstPath = dirPath
     for dirname in lstPath:
         candidate = os.path.join(dirname, element)
         if matchFunc(candidate):
