@@ -79,7 +79,7 @@ setup(
         'PyQt5>=5.10.1'
     ],
 
-    python_requires='>=3.6, <4',
+    python_requires='>=3.5, <4',
 
     include_package_data=True,
 
