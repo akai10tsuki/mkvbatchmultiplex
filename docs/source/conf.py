@@ -27,7 +27,7 @@ import sys
 #sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 sys.path.insert(0, os.path.abspath('../..'))
 
-import mkvbatchmultiplex.__version__ as __version__
+#import mkvbatchmultiplex.__version__ as __version__
 
 html_show_sourcelink=False
 
