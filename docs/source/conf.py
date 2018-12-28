@@ -15,65 +15,21 @@
 import os
 import sys
 
+#from unittest.mock import MagicMock
 
-from unittest.mock import MagicMock
+#MOCK_MODULES = ['PyQt5', 'PyQt5.QtCore', 'PyQt5.QtGui', 'PyQt5.QtWidgets', 'PyQt5.sip', 'pymediainfo']
 
-MOCK_MODULES = ['PyQt5', 'PyQt5.QtCore', 'PyQt5.QtGui', 'PyQt5.QtWidgets', 'PyQt5.sip', 'pymediainfo']
+#class Mock(MagicMock):
+#    @classmethod
+#    def __getattr__(cls, name):
+#        return MagicMock()
 
-class Mock(MagicMock):
-    @classmethod
-    def __getattr__(cls, name):
-        return MagicMock()
-
-sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+#sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 sys.path.insert(0, os.path.abspath('../..'))
 
-def _find(element, dirPath, matchFunc=os.path.isfile):
-    if isinstance(dirPath, str):
-        lstPath = pathToList(dirPath)
-    else:
-        lstPath = dirPath
-    for dirname in lstPath:
-        candidate = os.path.join(dirname, element)
-        if matchFunc(candidate):
-            return candidate
-    return None
-
-def findFile(element, dirPath=None):
-    """Find file in path specified or system PATH"""
-    if dirPath is None:
-        dirPath = os.getenv('PATH')
-    return _find(element, dirPath)
-
-def pathToList(pathVar):
-    """Convert a path variable to a list"""
-
-    pathList = []
-    bFound = False
-
-    paths = pathVar.split(os.pathsep)
-
-    for path in paths:
-        if os.path.isdir(path):
-            pathList.append(path)
-            if not bFound:
-                bFound = True
-
-    if bFound:
-        return pathList
-    else:
-        return None
-
-print("\n\nWhat path is been used for module search - {}\n".format(sys.path))
+import mkvbatchmultiplex.__version__ as __version__
 
 html_show_sourcelink=False
-
-fn = findFile('mkvbatchmultiplex/__version__.py', sys.path)
-
-print(__file__)
-
-if fn is not None:
-    print("Found {}".format(fn))
 
 # pylint: skip-file
 
@@ -86,7 +42,7 @@ author = 'Efrain Vergara'
 # The short X.Y version
 version = '0.5.3'
 # The full version, including alpha/beta/rc tags
-release = '0.5.3a2.dev2'
+release = '0.5.3a2.dev3'
 
 
 # -- General configuration ---------------------------------------------------

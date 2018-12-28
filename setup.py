@@ -1,11 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-"""Setup.py for mkvbatchmultiplex"""
 
+"""setup file to build python distributions"""
+
+
 import io
 import os
+import sys
 
 from setuptools import setup, find_packages
-#import mkvbatchmultiplex.__version__ as __version__
+
+sys.path.insert(0, os.path.abspath('.'))
+import mkvbatchmultiplex.__version__ as __version__
+
 
 DESCRIPTION = 'A mkv media batch multiplex.'
 KEYWORDS = 'mkv multimedia video'
@@ -14,19 +21,16 @@ REQUIRED = [
     'pymediainfo>=2.2.1',
     'PyQt5>=5.10.1'
 ]
-URL='https://github.com/akai10tsuki/mkvbatchmultiplex'
+URL = 'https://github.com/akai10tsuki/mkvbatchmultiplex'
 VERSION = None
-
-
 ROOT = os.path.abspath(os.path.dirname(__file__))
-
 
 def readme():
     """get README.rst"""
 
     try:
         with io.open(os.path.join(ROOT, 'README.rst'), encoding='utf-8') as f:
-            long_description = '\n\n' + f.read()
+            long_description = '\n' + f.read()
     except FileNotFoundError:
         long_description = DESCRIPTION
     return long_description
@@ -34,8 +38,8 @@ def readme():
 setup(
 
     name=NAME,  # Required
-    #version=__version__.VERSION,  # Required
-    version='0.5.3.a2.dev3',
+    version=__version__.VERSION,  # Required
+    #version='0.5.3.a2.dev3',
     description=DESCRIPTION,  # Required
     long_description=readme(),  # Optional
     author='Efrain Vergara',  # Optional

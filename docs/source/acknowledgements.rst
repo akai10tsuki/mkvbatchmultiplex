@@ -4,9 +4,6 @@ Acknowledgements
 
     * Martin Fitzpatrick
 
-        - PyQtConfig for saving configuration and
-          state of window did some modifications
-          to work on Windows but are not extensive
         - Tutorial for the multithreading code
 
     * Yusuke Kamiyamane
