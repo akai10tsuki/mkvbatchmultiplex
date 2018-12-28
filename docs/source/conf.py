@@ -14,12 +14,7 @@
 #
 import os
 import sys
-import PyQt5
-import PyQt5.QtCore
-import PyQt5.QtGui
-import PyQt5.QtWidgets
-import PyQt5.sip
-import pymediainfo
+
 
 from unittest.mock import MagicMock
 
