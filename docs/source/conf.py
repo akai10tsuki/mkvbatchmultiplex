@@ -15,12 +15,15 @@
 import os
 import sys
 import PyQt5
+import PyQt5.QtCore
+import PyQt5.QtGui
+import PyQt5.QtWidgets
 import PyQt5.sip
 import pymediainfo
 
 from unittest.mock import MagicMock
 
-MOCK_MODULES = ['PyQt5', 'PyQt5.sip', 'pymediainfo']
+MOCK_MODULES = ['PyQt5', 'PyQt5.QtCore', 'PyQt5.QtGui', 'PyQt5.QtWidgets', 'PyQt5.sip', 'pymediainfo']
 
 class Mock(MagicMock):
     @classmethod
