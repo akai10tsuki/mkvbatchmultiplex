@@ -73,7 +73,9 @@ print("\n\nWhat path is been used for module search - {}\n".format(sys.path))
 
 html_show_sourcelink=False
 
-fn = findFile('mkvbatchmultiplex/__verify__.py', sys.path)
+fn = findFile('mkvbatchmultiplex/__version__.py', sys.path)
+
+print(__file__)
 
 if fn is not None:
     print("Found {}".format(fn))
