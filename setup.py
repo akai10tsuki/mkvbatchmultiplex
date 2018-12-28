@@ -35,7 +35,7 @@ setup(
 
     name=NAME,  # Required
     #version=__version__.VERSION,  # Required
-    version='0.5.3.a2.dev2',
+    version='0.5.3.a2.dev3',
     description=DESCRIPTION,  # Required
     long_description=readme(),  # Optional
     author='Efrain Vergara',  # Optional
