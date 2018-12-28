@@ -25,6 +25,14 @@ from unittest.mock import MagicMock
 
 MOCK_MODULES = ['PyQt5', 'PyQt5.QtCore', 'PyQt5.QtGui', 'PyQt5.QtWidgets', 'PyQt5.sip', 'pymediainfo']
 
+class Mock(MagicMock):
+    @classmethod
+    def __getattr__(cls, name):
+        return MagicMock()
+
+sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+sys.path.insert(0, os.path.abspath('../..'))
+
 
 def _find(element, dirPath, matchFunc=os.path.isfile):
     lstPath = pathToList(dirPath)
@@ -58,15 +66,6 @@ def pathToList(pathVar):
         return pathList
     else:
         return None
-
-class Mock(MagicMock):
-    @classmethod
-    def __getattr__(cls, name):
-        return MagicMock()
-
-sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
-
-sys.path.insert(0, os.path.abspath('../..'))
 
 print("\n\nWhat path is been used for module search - {}\n".format(sys.path))
 
