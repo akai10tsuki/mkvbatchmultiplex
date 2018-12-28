@@ -25,6 +25,21 @@ from unittest.mock import MagicMock
 
 MOCK_MODULES = ['PyQt5', 'PyQt5.QtCore', 'PyQt5.QtGui', 'PyQt5.QtWidgets', 'PyQt5.sip', 'pymediainfo']
 
+
+def _find(element, dirPath, matchFunc=os.path.isfile):
+    lstPath = pathToList(dirPath)
+    for dirname in lstPath:
+        candidate = os.path.join(dirname, element)
+        if matchFunc(candidate):
+            return candidate
+    return None
+
+def findFile(element, dirPath=None):
+    """Find file in path specified or system PATH"""
+    if dirPath is None:
+        dirPath = os.getenv('PATH')
+    return _find(element, dirPath)
+
 class Mock(MagicMock):
     @classmethod
     def __getattr__(cls, name):
@@ -37,6 +52,11 @@ sys.path.insert(0, os.path.abspath('../..'))
 print("\n\nWhat path is been used for module search - {}\n".format(sys.path))
 
 html_show_sourcelink=False
+
+fn = findFile('__verify__.py', sys.path)
+
+if fn is not None:
+    print("Found {}".format(fn))
 
 # pylint: skip-file
 
