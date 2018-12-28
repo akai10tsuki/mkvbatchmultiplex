@@ -5,6 +5,7 @@ rotating logging handler
 import codecs
 import logging
 import re
+import sys
 from pathlib import Path
 
 from PyQt5.QtCore import QMutex, QMutexLocker
@@ -75,7 +76,14 @@ class QthLogRotateHandler(logging.Handler):
         Write record entry to log file
         use QMutexLocker to make it thread safe
         """
+
+        # Python 3.5 open not compatible with pathlib
+        if sys.version_info[:2] == (3, 5):
+            f = str(self.logFile)
+        else:
+            f = self.logFile
+
         with QMutexLocker(self.mutex):
-            with codecs.open(self.logFile, "a", encoding="utf-8") as file:
+            with codecs.open(f, "a", encoding="utf-8") as file:
                 logEntry = self.format(record)
                 file.write(logEntry + "\n")
