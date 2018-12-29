@@ -10,7 +10,7 @@ LOG FW025
 
 import logging
 import platform
-import time
+#import time
 
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal, pyqtSlot
 from PyQt5.QtGui import QValidator
@@ -171,14 +171,14 @@ class MKVFormWidget(QWidget):
         )
         self.btnProcessQueue.setToolTip("Execute commands on job queue.")
 
-        self.btnPreProcess = QPushButton(" Pre-Process ")
-        self.btnPreProcess.resize(self.btnPreProcess.sizeHint())
-        self.btnPreProcess.clicked.connect(
-            lambda: self.qthRunInThread(self.qthPreProcess)
-        )
-        self.btnPreProcess.setToolTip(
-            "Process the command line to check for errors."
-        )
+        #self.btnPreProcess = QPushButton(" Pre-Process ")
+        #self.btnPreProcess.resize(self.btnPreProcess.sizeHint())
+        #self.btnPreProcess.clicked.connect(
+        #    lambda: self.qthRunInThread(self.qthPreProcess)
+        #)
+        #self.btnPreProcess.setToolTip(
+        #    "Process the command line to check for errors."
+        #)
 
         self.btnProcess = QPushButton(" Process ")
         self.btnProcess.resize(self.btnProcess.sizeHint())
@@ -238,7 +238,7 @@ class MKVFormWidget(QWidget):
         self.btnGrid = QGridLayout()
 
         self.btnGrid.addWidget(self.btnPasteClipboard, 0, 0)
-        self.btnGrid.addWidget(self.btnPreProcess, 1, 0)
+        #self.btnGrid.addWidget(self.btnPreProcess, 1, 0)
         self.btnGrid.addWidget(self.btnProcess, 1, 1)
         self.btnGrid.addWidget(self.btnAddQueue, 2, 0)
         self.btnGrid.addWidget(self.btnProcessQueue, 2, 1)
@@ -291,7 +291,7 @@ class MKVFormWidget(QWidget):
 
         js = self.jobs.jobsStatus()
 
-        if js  == JobStatus.Aborted:
+        if js == JobStatus.Aborted:
             self.parent.close()
 
         #time.sleep(2)
@@ -322,7 +322,7 @@ class MKVFormWidget(QWidget):
         """Change button state"""
 
         if bState is not None:
-            self.btnPreProcess.setEnabled(bState)
+            #self.btnPreProcess.setEnabled(bState)
             self.btnCheckFiles.setEnabled(bState)
             self.btnShowSourceFiles.setEnabled(bState)
             self.btnShowCommands.setEnabled(bState)
@@ -369,30 +369,25 @@ class MKVFormWidget(QWidget):
             bTest = MKVCommand.bLooksOk(inputStr)
 
             if bTest:
-                self.parent.btnPreProcess.setEnabled(True)
+                #self.parent.btnPreProcess.setEnabled(True)
+                self.parent.objCommand.command = inputStr
+                self.parent.btnShowSourceFiles.setEnabled(True)
+                self.parent.btnShowCommands.setEnabled(True)
+                self.parent.btnCheckFiles.setEnabled(True)
                 self.parent.btnProcess.setEnabled(True)
                 self.parent.btnAddQueue.setEnabled(True)
-                if self.parent.jobs:
-                    tmpNum = self.parent.threadpool.activeThreadCount()
-
-                    if tmpNum == 0:
-                        self.parent.btnProcessQueue.setEnabled(True)
-                else:
-                    self.parent.btnProcessQueue.setEnabled(False)
                 self.parent.btnReset.setEnabled(True)
+
                 if self.parent.parent.log:
                     MODULELOG.debug("FW002: Ok: [%s]", inputStr)
             else:
-                self.parent.btnPreProcess.setEnabled(False)
+                #self.parent.btnPreProcess.setEnabled(False)
+                self.parent.btnShowSourceFiles.setEnabled(False)
+                self.parent.btnShowCommands.setEnabled(False)
+                self.parent.btnCheckFiles.setEnabled(False)
                 self.parent.btnProcess.setEnabled(False)
                 self.parent.btnAddQueue.setEnabled(False)
-                if self.parent.jobs:
-                    tmpNum = self.parent.threadpool.activeThreadCount()
 
-                    if tmpNum == 0:
-                        self.parent.btnProcessQueue.setEnabled(True)
-                else:
-                    self.parent.btnProcessQueue.setEnabled(False)
                 if self.parent.parent.log:
                     MODULELOG.debug("FW003: Not Ok: [%s]", inputStr)
 
@@ -455,95 +450,6 @@ class MKVFormWidget(QWidget):
 
         return jobID, cmd
 
-    def qthPreProcess(self, **kwargs):
-        """Process command but don't execute for debugging"""
-
-        # Get outputwindow signal function
-        if 'cbOutputMain' in kwargs:
-            cbOutputMain = kwargs['cbOutputMain']
-        else:
-            if self.parent.log:
-                MODULELOG.error("FW009: No output callback function")
-            return
-
-        if 'enableButtons' in kwargs:
-            bEnableButtons = kwargs['enableButtons']
-        else:
-            bEnableButtons = True
-
-        cmd = self.leCommand.text()
-
-        self.objCommand.command = cmd
-
-        QApplication.processEvents()
-
-        cbOutputMain.emit("Working...\n\n", {'color': Qt.black})
-
-        if self.objCommand:
-
-            cbOutputMain.emit("Getting Files...\n", {'color': Qt.black})
-
-            self.lstBaseFiles = []
-            self.lstSourceFiles = []
-
-            MKVUtil.getFiles(
-                self.objCommand,
-                lbf=self.lstBaseFiles,
-                lsf=self.lstSourceFiles,
-                clear=True,
-                log=True
-            )
-
-            if not self.objCommand:
-                cbOutputMain.emit(
-                    "\n" + self.objCommand.strError,
-                    {'color': Qt.red}
-                )
-
-            cbOutputMain.emit("\nDone.\n\n\n", {'color': Qt.black})
-
-            if bEnableButtons:
-                self.buttonsState(True)
-
-        else:
-
-            cbOutputMain.emit("Error processing command ...\n", {'color': Qt.red})
-            cbOutputMain.emit(self.objCommand.strError + "\n\n", {'color': Qt.red})
-
-    def qthCheckFiles(self, **kwargs):
-        """Check file structure against primary source file"""
-
-        if 'cbOutputMain' in kwargs:
-            cbOutputMain = kwargs['cbOutputMain']
-        else:
-            if self.parent.log:
-                MODULELOG.error("FW010: No output callback function")
-            return "No output callback function"
-
-        cbOutputMain.emit("Checking files...\n\n", {'color': Qt.black})
-
-        if self.lstSourceFiles:
-
-            for lstFiles in self.lstSourceFiles:
-                self.objCommand.setFiles(lstFiles)
-                if MKVUtil.bVerifyStructure(self.lstBaseFiles, lstFiles, self.parent.log):
-                    cbOutputMain.emit(
-                        "Structure looks OK:\n" \
-                        + str(lstFiles) + "\n\n",
-                        {'color': Qt.darkGreen}
-                    )
-                else:
-                    cbOutputMain.emit(
-                        "Error: In structure\n" \
-                        + str(lstFiles) \
-                        + "\n\n",
-                        {'color': Qt.red}
-                    )
-
-        cbOutputMain.emit("\n", {'color': Qt.black})
-
-        return None
-
     def qthShowSourceFiles(self, **kwargs):
         """List the source files found"""
 
@@ -556,20 +462,19 @@ class MKVFormWidget(QWidget):
 
         cbOutputMain.emit(
             "Base Files:\n\n" \
-            + str(self.lstBaseFiles) \
+            + str(self.objCommand.basefiles) \
             + "\n\nSource Files:\n\n",
             {'color': Qt.black}
         )
 
-        if self.lstSourceFiles:
-            for lstFiles in self.lstSourceFiles:
+        if self.objCommand:
+            for _, _, lstFiles in self.objCommand:
                 cbOutputMain.emit(str(lstFiles) + "\n\n", {'color': Qt.black})
         else:
-            if not self.objCommand:
-                cbOutputMain.emit(
-                    "\n" + self.objCommand.strError + "\n\n",
-                    {'color': Qt.red}
-                )
+            cbOutputMain.emit(
+                "\n" + self.objCommand.error + "\n\n",
+                {'color': Qt.red}
+            )
 
         cbOutputMain.emit("\n", {'color': Qt.black})
 
@@ -587,29 +492,62 @@ class MKVFormWidget(QWidget):
 
         cbOutputMain.emit(
             "Shell:\n\n" \
-            + self.objCommand.strShellcommand \
+            + self.objCommand.command \
             + "\n\n",
             {'color': Qt.black}
         )
         cbOutputMain.emit(
             "Command Template:\n\n" \
-            + str(self.objCommand.lstCommandTemplate) \
+            + str(self.objCommand.template) \
             + "\n\nCommands:\n\n",
             {'color': Qt.black}
         )
-        if self.lstSourceFiles:
-            for lstFiles in self.lstSourceFiles:
-                self.objCommand.setFiles(lstFiles)
-                cbOutputMain.emit(
-                    str(self.objCommand.lstProcessCommand),
-                    {'color': Qt.black}
-                )
+
+        if self.objCommand:
+            for command, _, _ in self.objCommand:
+                    cbOutputMain.emit(
+                        str(command) + "\n\n",
+                        {'color': Qt.black}
+                    )
         else:
-            if not self.objCommand:
-                cbOutputMain.emit(
-                    "\n" + self.objCommand.strError + "\n\n",
-                    {'color': Qt.red}
-                )
+            cbOutputMain.emit(
+                "\n" + self.objCommand.error + "\n\n",
+                {'color': Qt.red}
+            )
+
+        cbOutputMain.emit("\n", {'color': Qt.black})
+
+        return None
+
+    def qthCheckFiles(self, **kwargs):
+        """Check file structure against primary source file"""
+
+        if 'cbOutputMain' in kwargs:
+            cbOutputMain = kwargs['cbOutputMain']
+        else:
+            if self.parent.log:
+                MODULELOG.error("FW010: No output callback function")
+            return "No output callback function"
+
+        cbOutputMain.emit("Checking files...\n\n", {'color': Qt.black})
+
+        if self.objCommand:
+
+            for _, basefiles, sourcefiles in self.objCommand:
+
+                if MKVUtil.bVerifyStructure(basefiles, sourcefiles, self.parent.log):
+                    cbOutputMain.emit(
+                        "Structure looks OK:\n" \
+                        + str(sourcefiles) + "\n\n",
+                        {'color': Qt.darkGreen}
+                    )
+                else:
+                    cbOutputMain.emit(
+                        "Error: In structure\n" \
+                        + str(sourcefiles) \
+                        + "\n\n",
+                        {'color': Qt.red}
+                    )
 
         cbOutputMain.emit("\n", {'color': Qt.black})
 
@@ -710,8 +648,10 @@ class MKVFormWidget(QWidget):
         currentJob.outputJobError = \
             self.jobs.outputJob, self.jobs.outputError
 
-        workFiles = WorkFiles()
+        #workFiles = WorkFiles()
         result = None
+
+        objCommand = MKVCommand()
 
         while self.jobs:
 
@@ -735,9 +675,8 @@ class MKVFormWidget(QWidget):
                 )
                 continue
 
-
             if currentJob.command:
-                objCommand = MKVCommand(currentJob.command)
+                objCommand.command = currentJob.command
                 self.jobs.status(currentJob.jobID, JobStatus.Running)
             else:
                 # Skip empty command
@@ -761,39 +700,33 @@ class MKVFormWidget(QWidget):
                 {'color': Qt.blue}
             )
 
-            workFiles.clear()
-
-            MKVUtil.getFiles(objCommand, lbf=workFiles.baseFiles, lsf=workFiles.sourceFiles,
-                             log=self.parent.log)
-
             if not objCommand:
                 currentJob.outputMain.emit(
-                    "\n" + objCommand.strError,
+                    "\n" + objCommand.error,
                     {'color': Qt.red}
                 )
 
                 currentJob.outputJobMain(
                     currentJob.jobID,
-                    "\n" + objCommand.strError,
+                    "\n" + objCommand.error,
                     {'color': Qt.red}
                 )
 
                 currentJob.outputJobError(
                     currentJob.jobID,
-                    "\n" + objCommand.strError,
+                    "\n" + objCommand.error,
                     {'color': Qt.red}
                 )
 
+                if self.parent.log:
+                    MODULELOG.info("FW016: Base files in Process: %s",
+                                   str(objCommand.basefiles))
+                    MODULELOG.info("FW017: Source files in Process: %s",
+                                   str(objCommand.sourcefiles))
 
-            if self.parent.log:
-                MODULELOG.info("FW016: Base files in Process: %s",
-                               str(workFiles.baseFiles))
-                MODULELOG.info("FW017: Source files in Process: %s",
-                               str(workFiles.sourceFiles))
+            if objCommand:
 
-            if workFiles.sourceFiles:
-
-                nTotal = len(workFiles.sourceFiles) * 100
+                nTotal = len(objCommand) * 100
                 lstTotal = [0, nTotal]
 
                 # Set the total for progressbar to increase gradually
@@ -801,7 +734,12 @@ class MKVFormWidget(QWidget):
                 # Change to output queue tab
                 #self.parent.tabs.setCurrentIndex(2)
 
-                for lstFiles in workFiles.sourceFiles:
+                for command, basefiles, sourcefiles in objCommand:
+
+                    currentStatus = self.jobs.status(currentJob.jobID)
+
+                    if currentStatus == JobStatus.Abort:
+                        break
 
                     if self.controlQueue is not None:
                         if not self.controlQueue.empty():
@@ -814,13 +752,12 @@ class MKVFormWidget(QWidget):
                                 self.RUNNING = False
                                 return JobStatus.Aborted
 
-                    objCommand.setFiles(lstFiles)
-
                     bStructureOk = False
 
                     try:
-                        bStructureOk = MKVUtil.bVerifyStructure(workFiles.baseFiles,
-                                                                lstFiles, self.parent.log,
+                        bStructureOk = MKVUtil.bVerifyStructure(basefiles,
+                                                                sourcefiles,
+                                                                self.parent.log,
                                                                 currentJob)
                     except OSError as e:
                         currentJob.outputMain.emit(
@@ -838,12 +775,12 @@ class MKVFormWidget(QWidget):
                         currentJob.outputJobMain(
                             currentJob.jobID,
                             "\n\nCommand:\n" \
-                            + str(objCommand.lstProcessCommand) \
+                            + str(command) \
                             + "\n\n",
                             {'color': Qt.blue}
                         )
                         MKVUtil.runCommand(
-                            objCommand.lstProcessCommand,
+                            command,
                             currentJob,
                             lstTotal,
                             self.parent.log
@@ -851,11 +788,14 @@ class MKVFormWidget(QWidget):
                     else:
                         lstTotal[0] += 100
 
+
+                # End Processing
+
                 currentJob.progressBar.emit(0, nTotal)
 
                 currentStatus = self.jobs.status(currentJob.jobID)
 
-                if currentStatus == JobStatus.Aborted:
+                if currentStatus == JobStatus.Abort:
                     self.jobs.status(currentJob.jobID, JobStatus.Aborted)
                     currentJob.outputJobMain(
                         currentJob.jobID, "\n\nJob {} - Aborted.\n".format(currentJob.jobID),

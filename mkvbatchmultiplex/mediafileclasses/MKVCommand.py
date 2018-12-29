@@ -16,11 +16,11 @@ MC018
 import os
 import re
 import shlex
-import platform
 import logging
 
 from pathlib import Path
 
+import mkvbatchmultiplex.VS as vs
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -38,30 +38,34 @@ class MKVCommand(object):
 
     log = False
 
-    def __init__(self, strCommand="", bRemoveTitle=True):
+    def __init__(self, strCommand=None, bRemoveTitle=True):
 
-        self.strShellcommand = ""
-        self.objDestinationFile = None
-        self.lstObjFiles = []
-        self.lstCommandTemplate = []
-        self.lstProcessCommand = []
+        self._strShellcommand = ""
+        self._oDestinationFile = None
+        self._oBaseSourceFilesList = []
+        self._lstCommandTemplate = []
+        self._lstCommands = []
         self._bInconsistent = False
-        self.strError = ""
-        self.bRaiseError = False
-
+        self._strError = ""
+        self._bRaiseError = False
+        self._workFiles = WorkFiles()
+        self._index = 0
         self._initHelper(strCommand, bRemoveTitle)
+
+        if strCommand is not None:
+            self._GenerateCommands()
 
     def _initHelper(self, strCommand, bRemoveTitle=True):
 
-        if strCommand == "":
+        if strCommand is None:
 
             self._reset()
 
         else:
 
-            self.strShellcommand = strCommand
+            self._strShellcommand = strCommand
             self._bInconsistent = False
-            self.strError = ""
+            self._strError = ""
 
             if MKVCommand.bLooksOk(strCommand):
 
@@ -88,14 +92,14 @@ class MKVCommand(object):
                         if lstParsed[t[0]] in dictFileNames:
                             lstParsed[t[0]] = dictFileNames[t[1]]
 
-                    self.objDestinationFile = MKVSourceFile(
+                    self._oDestinationFile = MKVSourceFile(
                         lstParsed.index("--output") + 1,
                         lstParsed[lstParsed.index("--output") + 1]
                     )
 
                 else:
                     self._bInconsistent = True
-                    self.strError = "No output file found."
+                    self._strError = "No output file found."
 
                 # Windows present inconsistent use of
                 # forward and backward slash fix for
@@ -120,7 +124,7 @@ class MKVCommand(object):
                 # Store source files in list
                 j = 0
                 for i in lstIndices:
-                    self.lstObjFiles.append(
+                    self._oBaseSourceFilesList.append(
                         MKVSourceFile(i - (j * 2),
                                       lstParsed[i + 1])
                     )
@@ -132,55 +136,218 @@ class MKVCommand(object):
                     i for i in lstParsed if (i != "(") and (i != ")")
                 ]
 
-                self.lstCommandTemplate.extend(lstParsed)
+                self._lstCommandTemplate.extend(lstParsed)
 
-                self.lstCommandTemplate[self.objDestinationFile.index] = ""
+                self._lstCommandTemplate[self._oDestinationFile.index] = ""
 
-                for objFile in self.lstObjFiles:
+                for objFile in self._oBaseSourceFilesList:
 
-                    self.lstCommandTemplate[objFile.index] = ""
+                    self._lstCommandTemplate[objFile.index] = ""
 
             else:
 
                 self._bInconsistent = True
-                self.strError = "Error parsing command line."
+                self._strError = "Error parsing command line."
 
             if self._bInconsistent:
-                self.lstCommandTemplate = []
-                self.lstProcessCommand = []
+                self._lstCommandTemplate = []
                 if MKVCommand.log:
-                    MODULELOG.error("MC001: ".join(self.strError))
+                    MODULELOG.error("MC001: ".join(self._strError))
 
     def _reset(self):
         """Reset variable properties"""
-        self.strShellcommand = ""
-        self.objDestinationFile = None
-        self.lstObjFiles = []
-        self.lstCommandTemplate = []
-        self.lstProcessCommand = []
+        self._strShellcommand = ""
+        self._oDestinationFile = None
+        self._oBaseSourceFilesList = []
+        self._lstCommandTemplate = []
+        self._lstCommands = []
         self._bInconsistent = False
-        self.bRaiseError = False
-        self.strError = ""
-
-    def __len__(self):
-        return len(self.lstProcessCommand)
+        self._bRaiseError = False
+        self._strError = ""
+        self._index = 0
 
     def __bool__(self):
+        return not (self._bInconsistent or (self._strShellcommand == "") or self._bRaiseError)
+
+    def __contains__(self, item):
+        return item in self._lstCommands
+
+    def __getitem__(self, index):
+        return [self._lstCommands[index], self._workFiles.baseFiles, self._workFiles.sourceFiles[index]]
+
+    def __iter__(self):
+        return self
+
+    def __len__(self):
+        return len(self._lstCommands)
+
+    def __next__(self):
+        if self._index >= len(self._lstCommands):
+            self._index = 0
+            raise StopIteration
+        else:
+            self._index += 1
+            return [self._lstCommands[self._index - 1], self._workFiles.baseFiles, self._workFiles.sourceFiles[self._index - 1]]
+
+    def _GenerateCommands(self):
+
+        self._getFiles()
+
+        if self._workFiles.sourceFiles:
+            for lstFiles in self._workFiles.sourceFiles:
+                lstProcessCommand = self._setFiles(lstFiles)
+                # list assigns a copy of lstProcessCommand not the object
+                self._lstCommands.append(lstProcessCommand)
+
+    def _getFiles(self, log=False):
+        """read source directories to get files"""
+
+        self._workFiles.sourceFiles = []
+
+        lstMKVFiles = []
+        lstTypeTotal = []
+
+        # Get files from any directory found in command
+        # the number of files on each directory has to be equal
+        # Filter by type in original source file
+
+        if self._oBaseSourceFilesList:
+
+            self._workFiles.baseFiles = [x.fullPathName for x in self._oBaseSourceFilesList]
+
+            for objFile in self._oBaseSourceFilesList:
+                lstMKVFiles.append(
+                    vs.getFileList(
+                        objFile.directory,
+                        objFile.extension,
+                        True
+                    )
+                )
+
+            if self._bCheckLenOfLists(lstMKVFiles, lstTypeTotal):
+                # Join all source files in a list of lists each element
+                # have all source files in the order found
+                # The names are not used to pair the order in the
+                # directories is
+                for i in range(len(lstMKVFiles[0])):
+                    self._workFiles.sourceFiles.append([x[i] for x in lstMKVFiles])
+
+            else:
+
+                self._bRaiseError = True
+                error = "UT002: List of files total don't match."
+                self._strError = error + "\n\n"
+                if log:
+                    MODULELOG.error("UT003: List of files total don't match")
+                for lstTmp in lstTypeTotal:
+                    error = lstTmp[0] + " - " + lstTmp[1]
+                    self._strError = self._strError + error + "\n"
+                    if log:
+                        MODULELOG.error("UT004: File(s): %s", error)
+
+    def _bCheckLenOfLists(self, lstLists, lstTypeTotal):
+        """list of source files has to be equal length"""
+
+        intTmp = None
+        bReturn = True
+
+        for lstTmp in lstLists:
+
+            if not lstTmp:
+                bReturn = False
+                lstTypeTotal.append(("Ops!!!", "File(s) not found."))
+                break
+
+            lstTypeTotal.append([str(len(lstTmp)), os.path.splitext(lstTmp[0])[1]])
+
+            if not intTmp:
+                #length of first list is base for comparison
+                intTmp = len(lstTmp)
+            else:
+                if len(lstTmp) != intTmp:
+                    #not equal fail test
+                    if bReturn:
+                        bReturn = False
+
+        return bReturn
+
+    def _setFiles(self, lstFiles, strPrefix="new-"):
         """
-        if self._bInconsistent:
-            return False
-        if self.strShellcommand == "":
-            return False
-        return True
+        Substitute file names on command template
+
+        :param lstFiles: list of files in command line to process
+        :type lstFiles: list
+        :param strPrefix: prefix for output files
+        :type strPrefix: str
         """
-        return not (self._bInconsistent or (self.strShellcommand == "") or self.bRaiseError)
+
+        lstProcessCommand = []
+
+        if not self._bInconsistent:
+
+            lstProcessCommand = [x for x in self._lstCommandTemplate]
+
+            _, filename = os.path.split(lstFiles[0])
+
+            strTmp = os.path.join(
+                self._oDestinationFile.directory,
+                os.path.splitext(filename)[0] +
+                self._oDestinationFile.extension
+            )
+
+            # Check if destination file exist and add prefix if it does
+            if os.path.isfile(strTmp):
+                strSuffix = ""
+                n = 1
+                while True:
+                    strDestinationFile = os.path.join(
+                        self._oDestinationFile.directory,
+                        strPrefix
+                        + os.path.splitext(filename)[0]
+                        + strSuffix
+                        + self._oDestinationFile.extension
+                    )
+
+                    if os.path.isfile(strDestinationFile):
+                        strSuffix = " (%d)" % n
+                        n += 1
+                    else:
+                        break
+            else:
+                strDestinationFile = strTmp
+
+            lstProcessCommand[self._oDestinationFile.index] = strDestinationFile
+
+            for objFile, strFile in zip(self._oBaseSourceFilesList, lstFiles):
+                lstProcessCommand[objFile.index] = strFile
+
+        else:
+
+            lstProcessCommand = []
+
+        # return a copy of list not the object lstProcessCommand
+        return [x for x in lstProcessCommand]
+
+    @property
+    def basefiles(self):
+        """return base files list"""
+
+        return self._workFiles.baseFiles
+
+    @property
+    def sourcefiles(self):
+        """
+        property to return the working source files
+        """
+
+        return self._workFiles.sourceFiles
 
     @property
     def command(self):
         """
         property command produced by mkvtoolnix-gui can be set
         """
-        return self.strShellcommand
+        return self._strShellcommand
 
     @command.setter
     def command(self, value):
@@ -188,6 +355,22 @@ class MKVCommand(object):
         if isinstance(value, str):
             self._reset()
             self._initHelper(value)
+            self._GenerateCommands()
+
+
+    @property
+    def error(self):
+        """return error description"""
+
+        return self._strError
+
+    @property
+    def template(self):
+        """
+        constructed command template
+        """
+
+        return self._lstCommandTemplate
 
     @staticmethod
     def bLooksOk(strCommand):
@@ -237,70 +420,33 @@ class MKVCommand(object):
 
         return bOk
 
-    def setFiles(self, lstFiles, strPrefix="new-"):
-        """
-        Substitute file names on command template
-
-        :param lstFiles: list of files in command line to process
-        :type lstFiles: list
-        :param strPrefix: prefix for output files
-        :type strPrefix: str
-        """
-
-        if not self._bInconsistent:
-
-            self.lstProcessCommand = self.lstCommandTemplate
-
-            _, filename = os.path.split(lstFiles[0])
-
-            strTmp = os.path.join(
-                self.objDestinationFile.directory,
-                os.path.splitext(filename)[0] +
-                self.objDestinationFile.extension
-            )
-
-            # Check if destination file exist and add prefix if it does
-            if os.path.isfile(strTmp):
-                strSuffix = ""
-                n = 1
-                while True:
-                    strDestinationFile = os.path.join(
-                        self.objDestinationFile.directory,
-                        strPrefix
-                        + os.path.splitext(filename)[0]
-                        + strSuffix
-                        + self.objDestinationFile.extension
-                    )
-
-                    if os.path.isfile(strDestinationFile):
-                        strSuffix = " (%d)" % n
-                        n += 1
-                    else:
-                        break
-            else:
-                strDestinationFile = strTmp
-
-            self.lstProcessCommand[self.objDestinationFile.index] = strDestinationFile
-
-            for objFile, strFile in zip(self.lstObjFiles, lstFiles):
-                self.lstProcessCommand[objFile.index] = strFile
-
-        else:
-
-            self.lstProcessCommand = []
-
     def strCmdSourceFile(self):
         """First source file fullpath name"""
 
-        return self.lstObjFiles[0].fullPathName if self.lstObjFiles else None
+        return self._oBaseSourceFilesList[0].fullPathName if self._oBaseSourceFilesList else None
 
     def strCmdSourceDirectory(self):
         """First source file directory"""
-        return self.lstObjFiles[0].directory if self.lstObjFiles else None
+        return self._oBaseSourceFilesList[0].directory if self._oBaseSourceFilesList else None
 
     def strCmdSourceExtension(self):
         """First source file extension"""
-        return self.lstObjFiles[0].extension if self.lstObjFiles else None
+        return self._oBaseSourceFilesList[0].extension if self._oBaseSourceFilesList else None
+
+
+class WorkFiles:
+    """Files read from directories"""
+
+    def __init__(self):
+
+        self.baseFiles = []
+        self.sourceFiles = []
+
+    def clear(self):
+        """Clear file lists"""
+
+        self.baseFiles = []
+        self.sourceFiles = []
 
 
 class MKVSourceFile(object):
