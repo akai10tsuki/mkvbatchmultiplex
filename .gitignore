@@ -60,6 +60,7 @@ target/
 
 # mkvBatchMultiplex
 tests/NewFiles/
+tests/generatecommand.1.py
 .vscode/
 tmp/
 docs2/

@@ -239,7 +239,7 @@ class MKVFormWidget(QWidget):
 
         self.btnGrid.addWidget(self.btnPasteClipboard, 0, 0)
         #self.btnGrid.addWidget(self.btnPreProcess, 1, 0)
-        self.btnGrid.addWidget(self.btnProcess, 1, 1)
+        self.btnGrid.addWidget(self.btnProcess, 1, 0)
         self.btnGrid.addWidget(self.btnAddQueue, 2, 0)
         self.btnGrid.addWidget(self.btnProcessQueue, 2, 1)
         self.btnGrid.addWidget(self.btnShowSourceFiles, 3, 0)
@@ -322,10 +322,15 @@ class MKVFormWidget(QWidget):
         """Change button state"""
 
         if bState is not None:
-            #self.btnPreProcess.setEnabled(bState)
-            self.btnCheckFiles.setEnabled(bState)
+            #self.btnCheckFiles.setEnabled(bState)
+            #self.btnShowSourceFiles.setEnabled(bState)
+            #self.btnShowCommands.setEnabled(bState)
+
             self.btnShowSourceFiles.setEnabled(bState)
             self.btnShowCommands.setEnabled(bState)
+            self.btnCheckFiles.setEnabled(bState)
+            self.btnProcess.setEnabled(bState)
+            self.btnAddQueue.setEnabled(bState)
 
     def pasteClipboard(self):
         """Paste clipboard to command QLineEdit"""
@@ -369,24 +374,17 @@ class MKVFormWidget(QWidget):
             bTest = MKVCommand.bLooksOk(inputStr)
 
             if bTest:
-                #self.parent.btnPreProcess.setEnabled(True)
                 self.parent.objCommand.command = inputStr
-                self.parent.btnShowSourceFiles.setEnabled(True)
-                self.parent.btnShowCommands.setEnabled(True)
-                self.parent.btnCheckFiles.setEnabled(True)
-                self.parent.btnProcess.setEnabled(True)
-                self.parent.btnAddQueue.setEnabled(True)
+
+                self.parent.buttonsState(True)
+
                 self.parent.btnReset.setEnabled(True)
 
                 if self.parent.parent.log:
                     MODULELOG.debug("FW002: Ok: [%s]", inputStr)
             else:
-                #self.parent.btnPreProcess.setEnabled(False)
-                self.parent.btnShowSourceFiles.setEnabled(False)
-                self.parent.btnShowCommands.setEnabled(False)
-                self.parent.btnCheckFiles.setEnabled(False)
-                self.parent.btnProcess.setEnabled(False)
-                self.parent.btnAddQueue.setEnabled(False)
+                self.parent.buttonsState(False)
+
                 if self.parent.parent.log:
                     MODULELOG.debug("FW003: Not Ok: [%s]", inputStr)
 
