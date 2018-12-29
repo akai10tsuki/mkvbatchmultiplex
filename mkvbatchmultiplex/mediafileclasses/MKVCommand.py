@@ -386,7 +386,7 @@ class MKVCommand(object):
         """
         # For Windows and linux
         #rg = r"^'?(.*?)'\s.*?\-\-output.'(.*?)'\s.*?\s'\('\s'(.*?)'\s'\)\'.*?\-\-track-order\s(.*)"  # pylint: disable=C0301
-        rg = r"^'?(.*?)'\s.*?\-\-output.'(.*?)'\s.*?\s'\('\s'(.*?)'\s'\)'.*?\-\-track-order\s(.*)"  # pylint: disable=C0301
+        rg = r"^'(.*?)'\s.*?\-\-output.'(.*?)'\s.*?\s'\('\s'(.*?)'\s'\)'.*?\-\-track-order\s(.*)"  # pylint: disable=C0301
         regEx = re.compile(rg)
 
         bOk = False
@@ -423,7 +423,7 @@ class MKVCommand(object):
         return bOk
 
     @staticmethod
-    def bLooksOk(strCommand, lstResults=None):
+    def bLooksOk(strCmd, lstResults=None):
         """
         Sanity check on command any failure results in no action whatsoever
         and since the original are not modified the resulting command should be safe
@@ -435,11 +435,23 @@ class MKVCommand(object):
         :rtype: bool
         """
 
+        if not strCmd:
+            return False
+
+        strCommand = _strStripEscapeChars(strCmd)  # Comvert line to bash style
+
         lstAnalysis = []
 
+        #rg = r"^'(.*?)'\s.*?\-\-output.'(.*?)'\s.*?\s'\('\s'(.*?)'\s'\)'.*?\-\-track-order\s(.*)"  # pylint: disable=C0301
         rg = r"^'?(.*?)'\s.*?\-\-output.'(.*?)'\s.*?\s'\('\s'(.*?)'\s'\)'.*?\-\-track-order\s(.*)"  # pylint: disable=C0301
         regCommandEx = re.compile(rg)
         matchCommand = regCommandEx.match(strCommand)
+
+        reExecutableEx = re.compile(r"^'(.*?)'")
+        matchExecutable = reExecutableEx.match(strCommand)
+
+        reOutputFileEx = re.compile(r".*?\-\-output.'(.*?)'")
+        matchOutputFile = reOutputFileEx.match(strCommand)
 
         reSourcesEx = re.compile(r"'\('\s'(.*?)'\s'\)'")
         matchSources = reSourcesEx.finditer(strCommand)
@@ -447,39 +459,51 @@ class MKVCommand(object):
         reAttachmentsEx = re.compile(r"\-\-attach-file.'(.*?)'")
         matchAttachments = reAttachmentsEx.finditer(strCommand)
 
-        pthExecutable = Path(matchCommand.group(1))
-        pthDestination = Path(matchCommand.group(3))
-
         bOk = True
         # To look Ok must match the 5 group in the command line that
         # are expected
         # 1: mkvmerge name with fullpath
         # 2: output file
-        # 3: first or only source file
+        # 3: at list one source
         # 4: track order
-        if not (len(matchCommand.groups()) == 4):
-            lstAnalysis.append("Command bad format.")
-            if lstResults is None:
-                return False
-            bOk = False
-        else:
+        if matchCommand and (len(matchCommand.groups()) == 4):
             lstAnalysis.append("Command seems ok.")
+        else:
+            if lstResults is None:
+                return False
+            lstAnalysis.append("Command bad format.")
+            bOk = False
 
-        if not pthExecutable.is_file():
+        if matchExecutable:
+            p = Path(matchExecutable.group(1))
+            if not p.is_file():
+                if lstResults is None:
+                    return False
+                lstAnalysis.append("mkvmerge not found.")
+                bOk = False
+            else:
+                lstAnalysis.append("mkvmerge ok = {}".format(str(p)))
+        else:
+            if lstResults is None:
+                return False
             lstAnalysis.append("mkvmerge not found.")
-            if lstResults is None:
-                return False
             bOk = False
-        else:
-            lstAnalysis.append("mkvmerge ok = {}".format(str(pthExecutable)))
 
-        if not Path(pthDestination.parent).is_dir():
-            lstAnalysis.append("Bad destination.")
+        if matchOutputFile:
+            p = Path(matchOutputFile.group(1))
+            if not Path(p.parent).is_dir():
+                lstAnalysis.append("Bad destination.")
+                if lstResults is None:
+                    return False
+                bOk = False
+            else:
+                lstAnalysis.append("Destination directory ok = {}".format(str(p.parent)))
+        else:
             if lstResults is None:
                 return False
+            lstAnalysis.append("Bad match destination.")
             bOk = False
-        else:
-            lstAnalysis.append("Destination directory ok = {}".format(str(pthDestination.parent)))
+
 
         n = 1
         for match in matchSources:

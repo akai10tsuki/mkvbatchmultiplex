@@ -37,7 +37,7 @@ from collections import deque
 
 from PyQt5.QtCore import QByteArray, Qt, QThreadPool, pyqtSignal
 from PyQt5.QtGui import QIcon, QFont
-from PyQt5.QtWidgets import (QAction, QApplication, QDesktopWidget,
+from PyQt5.QtWidgets import (QAction, QApplication, QDesktopWidget, qApp,
                              QMainWindow, QMessageBox, QToolBar, QVBoxLayout,
                              QWidget, QFontDialog)
 
@@ -76,7 +76,7 @@ class MKVMultiplexApp(QMainWindow):
     def _initHelper(self):
 
         # Create Widgets
-        self.formWidget = MKVFormWidget(self, self.threadpool, self.jobs, self.ctrlQueue)
+        self.formWidget = MKVFormWidget(self, self.threadpool, self.jobs, self.ctrlQueue, log=True)
         self.outputQueueWidget = MKVOutputWidget(self)
         self.outputErrorWidget = MKVOutputWidget(self)
         self.jobsWidget = MKVJobsTableWidget(self, self.ctrlQueue)
@@ -119,6 +119,10 @@ class MKVMultiplexApp(QMainWindow):
         actExit.setStatusTip("Exit application")
         actExit.triggered.connect(self.close)
 
+        actAbort = QAction("Abort", self)
+        actAbort.setStatusTip("Force exit")
+        actAbort.triggered.connect(abort)
+
         toolbar = QToolBar("Exit")
         toolbar.addAction(actExit)
         self.toolbar = self.addToolBar(toolbar)
@@ -137,6 +141,7 @@ class MKVMultiplexApp(QMainWindow):
         menuBar = self.menuBar()
         fileMenu = menuBar.addMenu("&File")
         fileMenu.addAction(actExit)
+        fileMenu.addAction(actAbort)
 
         self.actEnableLogging = QAction("Enable logging", self, checkable=True)
         self.actEnableLogging.setStatusTip(
@@ -308,6 +313,10 @@ class MKVMultiplexApp(QMainWindow):
             self._center()
 
 
+def abort(self):
+    """Force Quit"""
+    qApp.quit()
+
 def setupLogging():
     """Configure log"""
 
@@ -326,7 +335,6 @@ def setupLogging():
     loghandler.setFormatter(formatter)
 
     logging.getLogger('').addHandler(loghandler)
-
 
 def mainApp():
     """Main"""

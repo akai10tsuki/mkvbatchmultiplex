@@ -17,7 +17,7 @@ from PyQt5.QtCore import QMutex, QMutexLocker, Qt
 
 import mkvbatchmultiplex.VS as vs
 from mkvbatchmultiplex.mediafileclasses import MediaFileInfo
-
+from mkvbatchmultiplex.jobs import JobStatus
 
 MUTEX = QMutex()
 MODULELOG = logging.getLogger(__name__)
@@ -173,7 +173,7 @@ def getFiles(objCommand=None, lbf=None, lsf=None, clear=False, log=False):
             MODULELOG.info("UT006: Base files: %s", str(getFiles.lstBaseFiles))
             MODULELOG.info("UT007: Source files: %s", str(getFiles.lstSourceFiles))
 
-def runCommand(command, currentJob, lstTotal, log=False):
+def runCommand(command, currentJob, lstTotal, log=False, ctrlQueue=None):
     """Execute command in a subprocess thread"""
 
     regEx = re.compile(r"(\d+)")
@@ -188,6 +188,14 @@ def runCommand(command, currentJob, lstTotal, log=False):
         n = 0
 
         for line in p.stdout:
+
+            request = None
+            if ctrlQueue is not None:
+                if not ctrlQueue.empty():
+                    request = ctrlQueue.get()
+                    if request == JobStatus.Abort:
+                        p.kill()
+                        return 2000
 
             if line.find(u"Progress:") == 0:
                 # Deal with progress percent
@@ -223,8 +231,9 @@ def runCommand(command, currentJob, lstTotal, log=False):
                 else:
                     currentJob.outputJobMain(currentJob.jobID, line, {'color': Qt.black})
 
-    if n > 0:
-        rc = p.poll()
+            rcResult = p.poll()
+            if rcResult is not None:
+                rc = rcResult
 
     lstTotal[0] += 100
 

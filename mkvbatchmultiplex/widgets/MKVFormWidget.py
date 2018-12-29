@@ -11,6 +11,7 @@ LOG FW025
 import logging
 import platform
 #import time
+from queue import Queue
 
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal, pyqtSlot
 from PyQt5.QtGui import QValidator
@@ -73,14 +74,15 @@ class MKVFormWidget(QWidget):
 
     RUNNING = False
 
-    def __init__(self, parent, qthThread, jobs, ctrlQueue):
+    def __init__(self, parent, qthThread, jobs, ctrlQueue, log=False):
         super(MKVFormWidget, self).__init__(parent)
 
         self.parent = parent
-        self.log = parent.log
+        self.log = log
         self.threadpool = qthThread
         self.jobs = jobs
         self.controlQueue = ctrlQueue
+        self.controlRunCommand = Queue()
         self.objCommand = MKVCommand()
         self.lstSourceFiles = []
         self.lstBaseFiles = []
@@ -333,7 +335,7 @@ class MKVFormWidget(QWidget):
         if 'cbOutputCommand' in kwargs:
             cbOutputCommand = kwargs['cbOutputCommand']
         else:
-            if self.parent.log:
+            if self.log:
                 MODULELOG.error("FW001: No output command callback function")
             return "No output command callback function"
 
@@ -364,13 +366,13 @@ class MKVFormWidget(QWidget):
 
                 self.parent.btnReset.setEnabled(True)
 
-                if self.parent.parent.log:
-                    MODULELOG.debug("FW002: Ok: [%s]", inputStr)
+                if self.parent.log:
+                    MODULELOG.debug("FW002: Command Ok: [%s]", inputStr)
             else:
                 self.parent.buttonsState(False)
 
-                if self.parent.parent.log:
-                    MODULELOG.debug("FW003: Not Ok: [%s]", inputStr)
+                if self.parent.log:
+                    MODULELOG.debug("FW003: Command not Ok: [%s]", inputStr)
 
             return (QValidator.Acceptable, inputStr, pos)
 
@@ -381,7 +383,7 @@ class MKVFormWidget(QWidget):
         kwargsKeys = ['cbOutputCommand', 'cbOutputMain']
         for key in kwargsKeys:
             if not key in kwargs:
-                if self.parent.log:
+                if self.log:
                     MODULELOG.error(
                         "FW007: No output command callback function %s.",
                         key
@@ -437,7 +439,7 @@ class MKVFormWidget(QWidget):
         if 'cbOutputMain' in kwargs:
             cbOutputMain = kwargs['cbOutputMain']
         else:
-            if self.parent.log:
+            if self.log:
                 MODULELOG.error("FW011: No output callback function")
             return "No output callback function"
 
@@ -467,7 +469,7 @@ class MKVFormWidget(QWidget):
         if 'cbOutputMain' in kwargs:
             cbOutputMain = kwargs['cbOutputMain']
         else:
-            if self.parent.log:
+            if self.log:
                 MODULELOG.error("FW012: No output callback function")
             return "No output callback function"
 
@@ -506,7 +508,7 @@ class MKVFormWidget(QWidget):
         if 'cbOutputMain' in kwargs:
             cbOutputMain = kwargs['cbOutputMain']
         else:
-            if self.parent.log:
+            if self.log:
                 MODULELOG.error("FW010: No output callback function")
             return "No output callback function"
 
@@ -516,7 +518,7 @@ class MKVFormWidget(QWidget):
 
             for _, basefiles, sourcefiles in self.objCommand:
 
-                if MKVUtil.bVerifyStructure(basefiles, sourcefiles, self.parent.log):
+                if MKVUtil.bVerifyStructure(basefiles, sourcefiles, self.log):
                     cbOutputMain.emit(
                         "Structure looks OK:\n" \
                         + str(sourcefiles) + "\n\n",
@@ -573,7 +575,6 @@ class MKVFormWidget(QWidget):
             self.parent.jobsWidget.clearTable()
             self.leCommand.clear()
             self.leCommand.setFocus()
-            MKVUtil.getFiles(clear=True, log=self.parent.log)
             self.parent.progressbar.setValues(0, 0)
 
     def qthProcessCommand(self, command=None, **kwargs):
@@ -581,7 +582,7 @@ class MKVFormWidget(QWidget):
 
         for key in ['cbOutputCommand', 'cbOutputMain', 'cbProgress']:
             if not key in kwargs:
-                if self.parent.log:
+                if self.log:
                     MODULELOG.error(
                         "FW013: No output command callback function %s.",
                         key
@@ -623,7 +624,7 @@ class MKVFormWidget(QWidget):
             currentJob.outputMain.emit("\nProcessing Queue.\n", {'color': Qt.blue})
             return "RUNNING"
 
-        MKVCommand.log = self.parent.log
+        MKVCommand.log = self.log
 
         currentJob.outputJobMain, \
         currentJob.outputJobError = \
@@ -698,7 +699,7 @@ class MKVFormWidget(QWidget):
                     {'color': Qt.red}
                 )
 
-                if self.parent.log:
+                if self.log:
                     MODULELOG.info("FW016: Base files in Process: %s",
                                    str(objCommand.basefiles))
                     MODULELOG.info("FW017: Source files in Process: %s",
@@ -737,7 +738,7 @@ class MKVFormWidget(QWidget):
                     try:
                         bStructureOk = MKVUtil.bVerifyStructure(basefiles,
                                                                 sourcefiles,
-                                                                self.parent.log,
+                                                                self.log,
                                                                 currentJob)
                     except OSError as e:
                         currentJob.outputMain.emit(
@@ -763,7 +764,7 @@ class MKVFormWidget(QWidget):
                             command,
                             currentJob,
                             lstTotal,
-                            self.parent.log
+                            self.log
                         )
                     else:
                         lstTotal[0] += 100
