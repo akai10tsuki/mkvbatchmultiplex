@@ -30,7 +30,7 @@ MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
 
-class CurrentJob(): # pylint: disable=R0903
+class CurrentJob: # pylint: disable=R0903
     """Helper class for working with a job"""
 
     def __init__(self):
@@ -42,22 +42,6 @@ class CurrentJob(): # pylint: disable=R0903
         self.outputJobMain = None
         self.outputJobError = None
         self.progressBar = None
-
-
-class WorkFiles():
-    """Files read from directories"""
-
-    def __init__(self):
-
-        self.baseFiles = []
-        self.sourceFiles = []
-
-    def clear(self):
-        """Clear file lists"""
-
-        self.baseFiles = []
-        self.sourceFiles = []
-
 
 class WorkerSignals(threads.WorkerSignals):
     """Additional signals for QRunables"""
@@ -502,10 +486,10 @@ class MKVFormWidget(QWidget):
 
         if self.objCommand:
             for command, _, _ in self.objCommand:
-                    cbOutputMain.emit(
-                        str(command) + "\n\n",
-                        {'color': Qt.black}
-                    )
+                cbOutputMain.emit(
+                    str(command) + "\n\n",
+                    {'color': Qt.black}
+                )
         else:
             cbOutputMain.emit(
                 "\n" + self.objCommand.error + "\n\n",
@@ -645,7 +629,6 @@ class MKVFormWidget(QWidget):
         currentJob.outputJobError = \
             self.jobs.outputJob, self.jobs.outputError
 
-        #workFiles = WorkFiles()
         result = None
 
         objCommand = MKVCommand()
