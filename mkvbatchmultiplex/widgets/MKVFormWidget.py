@@ -387,7 +387,6 @@ class MKVFormWidget(QWidget):
                 self.parent.btnCheckFiles.setEnabled(False)
                 self.parent.btnProcess.setEnabled(False)
                 self.parent.btnAddQueue.setEnabled(False)
-
                 if self.parent.parent.log:
                     MODULELOG.debug("FW003: Not Ok: [%s]", inputStr)
 
