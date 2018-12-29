@@ -11,7 +11,7 @@ import sys
 from setuptools import setup, find_packages
 
 sys.path.insert(0, os.path.abspath('.'))
-#import mkvbatchmultiplex.__version__ as __version__
+import mkvbatchmultiplex.__version__ as __version__
 
 
 DESCRIPTION = 'A mkv media batch multiplex.'
@@ -38,8 +38,8 @@ def readme():
 setup(
 
     name=NAME,  # Required
-    #version=__version__.VERSION,  # Required
-    version='0.5.3.a2.dev3',
+    version=__version__.VERSION,  # Required
+    #version='0.5.3.a2.dev3',
     description=DESCRIPTION,  # Required
     long_description=readme(),  # Optional
     author='Efrain Vergara',  # Optional
