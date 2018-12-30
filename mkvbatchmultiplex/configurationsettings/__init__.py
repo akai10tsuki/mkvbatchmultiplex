@@ -134,11 +134,11 @@ class ConfigurationSettings:
         self._config = {}
 
         if name is None:
-            searchIn = './Config/ConfigSetting'
+            searchIn = 'Config/ConfigSetting'
         else:
-            searchIn = "./" + name + "/ConfigSetting"
+            searchIn = name + "/ConfigSetting"
 
-        for setting in xmlDoc.findall('./Config/ConfigSetting'):
+        for setting in xmlDoc.findall(searchIn):
             key = setting.attrib["id"]
 
             if setting.attrib["type"] == "str":
@@ -202,7 +202,7 @@ def main():
     for key, value in configuration:
         print("Key = {0}, type = {2}, value = {1}".format(key, value, type(value).__name__))
 
-    prettyXML = configuration.xmlPrettyPrint()
+    prettyXML = configuration.xmlPrettyPrint(root)
 
     print()
     print(prettyXML)
