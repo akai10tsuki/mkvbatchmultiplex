@@ -10,7 +10,7 @@ run this script and it will paste to the clipboard a command for testing
 import os
 import sys
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTextEdit, QPushButton, QGridLayout, QWidget
+from PySide2.QtWidgets import QApplication, QMainWindow, QTextEdit, QPushButton, QGridLayout, QWidget
 
 
 class GenCommandApp(QMainWindow):

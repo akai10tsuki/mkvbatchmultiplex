@@ -8,7 +8,7 @@ import re
 import sys
 from pathlib import Path
 
-from PyQt5.QtCore import QMutex, QMutexLocker
+from PySide2.QtCore import QMutex, QMutexLocker
 
 
 class QthLogRotateHandler(logging.Handler):

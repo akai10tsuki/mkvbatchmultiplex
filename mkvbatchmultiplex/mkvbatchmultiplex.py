@@ -25,6 +25,7 @@ Libraries and programs used:
     PyQt5 5.10.1-5.11.3
 """
 
+import ast
 import base64
 import logging
 import logging.handlers
@@ -35,14 +36,16 @@ from pathlib import Path
 from queue import Queue
 from collections import deque
 
-from PyQt5.QtCore import QByteArray, Qt, QThreadPool, pyqtSignal
-from PyQt5.QtGui import QIcon, QFont
-from PyQt5.QtWidgets import (QAction, QApplication, QDesktopWidget, qApp,
-                             QMainWindow, QMessageBox, QToolBar, QVBoxLayout,
-                             QWidget, QFontDialog)
-
-
 import mkvbatchmultiplex.__version__ as __version__
+
+from PySide2.QtCore import QByteArray, Qt, QThreadPool, Signal
+from PySide2.QtGui import QIcon, QFont
+from PySide2.QtWidgets import (QAction, QApplication, QDesktopWidget, qApp,
+                                QMainWindow, QMessageBox, QToolBar, QVBoxLayout,
+                                QWidget, QFontDialog)
+
+
+
 from .loghandler import QthLogRotateHandler
 from .widgets import (DualProgressBar, MKVFormWidget, MKVTabsWidget,
                       MKVOutputWidget, MKVJobsTableWidget, SpacerWidget)
@@ -55,11 +58,11 @@ class MKVMultiplexApp(QMainWindow):
 
     log = False
     raiseErrors = False
-    outputMainSignal = pyqtSignal(str, dict)
-    outputQueue = pyqtSignal(str, dict)
-    outputError = pyqtSignal(str, dict)
-    addJob = pyqtSignal(int, str)
-    setJobStatus = pyqtSignal(int, str)
+    outputMainSignal = Signal(str, dict)
+    outputQueue = Signal(str, dict)
+    outputError = Signal(str, dict)
+    addJob = Signal(int, str)
+    setJobStatus = Signal(int, str)
 
     def __init__(self, parent=None):
         super(MKVMultiplexApp, self).__init__(parent)
@@ -246,7 +249,7 @@ class MKVMultiplexApp(QMainWindow):
 
         fontDialog = QFontDialog(self)
 
-        font, valid = fontDialog.getFont()
+        valid, font = fontDialog.getFont()
 
         if valid:
             self.setFont(font)
@@ -262,9 +265,10 @@ class MKVMultiplexApp(QMainWindow):
                 'logging', self.actEnableLogging.isChecked()
             )
 
-            byteGeometry = base64.b64encode(self.saveGeometry())
+            base64Geometry = self.saveGeometry().toBase64()
+
             self.config.set(
-                'geometry', byteGeometry.decode()
+                'geometry', base64Geometry
             )
 
             font = self.font()
@@ -303,10 +307,10 @@ class MKVMultiplexApp(QMainWindow):
 
         if strGeometry is not None:
             # Test for value read if not continue
-            byteGeometry = strGeometry.encode()
+            byte = ast.literal_eval(strGeometry)
+            byteGeometry = QByteArray(byte)
 
             self.restoreGeometry(QByteArray.fromBase64(byteGeometry))
-
         else:
 
             self.setGeometry(0, 0, 1280, 720)

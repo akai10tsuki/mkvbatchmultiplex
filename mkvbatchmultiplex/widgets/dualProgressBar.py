@@ -11,8 +11,8 @@ align:
     Qt.Vertical - Vertical layout
 """
 
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QProgressBar, QSizePolicy
-from PyQt5.QtCore import Qt
+from PySide2.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QProgressBar, QSizePolicy
+from PySide2.QtCore import Qt
 
 
 class DualProgressBar(QWidget):
@@ -241,7 +241,7 @@ class SpacerWidget(QWidget):
 if __name__ == '__main__':
 
     import sys
-    from PyQt5.QtWidgets import QApplication, QGridLayout, QMainWindow, QPushButton
+    from PySide2.QtWidgets import QApplication, QGridLayout, QMainWindow, QPushButton
 
     class MainWindow(QMainWindow):
         """Test the progress bars"""

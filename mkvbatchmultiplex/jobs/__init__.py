@@ -8,7 +8,7 @@ import logging
 
 from collections import deque
 
-from PyQt5.QtCore import QObject, QMutex, QMutexLocker, Qt, pyqtSlot, pyqtSignal
+from PySide2.QtCore import QObject, QMutex, QMutexLocker, Qt, Slot, Signal
 
 
 MUTEX = QMutex()
@@ -60,10 +60,10 @@ class JobQueue(QObject): # pylint: disable=R0902
     """
 
     jobID = 1
-    outputJobSignal = pyqtSignal(str, dict)
-    outputErrorSignal = pyqtSignal(str, dict)
-    updateStatusSignal = pyqtSignal(int, str)
-    addJobToTableSignal = pyqtSignal(int, str, str)
+    outputJobSignal = Signal(str, dict)
+    outputErrorSignal = Signal(str, dict)
+    updateStatusSignal = Signal(int, str)
+    addJobToTableSignal = Signal(int, str, str)
 
     def __init__(self, jobWorkQueue=None):
         super(JobQueue, self).__init__()
@@ -158,7 +158,7 @@ class JobQueue(QObject): # pylint: disable=R0902
 
         objSignal.connect(self.status)
 
-    @pyqtSlot(int, str, bool)
+    @Slot(int, str, bool)
     def status(self, nID, strStatus=None, bUpdate=True):
         """
         Set/Return job status
@@ -285,15 +285,15 @@ class JobQueue(QObject): # pylint: disable=R0902
         Setup output widget signals
 
         :param outputJobSlot: slot for job execution output
-        :type outputJobSlot: pyqtSlot
+        :type outputJobSlot: Slot
         :param outputErrorSlot: slot for job execution errors
-        :type outputErrorSlot: pyqtSlot
+        :type outputErrorSlot: Slot
         :param addJobToTableSlot: slot for job table widget
-        :type addJobToTableSlot: pyqtSlot
+        :type addJobToTableSlot: Slot
         :param updateStatusSlot: slot for job table status updates
-        :type updateStatusSlot: pyqtSlot
+        :type updateStatusSlot: Slot
         :param clearOutput: slot for clear output slot
-        :type clearOutput: pyqtSlot
+        :type clearOutput: Slot
         """
 
         if outputJobSlot:
@@ -344,12 +344,12 @@ class JobQueue(QObject): # pylint: disable=R0902
         Connect to signals showJobOutput slot
 
         :param objSignal: signal to connect to
-        :type: pyqtSignal
+        :type: Signal
         """
 
         objSignal.connect(self.showJobOutput)
 
-    @pyqtSlot(int, str, str)
+    @Slot(int, str, str)
     def showJobOutput(self, jobID, status, command): # pylint: disable=W0613
         """
         Click jobsWidget Table job row to update job run output and job error output

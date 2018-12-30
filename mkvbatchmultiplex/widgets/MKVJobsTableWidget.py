@@ -17,8 +17,8 @@ JT001
 
 import logging
 
-from PyQt5.QtCore import QMutex, QMutexLocker, Qt, pyqtSlot, pyqtSignal
-from PyQt5.QtWidgets import (QVBoxLayout, QTableWidget, QMenu, QWidget,
+from PySide2.QtCore import QMutex, QMutexLocker, Qt, Slot, Signal
+from PySide2.QtWidgets import (QVBoxLayout, QTableWidget, QMenu, QWidget,
                              QTableWidgetItem, QAbstractScrollArea)
 
 from mkvbatchmultiplex.jobs import JobStatus
@@ -34,7 +34,7 @@ class MKVJobsTableWidget(QWidget):
     Also shows status of job
     """
 
-    showJobOutput = pyqtSignal(int, str, str)
+    showJobOutput = Signal(int, str, str)
 
     def __init__(self, parent=None, ctrlQueue=None):
         super(MKVJobsTableWidget, self).__init__(parent)
@@ -75,7 +75,7 @@ class MKVJobsTableWidget(QWidget):
 
         objSignal.connect(self.jobsTable.setJobStatus)
 
-    @pyqtSlot(int, int)
+    @Slot(int, int)
     def onClick(self, row, col): # pylint: disable=W0613
         """On Single Click Slot"""
 
@@ -95,7 +95,7 @@ class MKVJobsTableWidget(QWidget):
 class JobsTableWidget(QTableWidget):
     """Jobs Table"""
 
-    updateJobStatus = pyqtSignal(int, str, bool)
+    updateJobStatus = Signal(int, str, bool)
 
     def __init__(self, parent=None, ctrlQueue=None):
         super(JobsTableWidget, self).__init__(parent)
@@ -209,7 +209,7 @@ class JobsTableWidget(QTableWidget):
                         self.ctrQueue.put(self.actions.Abort)
 
 
-    @pyqtSlot(int, str, str)
+    @Slot(int, str, str)
     def addJob(self, jobID, status, cmd):
         """Add Job to Table"""
 
@@ -228,7 +228,7 @@ class JobsTableWidget(QTableWidget):
             self.setItem(rowNumber, 1, item1)
             self.setItem(rowNumber, 2, item2)
 
-    @pyqtSlot(int, str)
+    @Slot(int, str)
     def setJobStatus(self, jobID, status):
         """Update the job status"""
 

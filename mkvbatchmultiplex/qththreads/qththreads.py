@@ -6,7 +6,7 @@
 import traceback
 import sys
 
-from PyQt5.QtCore import QObject, QRunnable, pyqtSignal, pyqtSlot
+from PySide2.QtCore import QObject, QRunnable, Signal, Slot
 
 
 class WorkerSignals(QObject):
@@ -24,9 +24,9 @@ class WorkerSignals(QObject):
     result
         `object` data returned from processing, anything
     '''
-    finished = pyqtSignal()
-    error = pyqtSignal(tuple)
-    result = pyqtSignal(object)
+    finished = Signal()
+    error = Signal(tuple)
+    result = Signal(object)
 
 class Worker(QRunnable):
     '''
@@ -50,7 +50,7 @@ class Worker(QRunnable):
         self.kwargs = kwargs
         self.signals = WorkerSignals()
 
-    @pyqtSlot()
+    @Slot()
     def run(self):
         '''
         Initialise the runner function with passed args, kwargs.

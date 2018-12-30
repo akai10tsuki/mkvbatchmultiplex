@@ -13,9 +13,9 @@ import platform
 #import time
 from queue import Queue
 
-from PyQt5.QtCore import Qt, QTimer, pyqtSignal, pyqtSlot
-from PyQt5.QtGui import QValidator
-from PyQt5.QtWidgets import (QApplication, QGridLayout, QGroupBox, QLabel,
+from PySide2.QtCore import Qt, QTimer, Signal, Slot
+from PySide2.QtGui import QValidator
+from PySide2.QtWidgets import (QApplication, QGridLayout, QGroupBox, QLabel,
                              QLineEdit, QMessageBox, QPushButton,
                              QWidget)
 
@@ -47,9 +47,9 @@ class CurrentJob: # pylint: disable=R0903
 class WorkerSignals(threads.WorkerSignals):
     """Additional signals for QRunables"""
 
-    progress = pyqtSignal(int, int)
-    outputmain = pyqtSignal(str, dict)
-    outputcommand = pyqtSignal(str)
+    progress = Signal(int, int)
+    outputmain = Signal(str, dict)
+    outputcommand = Signal(str)
 
 
 class Worker(threads.Worker): # pylint: disable=R0903
@@ -248,12 +248,12 @@ class MKVFormWidget(QWidget):
 
         self.setLayout(self.grid)
 
-    @pyqtSlot(int, int)
+    @Slot(int, int)
     def progress(self, unit, total):
         """Update the progress bars"""
         self.parent.progressbar.setValues(unit, total)
 
-    @pyqtSlot(str)
+    @Slot(str)
     def updateCommand(self, strCommand):
         """Update command input widget"""
 

@@ -3,8 +3,8 @@
 
 import logging
 
-from PyQt5.QtCore import QMutex
-from PyQt5.QtWidgets import QWidget, QTabWidget, QVBoxLayout
+from PySide2.QtCore import QMutex
+from PySide2.QtWidgets import QWidget, QTabWidget, QVBoxLayout
 
 MUTEX = QMutex()
 MODULELOG = logging.getLogger(__name__)

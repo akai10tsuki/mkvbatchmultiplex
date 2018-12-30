@@ -13,7 +13,7 @@ import os
 import re
 import subprocess
 
-from PyQt5.QtCore import QMutex, QMutexLocker, Qt
+from PySide2.QtCore import QMutex, QMutexLocker, Qt
 
 import mkvbatchmultiplex.VS as vs
 from mkvbatchmultiplex.mediafileclasses import MediaFileInfo
@@ -188,14 +188,6 @@ def runCommand(command, currentJob, lstTotal, log=False, ctrlQueue=None):
         n = 0
 
         for line in p.stdout:
-
-            request = None
-            if ctrlQueue is not None:
-                if not ctrlQueue.empty():
-                    request = ctrlQueue.get()
-                    if request == JobStatus.Abort:
-                        p.kill()
-                        return 2000
 
             if line.find(u"Progress:") == 0:
                 # Deal with progress percent

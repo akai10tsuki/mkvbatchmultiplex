@@ -4,7 +4,7 @@
 """Multithreading Class base on QThread"""
 
 
-from PyQt5.QtCore import QThread
+from PySide2.QtCore import QThread
 
 
 class GenericThread(QThread):

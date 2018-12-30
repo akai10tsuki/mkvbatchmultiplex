@@ -10,9 +10,9 @@ OW004
 
 import logging
 
-from PyQt5.QtCore import QMutex, QMutexLocker, Qt, pyqtSlot
-from PyQt5.QtGui import QTextCursor
-from PyQt5.QtWidgets import QTextEdit
+from PySide2.QtCore import QMutex, QMutexLocker, Qt, Slot
+from PySide2.QtGui import QTextCursor
+from PySide2.QtWidgets import QTextEdit
 
 MUTEX = QMutex()
 MODULELOG = logging.getLogger(__name__)
@@ -32,7 +32,7 @@ class MKVOutputWidget(QTextEdit):
 
         objSignal.connect(self.insertText)
 
-    @pyqtSlot(str, dict)
+    @Slot(str, dict)
     def insertText(self, strText, kwargs):
         """
         Insert text in output window
@@ -60,7 +60,7 @@ class MKVOutputWidget(QTextEdit):
                 replaceLine = False
 
             if replaceLine:
-                self.moveCursor(QTextCursor.StartOfLine, 1)
+                self.moveCursor(QTextCursor.StartOfLine, QTextCursor.KeepAnchor)
 
             self.setTextColor(color)
             self.insertPlainText(strText)
