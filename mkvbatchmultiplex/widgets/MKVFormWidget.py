@@ -141,6 +141,16 @@ class MKVFormWidget(QWidget):
             "Paste copy of <b>mkvtoolnix-gui</b> Show command line"
         )
 
+        self.btnAnalysis = QPushButton(" Analysis ")
+        self.btnAnalysis.resize(self.btnAnalysis.sizeHint())
+        self.btnAnalysis.clicked.connect(
+            lambda: self.qthRunInThread(self.qthAnalysis)
+        )
+        self.btnAnalysis.setToolTip(
+            "Print analysis of command line."
+        )
+        self.leCommand.textChanged.connect(self.analysisButtonsState)
+
         self.btnAddQueue = QPushButton(" Add Job ")
         self.btnAddQueue.resize(self.btnAddQueue.sizeHint())
         self.btnAddQueue.clicked.connect(
@@ -156,15 +166,6 @@ class MKVFormWidget(QWidget):
             lambda: self.qthRunInThread(self.qthProcessCommand)
         )
         self.btnProcessQueue.setToolTip("Execute commands on job queue.")
-
-        #self.btnPreProcess = QPushButton(" Pre-Process ")
-        #self.btnPreProcess.resize(self.btnPreProcess.sizeHint())
-        #self.btnPreProcess.clicked.connect(
-        #    lambda: self.qthRunInThread(self.qthPreProcess)
-        #)
-        #self.btnPreProcess.setToolTip(
-        #    "Process the command line to check for errors."
-        #)
 
         self.btnProcess = QPushButton(" Process ")
         self.btnProcess.resize(self.btnProcess.sizeHint())
@@ -206,13 +207,12 @@ class MKVFormWidget(QWidget):
         self.btnReset.clicked.connect(self.reset)
         self.btnReset.setToolTip("Reset state to work with another batch.")
 
-        self.btnProcess.setEnabled(False)
-        self.btnAddQueue.setEnabled(False)
+
+        self.buttonsState(False)
+        self.btnAnalysis.setEnabled(False)
         self.btnProcessQueue.setEnabled(False)
         self.btnClearOutputWindow.setEnabled(False)
         self.btnReset.setEnabled(False)
-        self.btnCheckFiles.setEnabled(False)
-        self.buttonsState(False)
 
         self.teOutputWindow = MKVOutputWidget(self)
         self.teOutputWindow.textChanged.connect(self.clearButtonsState)
@@ -224,8 +224,8 @@ class MKVFormWidget(QWidget):
         self.btnGrid = QGridLayout()
 
         self.btnGrid.addWidget(self.btnPasteClipboard, 0, 0)
-        #self.btnGrid.addWidget(self.btnPreProcess, 1, 0)
-        self.btnGrid.addWidget(self.btnProcess, 1, 0)
+        self.btnGrid.addWidget(self.btnAnalysis, 1, 0)
+        self.btnGrid.addWidget(self.btnProcess, 1, 1)
         self.btnGrid.addWidget(self.btnAddQueue, 2, 0)
         self.btnGrid.addWidget(self.btnProcessQueue, 2, 1)
         self.btnGrid.addWidget(self.btnShowSourceFiles, 3, 0)
@@ -304,6 +304,13 @@ class MKVFormWidget(QWidget):
             self.btnReset.setEnabled(False)
             self.btnClearOutputWindow.setEnabled(False)
 
+    def analysisButtonsState(self):
+        """Set clear button state"""
+        if self.leCommand.text() != "":
+            self.btnAnalysis.setEnabled(True)
+        else:
+            self.btnAnalysis.setEnabled(False)
+
     def buttonsState(self, bState=None):
         """Change button state"""
 
@@ -376,6 +383,35 @@ class MKVFormWidget(QWidget):
 
             return (QValidator.Acceptable, inputStr, pos)
 
+    def qthAnalysis(self, **kwargs):
+        """List the source files found"""
+
+        if 'cbOutputMain' in kwargs:
+            cbOutputMain = kwargs['cbOutputMain']
+        else:
+            if self.log:
+                MODULELOG.error("FW011: No output callback function")
+            return "No output callback function"
+
+        lstAnalysis = []
+        cmd = self.leCommand.text()
+
+        bTest = MKVCommand.bLooksOk(cmd, lstAnalysis)
+
+        cbOutputMain.emit("\nAnalysis of command line:\n\n", {'color': Qt.black})
+
+        if lstAnalysis:
+            for e in lstAnalysis:
+                i = e.find(r"ok")
+                if i > 0:
+                    cbOutputMain.emit("{}\n".format(e), {'color': Qt.darkGreen})
+                else:
+                    cbOutputMain.emit("{}\n".format(e), {'color': Qt.red})
+
+        cbOutputMain.emit("\n", {'color': Qt.black})
+
+        return None
+
     def addQueue(self, **kwargs):
         """Add Command to Work Queue"""
 
@@ -428,8 +464,6 @@ class MKVFormWidget(QWidget):
         jobStatus = JobStatus()
 
         jobID = self.jobs.append(cmd, jobStatus.Waiting)
-        #self.parent.addJob.emit(jobID, cmd)
-        #self.jobs.status(jobID, "Waiting")
 
         return jobID, cmd
 

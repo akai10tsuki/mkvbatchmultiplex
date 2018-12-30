@@ -13,6 +13,7 @@ path for executable and target options are parsed from the command line
 MC018
 """
 
+import ast
 import os
 import re
 import shlex
@@ -359,7 +360,6 @@ class MKVCommand(object):
             self._initHelper(value)
             self._GenerateCommands()
 
-
     @property
     def error(self):
         """return error description"""
@@ -460,6 +460,7 @@ class MKVCommand(object):
         matchAttachments = reAttachmentsEx.finditer(strCommand)
 
         bOk = True
+        trackOrder = None
         # To look Ok must match the 5 group in the command line that
         # are expected
         # 1: mkvmerge name with fullpath
@@ -468,18 +469,43 @@ class MKVCommand(object):
         # 4: track order
         if matchCommand and (len(matchCommand.groups()) == 4):
             lstAnalysis.append("Command seems ok.")
+            trackOrder = matchCommand.group(4)
         else:
             if lstResults is None:
                 return False
             lstAnalysis.append("Command bad format.")
             bOk = False
 
+        if trackOrder is not None:
+            try:
+                d = ast.literal_eval("{" + trackOrder + "}")
+                trackTotal = MKVCommand.numberOfTracks(strCommand)
+
+                s = trackOrder.split(',')
+                if trackTotal == len(s):
+                    for e in s:
+                        if not e.find(':') > 0:
+                            bOk = False
+                else:
+                    bOk = False
+
+                if not bOk:
+                    if lstResults is None:
+                        return False
+                    lstAnalysis.append("Number of tracks {} and track order don't match.".format(trackTotal, len(d)))
+
+            except:
+                if lstResults is None:
+                    return False
+                lstAnalysis.append("Command track order bad format.")
+                bOk = False
+
         if matchExecutable:
             p = Path(matchExecutable.group(1))
             if not p.is_file():
                 if lstResults is None:
                     return False
-                lstAnalysis.append("mkvmerge not found.")
+                lstAnalysis.append("mkvmerge not found - {}.".format(str(p)))
                 bOk = False
             else:
                 lstAnalysis.append("mkvmerge ok = {}".format(str(p)))
@@ -492,7 +518,7 @@ class MKVCommand(object):
         if matchOutputFile:
             p = Path(matchOutputFile.group(1))
             if not Path(p.parent).is_dir():
-                lstAnalysis.append("Bad destination.")
+                lstAnalysis.append("Destination directory not found - {}.".format(str(p.parent)))
                 if lstResults is None:
                     return False
                 bOk = False
@@ -501,32 +527,42 @@ class MKVCommand(object):
         else:
             if lstResults is None:
                 return False
-            lstAnalysis.append("Bad match destination.")
+            lstAnalysis.append("Destination directory not found.")
             bOk = False
 
-
-        n = 1
-        for match in matchSources:
-            p = Path(match.group(1))
-            if not Path(p.parent).is_dir():
-                lstAnalysis.append("Bad source directory {}".format(1))
-                if lstResults is None:
-                    return False
+        if matchSources:
+            n = 1
+            for match in matchSources:
+                p = Path(match.group(1))
+                if not Path(p.parent).is_dir():
+                    if lstResults is None:
+                        return False
+                    lstAnalysis.append("Source directory {} not found {}".format(n, str(p.parent)))
+                    bOk = False
+                else:
+                    lstAnalysis.append("Source directory {} ok = {}".format(n, str(p.parent)))
+                n += 1
+            if n == 1:
+                # if the command is so bad matchSources for loop won't run
+                lstAnalysis.append("Source directory not found.")
                 bOk = False
-            else:
-                lstAnalysis.append("Source directory {1} ok = {0}".format(str(p.parent), n))
-            n += 1
+        else:
+            if lstResults is None:
+                return False
+            lstAnalysis.append("Source directory not found.")
+            bOk = False
 
+        # This check if for optional attachments files
         n = 1
         for match in matchAttachments:
             p = Path(match.group(1))
-            if not Path(p.parent).is_dir():
-                lstAnalysis.append("Attachment not found - {}".format(str(p)))
+            if not p.is_file():
+                lstAnalysis.append("Attachment {} not found - {}".format(n ,str(p)))
                 if lstResults is None:
                     return False
                 bOk = False
             else:
-                lstAnalysis.append("Attachment ok = {0}".format(str(p)))
+                lstAnalysis.append("Attachment {} ok = {}".format(n, str(p)))
             n += 1
 
         if lstResults is not None:
@@ -534,6 +570,23 @@ class MKVCommand(object):
                 lstResults.append(e)
 
         return bOk
+
+    @staticmethod
+    def numberOfTracks(strCmd):
+
+        rg = r"^'?(.*?)'\s.*?\-\-output.'(.*?)'(.*)"
+
+        regEx = re.compile(rg)
+        regMatch = regEx.match(strCmd)
+        tracksInfo = ""
+
+        if regMatch:
+            tracksInfo = "'" + regMatch.group(3)
+
+        reLanguageEx = re.compile(r"\-\-language (.*?) ")
+        matchLanguage = reLanguageEx.findall(tracksInfo)
+
+        return len(matchLanguage)
 
     def strCmdSourceFile(self):
         """First source file fullpath name"""
