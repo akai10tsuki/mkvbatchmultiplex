@@ -5,9 +5,22 @@
 """
 Maintain configuration
 
+keys have to strings
+
+It works with basic data types:
+
+    - bool, byes, numbers: int, float, complex, strings
+
+and dictionaries, lists and tuples of basic data types
+
+binary data that can converted to base64 and save as bytes
+can work the conversion from byres to binary is not
+manage by the class
+
 CM0001
 """
 
+import ast
 import logging
 import xml
 import xml.etree.ElementTree as ET
@@ -25,13 +38,12 @@ class ConfigurationSettings:
     The class is iterable returning key, value pairs
     """
 
-    log = False
-
-    def __init__(self):
+    def __init__(self, log=False):
 
         self._config = {}
         self._current = 0
         self._len = 0
+        self._log = log
 
     def __iter__(self):
 
@@ -56,12 +68,14 @@ class ConfigurationSettings:
 
     def set(self, key, value):
         """
-        set configuration item
+        set configuration item the key must be a string
+        value can be basic data type
+        with dict, list, tuples of basic types
 
         :param key: configuration element
         :type key: str
         :param value: element value
-        :type value: object
+        :type value: basic data type
         """
 
         self._config[key] = value
@@ -76,9 +90,16 @@ class ConfigurationSettings:
         :rtype: object
         """
 
-        return self._config[key]
+        if key in self._config:
+            return self._config[key]
+        else:
+            if self._log:
+                s = str(key)
+                MODULELOG.debug("CM0001: key not found - %s", s)
 
-    def toXML(self, root=None):
+        return None
+
+    def toXML(self, root=None, name=None):
         """
         Returns the configuration in XML format
         if root is None returns the current configuration
@@ -86,7 +107,10 @@ class ConfigurationSettings:
         :rtype: xml.etree.ElementTree.Element
         """
 
-        config = ET.Element("Config")
+        if name is None:
+            name = "Config"
+
+        config = ET.Element(name)
 
         if root is not None:
             root.append(config)
@@ -101,25 +125,28 @@ class ConfigurationSettings:
 
         return root
 
-    def fromXML(self, xmlDoc):
+    def fromXML(self, xmlDoc, name=None):
         """
         Restore configuration from xml
 
         :param xmlDoc: xml document containing configuration data
         """
-
         self._config = {}
+
+        if name is None:
+            searchIn = './Config/ConfigSetting'
+        else:
+            searchIn = "./" + name + "/ConfigSetting"
 
         for setting in xmlDoc.findall('./Config/ConfigSetting'):
             key = setting.attrib["id"]
 
-            if setting.attrib["type"] == "bool":
-                value = bool(setting.text)
-            else:
+            if setting.attrib["type"] == "str":
                 value = setting.text
+            else:
+                value = ast.literal_eval(setting.text)
 
             self.set(key, value)
-
 
     def xmlPrettyPrint(self, root=None):
         """
@@ -146,15 +173,21 @@ def main():
     configFile = Path(Path.cwd(), "configmanager.xml")
     xmlFile = str(configFile)
 
+    b = b'mkvbatchmultiplex'
     configuration = ConfigurationSettings()
-    configuration.set("logging", True)
-    configuration.set("geometry", "AdnQywACAAAAAAHmAAAAoAAACM4AAAR5AAAB7wAAAMYAAAjFAAAEcAAAAAAAAAAACgA=")
-    configuration.set("font", "MS Shell Dlg 2,7.8,-1,5,50,0,0,0,0,0")
+    configuration.set("bool", True)
+    configuration.set("base64sting", "AdnQywACAAAAAAHmAAAAoAAACM4AAAR5AAAB7wAAAMYAAAjFAAAEcAAAAAAAAAAACgA=")
+    configuration.set("base86bytes", "AdnQywACAAAAAAHmAAAAoAAACM4AAAR5AAAB7wAAAMYAAAjFAAAEcAAAAAAAAAAACgA=".encode())
+    configuration.set("dict", {"key1": 1, "key2": 2, 3: b})
+    configuration.set("list", [2, 3, "list", {"key1": 1, 2: [2]}])
+    configuration.set("int", 13)
+    configuration.set("float", 1.3e200)
+    configuration.set("complex", 1+3j)
+    configuration.set("tuple", (1.11, 2.22, 3.33))
 
+    print("\nConfiguration set\n")
     for key, value in configuration:
-        print("Key = {}, value = {}".format(key, value))
-
-    print("\n\n")
+        print("Key = {0}, type = {2} value = {1}".format(key, value, type(value).__name__))
 
     root = ET.Element("VergaraSoft")
     xmlConfig = configuration.toXML(root)
@@ -165,11 +198,13 @@ def main():
     root = tree.getroot()
     configuration.fromXML(root)
 
+    print("\nRead from configuration file\n")
     for key, value in configuration:
-        print("Key = {}, value = {}".format(key, value))
+        print("Key = {0}, type = {2}, value = {1}".format(key, value, type(value).__name__))
 
     prettyXML = configuration.xmlPrettyPrint()
 
+    print()
     print(prettyXML)
 
 if __name__ == '__main__':

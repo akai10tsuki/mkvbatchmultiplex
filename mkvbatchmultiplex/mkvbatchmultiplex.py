@@ -267,8 +267,11 @@ class MKVMultiplexApp(QMainWindow):
 
             base64Geometry = self.saveGeometry().toBase64()
 
+            s = str(base64Geometry)
+            b = ast.literal_eval(s)
+
             self.config.set(
-                'geometry', base64Geometry
+                'geometry', b
             )
 
             font = self.font()
@@ -285,11 +288,12 @@ class MKVMultiplexApp(QMainWindow):
         else:
 
             if configFile.is_file():
-
-                tree = ET.ElementTree(file=xmlFile)
-                root = tree.getroot()
-                self.config.fromXML(root)
-
+                try:
+                    tree = ET.ElementTree(file=xmlFile)
+                    root = tree.getroot()
+                    self.config.fromXML(root)
+                except:
+                    logging.info("MW0001: Bad configuration file.")
             else:
 
                 configFile.touch(exist_ok=True)
@@ -303,12 +307,12 @@ class MKVMultiplexApp(QMainWindow):
             self.actEnableLogging.setChecked(bLogging)
             self.enableLogging(bLogging)
 
-        strGeometry = self.config.get('geometry')
+        byteGeometry = self.config.get('geometry')
 
-        if strGeometry is not None:
+        if byteGeometry is not None:
             # Test for value read if not continue
-            byte = ast.literal_eval(strGeometry)
-            byteGeometry = QByteArray(byte)
+            #byte = ast.literal_eval(strGeometry)
+            byteGeometry = QByteArray(byteGeometry)
 
             self.restoreGeometry(QByteArray.fromBase64(byteGeometry))
         else:
@@ -319,6 +323,7 @@ class MKVMultiplexApp(QMainWindow):
 
 def abort(self):
     """Force Quit"""
+    self.configuration(save=True)
     qApp.quit()
 
 def setupLogging():
