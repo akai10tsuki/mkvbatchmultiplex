@@ -81,7 +81,7 @@ setup(
 
     install_requires=[
         'pymediainfo>=2.2.1',
-        'PyQt5>=5.10.1'
+        'PySide2>=5.12'
     ],
 
     python_requires='>=3.5, <4',
