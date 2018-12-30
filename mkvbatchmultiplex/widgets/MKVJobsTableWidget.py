@@ -18,8 +18,8 @@ JT001
 import logging
 
 from PySide2.QtCore import QMutex, QMutexLocker, Qt, Slot, Signal
-from PySide2.QtWidgets import (QVBoxLayout, QTableWidget, QMenu, QWidget,
-                             QTableWidgetItem, QAbstractScrollArea)
+from PySide2.QtWidgets import (QVBoxLayout, QTableWidget, QMenu, QWidget, QHeaderView,
+                             QTableWidgetItem, QAbstractScrollArea, QLineEdit)
 
 from mkvbatchmultiplex.jobs import JobStatus
 
@@ -49,7 +49,7 @@ class MKVJobsTableWidget(QWidget):
         self.jobsTable = JobsTableWidget(self, self.ctrlQueue)
 
         # table selection change
-        self.jobsTable.cellClicked.connect(self.onClick)
+        self.jobsTable.cellDoubleClicked.connect(self.onDoubleClick)
 
     def _initLayout(self):
 
@@ -76,7 +76,7 @@ class MKVJobsTableWidget(QWidget):
         objSignal.connect(self.jobsTable.setJobStatus)
 
     @Slot(int, int)
-    def onClick(self, row, col): # pylint: disable=W0613
+    def onDoubleClick(self, row, col): # pylint: disable=W0613
         """On Single Click Slot"""
 
         #print("Clicked row = {} col = {}".format(row, col))
@@ -107,6 +107,8 @@ class JobsTableWidget(QTableWidget):
         self.setColumnCount(3)
         self.setHorizontalHeaderLabels(["Jobs ID", "Status", "Description"])
         self.horizontalHeader().setStretchLastSection(True)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.setWordWrap(False)
         self.setSizeAdjustPolicy(
             QAbstractScrollArea.AdjustToContents
         )
@@ -208,6 +210,16 @@ class JobsTableWidget(QTableWidget):
                     if self.ctrQueue is not None:
                         self.ctrQueue.put(self.actions.Abort)
 
+    def resizeEvent(self, event):
+
+        super(JobsTableWidget, self).resizeEvent(event)
+
+        header = self.horizontalHeader()
+
+        header.setSectionResizeMode(2, QHeaderView.ResizeToContents)
+        width = header.sectionSize(2)
+        header.setSectionResizeMode(2, QHeaderView.Interactive)
+        header.resizeSection(2, width)
 
     @Slot(int, str, str)
     def addJob(self, jobID, status, cmd):
@@ -221,6 +233,7 @@ class JobsTableWidget(QTableWidget):
             item0.setFlags(Qt.ItemIsEnabled)
             item1.setFlags(Qt.ItemIsEnabled)
             item2.setFlags(Qt.ItemIsEnabled)
+            item2.setToolTip(cmd)
 
             rowNumber = self.rowCount()
             self.insertRow(rowNumber)
