@@ -256,7 +256,7 @@ class MKVMultiplexApp(QMainWindow):
 
     def configuration(self, save=False):
         """Read and write configuration"""
-        configFile = Path(Path.home(), ".mkvBatchMultiplex/config.xml")
+        configFile = Path(Path.home(), ".mkvBatchMultiplex/config-pyside2.xml")
         xmlFile = str(configFile)
 
         if save:
