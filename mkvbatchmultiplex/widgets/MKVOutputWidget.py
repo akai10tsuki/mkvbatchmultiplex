@@ -62,7 +62,9 @@ class MKVOutputWidget(QTextEdit):
             if replaceLine:
                 self.moveCursor(QTextCursor.StartOfLine, QTextCursor.KeepAnchor)
 
-            self.setTextColor(color)
+            if not color == Qt.black:
+                # dark theme clash
+                self.setTextColor(color)
             self.insertPlainText(strText)
             self.ensureCursorVisible()
 

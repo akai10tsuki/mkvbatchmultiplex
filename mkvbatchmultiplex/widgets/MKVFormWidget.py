@@ -398,7 +398,7 @@ class MKVFormWidget(QWidget):
 
         bTest = MKVCommand.bLooksOk(cmd, lstAnalysis)
 
-        cbOutputMain.emit("\nAnalysis of command line:\n\n", {'color': Qt.black})
+        cbOutputMain.emit("\nAnalysis of command line:\n\n")
 
         if lstAnalysis:
             for e in lstAnalysis:
@@ -408,7 +408,7 @@ class MKVFormWidget(QWidget):
                 else:
                     cbOutputMain.emit("{}\n".format(e), {'color': Qt.red})
 
-        cbOutputMain.emit("\n", {'color': Qt.black})
+        cbOutputMain.emit("\n")
 
         return None
 
@@ -480,20 +480,19 @@ class MKVFormWidget(QWidget):
         cbOutputMain.emit(
             "Base Files:\n\n" \
             + str(self.objCommand.basefiles) \
-            + "\n\nSource Files:\n\n",
-            {'color': Qt.black}
+            + "\n\nSource Files:\n\n"
         )
 
         if self.objCommand:
             for _, _, lstFiles in self.objCommand:
-                cbOutputMain.emit(str(lstFiles) + "\n\n", {'color': Qt.black})
+                cbOutputMain.emit(str(lstFiles) + "\n\n")
         else:
             cbOutputMain.emit(
                 "\n" + self.objCommand.error + "\n\n",
                 {'color': Qt.red}
             )
 
-        cbOutputMain.emit("\n", {'color': Qt.black})
+        cbOutputMain.emit("\n")
 
         return None
 
@@ -510,21 +509,18 @@ class MKVFormWidget(QWidget):
         cbOutputMain.emit(
             "Shell:\n\n" \
             + self.objCommand.command \
-            + "\n\n",
-            {'color': Qt.black}
+            + "\n\n"
         )
         cbOutputMain.emit(
             "Command Template:\n\n" \
             + str(self.objCommand.template) \
-            + "\n\nCommands:\n\n",
-            {'color': Qt.black}
+            + "\n\nCommands:\n\n"
         )
 
         if self.objCommand:
             for command, _, _ in self.objCommand:
                 cbOutputMain.emit(
-                    str(command) + "\n\n",
-                    {'color': Qt.black}
+                    str(command) + "\n\n"
                 )
         else:
             cbOutputMain.emit(
@@ -532,7 +528,7 @@ class MKVFormWidget(QWidget):
                 {'color': Qt.red}
             )
 
-        cbOutputMain.emit("\n", {'color': Qt.black})
+        cbOutputMain.emit("\n")
 
         return None
 
@@ -546,7 +542,7 @@ class MKVFormWidget(QWidget):
                 MODULELOG.error("FW010: No output callback function")
             return "No output callback function"
 
-        cbOutputMain.emit("Checking files...\n\n", {'color': Qt.black})
+        cbOutputMain.emit("Checking files...\n\n")
 
         if self.objCommand:
 
@@ -566,7 +562,7 @@ class MKVFormWidget(QWidget):
                         {'color': Qt.red}
                     )
 
-        cbOutputMain.emit("\n", {'color': Qt.black})
+        cbOutputMain.emit("\n")
 
         return None
 
