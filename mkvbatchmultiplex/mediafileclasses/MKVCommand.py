@@ -493,6 +493,17 @@ class MKVCommand(object):
                     bOk = False
                 else:
                     lstAnalysis.append("Source directory {} ok = {}".format(n, str(p.parent)))
+
+                if not Path(p).is_file():
+                    print("Source bad")
+                    if lstResults is None:
+                        return False
+                    lstAnalysis.append("Source file {} not found {}".format(n, str(p)))
+                    bOk = False
+                else:
+                    print("Source ok")
+                    lstAnalysis.append("Source file {} ok = {}".format(n, str(p)))
+
                 n += 1
             if n == 1:
                 # if the command is so bad matchSources for loop won't run
@@ -630,6 +641,7 @@ class MKVCommand(object):
                 bOk = False
             else:
                 lstAnalysis.append("Destination directory ok = {}".format(str(p.parent)))
+
         else:
             if lstResults is None:
                 return False
@@ -641,6 +653,7 @@ class MKVCommand(object):
             for match in matchSources:
                 f = _stripQuote(match.group(1))
                 p = Path(f)
+
                 if not Path(p.parent).is_dir():
                     if lstResults is None:
                         return False
@@ -648,7 +661,18 @@ class MKVCommand(object):
                     bOk = False
                 else:
                     lstAnalysis.append("Source directory {} ok = {}".format(n, str(p.parent)))
+
+                if not Path(p).is_file():
+                    if lstResults is None:
+                        return False
+                    lstAnalysis.append("Source file {} not found {}".format(n, str(p)))
+                    bOk = False
+                else:
+                    lstAnalysis.append("Source file {} ok = {}".format(n, str(p)))
+
+
                 n += 1
+
             if n == 1:
                 # if the command is so bad matchSources for loop won't run
                 lstAnalysis.append("Source directory not found.")
