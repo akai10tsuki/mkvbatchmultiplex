@@ -49,20 +49,19 @@ class MKVOutputWidget(QTextEdit):
         strTmp = ""
 
         with QMutexLocker(MUTEX):
+            color = None
+            replaceLine = False
+
             if 'color' in kwargs:
                 color = kwargs['color']
-            else:
-                color = Qt.black
 
             if 'replaceLine' in kwargs:
                 replaceLine = kwargs['replaceLine']
-            else:
-                replaceLine = False
 
-            if replaceLine:
+            if replaceLine is not None:
                 self.moveCursor(QTextCursor.StartOfLine, QTextCursor.KeepAnchor)
 
-            if not color == Qt.black:
+            if color is not None:
                 # dark theme clash
                 self.setTextColor(color)
             self.insertPlainText(strText)
