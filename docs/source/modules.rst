@@ -2,6 +2,6 @@ mkvbatchmultiplex
 =================
 
 .. toctree::
-   :maxdepth: 6
+   :maxdepth: 4
 
-   mkvbatchmultiplex
+   reference/mkvbatchmultiplex
