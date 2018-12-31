@@ -8,21 +8,29 @@ mkvBatchMultiplex
 Program for batch processing mkvmerge commands
 
 The program will take command line argument from mkvtoolnix-gui
+from MKVToolNix
 
 Multiplexer->Show command line
-
-Works with either Windows (cmd.exe) or Linux/unix shells (bash, zsh, etc.)
 
 It will analyze the command and apply the same multiplex instructions to all
 the files in the same directory if more than one file is involved in the
 command they must match in numbers.
+
+Develop on Windows
+
+Works on:
+
+    * Tested on ubuntu 18.04
 
 Libraries and programs used:
 
     python 3.6-3.7
     pymediainfo 2.2.1-3.0
     mediainfo-17.10->18.12
-    PyQt5 5.10.1-5.11.3
+    PySide2 5.12
+
+Target program:
+    MKVToolNix - tested with versions v17.0.0-29.0.0
 """
 
 import ast
