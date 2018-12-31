@@ -28,8 +28,8 @@ The program uses:
         pymediainfo - Python MediaInfo wrapper, you can find it at
         https://pypi.org/project/pymediainfo/
 
-        PyQt5 - GUI interface library ussed,
-        https://pypi.org/project/PyQt5/
+        PySide2 - GUI interface library used,
+        https://wiki.qt.io/Qt_for_Python
 
     MKVToolNix - The target tool from witch we get the command,
     https://mkvtoolnix.download/
@@ -41,7 +41,6 @@ The program uses:
 Known Issues
 ============
 
-On macOS MKVToolNix and the application don't work on 10.14 mojave.
-This is Qt5 related.  Pre-release versions of MKVToolNix and the
-PyQt5 library do work.  So after the PyQt5 is and update will be
-made.
+On macOS 10.14 Mojave dark theme MKVToolNix doesn't work as of
+version 29.0.0. A pre-release versions of MKVToolNix is needed
+or wait for MKVToolNix greater than 29.0.0.

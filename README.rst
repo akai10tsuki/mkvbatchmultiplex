@@ -36,11 +36,12 @@ Done some testing with pre-release versions and works more or less find.
 Dependencies
 ************
 
-    * Python_ 3.6 or greater on system
-        - PyQt5_ 5.10.1 or greater
+    * Python_ 3.5 or greater on system
+
+        - PySide2_ 5.12 or greater
         - pymediainfo_ 2.2.1 or greater
     * MediaInfo_ tested with versions 17.10->18.12
-    * MKVToolNix_ tested with versions
+    * MKVToolNix_ tested with versions 17.00->29.00
 
 For now is a python package it can be installed:
 
@@ -50,7 +51,7 @@ For now is a python package it can be installed:
     or download the source
 
 
-macOS 10.14 Dark theme won't work.
+macOS 10.14 Dark theme MKVToolNix has to be version 29.0.0+
 
 Usage
 =====
@@ -82,7 +83,7 @@ See https://mkvbatchmultiplex.readthedocs.io for more information.
 .. Hyperlinks.
 
 .. _pymediainfo: https://pypi.org/project/pymediainfo/
-.. _PyQt5: https://pypi.org/project/PyQt5/
+.. _PySide2: https://wiki.qt.io/Qt_for_Python
 .. _Python: https://www.python.org/downloads/
 .. _MKVToolNix: https://mkvtoolnix.download/
 .. _Matroska: https://www.matroska.org/

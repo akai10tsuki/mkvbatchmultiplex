@@ -76,8 +76,8 @@ Functionality
 =============
 
 
-Naming
-~~~~~~
+Source File Naming
+~~~~~~~~~~~~~~~~~~
 
 The source and destination directories are taken from the template.
 The resulting name in the directory is taken from the first media file
@@ -110,12 +110,65 @@ The only setting is to enable logging.  The log will be saved one
 
   Enable logging.
 
+Buttons
+~~~~~~~
+
+.. figure:: images/mkvbatchmultiplex-mainbuttons.png
+
+* Paste Clipboard
+
+  Paste command line from system Clipboard is expected to be from
+  a copy to clipboard from MKVToolnix.
+
+* Process
+
+  Start working on the command line.  The output of the job can be subsequent
+  on the **Job Output** tab.
+
+* Add Job
+
+  If there is more than one operation to be done **Add Job** will add the
+  command to a job queue
+
+* Process Jobs
+
+  Start working on the job queue.  While the jobs are running more jobs can be
+  added to the queue.
+
+* Clear Output
+
+  Clear the output of the main window
+
+* Clear/Reset
+
+  Clear contents of all output windows and the job table.
+
+The following buttons are for troubleshooting
+
+* Analysis
+
+  Shows some information on the parse of the command line this can help
+  solving problems as to why the command is not been accepted
+
+* Source Files
+
+  Shows the source files to be worked with.
+
+* Commands
+
+  Show commands to be executed as lists to be submitted to a subprocess
+
+* Check Files
+
+  Verify the files to be worked on and signals any command that don't
+  pass consistency test.  Flagged commands will not be processed.
+
 Know Issues
-^^^^^^^^^^^
+===========
 
 When a job is running and exit is requested a prompt to stop the
 job will appear and a signal will be sent to the execution thread
-to stop.  When a message is shown that the job was aborted then
-you could exit.  This will change to stop the job then exit if
-the program waits for the threadpool to stop the GUI freezes.
-The way it works now is the less problematic approach.
+to stop.  When a message is shown that the job was aborted. The program
+will wait for the current file of the current job when it finished
+it will exit.  The killing of the subprocess is not working so even
+if you exit the subprocess will end in the background.

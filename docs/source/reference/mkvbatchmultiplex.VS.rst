@@ -8,6 +8,7 @@ mkvbatchmultiplex.VS.cipher module
 ----------------------------------
 
 .. automodule:: mkvbatchmultiplex.VS.cipher
+    :caption: VS.cipher
     :members:
     :undoc-members:
     :show-inheritance:

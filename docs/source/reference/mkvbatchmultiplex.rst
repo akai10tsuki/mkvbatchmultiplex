@@ -6,9 +6,9 @@ Subpackages
 
 .. toctree::
 
-    mkvbatchmultiplex.VS
+    VS <mkvbatchmultiplex.VS>
     mkvbatchmultiplex.configurationsettings
-    mkvbatchmultiplex.jobs
+    jobs <mkvbatchmultiplex.jobs>
     mkvbatchmultiplex.loghandler
     mkvbatchmultiplex.mediafileclasses
     mkvbatchmultiplex.qththreads

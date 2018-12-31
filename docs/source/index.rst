@@ -1,16 +1,15 @@
-.. include:: README.rst
+.. include:: introduction.rst
 
 .. toctree::
    :caption: mkvbatchmultiplex Documentation
    :maxdepth: 2
 
-   introduction
    installation
    gettingstarted
    using
    LICENSE
    acknowledgements
-   reference/modules
+   mkvbatchmultiplex reference <modules>
 
 Indices and tables
 ==================
