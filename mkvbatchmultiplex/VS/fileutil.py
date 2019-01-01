@@ -18,6 +18,7 @@ def _find(element, dirPath, matchFunc=os.path.isfile):
         candidate = os.path.join(dirname, element)
         if matchFunc(candidate):
             return candidate
+
     return None
 
 def findFile(element, dirPath=None):
