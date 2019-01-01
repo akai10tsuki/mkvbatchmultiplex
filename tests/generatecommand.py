@@ -14,10 +14,13 @@ import sys
 
 from pathlib import Path, PurePath
 
-from PySide2.QtWidgets import QApplication, QMainWindow, QTextEdit, QPushButton, QGridLayout, QWidget
+from PySide2.QtWidgets import (
+    QApplication, QMainWindow, QTextEdit, QPushButton, QGridLayout, QWidget
+)
 
 
 def findFile(element, dirPath=None):
+    """find file in the path"""
 
     if dirPath is None:
         dirPath = os.getenv('PATH')
@@ -32,6 +35,7 @@ def findFile(element, dirPath=None):
     return None
 
 def getMKVMerge():
+    """Looks for mkvmerge executable in the system"""
 
     # /Applications/MKVToolNix-29.0.0.app/Contents/MacOS/mkvmerge
     currentOS = platform.system()
@@ -78,6 +82,7 @@ def getMKVMerge():
     return None
 
 def checkForQuote(file):
+    """add quotes if find spaces in file name"""
 
     f = str(file)
 
@@ -108,22 +113,26 @@ class GenCommandApp(QMainWindow):
 
         # pylint
         self.cmd0 = mkvmerge + r" --ui-language en --output '" + d + \
-                r"/video - S01E01.mkv' --language 0:und --language 1:spa --default-track 1:yes '(' '" + s + \
+                r"/video - S01E01.mkv' --language 0:und --language 1:spa " + \
+                r"--default-track 1:yes '(' '" + s + \
                 r"/video - S01E01.avi' ')' --language 0:eng --default-track 0:yes '(' '" + s + \
                 r"/Video - S01E01.ass' ')' --track-order 0:0,0:1,1:0"
 
         self.cmd1 = mkvmerge + r" --ui-language en --output '" + d + \
-                r"/video - S01E02.mkv' --language 0:und --language 1:spa --default-track 1:yes '(' '" + s + \
+                r"/video - S01E02.mkv' --language 0:und --language 1:spa " + \
+                r"--default-track 1:yes '(' '" + s + \
                 r"/video - S01E02.avi' ')' --language 0:eng --default-track 0:yes '(' '" + s + \
                 r"/Video - S01E02.ass' ')' --track-order 0:0,0:1,1:0"
 
         self.cmd2 = mkvmerge + r" --ui-language en --output '" + d + \
-                r"/video - S01E03.mkv' --language 0:und --language 1:spa --default-track 1:yes '(' '" + s + \
+                r"/video - S01E03.mkv' --language 0:und --language 1:spa " + \
+                r"--default-track 1:yes '(' '" + s + \
                 r"/video - S01E03.avi' ')' --language 0:eng --default-track 0:yes '(' '" + s + \
                 r"/Video - S01E03.ass' ')' --track-order 0:0,0:1,1:0"
 
         self.cmd3 = mkvmerge + r" --ui-language en --output " + d + \
-                r"/video-S01E01.mkv --language 0:und --language 1:spa --default-track 1:yes '(' " + s + \
+                r"/video-S01E01.mkv --language 0:und --language 1:spa " + \
+                r"--default-track 1:yes '(' " + s + \
                 r"/video-S01E01.avi ')' --language 0:eng --default-track 0:yes '(' " + s + \
                 r"/Video-S01E01.ass ')' --track-order 0:0,0:1,1:0"
 
@@ -131,27 +140,27 @@ class GenCommandApp(QMainWindow):
         self.textWindow = QTextEdit()
         self.pushButton0 = QPushButton(" Command 0 ")
         self.pushButton0.resize(self.pushButton0.sizeHint())
-        self.pushButton0.clicked.connect(
+        self.pushButton0.clicked.connect(   # pylint: disable=E1101
             lambda: self.pasteClipboard(0)
         )
         self.pushButton1 = QPushButton(" Command 1 ")
         self.pushButton1.resize(self.pushButton1.sizeHint())
-        self.pushButton1.clicked.connect(
+        self.pushButton1.clicked.connect(   # pylint: disable=E1101
             lambda: self.pasteClipboard(1)
         )
         self.pushButton2 = QPushButton(" Command 2 ")
         self.pushButton2.resize(self.pushButton2.sizeHint())
-        self.pushButton2.clicked.connect(
+        self.pushButton2.clicked.connect(   # pylint: disable=E1101
             lambda: self.pasteClipboard(2)
         )
         self.pushButton3 = QPushButton(" Command 3 ")
         self.pushButton3.resize(self.pushButton2.sizeHint())
-        self.pushButton3.clicked.connect(
+        self.pushButton3.clicked.connect(   # pylint: disable=E1101
             lambda: self.pasteClipboard(3)
         )
         self.pushButtonExit = QPushButton(" Exit ")
         self.pushButtonExit.resize(self.pushButtonExit.sizeHint())
-        self.pushButtonExit.clicked.connect(
+        self.pushButtonExit.clicked.connect(    # pylint: disable=E1101
             self.exitApp
         )
 
