@@ -444,9 +444,9 @@ class MKVCommand(object):
                 if not bOk:
                     if lstResults is None:
                         return False
-                    lstAnalysis.append("Number of tracks {} and track order don't match.".format(trackTotal, len(d)))
+                    lstAnalysis.append("Number of tracks {} and track order of {} don't match.".format(trackTotal, len(d)))
 
-            except:
+            except SyntaxError:
                 if lstResults is None:
                     return False
                 lstAnalysis.append("Command track order bad format.")
@@ -520,7 +520,7 @@ class MKVCommand(object):
         for match in matchAttachments:
             p = Path(match.group(1))
             if not p.is_file():
-                lstAnalysis.append("Attachment {} not found - {}".format(n ,str(p)))
+                lstAnalysis.append("Attachment {} not found - {}".format(n, str(p)))
                 if lstResults is None:
                     return False
                 bOk = False
@@ -606,9 +606,9 @@ class MKVCommand(object):
                 if not bOk:
                     if lstResults is None:
                         return False
-                    lstAnalysis.append("Number of tracks {} and track order don't match.".format(trackTotal, len(d)))
+                    lstAnalysis.append("Number of tracks {} and track order of {} don't match.".format(trackTotal, len(d)))
 
-            except:
+            except SyntaxError:
                 if lstResults is None:
                     return False
                 lstAnalysis.append("Command track order bad format.")
@@ -689,7 +689,7 @@ class MKVCommand(object):
             f = _stripQuote(matchAttachments.group(1))
             p = Path(p)
             if not p.is_file():
-                lstAnalysis.append("Attachment {} not found - {}".format(n ,str(p)))
+                lstAnalysis.append("Attachment {} not found - {}".format(n, str(p)))
                 if lstResults is None:
                     return False
                 bOk = False
