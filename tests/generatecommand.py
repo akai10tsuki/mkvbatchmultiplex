@@ -16,6 +16,7 @@ from pathlib import Path, PurePath
 
 from PySide2.QtWidgets import QApplication, QMainWindow, QTextEdit, QPushButton, QGridLayout, QWidget
 
+
 def findFile(element, dirPath=None):
 
     if dirPath is None:
@@ -133,7 +134,6 @@ class GenCommandApp(QMainWindow):
         self.pushButton0.clicked.connect(
             lambda: self.pasteClipboard(0)
         )
-        self.pushButton0.clicked.
         self.pushButton1 = QPushButton(" Command 1 ")
         self.pushButton1.resize(self.pushButton1.sizeHint())
         self.pushButton1.clicked.connect(
@@ -143,6 +143,11 @@ class GenCommandApp(QMainWindow):
         self.pushButton2.resize(self.pushButton2.sizeHint())
         self.pushButton2.clicked.connect(
             lambda: self.pasteClipboard(2)
+        )
+        self.pushButton3 = QPushButton(" Command 3 ")
+        self.pushButton3.resize(self.pushButton2.sizeHint())
+        self.pushButton3.clicked.connect(
+            lambda: self.pasteClipboard(3)
         )
         self.pushButtonExit = QPushButton(" Exit ")
         self.pushButtonExit.resize(self.pushButtonExit.sizeHint())
