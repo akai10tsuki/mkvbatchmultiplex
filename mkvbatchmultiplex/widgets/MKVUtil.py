@@ -10,8 +10,11 @@ LOG UT009
 
 import logging
 import os
+import platform
 import re
 import subprocess
+
+from pathlib import Path
 
 from PySide2.QtCore import QMutex, QMutexLocker, Qt
 
@@ -23,6 +26,52 @@ MUTEX = QMutex()
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
+
+def getMKVMerge():
+
+    # /Applications/MKVToolNix-29.0.0.app/Contents/MacOS/mkvmerge
+    currentOS = platform.system()
+
+    if currentOS == "Darwin":
+        lstTest = glob.glob("/Applications/MKVToolNix*")
+        if lstTest:
+            f = lstTest[0] + "/Contents/MacOS/mkvmerge"
+            mkvmerge = Path(f)
+            if mkvmerge.is_file():
+                return mkvmerge
+
+    elif currentOS == "Windows":
+        #ProgramFiles=C:\Program Files
+        #ProgramFiles(x86)=C:\Program Files (x86)
+
+        defPrograms64 = os.environ.get('ProgramFiles')
+        defPrograms32 = os.environ.get('ProgramFiles(x86)')
+
+        dirs = []
+        if defPrograms64 is not None:
+            dirs.append(defPrograms64)
+
+        if defPrograms32 is not None:
+            dirs.append(defPrograms32)
+
+        # search 64 bits
+        for d in dirs:
+            search = sorted(Path(d).rglob("mkvmerge.exe"))
+            if search:
+                mkvmerge = Path(search[0])
+                if mkvmerge.is_file():
+                    return mkvmerge
+
+    elif currentOS == "Linux":
+
+        search = vs.findFile("mkvmerge")
+
+        if search is not None:
+            mkvmerge = Path(search)
+            if mkvmerge.is_file():
+                return mkvmerge
+
+    return None
 
 def getBaseFiles(objCommand, log=False):
     """get the base files from the command"""
