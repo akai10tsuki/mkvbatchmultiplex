@@ -14,7 +14,7 @@ from PySide2.QtCore import QMutex, QMutexLocker, Qt, Slot
 from PySide2.QtGui import QTextCursor
 from PySide2.QtWidgets import QTextEdit
 
-import mkvbatchmultiplex.VS as vs
+import mkvbatchmultiplex.utils as utils
 
 MUTEX = QMutex()
 MODULELOG = logging.getLogger(__name__)
@@ -63,7 +63,7 @@ class MKVOutputWidget(QTextEdit):
             if replaceLine is not None:
                 self.moveCursor(QTextCursor.StartOfLine, QTextCursor.KeepAnchor)
 
-            if vs.isMacDarkMode() and (color is None):
+            if utils.isMacDarkMode() and (color is None):
                 color = Qt.white
             elif color is None:
                 color = Qt.black

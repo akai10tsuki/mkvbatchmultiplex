@@ -1,14 +1,13 @@
 """VS module names"""
 
 from .cipher import encrypt, decrypt
-from .fileutil import findFile, findDir, pathToList, setFullPath, getFileList
-from .utils import (
-    setDate, padNumber, parseNumberRange, ctrlCodeNumber, stripSuffix,
-    gregorianDay, gregorianDay2Date, daysBetweenDates, isLeapYear,
+from .fileutil import findFile, getFileList
+from .decorators import staticVars
+
+from .utils import setDate, padNumber, parseNumberRange, ctrlCodeNumber, stripSuffix, \
+    gregorianDay, gregorianDay2Date, daysBetweenDates, isLeapYear, \
     isMacDarkMode, getCommandOutput
-)
-from .MKVUtil import (
-    getMKVMerge, getBaseFiles, bCheckLenOfLists, getSourceFiles,
+
+
+from .MKVUtil import getMKVMerge, getBaseFiles, bCheckLenOfLists, getSourceFiles, \
     bVerifyStructure, getFiles, runCommand
-)
-from .vsdecorators import staticVars

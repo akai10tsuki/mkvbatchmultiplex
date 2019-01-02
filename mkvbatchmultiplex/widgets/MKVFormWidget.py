@@ -20,9 +20,10 @@ from PySide2.QtWidgets import (QApplication, QGridLayout, QGroupBox, QLabel,
                              QWidget)
 
 import mkvbatchmultiplex.qththreads as threads
+import mkvbatchmultiplex.utils as utils
+
 from mkvbatchmultiplex.mediafileclasses import MKVCommand
 
-from . import MKVUtil
 from .MKVOutputWidget import MKVOutputWidget
 from .MKVJobsTableWidget import JobStatus
 
@@ -552,7 +553,7 @@ class MKVFormWidget(QWidget):
 
             for _, basefiles, sourcefiles in self.objCommand:
 
-                if MKVUtil.bVerifyStructure(basefiles, sourcefiles, self.log):
+                if utils.bVerifyStructure(basefiles, sourcefiles, self.log):
                     cbOutputMain.emit(
                         "Structure looks OK:\n" \
                         + str(sourcefiles) + "\n\n",
@@ -770,7 +771,7 @@ class MKVFormWidget(QWidget):
                     bStructureOk = False
 
                     try:
-                        bStructureOk = MKVUtil.bVerifyStructure(basefiles,
+                        bStructureOk = utils.bVerifyStructure(basefiles,
                                                                 sourcefiles,
                                                                 self.log,
                                                                 currentJob)
@@ -794,7 +795,7 @@ class MKVFormWidget(QWidget):
                             + "\n\n",
                             {'color': Qt.blue}
                         )
-                        MKVUtil.runCommand(
+                        utils.runCommand(
                             command,
                             currentJob,
                             lstTotal,

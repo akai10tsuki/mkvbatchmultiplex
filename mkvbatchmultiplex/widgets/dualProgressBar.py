@@ -12,7 +12,7 @@ align:
 """
 
 from PySide2.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QProgressBar, QSizePolicy
-from PySide2.QtCore import Qt
+from PySide2.QtCore import Qt, Slot
 
 
 class DualProgressBar(QWidget):
@@ -37,10 +37,12 @@ class DualProgressBar(QWidget):
         self.pbBarUnit = QProgressBar()
         self.pbBarUnit.setRange(0, 100)
         self.pbBarUnit.setValue(0)
+        self.pbBarUnit.resize(self.pbBarUnit.sizeHint())
 
         self.pbBarTotal = QProgressBar()
         self.pbBarTotal.setRange(0, 100)
         self.pbBarTotal.setValue(0)
+        self.pbBarTotal.resize(self.pbBarTotal.sizeHint())
 
         # Horizontal with horizontal elements
         self.hboxLayout = QHBoxLayout()
@@ -80,6 +82,7 @@ class DualProgressBar(QWidget):
             self._hLayout()
             self.setLayout(self.hboxLayout)
 
+    @Slot(int)
     def setAlignment(self, align):
         """
         Set Alignment
@@ -235,7 +238,7 @@ class SpacerWidget(QWidget):
     def __init__(self, parent=None):
         super(SpacerWidget, self).__init__(parent)
 
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Expanding)
 
 
 if __name__ == '__main__':
@@ -245,6 +248,7 @@ if __name__ == '__main__':
 
     class MainWindow(QMainWindow):
         """Test the progress bars"""
+
         def __init__(self, *args, **kwargs):
             super(MainWindow, self).__init__(*args, **kwargs)
 
@@ -269,6 +273,7 @@ if __name__ == '__main__':
             self.setCentralWidget(w)
 
             self.show()
+
         def horizontal(self):
             """Horizontal progress bar"""
             self.pb.setAlignment(Qt.Horizontal)

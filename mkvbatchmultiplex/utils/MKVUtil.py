@@ -19,8 +19,8 @@ from pathlib import Path
 
 from PySide2.QtCore import QMutex, QMutexLocker, Qt
 
-from mkvbatchmultiplex.utils import findFile, getFileList, staticVars
 from mkvbatchmultiplex.mediafileclasses import MediaFileInfo
+from mkvbatchmultiplex.utils import staticVars, findFile, getFileList
 
 MUTEX = QMutex()
 MODULELOG = logging.getLogger(__name__)
