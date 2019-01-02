@@ -7,5 +7,8 @@ from .utils import (
     gregorianDay, gregorianDay2Date, daysBetweenDates, isLeapYear,
     isMacDarkMode, getCommandOutput
 )
-
+from .MKVUtil import (
+    getMKVMerge, getBaseFiles, bCheckLenOfLists, getSourceFiles,
+    bVerifyStructure, getFiles, runCommand
+)
 from .vsdecorators import staticVars
