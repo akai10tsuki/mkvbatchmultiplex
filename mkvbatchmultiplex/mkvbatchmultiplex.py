@@ -34,25 +34,23 @@ Target program:
 """
 
 import ast
-import base64
 import logging
 import logging.handlers
 import sys
 import os
+import xml
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from queue import Queue
 from collections import deque
 
-import mkvbatchmultiplex.__version__ as __version__
-
 from PySide2.QtCore import QByteArray, Qt, QThreadPool, Signal
 from PySide2.QtGui import QIcon, QFont
 from PySide2.QtWidgets import (QAction, QApplication, QDesktopWidget, qApp,
-                                QMainWindow, QMessageBox, QToolBar, QVBoxLayout,
-                                QWidget, QFontDialog)
+                               QMainWindow, QMessageBox, QToolBar, QVBoxLayout,
+                               QWidget, QFontDialog)
 
-
+import mkvbatchmultiplex.config as config
 
 from .loghandler import QthLogRotateHandler
 from .widgets import (DualProgressBar, MKVFormWidget, MKVTabsWidget,
@@ -61,7 +59,7 @@ from .jobs import JobQueue, JobStatus
 from .configurationsettings import ConfigurationSettings
 
 
-class MKVMultiplexApp(QMainWindow):
+class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
     """Main window of application"""
 
     log = False
@@ -124,6 +122,7 @@ class MKVMultiplexApp(QMainWindow):
     def _initMenu(self):
 
         p = Path(os.path.realpath(__file__))
+        defaultFont = QFont("Segoe UI", 9)
 
         actExit = QAction(QIcon(str(p.parent) + "/images/cross-circle.png"), "&Exit", self)
         actExit.setShortcut("Ctrl+E")
@@ -158,17 +157,16 @@ class MKVMultiplexApp(QMainWindow):
         self.actEnableLogging.setStatusTip(
             "Enable session logging in ~/.mkvBatchMultiplex/mkvBatchMultiplex.log"
         )
-        """
         self.actEnableLogging.triggered.connect(self.enableLogging)
         self.actSelectFont = QAction("Font")
         self.actSelectFont.triggered.connect(self.selectFont)
-        """
 
         settingsMenu = menuBar.addMenu("&Settings")
         settingsMenu.addAction(self.actEnableLogging)
-        #settingsMenu.addAction(self.actSelectFont)
+        settingsMenu.addAction(self.actSelectFont)
 
         # Read configuration elements
+        self.setFont(defaultFont)
         self.configuration()
         self.restoreConfig()
 
@@ -255,7 +253,8 @@ class MKVMultiplexApp(QMainWindow):
     def selectFont(self):
         """Select Font"""
 
-        fontDialog = QFontDialog(self)
+        font = self.font()
+        fontDialog = QFontDialog(font)
 
         valid, font = fontDialog.getFont()
 
@@ -300,10 +299,12 @@ class MKVMultiplexApp(QMainWindow):
                     tree = ET.ElementTree(file=xmlFile)
                     root = tree.getroot()
                     self.config.fromXML(root)
-                except:
-                    logging.info("MW0001: Bad configuration file.")
+                except NameError:
+                    logging.info("MW0002: Bad configuration definition file.")
+                except xml.etree.ElementTree.ParseError:
+                    print("Loggin....")
+                    logging.info("MW0001: Bad or corrupt configuration file.")
             else:
-
                 configFile.touch(exist_ok=True)
 
     def restoreConfig(self):
@@ -332,7 +333,7 @@ class MKVMultiplexApp(QMainWindow):
 def abort(self):
     """Force Quit"""
     self.configuration(save=True)
-    qApp.quit()
+    qApp.quit()     # pylint: disable=E1101
 
 def setupLogging():
     """Configure log"""
@@ -360,7 +361,7 @@ def mainApp():
 
     logging.info("App Start.")
     logging.info("Python: %s", sys.version)
-    logging.info("mkvbatchmultiplex-%s", __version__.VERSION)
+    logging.info("mkvbatchmultiplex-%s", config.VERSION)
     app = QApplication(sys.argv)
     win = MKVMultiplexApp()
     win.show()
