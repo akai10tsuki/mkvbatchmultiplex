@@ -21,7 +21,7 @@ import logging
 
 from pathlib import Path
 
-import mkvbatchmultiplex.VS as vs
+import mkvbatchmultiplex.utils as utils
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -220,7 +220,7 @@ class MKVCommand(object):
 
             for objFile in self._oBaseSourceFilesList:
                 lstMKVFiles.append(
-                    vs.getFileList(
+                    utils.getFileList(
                         objFile.directory,
                         objFile.extension,
                         True
