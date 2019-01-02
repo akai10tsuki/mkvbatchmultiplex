@@ -111,7 +111,6 @@ class GenCommandApp(QMainWindow):
         if not e:
             os.mkdir(str(d))
 
-        # pylint
         self.cmd0 = mkvmerge + r" --ui-language en --output '" + d + \
                 r"/video - S01E01.mkv' --language 0:und --language 1:spa " + \
                 r"--default-track 1:yes '(' '" + s + \
@@ -135,7 +134,6 @@ class GenCommandApp(QMainWindow):
                 r"--default-track 1:yes '(' " + s + \
                 r"/video-S01E01.avi ')' --language 0:eng --default-track 0:yes '(' " + s + \
                 r"/Video-S01E01.ass ')' --track-order 0:0,0:1,1:0"
-
 
         self.textWindow = QTextEdit()
         self.pushButton0 = QPushButton(" Command 0 ")
