@@ -4,3 +4,4 @@ from .MKVFormWidget import MKVFormWidget
 from .MKVTabsWidget import MKVTabsWidget
 from .MKVOutputWidget import MKVOutputWidget
 from .MKVJobsTableWidget import MKVJobsTableWidget
+from .jobStatusLabel import JobStatusLabel
