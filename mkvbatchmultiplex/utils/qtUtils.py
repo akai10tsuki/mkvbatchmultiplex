@@ -8,153 +8,22 @@ Main form
 LOG UT009
 """
 
-import glob
 import logging
-import os
-import platform
 import re
 import subprocess
 
-from pathlib import Path
-
 from PySide2.QtCore import QMutex, QMutexLocker, Qt
+from PySide2.QtWidgets import QDesktopWidget
 
 from mkvbatchmultiplex.mediafileclasses import MediaFileInfo
-from mkvbatchmultiplex.utils import staticVars, findFile, getFileList
+from mkvbatchmultiplex.utils import staticVars
+
+from .mkvUtils import getBaseFiles, getSourceFiles
 
 MUTEX = QMutex()
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
-
-def getMKVMerge():
-    """get the name of the mkvmerge executable in the system"""
-
-    currentOS = platform.system()
-
-    if currentOS == "Darwin":
-
-        lstTest = glob.glob("/Applications/MKVToolNix*")
-        if lstTest:
-            f = lstTest[0] + "/Contents/MacOS/mkvmerge"
-            mkvmerge = Path(f)
-            if mkvmerge.is_file():
-                return mkvmerge
-
-    elif currentOS == "Windows":
-
-        defPrograms64 = os.environ.get('ProgramFiles')
-        defPrograms32 = os.environ.get('ProgramFiles(x86)')
-
-        dirs = []
-        if defPrograms64 is not None:
-            dirs.append(defPrograms64)
-
-        if defPrograms32 is not None:
-            dirs.append(defPrograms32)
-
-        # search 64 bits
-        for d in dirs:
-            search = sorted(Path(d).rglob("mkvmerge.exe"))
-            if search:
-                mkvmerge = Path(search[0])
-                if mkvmerge.is_file():
-                    return mkvmerge
-
-    elif currentOS == "Linux":
-
-        search = findFile("mkvmerge")
-
-        if search is not None:
-            mkvmerge = Path(search)
-            if mkvmerge.is_file():
-                return mkvmerge
-
-    return None
-
-def getBaseFiles(objCommand, log=False):
-    """get the base files from the command"""
-
-    lstBaseFiles = []
-
-    if objCommand and objCommand.lstObjFiles:
-
-        # list of base source files the ones received on command line
-        lstBaseFiles = \
-            [x.fullPathName for x in objCommand.lstObjFiles]
-
-    else:
-        if log:
-            MODULELOG.error("UT001: Base files reading error")
-
-    return lstBaseFiles
-
-def bCheckLenOfLists(lstLists, lstTypeTotal):
-    """list of source files has to be equal length"""
-
-    intTmp = None
-    bReturn = True
-
-    for lstTmp in lstLists:
-
-        if not lstTmp:
-            bReturn = False
-            lstTypeTotal.append(("Ops!!!", "File not found."))
-            break
-
-        lstTypeTotal.append([str(len(lstTmp)), os.path.splitext(lstTmp[0])[1]])
-
-        if not intTmp:
-            intTmp = len(lstTmp)
-        else:
-            if len(lstTmp) != intTmp:
-                if bReturn:
-                    bReturn = False
-
-    return bReturn
-
-def getSourceFiles(objCommand, log=False):
-    """read source directories to get files"""
-
-    lstMKVFiles = []
-    lstSourceFiles = []
-    lstTypeTotal = []
-
-    # Get files from any directory found in command
-    # the number of files on each directory has to be equal
-    # Filter by type in original source file
-
-    if objCommand and objCommand.lstObjFiles:
-
-        for objFile in objCommand.lstObjFiles:
-            lstMKVFiles.append(
-                getFileList(
-                    objFile.directory,
-                    objFile.extension,
-                    True
-                )
-            )
-
-        if bCheckLenOfLists(lstMKVFiles, lstTypeTotal):
-
-            # Join all source files in a list of lists each element
-            # have all source files in the order found
-            # That is the names are not used the order in the directories is
-            for i in range(len(lstMKVFiles[0])):
-                lstSourceFiles.append([x[i] for x in lstMKVFiles])
-        else:
-            objCommand.bRaiseError = True
-            error = "UT002: List of files total don't match."
-            objCommand.strError = error + "\n\n"
-            if log:
-                MODULELOG.error("UT003: List of files total don't match")
-            for lstTmp in lstTypeTotal:
-                error = lstTmp[0] + " - " + lstTmp[1]
-                objCommand.strError = objCommand.strError + error + "\n"
-                if log:
-                    MODULELOG.error("UT004: File(s): %s", error)
-
-    return lstSourceFiles
 
 def bVerifyStructure(lstBaseFiles, lstFiles, log=False, currentJob=None):
     """verify the file structure against the base files"""
@@ -188,6 +57,29 @@ def bVerifyStructure(lstBaseFiles, lstFiles, log=False, currentJob=None):
 
     return True
 
+def centerWidgets(widget, parent=None):
+    """center widget based on parent or screen geometry"""
+
+    if parent is None:
+        parent = widget.parentWidget()
+
+    if parent:
+        #hostRect = parent.geometry()
+        #widget.move(hostRect.center() - widget.rect().center())
+
+        # cP = parent.rect().center
+
+        #qR = widget.frameGeometry()
+        #cP = parent.rect().center()
+        #qR.moveCenter(cP)
+        #widget.move(qR.topLeft())
+
+        widget.move(parent.rect().center() - widget.frameGeometry().center())
+
+    else:
+
+        widget.move(QDesktopWidget().availableGeometry().center() - widget.frameGeometry().center())
+
 @staticVars(strCommand="", lstBaseFiles=[], lstSourceFiles=[])
 def getFiles(objCommand=None, lbf=None, lsf=None, clear=False, log=False):
     """Get the list of files to be worked on in thread safe manner"""
@@ -206,7 +98,7 @@ def getFiles(objCommand=None, lbf=None, lsf=None, clear=False, log=False):
                 getFiles.lstSourceFiles = getSourceFiles(objCommand, log=log)
             else:
                 if log:
-                    MODULELOG.info("UT005: Hit cached information.")
+                    MODULELOG.info("UT004: Hit cached information.")
 
             # lbf and lsf are mutable pass information back here
             # this approach should make it thread safe so
@@ -218,8 +110,8 @@ def getFiles(objCommand=None, lbf=None, lsf=None, clear=False, log=False):
                 lsf.extend(getFiles.lstSourceFiles)
 
         if log:
-            MODULELOG.info("UT006: Base files: %s", str(getFiles.lstBaseFiles))
-            MODULELOG.info("UT007: Source files: %s", str(getFiles.lstSourceFiles))
+            MODULELOG.info("UT005: Base files: %s", str(getFiles.lstBaseFiles))
+            MODULELOG.info("UT006: Source files: %s", str(getFiles.lstSourceFiles))
 
 def runCommand(command, currentJob, lstTotal, log=False, ctrlQueue=None):
     """Execute command in a subprocess thread"""
@@ -278,6 +170,6 @@ def runCommand(command, currentJob, lstTotal, log=False, ctrlQueue=None):
     lstTotal[0] += 100
 
     if log:
-        MODULELOG.info("UT008: mkvmerge rc=%d - %s", rc, command)
+        MODULELOG.info("UT007: mkvmerge rc=%d - %s", rc, command)
 
     return rc

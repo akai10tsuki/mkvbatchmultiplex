@@ -52,10 +52,6 @@ def pathToList(pathVar):
     else:
         return None
 
-def setFullPath(strPath, strFile):
-    """Set the filename with the fullpath mkvmerge seems to need this didn't work otherwise"""
-    return os.path.join(strPath, strFile)
-
 def getFileList(strPath, strExtFilter=None, bFullPath=False):
     """
     Get files in a directory
