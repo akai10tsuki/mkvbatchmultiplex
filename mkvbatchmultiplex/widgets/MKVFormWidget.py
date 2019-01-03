@@ -16,8 +16,8 @@ from queue import Queue
 from PySide2.QtCore import Qt, QTimer, Signal, Slot
 from PySide2.QtGui import QValidator
 from PySide2.QtWidgets import (QApplication, QGridLayout, QGroupBox, QLabel,
-                             QLineEdit, QMessageBox, QPushButton,
-                             QWidget)
+                               QLineEdit, QMessageBox, QPushButton,
+                               QWidget)
 
 import mkvbatchmultiplex.qththreads as threads
 import mkvbatchmultiplex.utils as utils
@@ -44,6 +44,7 @@ class CurrentJob: # pylint: disable=R0903
         self.outputJobMain = None
         self.outputJobError = None
         self.progressBar = None
+
 
 class WorkerSignals(threads.WorkerSignals):
     """Additional signals for QRunables"""
@@ -96,12 +97,6 @@ class MKVFormWidget(QWidget):
         self.timer.setInterval(2000)
         self.timer.timeout.connect(self.watchJobs)
         self.timer.start()
-
-        #self.qth = threads.GenericThread(self.watchJobs)
-        #self.qth.isRunning()
-        #self.qth.start()
-
-        #self.qthRunInThread(self.whatEver)
 
     def _initHelper(self):
         self.objCommand = MKVCommand()
@@ -397,7 +392,7 @@ class MKVFormWidget(QWidget):
         lstAnalysis = []
         cmd = self.leCommand.text()
 
-        bTest = MKVCommand.bLooksOk(cmd, lstAnalysis)
+        MKVCommand.bLooksOk(cmd, lstAnalysis)
 
         cbOutputMain.emit("\nAnalysis of command line:\n\n", {})
 
@@ -465,6 +460,8 @@ class MKVFormWidget(QWidget):
         jobStatus = JobStatus()
 
         jobID = self.jobs.append(cmd, jobStatus.Waiting)
+
+        self.parent.jobsLabel[0] = len(self.jobs)
 
         return jobID, cmd
 
@@ -612,6 +609,12 @@ class MKVFormWidget(QWidget):
             self.leCommand.setFocus()
             self.parent.progressbar.setValues(0, 0)
 
+            jobsLabelValues = self.parent.jobsLabel.values
+
+            jobsLabelValues[0] = len(self.jobs)
+
+            self.parent.jobsLabel.setValues(jobsLabelValues)
+
     def qthProcessCommand(self, command=None, **kwargs):
         """Main worker function will process the commands"""
 
@@ -742,7 +745,13 @@ class MKVFormWidget(QWidget):
 
             if objCommand:
 
+                self.parent.jobsLabel[1] = currentJob.jobID
+                self.parent.jobsLabel[3] = len(objCommand)
+
+                currentJob.jobsLabelValues = self.parent.jobsLabel.values
+
                 nTotal = len(objCommand) * 100
+                nFile = 0
                 lstTotal = [0, nTotal]
 
                 # Set the total for progressbar to increase gradually
@@ -751,6 +760,8 @@ class MKVFormWidget(QWidget):
                 #self.parent.tabs.setCurrentIndex(2)
 
                 for command, basefiles, sourcefiles in objCommand:
+
+                    nFile += 1
 
                     currentStatus = self.jobs.status(currentJob.jobID)
 
@@ -771,10 +782,12 @@ class MKVFormWidget(QWidget):
                     bStructureOk = False
 
                     try:
-                        bStructureOk = utils.bVerifyStructure(basefiles,
-                                                                sourcefiles,
-                                                                self.log,
-                                                                currentJob)
+                        bStructureOk = utils.bVerifyStructure(
+                            basefiles,
+                            sourcefiles,
+                            self.log,
+                            currentJob
+                        )
                     except OSError as e:
                         currentJob.outputMain.emit(
                             "\n\nMediaInfo not found.\n\n",
@@ -795,6 +808,7 @@ class MKVFormWidget(QWidget):
                             + "\n\n",
                             {'color': Qt.blue}
                         )
+                        self.parent.jobsLabel[2]
                         utils.runCommand(
                             command,
                             currentJob,
@@ -802,6 +816,7 @@ class MKVFormWidget(QWidget):
                             self.log
                         )
                     else:
+                        self.parent.jobsLabel[4] += 1
                         lstTotal[0] += 100
 
 
