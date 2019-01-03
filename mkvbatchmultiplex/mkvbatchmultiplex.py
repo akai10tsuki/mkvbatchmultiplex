@@ -53,8 +53,8 @@ from PySide2.QtWidgets import (QAction, QApplication, QDesktopWidget, qApp,
 import mkvbatchmultiplex.config as config
 
 from .loghandler import QthLogRotateHandler
-from .widgets import (DualProgressBar, MKVFormWidget, MKVTabsWidget,
-                      MKVOutputWidget, MKVJobsTableWidget, SpacerWidget)
+from .widgets import (DualProgressBar, MKVFormWidget, MKVTabsWidget, FormatLabel,
+                      MKVOutputWidget, MKVJobsTableWidget)
 from .jobs import JobQueue, JobStatus
 from .configurationsettings import ConfigurationSettings
 
@@ -78,9 +78,19 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         self.threadpool = QThreadPool()
         self.jobs = JobQueue(self.workQueue)
         self.config = ConfigurationSettings()
+        self.actEnableLogging = None
 
-        self._initMenu()
+        cwd = Path(os.path.realpath(__file__))
+
+        self.setWindowTitle("MKVMERGE: Batch Multiplex")
+        self.setWindowIcon(QIcon(str(cwd.parent) + "/images/mkvBatchMultiplex.png"))
+
+        self._initMenu(cwd)
         self._initHelper()
+
+        # Read configuration elements
+        self.configuration()
+        self.restoreConfig()
 
     def _initHelper(self):
 
@@ -119,12 +129,11 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         layout.addWidget(self.tabsWidget)
         self.setCentralWidget(widget)
 
-    def _initMenu(self):
+    def _initMenu(self, cwd):
 
-        p = Path(os.path.realpath(__file__))
-        defaultFont = QFont("Segoe UI", 9)
+        menuBar = self.menuBar()
 
-        actExit = QAction(QIcon(str(p.parent) + "/images/cross-circle.png"), "&Exit", self)
+        actExit = QAction(QIcon(str(cwd.parent) + "/images/cross-circle.png"), "&Exit", self)
         actExit.setShortcut("Ctrl+E")
         actExit.setStatusTip("Exit application")
         actExit.triggered.connect(self.close)
@@ -133,22 +142,6 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         actAbort.setStatusTip("Force exit")
         actAbort.triggered.connect(abort)
 
-        toolbar = QToolBar("Exit")
-        toolbar.addAction(actExit)
-        self.toolbar = self.addToolBar(toolbar)
-
-        self.progressbar = DualProgressBar(align=Qt.Horizontal)
-        toolSpacer = SpacerWidget()
-
-        toolbar1 = QToolBar("Progress")
-        toolbar1.addWidget(toolSpacer)
-        toolbar1.addSeparator()
-        toolbar1.addWidget(self.progressbar)
-        self.toolbar = self.addToolBar(toolbar1)
-
-        self.statusBar()
-
-        menuBar = self.menuBar()
         fileMenu = menuBar.addMenu("&File")
         fileMenu.addAction(actExit)
         fileMenu.addAction(actAbort)
@@ -158,28 +151,32 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
             "Enable session logging in ~/.mkvBatchMultiplex/mkvBatchMultiplex.log"
         )
         self.actEnableLogging.triggered.connect(self.enableLogging)
-        self.actSelectFont = QAction("Font")
-        self.actSelectFont.triggered.connect(self.selectFont)
+
+        actSelectFont = QAction("Font", self)
+        actSelectFont.setStatusTip("")
+        actSelectFont.triggered.connect(self.selectFont)
+
+        actRestoreDefaults = QAction("Restore Defaults", self)
+        actRestoreDefaults.triggered.connect(self.restoreDefaults)
 
         settingsMenu = menuBar.addMenu("&Settings")
         settingsMenu.addAction(self.actEnableLogging)
-        settingsMenu.addAction(self.actSelectFont)
+        settingsMenu.addAction(actSelectFont)
+        settingsMenu.addAction(actRestoreDefaults)
 
-        # Read configuration elements
-        self.setFont(defaultFont)
-        self.configuration()
-        self.restoreConfig()
+        tb = QToolBar("Exit", self)
+        tb.addAction(actExit)
+        self.addToolBar(tb)
 
-        self.setWindowTitle("MKVMERGE: Batch Multiplex")
-        self.setWindowIcon(QIcon(str(p.parent) + "/images/mkvBatchMultiplex.png"))
+        self.progressbar = DualProgressBar(align=Qt.Horizontal)
+        self.jobsLabel = FormatLabel(
+            "Job(s): {0:3d} Current: {1:3d} File: {2:3d} of {3:3d} Errors: {4:3d}",
+            init=[0, 0, 0, 0, 0]
+        )
 
-    def _center(self):
-        """Center frame on first run"""
-
-        qR = self.frameGeometry()
-        cP = QDesktopWidget().availableGeometry().center()
-        qR.moveCenter(cP)
-        self.move(qR.topLeft())
+        statusBar = self.statusBar()
+        statusBar.addPermanentWidget(self.jobsLabel)
+        statusBar.addPermanentWidget(self.progressbar)
 
     def clearOutput(self):
         """Clear output for JobQueue"""
@@ -254,9 +251,11 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         """Select Font"""
 
         font = self.font()
-        fontDialog = QFontDialog(font)
 
-        valid, font = fontDialog.getFont()
+        fontDialog = QFontDialog()
+        centerWidgets(fontDialog, self)
+
+        valid, font = fontDialog.getFont(font)
 
         if valid:
             self.setFont(font)
@@ -302,37 +301,86 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
                 except NameError:
                     logging.info("MW0002: Bad configuration definition file.")
                 except xml.etree.ElementTree.ParseError:
-                    print("Loggin....")
                     logging.info("MW0001: Bad or corrupt configuration file.")
             else:
                 configFile.touch(exist_ok=True)
 
-    def restoreConfig(self):
+    def restoreConfig(self, resetDefaults=False):
         """Restore configuration if any"""
 
-        bLogging = self.config.get('logging')
+        defaultFont = QFont("Segoe UI", 9)
+        bLogging = False
 
-        if bLogging is not None:
+        if resetDefaults:
+            self.setFont(defaultFont)
             self.actEnableLogging.setChecked(bLogging)
             self.enableLogging(bLogging)
-
-        byteGeometry = self.config.get('geometry')
-
-        if byteGeometry is not None:
-            # Test for value read if not continue
-            #byte = ast.literal_eval(strGeometry)
-            byteGeometry = QByteArray(byteGeometry)
-
-            self.restoreGeometry(QByteArray.fromBase64(byteGeometry))
-        else:
-
             self.setGeometry(0, 0, 1280, 720)
             self._center()
 
+        else:
 
-def abort(self):
+            strFont = self.config.get('font')
+
+            if strFont is not None:
+                restoreFont = QFont()
+                restoreFont.fromString(strFont)
+                self.setFont(restoreFont)
+
+            else:
+                self.setFont(defaultFont)
+
+            bLogging = self.config.get('logging')
+
+            if bLogging is not None:
+                self.actEnableLogging.setChecked(bLogging)
+                self.enableLogging(bLogging)
+
+            byteGeometry = self.config.get('geometry')
+
+            if byteGeometry is not None:
+                # Test for value read if not continue
+                #byte = ast.literal_eval(strGeometry)
+                byteGeometry = QByteArray(byteGeometry)
+
+                self.restoreGeometry(QByteArray.fromBase64(byteGeometry))
+            else:
+
+                self.setGeometry(0, 0, 1280, 720)
+                centerWidgets(self)
+
+                #self._center()
+
+    def restoreDefaults(self):
+        """restore defaults settings"""
+
+        result = QMessageBox.question(
+            self,
+            "Confirm Restore...",
+            "Restore default settings ?",
+            QMessageBox.Yes | QMessageBox.No
+        )
+
+        if result == QMessageBox.Yes:
+            self.restoreConfig(resetDefaults=True)
+
+
+def centerWidgets(widget, parent=None):
+    """center widget based on parent or screen geometry"""
+
+    if parent is None:
+        parent = widget.parentWidget()
+
+    if parent:
+        widget.move(parent.frameGeometry().center() - widget.frameGeometry().center())
+
+    else:
+        widget.move(QDesktopWidget().availableGeometry().center() - widget.frameGeometry().center())
+
+
+def abort():
     """Force Quit"""
-    self.configuration(save=True)
+
     qApp.quit()     # pylint: disable=E1101
 
 def setupLogging():
