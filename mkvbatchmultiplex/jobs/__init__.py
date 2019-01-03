@@ -88,6 +88,9 @@ class JobQueue(QObject): # pylint: disable=R0902
 
         return False
 
+    def __len__(self):
+        return len(self._jobs)
+
     def clear(self):
         """Clear the job queue"""
 
