@@ -80,29 +80,29 @@ class MKVCommand(object):
 
                 strCommand = _strStripEscapeChars(strCommand)
 
-                _parseSourceFiles(strCommand, lstFileNames,
-                                  dictFileNames, dictFileTokens, MKVCommand.log)
+                #_parseSourceFiles(strCommand, lstFileNames,
+                #                  dictFileNames, dictFileTokens, MKVCommand.log)
 
-                if lstFileNames:
+                #if lstFileNames:
 
-                    for strFile in lstFileNames:
-                        strCommand = strCommand.replace(
-                            strFile, dictFileTokens[strFile])
+                    #for strFile in lstFileNames:
+                    #    strCommand = strCommand.replace(
+                    #        strFile, dictFileTokens[strFile])
 
-                    lstParsed = shlex.split(strCommand)
+                lstParsed = shlex.split(strCommand)
 
-                    for t in enumerate(lstParsed):
-                        if lstParsed[t[0]] in dictFileNames:
-                            lstParsed[t[0]] = dictFileNames[t[1]]
+                    #for t in enumerate(lstParsed):
+                    #    if lstParsed[t[0]] in dictFileNames:
+                    #        lstParsed[t[0]] = dictFileNames[t[1]]
 
-                    self._oDestinationFile = MKVSourceFile(
-                        lstParsed.index("--output") + 1,
-                        lstParsed[lstParsed.index("--output") + 1]
-                    )
+                self._oDestinationFile = MKVSourceFile(
+                    lstParsed.index("--output") + 1,
+                    lstParsed[lstParsed.index("--output") + 1]
+                )
 
-                else:
-                    self._bInconsistent = True
-                    self._strError = "No output file found."
+                #else:
+                #    self._bInconsistent = True
+                #    self._strError = "No output file found."
 
                 # Windows present inconsistent use of
                 # forward and backward slash fix for
@@ -474,6 +474,7 @@ class MKVCommand(object):
 
         if matchOutputFile:
             f = _stripQuote(matchOutputFile.group(1))
+            f = f.replace(r"'\''", "'")
             p = Path(f)
 
             if not Path(p.parent).is_dir():
@@ -494,6 +495,7 @@ class MKVCommand(object):
             n = 1
             for match in matchSources:
                 f = _stripQuote(match.group(1))
+                f = f.replace(r"'\''", "'")
                 p = Path(f)
 
                 if not Path(p.parent).is_dir():
@@ -529,6 +531,7 @@ class MKVCommand(object):
         n = 1
         for match in matchAttachments:
             f = _stripQuote(matchAttachments.group(1))
+            f = f.replace(r"'\''", "'")
             p = Path(p)
             if not p.is_file():
                 lstAnalysis.append("Attachment {} not found - {}".format(n, str(p)))
@@ -667,9 +670,10 @@ def _strStripEscapeChars(strCommand):
 
     if strTmp.find(r'^"^(^"') > 0:
         # This is for cmd in Windows
-        strTmp = strTmp.replace('^', '').replace('/', '\\').replace('"', "'")
-    elif strTmp.find(r"'\''") > 0:
-        strTmp = strTmp.replace(r"'\''", "'")
+        strTmp = strTmp.replace("'", r"'\''").replace('^', '').replace('/', '\\').replace('"', "'")
+
+    #elif strTmp.find(r"'\''") > 0:
+    #    strTmp = strTmp.replace(r"'\''", "'")
 
     return strTmp
 
