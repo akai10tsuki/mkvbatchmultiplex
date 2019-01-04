@@ -377,7 +377,6 @@ def centerWidgets(widget, parent=None):
     else:
         widget.move(QDesktopWidget().availableGeometry().center() - widget.frameGeometry().center())
 
-
 def abort():
     """Force Quit"""
 

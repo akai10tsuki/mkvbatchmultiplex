@@ -5,7 +5,7 @@ MKVFormWidget:
 
 Main form
 
-LOG FW025
+LOG FW0013
 """
 
 import logging
@@ -339,7 +339,7 @@ class MKVFormWidget(QWidget):
             cbOutputCommand = kwargs['cbOutputCommand']
         else:
             if self.log:
-                MODULELOG.error("FW001: No output command callback function")
+                MODULELOG.error("FW0001: No output command callback function")
             return "No output command callback function"
 
         clip = QApplication.clipboard().text()
@@ -370,12 +370,12 @@ class MKVFormWidget(QWidget):
                 self.parent.btnReset.setEnabled(True)
 
                 if self.parent.log:
-                    MODULELOG.debug("FW002: Command Ok: [%s]", inputStr)
+                    MODULELOG.debug("FW0002: Command Ok: [%s]", inputStr)
             else:
                 self.parent.buttonsState(False)
 
                 if self.parent.log:
-                    MODULELOG.debug("FW003: Command not Ok: [%s]", inputStr)
+                    MODULELOG.debug("FW0003: Command not Ok: [%s]", inputStr)
 
             return (QValidator.Acceptable, inputStr, pos)
 
@@ -386,7 +386,7 @@ class MKVFormWidget(QWidget):
             cbOutputMain = kwargs['cbOutputMain']
         else:
             if self.log:
-                MODULELOG.error("FW011: No output callback function")
+                MODULELOG.error("FW0004: No output callback function")
             return "No output callback function"
 
         lstAnalysis = []
@@ -394,7 +394,7 @@ class MKVFormWidget(QWidget):
 
         MKVCommand.bLooksOk(cmd, lstAnalysis)
 
-        cbOutputMain.emit("\nAnalysis of command line:\n\n", {})
+        cbOutputMain.emit("Analysis of command line:\n\n", {})
 
         if lstAnalysis:
             for e in lstAnalysis:
@@ -417,7 +417,7 @@ class MKVFormWidget(QWidget):
             if not key in kwargs:
                 if self.log:
                     MODULELOG.error(
-                        "FW007: No output command callback function %s.",
+                        "FW0005: No output command callback function %s.",
                         key
                     )
                 return "No output command callback function"
@@ -441,7 +441,7 @@ class MKVFormWidget(QWidget):
                 jobID, _ = self._addQueue(cmd)
 
                 cbOutputMain.emit(
-                    "Command added to queue:\n\nJob {} - {}\n\n".format(jobID, cmd),
+                    "Command added to queue:\n\nJob {0} - {1}\n\n".format(jobID, cmd),
                     {'color': Qt.blue}
                 )
 
@@ -472,13 +472,13 @@ class MKVFormWidget(QWidget):
             cbOutputMain = kwargs['cbOutputMain']
         else:
             if self.log:
-                MODULELOG.error("FW011: No output callback function")
+                MODULELOG.error("FW0006: No output callback function")
             return "No output callback function"
 
+        msg = "Base Files:\n\n{}\n\nSource Files:\n\n".format(str(self.objCommand.basefiles))
+
         cbOutputMain.emit(
-            "Base Files:\n\n" \
-            + str(self.objCommand.basefiles) \
-            + "\n\nSource Files:\n\n",
+            msg,
             {}
         )
 
@@ -487,7 +487,7 @@ class MKVFormWidget(QWidget):
                 cbOutputMain.emit(str(lstFiles) + "\n\n", {})
         else:
             cbOutputMain.emit(
-                "\n" + self.objCommand.error + "\n\n",
+                self.objCommand.error + "\n\n",
                 {'color': Qt.red}
             )
 
@@ -502,19 +502,16 @@ class MKVFormWidget(QWidget):
             cbOutputMain = kwargs['cbOutputMain']
         else:
             if self.log:
-                MODULELOG.error("FW012: No output callback function")
+                MODULELOG.error("FW0007: No output callback function")
             return "No output callback function"
 
+
         cbOutputMain.emit(
-            "Shell:\n\n" \
-            + self.objCommand.command \
-            + "\n\n",
+            "Shell:\n\n{}\n\n".format(self.objCommand.command),
             {}
         )
         cbOutputMain.emit(
-            "Command Template:\n\n" \
-            + str(self.objCommand.template) \
-            + "\n\nCommands:\n\n",
+            "Command Template:\n\n{}\n\nCommands:\n\n".format(str(self.objCommand.template)),
             {}
         )
 
@@ -526,7 +523,7 @@ class MKVFormWidget(QWidget):
                 )
         else:
             cbOutputMain.emit(
-                "\n" + self.objCommand.error + "\n\n",
+                "FW0008: Error in command construction {}\n\n".format(self.objCommand.error),
                 {'color': Qt.red}
             )
 
@@ -541,7 +538,7 @@ class MKVFormWidget(QWidget):
             cbOutputMain = kwargs['cbOutputMain']
         else:
             if self.log:
-                MODULELOG.error("FW010: No output callback function")
+                MODULELOG.error("FW0009: No output callback function")
             return "No output callback function"
 
         cbOutputMain.emit("Checking files...\n\n", {})
@@ -609,8 +606,7 @@ class MKVFormWidget(QWidget):
             self.leCommand.setFocus()
             self.parent.progressbar.setValues(0, 0)
 
-            jobsLabelValues = self.parent.jobsLabel.values
-
+            jobsLabelValues = [0, 0, 0, 0, 0]
             jobsLabelValues[0] = len(self.jobs)
 
             self.parent.jobsLabel.setValues(jobsLabelValues)
@@ -622,7 +618,7 @@ class MKVFormWidget(QWidget):
             if not key in kwargs:
                 if self.log:
                     MODULELOG.error(
-                        "FW013: No output command callback function %s.",
+                        "FW0010: No output command callback function %s.",
                         key
                     )
                 return "No output command callback function"
@@ -679,17 +675,20 @@ class MKVFormWidget(QWidget):
             status = self.jobs.status(currentJob.jobID)
 
             if status != JobStatus.Waiting:
+
+                msg = "Job {0} - with {1} status skipping.\n\n".format(str(currentJob.jobID), status)
+
                 currentJob.outputMain.emit(
-                    "\n\nJob - {0} with {1} status skipping.".format(str(currentJob.jobID), status),
+                    msg,
                     {'color': Qt.blue}
                 )
 
+                msg = "**********\nSkip requested on Command:\nJob {0} - {1}\n**********\n\n"
+                msg = msg.format(str(currentJob.jobID), currentJob.command)
+
                 currentJob.outputJobMain(
                     currentJob.jobID,
-                    "\n\n**********\nSkip requested on Command:\n" \
-                    + "Job " + str(currentJob.jobID) + " - " \
-                    + currentJob.command \
-                    + "\n**********\n\n",
+                    msg,
                     {'color': Qt.blue}
                 )
                 continue
@@ -702,53 +701,27 @@ class MKVFormWidget(QWidget):
                 self.jobs.status(currentJob.jobID, JobStatus.Error)
                 continue
 
+            msg = "Working on Command:\nJob {0} - {1}\n\n"
+            msg = msg.format(str(currentJob.jobID), currentJob.command)
+
             currentJob.outputMain.emit(
-                "\n\nWorking on Command:\n" \
-                + "Job " + str(currentJob.jobID) + " - " \
-                + currentJob.command \
-                + "\n\n",
+                msg,
                 {'color': Qt.blue}
             )
+
+            msg = "**********\nWorking on Command:\nJob {0} - {1}\n**********\n\n"
+            msg = msg.format(str(currentJob.jobID), currentJob.command)
 
             currentJob.outputJobMain(
                 currentJob.jobID,
-                "\n\n**********\nWorking on Command:\n" \
-                + "Job " + str(currentJob.jobID) + " - " \
-                + currentJob.command \
-                + "\n**********\n\n",
+                msg,
                 {'color': Qt.blue}
             )
-
-            if not objCommand:
-                currentJob.outputMain.emit(
-                    "\n" + objCommand.error,
-                    {'color': Qt.red}
-                )
-
-                currentJob.outputJobMain(
-                    currentJob.jobID,
-                    "\n" + objCommand.error,
-                    {'color': Qt.red}
-                )
-
-                currentJob.outputJobError(
-                    currentJob.jobID,
-                    "\n" + objCommand.error,
-                    {'color': Qt.red}
-                )
-
-                if self.log:
-                    MODULELOG.info("FW016: Base files in Process: %s",
-                                   str(objCommand.basefiles))
-                    MODULELOG.info("FW017: Source files in Process: %s",
-                                   str(objCommand.sourcefiles))
 
             if objCommand:
 
                 self.parent.jobsLabel[1] = currentJob.jobID
                 self.parent.jobsLabel[3] = len(objCommand)
-
-                currentJob.jobsLabelValues = self.parent.jobsLabel.values
 
                 nTotal = len(objCommand) * 100
                 nFile = 0
@@ -790,7 +763,7 @@ class MKVFormWidget(QWidget):
                         )
                     except OSError as e:
                         currentJob.outputMain.emit(
-                            "\n\nMediaInfo not found.\n\n",
+                            "MediaInfo not found.\n\n",
                             {'color': Qt.red}
                         )
                         # Error unable to continue
@@ -803,12 +776,10 @@ class MKVFormWidget(QWidget):
                     if bStructureOk:
                         currentJob.outputJobMain(
                             currentJob.jobID,
-                            "\n\nCommand:\n" \
-                            + str(command) \
-                            + "\n\n",
+                            "Command:\n{}\n\n".format(str(command)),
                             {'color': Qt.blue}
                         )
-                        self.parent.jobsLabel[2]
+                        self.parent.jobsLabel[2] = nFile
                         utils.runCommand(
                             command,
                             currentJob,
@@ -829,20 +800,49 @@ class MKVFormWidget(QWidget):
                 if currentStatus == JobStatus.Abort:
                     self.jobs.status(currentJob.jobID, JobStatus.Aborted)
                     currentJob.outputJobMain(
-                        currentJob.jobID, "\n\nJob {} - Aborted.\n".format(currentJob.jobID),
+                        currentJob.jobID, "Job {} - Aborted.\n\n\n".format(currentJob.jobID),
                         {'color': Qt.blue}
                     )
                 else:
                     self.jobs.status(currentJob.jobID, JobStatus.Done)
                     currentJob.outputJobMain(
                         currentJob.jobID,
-                        "\n\nJob {} - Done.\n".format(currentJob.jobID),
+                        "Job {} - Done.\n\n\n".format(currentJob.jobID),
                         {'color': Qt.blue}
                     )
 
             else:
 
                 self.jobs.status(currentJob.jobID, JobStatus.Error)
+
+                msg = "FM0026: Error in construction of command - {}\n\n".format(objCommand.error),
+
+                currentJob.outputMain.emit(
+                    msg,
+                    {'color': Qt.red}
+                )
+
+                currentJob.outputJobMain(
+                    currentJob.jobID,
+                    msg,
+                    {'color': Qt.red}
+                )
+
+                currentJob.outputJobError(
+                    currentJob.jobID,
+                    msg,
+                    {'color': Qt.red}
+                )
+
+                if self.log:
+                    MODULELOG.info("FW0011: Error Base files in Process: %s",
+                                   str(objCommand.basefiles))
+                    MODULELOG.info("FW0012: Error Source files in Process: %s",
+                                   str(objCommand.sourcefiles))
+
+        self.parent.jobsLabel[1] = currentJob.jobID
+        self.parent.jobsLabel[2] = 0
+        self.parent.jobsLabel[3] = 0
 
         self.RUNNING = False
         self.jobs.jobsStatus(JobStatus.Done)
