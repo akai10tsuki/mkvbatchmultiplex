@@ -123,7 +123,7 @@ def runCommand(command, currentJob, lstTotal, log=False, ctrlQueue=None):
 
     with subprocess.Popen(command, stdout=subprocess.PIPE, bufsize=1,
                           universal_newlines=True) as p:
-        addNewline = False
+        addNewline = True
         iTotal = lstTotal[0]
         n = 0
 
@@ -131,8 +131,13 @@ def runCommand(command, currentJob, lstTotal, log=False, ctrlQueue=None):
 
             if line.find(u"Progress:") == 0:
                 # Deal with progress percent
-                if not addNewline:
-                    addNewline = True
+                if addNewline:
+                    currentJob.outputJobMain(
+                        currentJob.jobID,
+                        "",
+                        {}
+                    )
+                    addNewline = False
 
                 m = regEx.search(line)
 
@@ -143,29 +148,31 @@ def runCommand(command, currentJob, lstTotal, log=False, ctrlQueue=None):
                     currentJob.outputJobMain(
                         currentJob.jobID,
                         line.strip(),
-                        {'color': Qt.black, 'replaceLine': True}
+                        {'replaceLine': True}
                     )
-
                     currentJob.progressBar.emit(n, iTotal + n)
 
             else:
 
-                if addNewline:
-                    addNewline = False
-                    currentJob.outputJobMain(currentJob.jobID, "\n", {'color': Qt.black})
-
-                if not "\n" in line:
-                    line = line + "\n"
-
+                #if  not line.strip("\n"):
+                #    currentJob.outputJobMain(currentJob.jobID, "\n\n", {})
+                #else:
                 if line.find(u"Warning") == 0:
-                    currentJob.outputJobMain(currentJob.jobID, line, {'color': Qt.red})
-                    currentJob.outputJobError(currentJob.jobID, line, {'color': Qt.red})
+                    currentJob.outputJobMain(currentJob.jobID, line.strip(), {'color': Qt.red})
+                    currentJob.outputJobError(currentJob.jobID, line.strip(), {'color': Qt.red})
                 else:
-                    currentJob.outputJobMain(currentJob.jobID, line, {'color': Qt.black})
+                    currentJob.outputJobMain(currentJob.jobID, line.strip(), {})
 
             rcResult = p.poll()
             if rcResult is not None:
                 rc = rcResult
+
+        if addNewline:
+            currentJob.outputJobMain(
+                currentJob.jobID,
+                "\n",
+                {}
+            )
 
     lstTotal[0] += 100
 

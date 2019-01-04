@@ -72,43 +72,18 @@ class MKVCommand(object):
 
             if MKVCommand.bLooksOk(strCommand):
 
-                #Substitute file names for shlex help with apostrophe
-                lstFileNames = []
-                dictFileNames = {}
-                dictFileTokens = {}
                 lstParsed = []
-
                 strCommand = _strStripEscapeChars(strCommand)
-
-                #_parseSourceFiles(strCommand, lstFileNames,
-                #                  dictFileNames, dictFileTokens, MKVCommand.log)
-
-                #if lstFileNames:
-
-                    #for strFile in lstFileNames:
-                    #    strCommand = strCommand.replace(
-                    #        strFile, dictFileTokens[strFile])
-
-                lstParsed = shlex.split(strCommand)
-
-                    #for t in enumerate(lstParsed):
-                    #    if lstParsed[t[0]] in dictFileNames:
-                    #        lstParsed[t[0]] = dictFileNames[t[1]]
+                try:
+                    lstParsed = shlex.split(strCommand)
+                except ValueError as e:
+                    print(e)
+                    print(strCommand)
 
                 self._oDestinationFile = MKVSourceFile(
                     lstParsed.index("--output") + 1,
                     lstParsed[lstParsed.index("--output") + 1]
                 )
-
-                #else:
-                #    self._bInconsistent = True
-                #    self._strError = "No output file found."
-
-                # Windows present inconsistent use of
-                # forward and backward slash fix for
-                # windows
-                #ft = Path(lstParsed[0])
-                #lstParsed[0] = str(ft)
 
                 if bRemoveTitle and lstParsed:
                     #Remove title if found since this is for batch processing
@@ -128,8 +103,10 @@ class MKVCommand(object):
                 j = 0
                 for i in lstIndices:
                     self._oBaseSourceFilesList.append(
-                        MKVSourceFile(i - (j * 2),
-                                      lstParsed[i + 1])
+                        MKVSourceFile(
+                            i - (j * 2),
+                            lstParsed[i + 1]
+                        )
                     )
                     j += 1
 
@@ -229,7 +206,7 @@ class MKVCommand(object):
                     )
                 )
 
-            if self._bCheckLenOfLists(lstMKVFiles, lstTypeTotal):
+            if _bCheckLenOfLists(lstMKVFiles, lstTypeTotal):
                 # Join all source files in a list of lists each element
                 # have all source files in the order found
                 # The names are not used to pair the order in the
@@ -249,32 +226,6 @@ class MKVCommand(object):
                     self._strError = self._strError + error + "\n"
                     if log:
                         MODULELOG.error("UT004: File(s): %s", error)
-
-    def _bCheckLenOfLists(self, lstLists, lstTypeTotal):
-        """list of source files has to be equal length"""
-
-        intTmp = None
-        bReturn = True
-
-        for lstTmp in lstLists:
-
-            if not lstTmp:
-                bReturn = False
-                lstTypeTotal.append(("Ops!!!", "File(s) not found."))
-                break
-
-            lstTypeTotal.append([str(len(lstTmp)), os.path.splitext(lstTmp[0])[1]])
-
-            if not intTmp:
-                #length of first list is base for comparison
-                intTmp = len(lstTmp)
-            else:
-                if len(lstTmp) != intTmp:
-                    #not equal fail test
-                    if bReturn:
-                        bReturn = False
-
-        return bReturn
 
     def _setFiles(self, lstFiles, strPrefix="new-"):
         """
@@ -397,7 +348,7 @@ class MKVCommand(object):
         lstAnalysis = []
 
         #rg = r"^'(.*?)'\s.*?\-\-output.'(.*?)'\s.*?\s'\('\s'(.*?)'\s'\)'.*?\-\-track-order\s(.*)"  # pylint: disable=C0301
-        rg = r"^'(.*?)'\s.*?\-\-output.'(.*?)'\s.*?\s'\('\s'(.*?)'\s'\)'.*?\-\-track-order\s(.*)"  # pylint: disable=C0301
+        #rg = r"^'(.*?)'\s.*?\-\-output.'(.*?)'\s.*?\s'\('\s'(.*?)'\s'\)'.*?\-\-track-order\s(.*)"  # pylint: disable=C0301
         rg = r"^(.*?)\s\-\-.*?\-\-output.(.*?)\s\-\-.*?\s'\('\s(.*?)\s'\)'.*?\-\-track-order\s(.*)"
 
         regCommandEx = re.compile(rg)
@@ -593,34 +544,6 @@ class WorkFiles:
         self.sourceFiles = []
 
 
-class MKVSourceFileOld(object):
-    """
-    Source file properties
-
-    :param index: index of file in the command line
-    :type index: int
-    :param fullPathName: filename with full path
-    :type fullPathName: str
-    """
-
-
-    def __init__(self, index, fullPathName):
-        """Use path to convert to right path OS independent"""
-        fileName = Path(fullPathName)
-
-        self.index = index
-        self.fullPathName = str(fileName)
-        self.directory = str(fileName.parent)
-        self.extension = str(fileName.suffix)
-
-    def __str__(self):
-        return "Index: " + str(self.index) \
-            + "\nName: " + self.fullPathName \
-            + "\nDirectory: " + self.directory \
-            + "\nExtension: " + self.extension \
-            + "\n"
-
-
 class MKVSourceFile(object):
     """
     Source file properties
@@ -650,6 +573,35 @@ class MKVSourceFile(object):
             + "\n"
 
 
+def _bCheckLenOfLists(lstLists, lstTypeTotal):
+    """list of source files has to be equal length"""
+
+    intTmp = None
+    bReturn = True
+
+    for lstTmp in lstLists:
+
+        if not lstTmp:
+            bReturn = False
+            lstTypeTotal.append(("Ops!!!", "File(s) not found."))
+            break
+
+        lstTypeTotal.append([str(len(lstTmp)), os.path.splitext(lstTmp[0])[1]])
+
+        if not intTmp:
+            #length of first list is base for comparison
+            intTmp = len(lstTmp)
+        else:
+            if len(lstTmp) != intTmp:
+                #not equal fail test
+                if bReturn:
+                    bReturn = False
+
+    return bReturn
+
+
+
+
 def _stripQuote(strFile):
     """Strip single quote at start and end of file"""
 
@@ -662,8 +614,9 @@ def _stripQuote(strFile):
 
 def _strStripEscapeChars(strCommand):
     """
-    Strip escape chars for the command line in the end they won't be used in a shell
-    the resulting command string should work for Windows and linux
+    Strip escape windows chars for the command line
+    in the end they won't be used in a shell
+    the resulting command is bash/zh like
     """
 
     strTmp = strCommand
@@ -672,123 +625,4 @@ def _strStripEscapeChars(strCommand):
         # This is for cmd in Windows
         strTmp = strTmp.replace("'", r"'\''").replace('^', '').replace('/', '\\').replace('"', "'")
 
-    #elif strTmp.find(r"'\''") > 0:
-    #    strTmp = strTmp.replace(r"'\''", "'")
-
     return strTmp
-
-def _parseSourceFilesOld(strCommand, lstFileNames, dictFileNames, dictFileTokens, log=False):
-    """
-    In order to work with apostrophe in file names
-    substitute the file names with tokens for shlex
-    here parse files and create token dictionaries
-    """
-
-    regExOutput = re.compile(r".*?--output\s'(.*?)'\s--.*")
-    regExSource = re.compile(r"'\('\s'(.*?)'\s'\)'")
-    regExAttachFile = re.compile(r"--attach-file\s'(.*?)'\s--")
-    regExTitle = re.compile(r"--title\s'(.*?)'\s--")
-
-    fileMatch = regExOutput.match(strCommand)
-
-    # Required Files
-    if fileMatch:
-        lstFileNames.append(fileMatch.group(1))
-    else:
-        lstFileNames = []
-        return
-
-    fileMatch = regExSource.finditer(strCommand)
-
-    if fileMatch:
-
-        for match in fileMatch:
-            lstFileNames.append(match.group(1))
-    else:
-        lstFileNames = []
-        return
-
-    # Optional Files
-    fileMatch = regExAttachFile.finditer(strCommand)
-
-    for match in fileMatch:
-        lstFileNames.append(match.group(1))
-
-    fileMatch = regExTitle.finditer(strCommand)
-
-    for match in fileMatch:
-        lstFileNames.append(match.group(1))
-
-    if lstFileNames:
-        i = 0
-        for strFile in lstFileNames:
-            fileToken = "TOKEN!!!!!FILE{}".format(i)
-            dictFileNames[fileToken] = strFile
-            dictFileTokens[strFile] = fileToken
-            i += 1
-            if log:
-                MODULELOG.debug(
-                    "MC005: Token  %s - %s",
-                    fileToken,
-                    strFile
-                )
-
-def _parseSourceFiles(strCommand, lstFileNames, dictFileNames, dictFileTokens, log=False):
-    """
-    In order to work with single quote in file names
-    substitute the file names with tokens for shlex
-    execution the single quote break shlex split
-    function
-
-    here parse files and create token dictionaries
-    """
-
-
-    regExOutput = re.compile(r".*?\-\-output\s(.*?)\s\-\-.*")
-    regExSource = re.compile(r"'\('\s(.*?)\s'\)'")
-    regExAttachFile = re.compile(r"\-\-attach-file\s(.*?)\s\-\-")
-    regExTitle = re.compile(r"--title\s(.*?)\s\-\-")
-
-    fileMatch = regExOutput.match(strCommand)
-
-    # Required Files
-    if fileMatch:
-        lstFileNames.append(fileMatch.group(1))
-    else:
-        lstFileNames = []
-        return
-
-    fileMatch = regExSource.finditer(strCommand)
-
-    if fileMatch:
-
-        for match in fileMatch:
-            lstFileNames.append(match.group(1))
-    else:
-        lstFileNames = []
-        return
-
-    # Optional Files
-    fileMatch = regExAttachFile.finditer(strCommand)
-
-    for match in fileMatch:
-        lstFileNames.append(match.group(1))
-
-    fileMatch = regExTitle.finditer(strCommand)
-
-    for match in fileMatch:
-        lstFileNames.append(match.group(1))
-
-    if lstFileNames:
-        i = 0
-        for strFile in lstFileNames:
-            fileToken = "TOKEN!!!!!FILE{}".format(i)
-            dictFileNames[fileToken] = strFile
-            dictFileTokens[strFile] = fileToken
-            i += 1
-            if log:
-                MODULELOG.debug(
-                    "MC005: Token  %s - %s",
-                    fileToken,
-                    strFile
-                )

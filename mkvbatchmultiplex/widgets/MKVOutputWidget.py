@@ -60,9 +60,6 @@ class MKVOutputWidget(QTextEdit):
             if 'replaceLine' in kwargs:
                 replaceLine = kwargs['replaceLine']
 
-            if replaceLine is not None:
-                self.moveCursor(QTextCursor.StartOfLine, QTextCursor.KeepAnchor)
-
             if utils.isMacDarkMode() and (color is None):
                 color = Qt.white
             elif color is None:
@@ -72,7 +69,12 @@ class MKVOutputWidget(QTextEdit):
                 # dark theme clash
                 self.setTextColor(color)
 
-            self.insertPlainText(strText)
+            if replaceLine:
+                self.moveCursor(QTextCursor.StartOfLine, QTextCursor.KeepAnchor)
+                self.insertPlainText(strText)
+            else:
+                self.append(strText)
+
             self.ensureCursorVisible()
 
             if self.parent.log:
