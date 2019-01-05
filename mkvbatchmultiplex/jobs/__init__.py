@@ -27,6 +27,7 @@ class JobStatus: # pylint: disable=R0903
     Stop = "Stop"
     Waiting = "Waiting"
     Error = "Error"
+    AbortForced = "AbortForced"
 
 
 class JobInfo: # pylint: disable=R0903
@@ -85,7 +86,6 @@ class JobQueue(QObject): # pylint: disable=R0902
     def __bool__(self):
         if self._workQueue:
             return True
-
         return False
 
     def __len__(self):
@@ -281,8 +281,8 @@ class JobQueue(QObject): # pylint: disable=R0902
 
         return False
 
-    def setOutputSignal(self, outputJobSlot=None, outputErrorSlot=None,
-                        addJobToTableSlot=None, updateStatusSlot=None,
+    def setOutputSignal(self, outputJobSlotConnection=None, outputErrorSlotConnection=None,
+                        addJobToTableSlotConnection=None, updateStatusSlotConnection=None,
                         clearOutput=None):
         """
         Setup output widget signals
@@ -299,20 +299,20 @@ class JobQueue(QObject): # pylint: disable=R0902
         :type clearOutput: Slot
         """
 
-        if outputJobSlot:
-            outputJobSlot(self.outputJobSignal)
+        if outputJobSlotConnection:
+            outputJobSlotConnection(self.outputJobSignal)
             self.emitOutput = True
 
-        if outputErrorSlot:
-            outputErrorSlot(self.outputErrorSignal)
+        if outputErrorSlotConnection:
+            outputErrorSlotConnection(self.outputErrorSignal)
             self.emitError = True
 
-        if addJobToTableSlot:
-            addJobToTableSlot(self.addJobToTableSignal)
+        if addJobToTableSlotConnection:
+            addJobToTableSlotConnection(self.addJobToTableSignal)
             self.emitAddJobToTable = True
 
-        if updateStatusSlot:
-            updateStatusSlot(self.updateStatusSignal)
+        if updateStatusSlotConnection:
+            updateStatusSlotConnection(self.updateStatusSignal)
             self.emitStatusUpdates = True
 
         if clearOutput:

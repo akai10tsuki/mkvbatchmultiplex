@@ -19,7 +19,7 @@ import logging
 
 from PySide2.QtCore import QMutex, QMutexLocker, Qt, Slot, Signal
 from PySide2.QtWidgets import (QVBoxLayout, QTableWidget, QMenu, QWidget, QHeaderView,
-                             QTableWidgetItem, QAbstractScrollArea, QLineEdit)
+                               QTableWidgetItem, QAbstractScrollArea)
 
 from mkvbatchmultiplex.jobs import JobStatus
 
@@ -36,11 +36,12 @@ class MKVJobsTableWidget(QWidget):
 
     showJobOutput = Signal(int, str, str)
 
-    def __init__(self, parent=None, ctrlQueue=None):
+    def __init__(self, parent=None, jobCtrlQueue=None, jobSpCtrlQueue=None):
         super(MKVJobsTableWidget, self).__init__(parent)
 
         self.parent = parent
-        self.ctrlQueue = ctrlQueue
+        self.ctrlQueue = jobCtrlQueue
+        self.spCtrlQueue = jobSpCtrlQueue
         self._initControls()
         self._initLayout()
 
@@ -207,8 +208,8 @@ class JobsTableWidget(QTableWidget):
                     self.setRowStatus(row, self.actions.Waiting)
                 elif action == abortAction:
                     self.setRowStatus(row, self.actions.Abort)
-                    if self.ctrQueue is not None:
-                        self.ctrQueue.put(self.actions.Abort)
+                    if self.spCtrQueue is not None:
+                        self.spCtrlQueue.put(self.actions.Abort)
 
     def resizeEvent(self, event):
 

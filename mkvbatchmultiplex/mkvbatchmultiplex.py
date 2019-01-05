@@ -74,7 +74,8 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         super(MKVMultiplexApp, self).__init__(parent)
 
         self.workQueue = deque()
-        self.ctrlQueue = Queue()
+        self.jobProcessQueue = Queue()
+        self.jobSubprocessQueue = Queue()
         self.threadpool = QThreadPool()
         self.jobs = JobQueue(self.workQueue)
         self.config = ConfigurationSettings()
@@ -95,10 +96,20 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
     def _initHelper(self):
 
         # Create Widgets
-        self.formWidget = MKVFormWidget(self, self.threadpool, self.jobs, self.ctrlQueue, log=True)
+        self.formWidget = MKVFormWidget(
+            self, self.threadpool,
+            self.jobs,
+            self.jobProcessQueue,
+            self.jobSubprocessQueue,
+            log=True
+        )
         self.outputQueueWidget = MKVOutputWidget(self)
         self.outputErrorWidget = MKVOutputWidget(self)
-        self.jobsWidget = MKVJobsTableWidget(self, self.ctrlQueue)
+        self.jobsWidget = MKVJobsTableWidget(
+            self,
+            self.jobProcessQueue,
+            self.jobSubprocessQueue
+        )
 
         # Connect signals to print in outputWidgets and update jobsWidget
         self.jobs.setOutputSignal(
@@ -230,7 +241,7 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
                         "\nJobs running aborting jobs...\n\n",
                         {'color': Qt.blue}
                     )
-                    self.ctrlQueue.put(JobStatus.Abort)
+                    self.jobSubprocessQueue.put(JobStatus.Abort)
                     event.ignore()
 
                 else:

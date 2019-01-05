@@ -153,8 +153,10 @@ class MKVCommand(object):
         return item in self._lstCommands
 
     def __getitem__(self, index):
-        return [self._lstCommands[index], self._workFiles.baseFiles,
-                self._workFiles.sourceFiles[index]]
+        return [self._lstCommands[index],
+                self._workFiles.baseFiles,
+                self._workFiles.sourceFiles[index],
+                self._workFiles.destinationFile[index]]
 
     def __iter__(self):
         return self
@@ -168,8 +170,10 @@ class MKVCommand(object):
             raise StopIteration
         else:
             self._index += 1
-            return [self._lstCommands[self._index - 1], self._workFiles.baseFiles,
-                    self._workFiles.sourceFiles[self._index - 1]]
+            return [self._lstCommands[self._index - 1],
+                    self._workFiles.baseFiles,
+                    self._workFiles.sourceFiles[self._index - 1],
+                    self._workFiles.destinationFile[self._index - 1]]
 
     def _GenerateCommands(self):
 
@@ -177,9 +181,10 @@ class MKVCommand(object):
 
         if self._workFiles.sourceFiles:
             for lstFiles in self._workFiles.sourceFiles:
-                lstProcessCommand = self._setFiles(lstFiles)
+                lstProcessCommand, destinationFile = self._setFiles(lstFiles)
                 # list assigns a copy of lstProcessCommand not the object
                 self._lstCommands.append(lstProcessCommand)
+                self._workFiles.destinationFile.append(destinationFile)
 
     def _getFiles(self, log=False):
         """read source directories to get files"""
@@ -282,7 +287,7 @@ class MKVCommand(object):
             lstProcessCommand = []
 
         # return a copy of list not the object lstProcessCommand
-        return [x for x in lstProcessCommand]
+        return [[x for x in lstProcessCommand], str(strDestinationFile)]
 
     @property
     def basefiles(self):
@@ -536,12 +541,14 @@ class WorkFiles:
 
         self.baseFiles = []
         self.sourceFiles = []
+        self.destinationFile = []
 
     def clear(self):
         """Clear file lists"""
 
         self.baseFiles = []
         self.sourceFiles = []
+        self.destinationFile = []
 
 
 class MKVSourceFile(object):
@@ -598,8 +605,6 @@ def _bCheckLenOfLists(lstLists, lstTypeTotal):
                     bReturn = False
 
     return bReturn
-
-
 
 
 def _stripQuote(strFile):

@@ -17,6 +17,7 @@ from PySide2.QtWidgets import QDesktopWidget
 
 from mkvbatchmultiplex.mediafileclasses import MediaFileInfo
 from mkvbatchmultiplex.utils import staticVars
+from mkvbatchmultiplex.jobs import JobStatus
 
 from .mkvUtils import getBaseFiles, getSourceFiles
 
@@ -37,7 +38,7 @@ def bVerifyStructure(lstBaseFiles, lstFiles, log=False, currentJob=None):
             if currentJob is not None:
                 currentJob.outputJobMain(
                     currentJob.jobID,
-                    "\n\nError: In structure \n" \
+                    "Error: In structure \n" \
                     + str(objFile) \
                     + "\n"
                     + str(objSource) \
@@ -46,7 +47,7 @@ def bVerifyStructure(lstBaseFiles, lstFiles, log=False, currentJob=None):
                 )
                 currentJob.outputJobError(
                     currentJob.jobID,
-                    "\n\nError: In structure \n"
+                    "Error: In structure \n"
                     + str(objFile)
                     + "\n"
                     + str(objSource)
@@ -113,7 +114,7 @@ def getFiles(objCommand=None, lbf=None, lsf=None, clear=False, log=False):
             MODULELOG.info("UT005: Base files: %s", str(getFiles.lstBaseFiles))
             MODULELOG.info("UT006: Source files: %s", str(getFiles.lstSourceFiles))
 
-def runCommand(command, currentJob, lstTotal, log=False, ctrlQueue=None):
+def runCommand(command, currentJob, lstTotal, log=False):
     """Execute command in a subprocess thread"""
 
     regEx = re.compile(r"(\d+)")
@@ -122,12 +123,17 @@ def runCommand(command, currentJob, lstTotal, log=False, ctrlQueue=None):
     rc = 1000
 
     with subprocess.Popen(command, stdout=subprocess.PIPE, bufsize=1,
-                          universal_newlines=True) as p:
+                          universal_newlines=True,
+                          creationflags=subprocess.CREATE_NEW_PROCESS_GROUP) as p:
         addNewline = True
         iTotal = lstTotal[0]
         n = 0
 
         for line in p.stdout:
+
+            rcResult = p.poll()
+            if rcResult is not None:
+                rc = rcResult
 
             if line.find(u"Progress:") == 0:
                 # Deal with progress percent
@@ -135,7 +141,7 @@ def runCommand(command, currentJob, lstTotal, log=False, ctrlQueue=None):
                     currentJob.outputJobMain(
                         currentJob.jobID,
                         "",
-                        {}
+                        {'appendLine': True}
                     )
                     addNewline = False
 
@@ -158,21 +164,38 @@ def runCommand(command, currentJob, lstTotal, log=False, ctrlQueue=None):
                 #    currentJob.outputJobMain(currentJob.jobID, "\n\n", {})
                 #else:
                 if line.find(u"Warning") == 0:
-                    currentJob.outputJobMain(currentJob.jobID, line.strip(), {'color': Qt.red})
-                    currentJob.outputJobError(currentJob.jobID, line.strip(), {'color': Qt.red})
+                    currentJob.outputJobMain(
+                        currentJob.jobID, line.strip(),
+                        {'color': Qt.red, 'appendLine': True}
+                    )
+                    currentJob.outputJobError(
+                        currentJob.jobID, line.strip(),
+                        {'color': Qt.red, 'appendLine': True}
+                    )
                 else:
-                    currentJob.outputJobMain(currentJob.jobID, line.strip(), {})
+                    currentJob.outputJobMain(
+                        currentJob.jobID, line.strip(), {'appendLine': True}
+                    )
 
-            rcResult = p.poll()
-            if rcResult is not None:
-                rc = rcResult
+            if not currentJob.spControlQueue.empty():
+                request = currentJob.spControlQueue.get()
+                if request == JobStatus.Abort:
+                    currentJob.controlQueue.put(JobStatus.AbortForced)
+                    p.send_signal(subprocess.signal.CTRL_BREAK_EVENT)
+                    #p.kill()
+                    outs, errs = p.communicate()
+                    if outs:
+                        print(outs)
+                    if errs:
+                        print(errs)
+                    print(p.returncode)
+                    break
 
-        if addNewline:
-            currentJob.outputJobMain(
-                currentJob.jobID,
-                "\n",
-                {}
-            )
+        currentJob.outputJobMain(
+            currentJob.jobID,
+            "\n",
+            {'appendLine': True}
+        )
 
     lstTotal[0] += 100
 

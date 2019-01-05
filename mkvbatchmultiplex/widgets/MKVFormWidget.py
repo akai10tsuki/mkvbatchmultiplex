@@ -10,8 +10,9 @@ LOG FW0013
 
 import logging
 import platform
-#import time
+
 from queue import Queue
+from pathlib import Path
 
 from PySide2.QtCore import Qt, QTimer, Signal, Slot
 from PySide2.QtGui import QValidator
@@ -23,9 +24,9 @@ import mkvbatchmultiplex.qththreads as threads
 import mkvbatchmultiplex.utils as utils
 
 from mkvbatchmultiplex.mediafileclasses import MKVCommand
+from mkvbatchmultiplex.jobs import JobStatus
 
 from .MKVOutputWidget import MKVOutputWidget
-from .MKVJobsTableWidget import JobStatus
 
 
 MODULELOG = logging.getLogger(__name__)
@@ -44,6 +45,8 @@ class CurrentJob: # pylint: disable=R0903
         self.outputJobMain = None
         self.outputJobError = None
         self.progressBar = None
+        self.controlQueue = None
+        self.spControlQueue = None
 
 
 class WorkerSignals(threads.WorkerSignals):
@@ -76,14 +79,15 @@ class MKVFormWidget(QWidget):
 
     RUNNING = False
 
-    def __init__(self, parent, qthThread, jobs, ctrlQueue, log=False):
+    def __init__(self, parent, qthThread, jobs, jobCtrlQueue, jobSpCtrlQueue, log=False):
         super(MKVFormWidget, self).__init__(parent)
 
         self.parent = parent
         self.log = log
         self.threadpool = qthThread
         self.jobs = jobs
-        self.controlQueue = ctrlQueue
+        self.controlQueue = jobCtrlQueue
+        self.spControlQueue = jobSpCtrlQueue
         self.controlRunCommand = Queue()
         self.objCommand = MKVCommand()
         self.lstSourceFiles = []
@@ -483,8 +487,8 @@ class MKVFormWidget(QWidget):
         )
 
         if self.objCommand:
-            for _, _, lstFiles in self.objCommand:
-                cbOutputMain.emit(str(lstFiles) + "\n\n", {})
+            for _, _, lstFiles, dFile in self.objCommand:
+                cbOutputMain.emit(str(lstFiles) + "\n" + dFile + "\n\n", {})
         else:
             cbOutputMain.emit(
                 self.objCommand.error + "\n\n",
@@ -625,10 +629,18 @@ class MKVFormWidget(QWidget):
 
         currentJob = CurrentJob()
 
-        currentJob.outputMain, currentJob.progressBar, \
-        currentJob.outputJobMain, currentJob.outputJobError = \
-            kwargs['cbOutputMain'], kwargs['cbProgress'], \
-            self.jobs.outputJob, self.jobs.outputError
+        (currentJob.outputMain,
+         currentJob.progressBar,
+         currentJob.outputJobMain,
+         currentJob.outputJobError,
+         currentJob.controlQueue,
+         currentJob.spControlQueue) = (
+             kwargs['cbOutputMain'],
+             kwargs['cbProgress'],
+             self.jobs.outputJob,
+             self.jobs.outputError,
+             self.controlQueue,
+             self.spControlQueue)
 
         if not self.RUNNING:
 
@@ -660,9 +672,10 @@ class MKVFormWidget(QWidget):
 
         MKVCommand.log = self.log
 
-        currentJob.outputJobMain, \
-        currentJob.outputJobError = \
-            self.jobs.outputJob, self.jobs.outputError
+        (currentJob.outputJobMain,
+         currentJob.outputJobError) = (
+             self.jobs.outputJob,
+             self.jobs.outputError)
 
         result = None
 
@@ -676,7 +689,9 @@ class MKVFormWidget(QWidget):
 
             if status != JobStatus.Waiting:
 
-                msg = "Job {0} - with {1} status skipping.\n\n".format(str(currentJob.jobID), status)
+                msg = "Job {0} - with {1} status skipping.\n\n".format(
+                    str(currentJob.jobID), status
+                )
 
                 currentJob.outputMain.emit(
                     msg,
@@ -701,7 +716,7 @@ class MKVFormWidget(QWidget):
                 self.jobs.status(currentJob.jobID, JobStatus.Error)
                 continue
 
-            msg = "Working on Command:\nJob {0} - {1}\n\n"
+            msg = "Working on Command:\n\nJob {0} - {1}\n\n"
             msg = msg.format(str(currentJob.jobID), currentJob.command)
 
             currentJob.outputMain.emit(
@@ -732,9 +747,7 @@ class MKVFormWidget(QWidget):
                 # Change to output queue tab
                 #self.parent.tabs.setCurrentIndex(2)
 
-                for command, basefiles, sourcefiles in objCommand:
-
-                    nFile += 1
+                for cmd, basefiles, sourcefiles, _ in objCommand:
 
                     currentStatus = self.jobs.status(currentJob.jobID)
 
@@ -744,7 +757,11 @@ class MKVFormWidget(QWidget):
                     if self.controlQueue is not None:
                         if not self.controlQueue.empty():
                             request = self.controlQueue.get()
-                            if request == JobStatus.Abort:
+                            if request in [JobStatus.Abort, JobStatus.AbortForced]:
+                                if request == JobStatus.AbortForced:
+                                    p = Path(objCommand[nFile - 1][3])
+                                    if p.is_file():
+                                        p.unlink()
                                 self.jobs.status(currentJob.jobID, JobStatus.Aborted)
                                 self.jobs.clear()
                                 self.jobs.abortAll()
@@ -776,12 +793,13 @@ class MKVFormWidget(QWidget):
                     if bStructureOk:
                         currentJob.outputJobMain(
                             currentJob.jobID,
-                            "Command:\n{}\n\n".format(str(command)),
+                            "Command:\n{}\n".format(str(cmd)),
                             {'color': Qt.blue}
                         )
+                        nFile += 1
                         self.parent.jobsLabel[2] = nFile
                         utils.runCommand(
-                            command,
+                            cmd,
                             currentJob,
                             lstTotal,
                             self.log
