@@ -4,6 +4,7 @@
 import platform
 import shlex
 import subprocess
+import sys
 
 
 class RunCommand:
@@ -123,6 +124,9 @@ def isMacDarkMode():
 
     if platform.system() == "Darwin":
         cmd = RunCommand("defaults read -g AppleInterfaceStyle")
+
+        if getattr(sys, 'frozen', False):
+            return False
 
         if cmd.run():
             for e in cmd.output:

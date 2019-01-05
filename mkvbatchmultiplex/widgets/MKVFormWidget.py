@@ -520,7 +520,7 @@ class MKVFormWidget(QWidget):
         )
 
         if self.objCommand:
-            for command, _, _ in self.objCommand:
+            for command, _, _, _ in self.objCommand:
                 cbOutputMain.emit(
                     str(command) + "\n\n",
                     {}
@@ -549,7 +549,7 @@ class MKVFormWidget(QWidget):
 
         if self.objCommand:
 
-            for _, basefiles, sourcefiles in self.objCommand:
+            for _, basefiles, sourcefiles, _ in self.objCommand:
 
                 if utils.bVerifyStructure(basefiles, sourcefiles, self.log):
                     cbOutputMain.emit(
