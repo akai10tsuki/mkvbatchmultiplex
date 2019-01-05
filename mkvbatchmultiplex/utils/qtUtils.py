@@ -36,23 +36,13 @@ def bVerifyStructure(lstBaseFiles, lstFiles, log=False, currentJob=None):
 
         if objSource != objFile:
             if currentJob is not None:
+                msg = "Error: In structure \n{}\n{}\n"
+                msg = msg.format(str(objFile), str(objSource))
                 currentJob.outputJobMain(
                     currentJob.jobID,
-                    "Error: In structure \n" \
-                    + str(objFile) \
-                    + "\n"
-                    + str(objSource) \
-                    + "\n\n",
-                    {'color': Qt.red}
-                )
-                currentJob.outputJobError(
-                    currentJob.jobID,
-                    "Error: In structure \n"
-                    + str(objFile)
-                    + "\n"
-                    + str(objSource)
-                    + "\n\n",
-                    {'color': Qt.red}
+                    msg,
+                    {'color': Qt.red},
+                    error=True
                 )
             return False
 

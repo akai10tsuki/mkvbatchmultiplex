@@ -77,8 +77,6 @@ class MKVFormWidget(QWidget):
     # pylint: disable=too-many-instance-attributes
     # Defining elements of a GUI
 
-    RUNNING = False
-
     def __init__(self, parent, qthThread, jobs, jobCtrlQueue, jobSpCtrlQueue, log=False):
         super(MKVFormWidget, self).__init__(parent)
 
@@ -618,64 +616,59 @@ class MKVFormWidget(QWidget):
     def qthProcessCommand(self, command=None, **kwargs):
         """Main worker function will process the commands"""
 
-        for key in ['cbOutputCommand', 'cbOutputMain', 'cbProgress']:
-            if not key in kwargs:
-                if self.log:
-                    MODULELOG.error(
-                        "FW0010: No output command callback function %s.",
-                        key
-                    )
-                return "No output command callback function"
+        if self.jobs.jobsStatus() != JobStatus.Running:
 
-        currentJob = CurrentJob()
+            for key in ['cbOutputCommand', 'cbOutputMain', 'cbProgress']:
+                if not key in kwargs:
+                    if self.log:
+                        MODULELOG.error(
+                            "FW0010: No output command callback function %s.",
+                            key
+                        )
+                    return "No output command callback function"
 
-        (currentJob.outputMain,
-         currentJob.progressBar,
-         currentJob.outputJobMain,
-         currentJob.outputJobError,
-         currentJob.controlQueue,
-         currentJob.spControlQueue) = (
-             kwargs['cbOutputMain'],
-             kwargs['cbProgress'],
-             self.jobs.outputJob,
-             self.jobs.outputError,
-             self.controlQueue,
-             self.spControlQueue)
+            currentJob = CurrentJob()
 
-        if not self.RUNNING:
+            (currentJob.outputMain,
+            currentJob.progressBar,
+            currentJob.outputJobMain,
+            currentJob.outputJobError,
+            currentJob.controlQueue,
+            currentJob.spControlQueue) = (
+                kwargs['cbOutputMain'],
+                kwargs['cbProgress'],
+                self.jobs.outputJob,
+                self.jobs.outputError,
+                self.controlQueue,
+                self.spControlQueue)
 
-            self.btnProcessQueue.setEnabled(False)
+        if command:
+            # This is Proccess button request use for TODO:immediate action
 
-            if command:
-                # This is Proccess button request use for TODO:immediate action
+            jobID, _ = self._addQueue(command)
 
-                jobID, _ = self._addQueue(command)
+            currentJob.outputMain.emit(
+                "Command added to queue:\n\nJob {} - {}\n\n".format(jobID, command),
+                {'color': Qt.blue}
+            )
 
-                currentJob.outputMain.emit(
-                    "Command added to queue:\n\nJob {} - {}\n\n".format(jobID, command),
-                    {'color': Qt.blue}
-                )
+            # Clear command line
+            kwargs['cbOutputCommand'].emit("")
 
-                # Clear command line
-                kwargs['cbOutputCommand'].emit("")
-
-            if not self.jobs:
-                currentJob.outputMain.emit("\nNothing on Queue.\n", {'color': Qt.blue})
-                return "Queue empty"
-
-            self.RUNNING = True  # pylint: disable=C0103
-            self.jobs.jobsStatus(JobStatus.Running)
-
-        else:
+        if self.jobs.jobsStatus() == JobStatus.Running:
+            # if RUNNING just add command to que if given
             currentJob.outputMain.emit("\nProcessing Queue.\n", {'color': Qt.blue})
             return "RUNNING"
 
-        MKVCommand.log = self.log
+        self.btnProcessQueue.setEnabled(False)
 
-        (currentJob.outputJobMain,
-         currentJob.outputJobError) = (
-             self.jobs.outputJob,
-             self.jobs.outputError)
+        if not self.jobs:
+            currentJob.outputMain.emit("\nNothing on Queue.\n", {'color': Qt.blue})
+            return "Queue empty"
+
+        self.jobs.jobsStatus(JobStatus.Running)
+
+        MKVCommand.log = self.log
 
         result = None
 
@@ -766,8 +759,13 @@ class MKVFormWidget(QWidget):
                                 self.jobs.clear()
                                 self.jobs.abortAll()
                                 self.jobs.jobsStatus(JobStatus.Aborted)
-                                self.RUNNING = False
                                 return JobStatus.Aborted
+
+                    currentJob.outputJobMain(
+                        currentJob.jobID,
+                        "Command:\n{}\n\n".format(str(cmd)),
+                        {'color': Qt.blue}
+                    )
 
                     bStructureOk = False
 
@@ -791,11 +789,6 @@ class MKVFormWidget(QWidget):
                         return e
 
                     if bStructureOk:
-                        currentJob.outputJobMain(
-                            currentJob.jobID,
-                            "Command:\n{}\n".format(str(cmd)),
-                            {'color': Qt.blue}
-                        )
                         nFile += 1
                         self.parent.jobsLabel[2] = nFile
                         utils.runCommand(
@@ -843,13 +836,8 @@ class MKVFormWidget(QWidget):
                 currentJob.outputJobMain(
                     currentJob.jobID,
                     msg,
-                    {'color': Qt.red}
-                )
-
-                currentJob.outputJobError(
-                    currentJob.jobID,
-                    msg,
-                    {'color': Qt.red}
+                    {'color': Qt.red},
+                    error=True
                 )
 
                 if self.log:
@@ -862,7 +850,6 @@ class MKVFormWidget(QWidget):
         self.parent.jobsLabel[2] = 0
         self.parent.jobsLabel[3] = 0
 
-        self.RUNNING = False
         self.jobs.jobsStatus(JobStatus.Done)
 
         return result

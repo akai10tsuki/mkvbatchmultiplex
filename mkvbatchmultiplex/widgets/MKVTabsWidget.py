@@ -38,8 +38,8 @@ class MKVTabsWidget(QWidget):
         # Add tabs
         self.tabs.addTab(self.tab1, "Command(s)")
         self.tabs.addTab(self.tab2, "Job(s)")
-        self.tabs.addTab(self.tab3, "Job Output")
-        self.tabs.addTab(self.tab4, "Job Error(s)")
+        self.tabs.addTab(self.tab3, "Job(s) Output")
+        self.tabs.addTab(self.tab4, "Job(s) Error(s)")
 
         # Create first tab
         self.tab1.layout = QVBoxLayout(self)

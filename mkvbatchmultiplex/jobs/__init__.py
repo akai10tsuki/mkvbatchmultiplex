@@ -318,7 +318,7 @@ class JobQueue(QObject): # pylint: disable=R0902
         if clearOutput:
             self.clearOutput = clearOutput
 
-    def outputJob(self, jobID, strMessage, dictAttributes):
+    def outputJob(self, jobID, strMessage, dictAttributes, error=False):
         """Update job output on screen and save it"""
 
         if self.emitOutput:
@@ -330,12 +330,17 @@ class JobQueue(QObject): # pylint: disable=R0902
             if jobID in self._jobs:
                 self._jobs[jobID].output.append([strMessage, dictAttributes])
 
+        if error:
+            self.outputError(jobID, strMessage, dictAttributes)
+
     def outputError(self, jobID, strMessage, dictAttributes):
         """Update job output on screen and save it"""
 
         if self.emitError:
+            msg = "----------\nJob: {}\n{}\n----------\n\n"
+            msg = msg.format(str(jobID), strMessage.strip())
             self.outputErrorSignal.emit(
-                strMessage,
+                msg,
                 dictAttributes
             )
 
