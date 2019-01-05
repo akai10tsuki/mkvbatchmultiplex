@@ -5,7 +5,7 @@ Installation
 
 I'm working on the backbone to maintain the project on GitHub
 once is up work on easy installations for the supported
-operating system will be made.  If you are a python users
+operating system will be made.  If you are a python user
 I don't see any problems you using the application right away.
 
 Python package
@@ -41,6 +41,8 @@ The program uses:
 Known Issues
 ============
 
-On macOS 10.14 Mojave dark theme MKVToolNix doesn't work as of
-version 29.0.0. A pre-release versions of MKVToolNix is needed
-or wait for MKVToolNix greater than 29.0.0.
+* On macOS 10.14 Mojave:
+    - dark theme MKVToolNix prior to 30.0.0
+      don't work.
+    - mkvbatchmultiplex always uses light theme
+      this is not the case for the python install

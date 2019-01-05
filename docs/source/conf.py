@@ -26,7 +26,7 @@ import sys
 
 #sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 sys.path.insert(0, os.path.abspath('../..'))
-#import mkvbatchmultiplex.__version__ as __version__
+import mkvbatchmultiplex.config as config
 
 html_show_sourcelink=False
 
@@ -41,7 +41,7 @@ author = 'Efrain Vergara'
 # The short X.Y version
 version = '0.5.3'
 # The full version, including alpha/beta/rc tags
-release = '0.5.3a2.dev3'
+release = '0.5.3a3.dev1'
 #release = __version__.VERSION
 
 

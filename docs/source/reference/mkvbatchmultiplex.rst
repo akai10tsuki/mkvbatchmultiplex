@@ -6,16 +6,24 @@ Subpackages
 
 .. toctree::
 
-    mkvbatchmultiplex.VS
     mkvbatchmultiplex.configurationsettings
     mkvbatchmultiplex.jobs
     mkvbatchmultiplex.loghandler
     mkvbatchmultiplex.mediafileclasses
     mkvbatchmultiplex.qththreads
+    mkvbatchmultiplex.utils
     mkvbatchmultiplex.widgets
 
 Submodules
 ----------
+
+mkvbatchmultiplex.config module
+-------------------------------
+
+.. automodule:: mkvbatchmultiplex.config
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 mkvbatchmultiplex.mkvbatchmultiplex module
 ------------------------------------------

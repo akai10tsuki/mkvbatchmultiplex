@@ -36,18 +36,18 @@ mkvbatchmultiplex.widgets.MKVTabsWidget module
     :undoc-members:
     :show-inheritance:
 
-mkvbatchmultiplex.widgets.MKVUtil module
-----------------------------------------
-
-.. automodule:: mkvbatchmultiplex.widgets.MKVUtil
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 mkvbatchmultiplex.widgets.dualProgressBar module
 ------------------------------------------------
 
 .. automodule:: mkvbatchmultiplex.widgets.dualProgressBar
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+mkvbatchmultiplex.widgets.formatLabel module
+--------------------------------------------
+
+.. automodule:: mkvbatchmultiplex.widgets.formatLabel
     :members:
     :undoc-members:
     :show-inheritance:
