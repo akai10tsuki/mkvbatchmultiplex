@@ -5,7 +5,7 @@
 from .fileUtils import findFile, getFileList
 from .decorators import staticVars, functionTimer
 
-from .utils import isMacDarkMode, getCommandOutput
+from .utils import isMacDarkMode, RunCommand
 
 from .mkvUtils import getMKVMerge, getBaseFiles, bCheckLenOfLists, getSourceFiles
 

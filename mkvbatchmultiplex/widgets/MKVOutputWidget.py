@@ -53,12 +53,16 @@ class MKVOutputWidget(QTextEdit):
         with QMutexLocker(MUTEX):
             color = None
             replaceLine = False
+            appendLine = False
 
             if 'color' in kwargs:
                 color = kwargs['color']
 
             if 'replaceLine' in kwargs:
                 replaceLine = kwargs['replaceLine']
+
+            if 'appendLine' in kwargs:
+                appendLine = kwargs['appendLine']
 
             if utils.isMacDarkMode() and (color is None):
                 color = Qt.white
@@ -72,8 +76,10 @@ class MKVOutputWidget(QTextEdit):
             if replaceLine:
                 self.moveCursor(QTextCursor.StartOfLine, QTextCursor.KeepAnchor)
                 self.insertPlainText(strText)
-            else:
+            elif appendLine:
                 self.append(strText)
+            else:
+                self.insertPlainText(strText)
 
             self.ensureCursorVisible()
 
