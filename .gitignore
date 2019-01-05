@@ -69,3 +69,4 @@ mkvBatchMultiplex.nsi
 test.py
 MediaInfo.dll
 .DS_Store
+.gitchangelog.rc
