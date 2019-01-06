@@ -15,10 +15,12 @@ align:
     Qt.Vertical - Vertical layout
 """
 
+
 import random
 
 from PySide2.QtWidgets import QWidget, QLabel
 from PySide2.QtCore import Slot
+
 
 class FormatLabel(QLabel):
     """
@@ -41,7 +43,7 @@ class FormatLabel(QLabel):
                 raise KeyError("init= not specified")
 
             if args:
-                if type(args[0]) == str:
+                if isinstance(args[0]) == str:
                     template = args[0]
                     args = args[1:]
 
@@ -109,7 +111,7 @@ if __name__ == '__main__':
             l = QGridLayout()
 
             self.jobInfo = FormatLabel()
-            self.formatLabel = JobStatusLabel("Random 1 = {0:>3d} -- Random 2 = {0:3d}", init=[0, 0])
+            self.formatLabel = FormatLabel("Random 1 = {0:>3d} -- Random 2 = {0:3d}", init=[0, 0])
 
             b = QPushButton("Test 1")
             b.pressed.connect(self.test)
@@ -141,7 +143,7 @@ if __name__ == '__main__':
             )
 
         def test1(self):
-
+            """Test FormatLabel"""
             r = random.randint
 
             self.formatLabel[0] = r(1, 1001)
