@@ -6,12 +6,11 @@
 
 import io
 import os
-import sys
 
 from setuptools import setup, find_packages
 
-sys.path.insert(0, os.path.abspath('.'))
-import mkvbatchmultiplex.config as config
+#sys.path.insert(0, os.path.abspath('.'))
+from mkvbatchmultiplex import config
 
 
 DESCRIPTION = 'A mkv media batch multiplex.'
