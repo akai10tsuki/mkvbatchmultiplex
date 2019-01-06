@@ -4,7 +4,7 @@ License
 
 MIT License
 
-Copyright (c) 2017-2818 Efrain Vergara <akai10tsuki@gmail.com>
+Copyright (c) 2017-2019 Efrain Vergara <akai10tsuki@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

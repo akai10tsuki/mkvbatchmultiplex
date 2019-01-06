@@ -44,5 +44,5 @@ Known Issues
 * On macOS 10.14 Mojave:
     - dark theme MKVToolNix prior to 30.0.0
       don't work.
-    - mkvbatchmultiplex always uses light theme
+    - mkvbatchmultiplex binary install always uses light theme
       this is not the case for the python install

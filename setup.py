@@ -9,7 +9,6 @@ import os
 
 from setuptools import setup, find_packages
 
-#sys.path.insert(0, os.path.abspath('.'))
 from mkvbatchmultiplex import config
 
 

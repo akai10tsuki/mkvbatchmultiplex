@@ -26,12 +26,14 @@ Works with either Windows (cmd.exe) or Linux/unix shells (bash, zsh, etc.)
 Installation
 ============
 
-If you just can wait for an easier way.  It is been developed on Windows the
-media server is Windows based.  Made light testing on ubuntu and macOS.  On
-macOS 10.14 mojave it does not work the color palette makes it unusable.  This
-a Qt5 problem version 5.12 is working on it when released it will work.
-MKVToolNix have the same problem have to wait for version 29.0.0+.
-Done some testing with pre-release versions and works more or less find.
+.. code:: bash
+
+    pip install mkvbatchmultiplex
+
+It is been developed on Windows the media server is Windows based.
+Made light testing on ubuntu and macOS 10.14 Mojave and ubuntu 18.04.
+On macOS MKVToolNix must be version 30.0.0 or higher if working with
+Dark Theme.
 
 Dependencies
 ************
@@ -41,7 +43,7 @@ Dependencies
         - PySide2_ 5.12 or greater
         - pymediainfo_ 2.2.1 or greater
     * MediaInfo_ tested with versions 17.10->18.12
-    * MKVToolNix_ tested with versions 17.00->29.00
+    * MKVToolNix_ tested with versions 17.00->30.1.00
 
 For now is a python package it can be installed:
 
@@ -51,7 +53,7 @@ For now is a python package it can be installed:
     or download the source
 
 
-macOS 10.14 Dark theme MKVToolNix has to be version 29.0.0+
+macOS 10.14 Dark theme MKVToolNix has to be version 30.0.0+
 
 Usage
 =====
@@ -77,6 +79,7 @@ This is just the base for the project.  The roadmap is:
 If the the program generates interest any further changes and additions will
 depend on any user base needs.
 
+Work on binaries started.
 
 See https://mkvbatchmultiplex.readthedocs.io for more information.
 
