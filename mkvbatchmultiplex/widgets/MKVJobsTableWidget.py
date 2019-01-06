@@ -21,7 +21,7 @@ from PySide2.QtCore import QMutex, QMutexLocker, Qt, Slot, Signal
 from PySide2.QtWidgets import (QVBoxLayout, QTableWidget, QMenu, QWidget, QHeaderView,
                                QTableWidgetItem, QAbstractScrollArea)
 
-from mkvbatchmultiplex.jobs import JobStatus
+from ..jobs import JobStatus
 
 MUTEX = QMutex()
 MODULELOG = logging.getLogger(__name__)

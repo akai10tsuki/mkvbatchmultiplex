@@ -14,7 +14,7 @@ from PySide2.QtCore import QMutex, QMutexLocker, Qt, Slot
 from PySide2.QtGui import QTextCursor
 from PySide2.QtWidgets import QTextEdit
 
-import mkvbatchmultiplex.utils as utils
+from .. import utils
 
 MUTEX = QMutex()
 MODULELOG = logging.getLogger(__name__)

@@ -16,9 +16,9 @@ import subprocess
 from PySide2.QtCore import QMutex, QMutexLocker, Qt
 from PySide2.QtWidgets import QDesktopWidget
 
-from mkvbatchmultiplex.mediafileclasses import MediaFileInfo
-from mkvbatchmultiplex.utils import staticVars
-from mkvbatchmultiplex.jobs import JobStatus
+from ..mediafileclasses import MediaFileInfo
+from ..utils import staticVars
+from ..jobs import JobStatus
 
 from .mkvUtils import getBaseFiles, getSourceFiles
 

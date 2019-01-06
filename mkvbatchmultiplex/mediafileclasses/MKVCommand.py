@@ -22,7 +22,7 @@ import logging
 
 from pathlib import Path
 
-from mkvbatchmultiplex import utils
+from .. import utils
 
 
 MODULELOG = logging.getLogger(__name__)

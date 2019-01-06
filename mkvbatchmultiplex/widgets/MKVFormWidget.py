@@ -20,11 +20,11 @@ from PySide2.QtWidgets import (QApplication, QGridLayout, QGroupBox, QLabel,
                                QLineEdit, QMessageBox, QPushButton,
                                QWidget)
 
-import mkvbatchmultiplex.qththreads as threads
-import mkvbatchmultiplex.utils as utils
+from .. import qththreads as threads
+from .. import utils
 
-from mkvbatchmultiplex.mediafileclasses import MKVCommand
-from mkvbatchmultiplex.jobs import JobStatus
+from ..mediafileclasses import MKVCommand
+from ..jobs import JobStatus
 
 from .MKVOutputWidget import MKVOutputWidget
 
@@ -630,17 +630,17 @@ class MKVFormWidget(QWidget):
             currentJob = CurrentJob()
 
             (currentJob.outputMain,
-            currentJob.progressBar,
-            currentJob.outputJobMain,
-            currentJob.outputJobError,
-            currentJob.controlQueue,
-            currentJob.spControlQueue) = (
-                kwargs['cbOutputMain'],
-                kwargs['cbProgress'],
-                self.jobs.outputJob,
-                self.jobs.outputError,
-                self.controlQueue,
-                self.spControlQueue)
+             currentJob.progressBar,
+             currentJob.outputJobMain,
+             currentJob.outputJobError,
+             currentJob.controlQueue,
+             currentJob.spControlQueue) = (
+                 kwargs['cbOutputMain'],
+                 kwargs['cbProgress'],
+                 self.jobs.outputJob,
+                 self.jobs.outputError,
+                 self.controlQueue,
+                 self.spControlQueue)
 
         if command:
             # This is Proccess button request use for TODO:immediate action
@@ -682,15 +682,6 @@ class MKVFormWidget(QWidget):
 
             if status != JobStatus.Waiting:
 
-                msg = "Job {0} - with {1} status skipping.\n\n".format(
-                    str(currentJob.jobID), status
-                )
-
-                currentJob.outputMain.emit(
-                    msg,
-                    {'color': Qt.blue}
-                )
-
                 msg = "**********\nSkip requested on Command:\nJob {0} - {1}\n**********\n\n"
                 msg = msg.format(str(currentJob.jobID), currentJob.command)
 
@@ -708,14 +699,6 @@ class MKVFormWidget(QWidget):
                 # Skip empty command
                 self.jobs.status(currentJob.jobID, JobStatus.Error)
                 continue
-
-            msg = "Working on Command:\n\nJob {0} - {1}\n\n"
-            msg = msg.format(str(currentJob.jobID), currentJob.command)
-
-            currentJob.outputMain.emit(
-                msg,
-                {'color': Qt.blue}
-            )
 
             msg = "**********\nWorking on Command:\nJob {0} - {1}\n**********\n\n"
             msg = msg.format(str(currentJob.jobID), currentJob.command)
@@ -776,9 +759,13 @@ class MKVFormWidget(QWidget):
                             self.log,
                             currentJob
                         )
+
                     except OSError as e:
-                        currentJob.outputMain.emit(
-                            "MediaInfo not found.\n\n",
+
+                        msg = "MediaInfo not found.\n{}\n\n".format(e)
+                        currentJob.outputJobMain(
+                            currentJob.jobID,
+                            msg,
                             {'color': Qt.red}
                         )
                         # Error unable to continue
@@ -786,6 +773,9 @@ class MKVFormWidget(QWidget):
                         self.jobs.clear()
                         self.jobs.abortAll()
                         self.jobs.jobsStatus(JobStatus.Error)
+                        # May be rude but is show stopper
+                        self.parent.tabs.setCurrentIndex(2)
+
                         return e
 
                     if bStructureOk:
@@ -848,7 +838,7 @@ class MKVFormWidget(QWidget):
 
         self.parent.jobsLabel[1] = currentJob.jobID
         self.parent.jobsLabel[2] = 0
-        self.parent.jobsLabel[3] = 0
+        #self.parent.jobsLabel[3] = 0
 
         self.jobs.jobsStatus(JobStatus.Done)
 
