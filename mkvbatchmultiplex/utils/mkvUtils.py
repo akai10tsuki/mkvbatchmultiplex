@@ -11,10 +11,13 @@ import glob
 import logging
 import os
 import platform
+import shlex
 
 from pathlib import Path
 
 from .fileUtils import findFile, getFileList
+from .utils import RunCommand
+
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -62,6 +65,21 @@ def getMKVMerge():
             mkvmerge = Path(search)
             if mkvmerge.is_file():
                 return mkvmerge
+
+    return None
+
+def getMKVMergeVersion(mkvmerge):
+
+    s = mkvmerge
+
+    if s[0:1] != "'" and s[-1:] != "'":
+        s = shlex.quote(s)
+        print(s)
+
+    runCmd = RunCommand(s + " --version", regexsearch=r" v(.*?) ")
+
+    if runCmd.run():
+        return runCmd.regexmatch
 
     return None
 

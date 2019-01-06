@@ -2,6 +2,7 @@
 
 
 import platform
+import re
 import shlex
 import subprocess
 import sys
@@ -18,12 +19,16 @@ class RunCommand:
     :type processLine: func
     """
 
-    def __init__(self, command, processLine=None):
+    def __init__(self, command, processLine=None, regexsearch=None):
 
         self._output = []
         self._command = command
         self._error = ""
         self._process = processLine
+        self._regexmatch = None
+        self._regEx = None
+        if regexsearch is not None:
+            self._regEx = re.compile(regexsearch)
 
     def __bool__(self):
         if self._command:
@@ -75,6 +80,22 @@ class RunCommand:
         """
         return shlex.split(self._command)
 
+    @property
+    def regexmatch(self):
+        """results of regular expresion search"""
+        return self._regexmatch
+
+    def _regexMatch(self, line):
+
+        m = None
+
+        if self._regEx:
+            m = self._regEx.search(line)
+
+        if m is not None:
+            if self._regexmatch is None:
+                self._regexmatch = m.group(1)
+
     def _getCommandOutput(self):
         """Execute command in a subprocess"""
 
@@ -88,6 +109,7 @@ class RunCommand:
 
                 for line in p.stdout:
                     self._output.append(line)
+                    self._regexMatch(line)
                     if self._process is not None:
                         self._process(line)
 
@@ -97,7 +119,6 @@ class RunCommand:
 
         except FileNotFoundError as e:
             self._error = e
-
 
 
 def getCommandOutput(command, lstOutput):

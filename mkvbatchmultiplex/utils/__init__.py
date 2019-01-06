@@ -7,6 +7,7 @@ from .decorators import staticVars, functionTimer
 
 from .utils import isMacDarkMode, RunCommand
 
-from .mkvUtils import getMKVMerge, getBaseFiles, bCheckLenOfLists, getSourceFiles
+from .mkvUtils import (getMKVMerge, getBaseFiles, bCheckLenOfLists,
+                       getSourceFiles, getMKVMergeVersion)
 
 from .qtUtils import bVerifyStructure, getFiles, runCommand

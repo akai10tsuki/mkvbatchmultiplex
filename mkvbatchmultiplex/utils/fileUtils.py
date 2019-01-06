@@ -3,54 +3,25 @@
 """File utilities"""
 
 import os
-from pathlib import Path
+from pathlib import Path, PurePath
 
 #class FindFileError(Exception): pass
 
-def _find(element, dirPath, matchFunc=os.path.isfile):
+def findFile(element, dirPath=None):
+    """find file in the path"""
 
-    if isinstance(dirPath, str):
-        lstPath = pathToList(dirPath)
-    else:
-        lstPath = dirPath
+    if dirPath is None:
+        dirPath = os.getenv('PATH')
 
-    for dirname in lstPath:
-        candidate = os.path.join(dirname, element)
-        if matchFunc(candidate):
+    dirs = dirPath.split(os.pathsep)
+
+    for dirname in dirs:
+        candidate = Path(PurePath(dirname).joinpath(element))
+        if candidate.is_file():
             return candidate
 
     return None
 
-def findFile(element, dirPath=None):
-    """Find file in path specified or system PATH"""
-    if dirPath is None:
-        dirPath = os.getenv('PATH')
-    return _find(element, dirPath)
-
-def findDir(element, dirPath=None):
-    """Find directory in path specified or system PATH"""
-    if dirPath is None:
-        dirPath = os.getenv('PATH')
-    return _find(element, dirPath, matchFunc=os.path.isdir)
-
-def pathToList(pathVar):
-    """Convert a path variable to a list"""
-
-    pathList = []
-    bFound = False
-
-    paths = pathVar.split(os.pathsep)
-
-    for path in paths:
-        if os.path.isdir(path):
-            pathList.append(path)
-            if not bFound:
-                bFound = True
-
-    if bFound:
-        return pathList
-    else:
-        return None
 
 def getFileList(strPath, strExtFilter=None, bFullPath=False):
     """

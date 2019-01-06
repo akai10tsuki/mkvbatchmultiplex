@@ -8,6 +8,7 @@ Main form
 LOG UT009
 """
 
+
 import logging
 import re
 import subprocess
@@ -20,6 +21,7 @@ from mkvbatchmultiplex.utils import staticVars
 from mkvbatchmultiplex.jobs import JobStatus
 
 from .mkvUtils import getBaseFiles, getSourceFiles
+
 
 MUTEX = QMutex()
 MODULELOG = logging.getLogger(__name__)
