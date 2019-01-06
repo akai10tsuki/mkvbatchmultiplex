@@ -11,6 +11,7 @@ align:
     Qt.Vertical - Vertical layout
 """
 
+
 from PySide2.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QProgressBar, QSizePolicy
 from PySide2.QtCore import Qt, Slot
 

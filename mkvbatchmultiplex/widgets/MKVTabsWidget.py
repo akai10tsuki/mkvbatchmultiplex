@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Tabs Widget"""
 
+
 import logging
 
 from PySide2.QtCore import QMutex
