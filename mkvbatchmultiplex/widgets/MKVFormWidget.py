@@ -212,9 +212,9 @@ class MKVFormWidget(QWidget):
         self.btnClearOutputWindow.setEnabled(False)
         self.btnReset.setEnabled(False)
 
-        self.teOutputWindow = MKVOutputWidget(self)
-        self.teOutputWindow.textChanged.connect(self.clearButtonsState)
-        self.teOutputWindow.setReadOnly(True)
+        self.textOutputWindow = MKVOutputWidget(self)
+        self.textOutputWindow.textChanged.connect(self.clearButtonsState)
+        self.textOutputWindow.setReadOnly(True)
 
     def _initLayout(self):
 
@@ -242,7 +242,7 @@ class MKVFormWidget(QWidget):
 
         self.grid.addWidget(self.btnGroup, 2, 0, 5, 2)
 
-        self.grid.addWidget(self.teOutputWindow, 2, 2, 10, 1)
+        self.grid.addWidget(self.textOutputWindow, 2, 2, 10, 1)
 
         self.setLayout(self.grid)
 
@@ -267,11 +267,19 @@ class MKVFormWidget(QWidget):
 
         #while True:
         if self.jobs.jobsAreWaiting():
-            tmpNum = self.threadpool.activeThreadCount()
 
-            if tmpNum == 0:
-                self.jobs.requeueWaiting()
-                self.btnProcessQueue.setEnabled(True)
+            jobsCurrentStatus = self.jobs.jobsStatus()
+
+            if jobsCurrentStatus == JobStatus.Blocked:
+                self.btnProcess.setEnabled(False)
+                self.btnProcessQueue.setEnabled(False)
+
+            else:
+                tmpNum = self.threadpool.activeThreadCount()
+
+                if tmpNum == 0:
+                    self.jobs.requeueWaiting()
+                    self.btnProcessQueue.setEnabled(True)
 
         js = self.jobs.jobsStatus()
 
@@ -286,7 +294,7 @@ class MKVFormWidget(QWidget):
         kwargs are passed to the run function
         """
         worker = Worker(function, *args, **kwargs)
-        worker.signals.outputmain.connect(self.teOutputWindow.insertText)
+        worker.signals.outputmain.connect(self.textOutputWindow.insertText)
         worker.signals.progress.connect(self.progress)
         worker.signals.outputcommand.connect(self.updateCommand)
 
@@ -295,7 +303,7 @@ class MKVFormWidget(QWidget):
 
     def clearButtonsState(self):
         """Set clear button state"""
-        if self.teOutputWindow.toPlainText() != "":
+        if self.textOutputWindow.toPlainText() != "":
             self.btnReset.setEnabled(True)
             self.btnClearOutputWindow.setEnabled(True)
         else:
@@ -320,8 +328,14 @@ class MKVFormWidget(QWidget):
             self.btnShowSourceFiles.setEnabled(bState)
             self.btnShowCommands.setEnabled(bState)
             self.btnCheckFiles.setEnabled(bState)
-            self.btnProcess.setEnabled(bState)
-            self.btnAddQueue.setEnabled(bState)
+            if self.jobs.jobsStatus() == JobStatus.Blocked:
+                self.btnCheckFiles.setEnabled(False)
+                self.btnProcess.setEnabled(False)
+                self.btnAddQueue.setEnabled(False)
+            else:
+                self.btnCheckFiles.setEnabled(bState)
+                self.btnProcess.setEnabled(bState)
+                self.btnAddQueue.setEnabled(bState)
 
     def pasteClipboard(self):
         """Paste clipboard to command QLineEdit"""
@@ -412,6 +426,10 @@ class MKVFormWidget(QWidget):
 
     def addQueue(self, **kwargs):
         """Add Command to Work Queue"""
+
+        if self.jobs.jobsStatus() == JobStatus.Blocked:
+            self.btnProcessQueue.setEnabled(True)
+            return JobStatus.Blocked
 
         # Get outputwindow signal function
         kwargsKeys = ['cbOutputCommand', 'cbOutputMain']
@@ -579,7 +597,7 @@ class MKVFormWidget(QWidget):
         )
 
         if result == QMessageBox.Yes:
-            self.teOutputWindow.clear()
+            self.textOutputWindow.clear()
             self.btnClearOutputWindow.setEnabled(False)
 
     def reset(self):
@@ -600,7 +618,7 @@ class MKVFormWidget(QWidget):
             self.btnProcess.setEnabled(False)
             self.btnPasteClipboard.setEnabled(True)
             self.btnAddQueue.setEnabled(False)
-            self.teOutputWindow.clear()
+            self.textOutputWindow.clear()
             self.parent.outputQueueWidget.clear()
             self.parent.outputErrorWidget.clear()
             self.parent.jobsWidget.clearTable()

@@ -12,6 +12,7 @@ import logging
 import os
 import platform
 import shlex
+import sys
 
 from pathlib import Path
 
@@ -22,6 +23,39 @@ from .utils import RunCommand
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
+
+def getMediaInfoLib():
+    """find MediaInfo library on system"""
+
+    currentOS = platform.system()
+
+    library_names = ()
+    library_fullpath = []
+
+    if currentOS == "Darwin":
+        library_names = ("libmediainfo.0.dylib", "libmediainfo.dylib")
+    elif currentOS == "Linux":
+        library_names = ("libmediainfo.so.0", "libzen.so.0")
+    elif currentOS == "Windows":
+        library_names = ("MediaInfo.dll",)
+
+    if library_names:
+
+        dirs = sys.path
+
+        # python system path
+        for library in library_names:
+            libFile = findFile(library, dirs)
+
+            if libFile is not None:
+                library_fullpath.append(libFile)
+            else:
+                # search failed
+                return []
+    else:
+        return []
+
+    return library_fullpath
 
 def getMKVMerge():
     """get the name of the mkvmerge executable in the system"""
@@ -69,6 +103,7 @@ def getMKVMerge():
     return None
 
 def getMKVMergeVersion(mkvmerge):
+    """get mkvmerge version"""
 
     s = mkvmerge
 

@@ -50,13 +50,13 @@ from PySide2.QtWidgets import (QAction, QApplication, QDesktopWidget, qApp,
                                QMainWindow, QMessageBox, QToolBar, QVBoxLayout,
                                QWidget, QFontDialog)
 
-import mkvbatchmultiplex.config as config
-
+from . import config
 from .loghandler import QthLogRotateHandler
 from .widgets import (DualProgressBar, MKVFormWidget, MKVTabsWidget, FormatLabel,
                       MKVOutputWidget, MKVJobsTableWidget)
 from .jobs import JobQueue, JobStatus
 from .configurationsettings import ConfigurationSettings
+from .utils import getMediaInfoLib
 
 
 class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
@@ -92,6 +92,8 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         # Read configuration elements
         self.configuration()
         self.restoreConfig()
+
+        self._checkDependencies()
 
     def _initHelper(self):
 
@@ -206,7 +208,7 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         result = m.exec_()
         """
 
-        self.formWidget.teOutputWindow.makeConnection(self.outputMainSignal)
+        self.formWidget.textOutputWindow.makeConnection(self.outputMainSignal)
         jobsStatus = self.jobs.jobsStatus()
 
         if jobsStatus == JobStatus.Aborted:
@@ -375,6 +377,19 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         if result == QMessageBox.Yes:
             self.restoreConfig(resetDefaults=True)
 
+    def _checkDependencies(self):
+
+        libFiles = getMediaInfoLib()
+
+        print(libFiles)
+
+        if not libFiles:
+            print("Bad Ending.")
+            self.formWidget.textOutputWindow.insertText(
+                "\nMediaInfo library not found can not process jobs.\n\n",
+                {'color': Qt.red}
+            )
+            self.jobs.jobsStatus(JobStatus.Blocked)
 
 def centerWidgets(widget, parent=None):
     """center widget based on parent or screen geometry"""

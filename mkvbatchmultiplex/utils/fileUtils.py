@@ -13,7 +13,10 @@ def findFile(element, dirPath=None):
     if dirPath is None:
         dirPath = os.getenv('PATH')
 
-    dirs = dirPath.split(os.pathsep)
+    if isinstance(dirPath, str):
+        dirs = dirPath.split(os.pathsep)
+    else:
+        dirs = dirPath
 
     for dirname in dirs:
         candidate = Path(PurePath(dirname).joinpath(element))

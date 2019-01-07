@@ -33,8 +33,20 @@ def bVerifyStructure(lstBaseFiles, lstFiles, log=False, currentJob=None):
 
     for strSource, strFile in zip(lstBaseFiles, lstFiles):
 
-        objSource = MediaFileInfo(strSource, log)
-        objFile = MediaFileInfo(strFile, log)
+        try:
+            objSource = MediaFileInfo(strSource, log)
+            objFile = MediaFileInfo(strFile, log)
+        except OSError:
+            if currentJob is not None:
+                msg = "Error: In structure \n{}\n{}\n"
+                msg = msg.format(str(objFile), str(objSource))
+                currentJob.outputJobMain(
+                    currentJob.jobID,
+                    msg,
+                    {'color': Qt.red},
+                    error=True
+                )
+            return False
 
         if objSource != objFile:
             if currentJob is not None:
