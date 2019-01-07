@@ -127,8 +127,7 @@ def runCommand(command, currentJob, lstTotal, log=False):
     rc = 1000
 
     with subprocess.Popen(command, stdout=subprocess.PIPE, bufsize=1,
-                          universal_newlines=True,
-                          creationflags=subprocess.CREATE_NEW_PROCESS_GROUP) as p:
+                          universal_newlines=True) as p:
         addNewline = True
         iTotal = lstTotal[0]
         n = 0
@@ -169,12 +168,9 @@ def runCommand(command, currentJob, lstTotal, log=False):
                 #else:
                 if line.find(u"Warning") == 0:
                     currentJob.outputJobMain(
-                        currentJob.jobID, line.strip(),
-                        {'color': Qt.red, 'appendLine': True}
-                    )
-                    currentJob.outputJobError(
-                        currentJob.jobID, line.strip(),
-                        {'color': Qt.red, 'appendLine': True}
+                        currentJob.jobID, line,
+                        {'color': Qt.red, 'appendLine': True},
+                        True
                     )
                 else:
                     currentJob.outputJobMain(
@@ -185,8 +181,7 @@ def runCommand(command, currentJob, lstTotal, log=False):
                 request = currentJob.spControlQueue.get()
                 if request == JobStatus.Abort:
                     currentJob.controlQueue.put(JobStatus.AbortForced)
-                    p.send_signal(subprocess.signal.CTRL_BREAK_EVENT)
-                    #p.kill()
+                    p.kill()
                     outs, errs = p.communicate()
                     if outs:
                         print(outs)
