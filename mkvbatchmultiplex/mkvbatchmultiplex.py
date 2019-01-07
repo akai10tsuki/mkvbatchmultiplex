@@ -56,7 +56,7 @@ from .widgets import (DualProgressBar, MKVFormWidget, MKVTabsWidget, FormatLabel
                       MKVOutputWidget, MKVJobsTableWidget)
 from .jobs import JobQueue, JobStatus
 from .configurationsettings import ConfigurationSettings
-from .utils import getMediaInfoLib
+from .utils import isMediaInfoLib
 
 
 class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
@@ -379,12 +379,9 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
 
     def _checkDependencies(self):
 
-        libFiles = getMediaInfoLib()
-
-        print(libFiles)
+        libFiles = isMediaInfoLib()
 
         if not libFiles:
-            print("Bad Ending.")
             self.formWidget.textOutputWindow.insertText(
                 "\nMediaInfo library not found can not process jobs.\n\n",
                 {'color': Qt.red}

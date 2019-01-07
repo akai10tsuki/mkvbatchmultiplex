@@ -9,6 +9,6 @@ from .utils import isMacDarkMode, RunCommand
 
 from .mkvUtils import (getMKVMerge, getBaseFiles, bCheckLenOfLists,
                        getSourceFiles, getMKVMergeVersion,
-                       getMediaInfoLib)
+                       isMediaInfoLib)
 
 from .qtUtils import bVerifyStructure, getFiles, runCommand
