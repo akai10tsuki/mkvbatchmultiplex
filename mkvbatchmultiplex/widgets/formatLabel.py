@@ -43,7 +43,7 @@ class FormatLabel(QLabel):
                 raise KeyError("init= not specified")
 
             if args:
-                if isinstance(args[0]) == str:
+                if isinstance(args[0], str):
                     template = args[0]
                     args = args[1:]
 
