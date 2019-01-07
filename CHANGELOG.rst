@@ -15,13 +15,14 @@ Added
   command for testing purposes based on the contents of the directory
 - more thorough check of command line input
 - added **Analysis** button to display information of checks of command line
+- check if pymediainfo finds MediaInfo library
 
 Changed
 ~~~~~~~
 - documentation updates
 - code cleanup:
 
-  * internal references all relative RTD works ok now
+  * internal references all relative RTD_ works ok now
   * error output revisions
   * better handling of exit request when jobs are running
   * better handling of single quote in file names
@@ -47,3 +48,5 @@ Added
 - Windows install binary
 
 0.5.3a1 - 2018-12-20
+
+.. _RTD: https://mkvbatchmultiplex.readthedocs.io
