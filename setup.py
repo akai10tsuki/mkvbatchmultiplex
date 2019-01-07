@@ -17,7 +17,7 @@ KEYWORDS = 'mkv multimedia video'
 NAME = "mkvbatchmultiplex"
 REQUIRED = [
     'pymediainfo>=2.2.1',
-    'PyQt5>=5.10.1'
+    'PySide2>=5.12'
 ]
 URL = 'https://github.com/akai10tsuki/mkvbatchmultiplex'
 VERSION = None
@@ -71,16 +71,16 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+
+        # Implementation
+        "Programming Language :: Python :: Implementation :: CPython",
     ],
 
     keywords=KEYWORDS,  # Optional
 
     packages=find_packages(exclude=['docs', 'tests*',]),  # Required
 
-    install_requires=[
-        'pymediainfo>=2.2.1',
-        'PySide2>=5.12'
-    ],
+    install_requires=REQUIRED,
 
     python_requires='>=3.5, <4',
 
