@@ -100,8 +100,16 @@ class GenCommandApp(QMainWindow):
 
         mkvmergeex = getMKVMerge()
 
+        currentOS = platform.system()
+
         if mkvmergeex:
             mkvmerge = checkForQuote(mkvmergeex)
+
+        if currentOS == "Windows":
+            l = "--language en"
+        else:
+            l = "--language en_US"
+
 
         p = os.path.dirname(os.path.realpath(__file__))
         p = os.path.realpath(p)
@@ -111,29 +119,36 @@ class GenCommandApp(QMainWindow):
         if not e:
             os.mkdir(str(d))
 
-        self.cmd0 = mkvmerge + r" --ui-language en --output '" + d + \
-                r"/video - S01E01.mkv' --language 0:und --language 1:spa " + \
+        self.cmd0 = mkvmerge + r" " + l + " --output '" + d + \
+                r"/video-S01E01.mkv' --language 0:und --language 1:spa " + \
                 r"--default-track 1:yes '(' '" + s + \
-                r"/video - S01E01.avi' ')' --language 0:eng --default-track 0:yes '(' '" + s + \
-                r"/Video - S01E01.ass' ')' --track-order 0:0,0:1,1:0"
+                r"/video-S01E01.avi' ')' --language 0:eng --default-track 0:yes '(' '" + s + \
+                r"/Video-S01E01.ass' ')' --track-order 0:0,0:1,1:0"
 
-        self.cmd1 = mkvmerge + r" --ui-language en --output '" + d + \
+        self.cmd1 = mkvmerge + r" " + l + " --output '" + d + \
                 r"/video - S01E02.mkv' --language 0:und --language 1:spa " + \
                 r"--default-track 1:yes '(' '" + s + \
                 r"/video - S01E02.avi' ')' --language 0:eng --default-track 0:yes '(' '" + s + \
                 r"/Video - S01E02.ass' ')' --track-order 0:0,0:1,1:0"
 
-        self.cmd2 = mkvmerge + r" --ui-language en --output '" + d + \
+        self.cmd2 = mkvmerge + r" " + l + " --output '" + d + \
                 r"/video - S01E03.mkv' --language 0:und --language 1:spa " + \
                 r"--default-track 1:yes '(' '" + s + \
                 r"/video - S01E03.avi' ')' --language 0:eng --default-track 0:yes '(' '" + s + \
                 r"/Video - S01E03.ass' ')' --track-order 0:0,0:1,1:0"
 
-        self.cmd3 = mkvmerge + r" --ui-language en --output " + d + \
+        self.cmd3 = mkvmerge + r" " + l + " --output '" + d + \
+                r"/video'\''S01E05.mkv' --language 0:und --language 1:spa " + \
+                r"--default-track 1:yes '(' '" + s + \
+                r"/video'\''S01E05.avi' ')' --language 0:eng --default-track 0:yes '(' '" + s + \
+                r"/Video'\''S01E05.ass' ')' --track-order 0:0,0:1,1:0"
+
+        self.cmd4 = mkvmerge + r" " + l + " --output " + d + \
                 r"/video-S01E01.mkv --language 0:und --language 1:spa " + \
                 r"--default-track 1:yes '(' " + s + \
                 r"/video-S01E01.avi ')' --language 0:eng --default-track 0:yes '(' " + s + \
                 r"/Video-S01E01.ass ')' --track-order 0:0,0:1,1:0"
+
 
         self.textWindow = QTextEdit()
         self.pushButton0 = QPushButton(" Command 0 ")
@@ -156,6 +171,11 @@ class GenCommandApp(QMainWindow):
         self.pushButton3.clicked.connect(   # pylint: disable=E1101
             lambda: self.pasteClipboard(3)
         )
+        self.pushButton4 = QPushButton(" Command 4 ")
+        self.pushButton4.resize(self.pushButton2.sizeHint())
+        self.pushButton4.clicked.connect(   # pylint: disable=E1101
+            lambda: self.pasteClipboard(4)
+        )
         self.pushButtonExit = QPushButton(" Exit ")
         self.pushButtonExit.resize(self.pushButtonExit.sizeHint())
         self.pushButtonExit.clicked.connect(    # pylint: disable=E1101
@@ -170,7 +190,9 @@ class GenCommandApp(QMainWindow):
         layout.addWidget(self.pushButton0, 7, 0)
         layout.addWidget(self.pushButton1, 7, 1)
         layout.addWidget(self.pushButton2, 7, 2)
-        layout.addWidget(self.pushButtonExit, 7, 3)
+        layout.addWidget(self.pushButton3, 7, 3)
+        layout.addWidget(self.pushButton4, 7, 4)
+        layout.addWidget(self.pushButtonExit, 7, 5)
 
         self.setCentralWidget(widget)
 
@@ -186,10 +208,12 @@ class GenCommandApp(QMainWindow):
         cmd = self.cmd0
         if index == 1:
             cmd = self.cmd1
-            print("change 1")
         elif index == 2:
             cmd = self.cmd2
-            print("change 2")
+        elif index == 3:
+            cmd = self.cmd3
+        elif index == 4:
+            cmd = self.cmd4
 
         QApplication.clipboard().clear()
         QApplication.clipboard().setText(cmd)
