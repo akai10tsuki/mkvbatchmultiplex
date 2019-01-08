@@ -65,8 +65,8 @@ tests/generatecommand.1.py
 tmp/
 docs2/
 sources/
-mkvBatchMultiplex.nsi
-mkvBatchMultiplex.iss
+*.nsi
+*.iss
 test.py
 MediaInfo.dll
 .DS_Store
