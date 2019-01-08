@@ -11,10 +11,10 @@ mkvbatchmultiplex: MKVMERGE batch multiplexing
   :target: https://pypi.org/project/mkvbatchmultiplex
 
 
-This project started out of the necessity to multiplex a library of many series
-using AVI_ container and SRT_ for subtitles to be maintained in a Media Server.
-And as the saying goes search for something to use did not find anything that
-met my requirements so program it myself.
+This project started out of the necessity to multiplex a library of many video
+series using AVI_ container and SRT_ for subtitles to be maintained in a Media
+Server. And as the saying goes search for something to use did not find anything
+that met my requirements so program it myself.
 
 Description
 ===========
@@ -29,7 +29,7 @@ in the directory. The command line is expected to be taken from
 **mkvmerge** and **mkvtoolnix-gui** are part of the MKVToolNix_ set of tools
 to work with Matroska_ media container files.
 
-Works with either Windows (cmd.exe) or Linux/unix shells (bash, zsh, etc.)
+Works with Windows (cmd.exe) or Linux/unix shells (bash, zsh, etc.)
 
 Installation
 ============
