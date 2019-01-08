@@ -66,6 +66,7 @@ tmp/
 docs2/
 sources/
 mkvBatchMultiplex.nsi
+mkvBatchMultiplex.iss
 test.py
 MediaInfo.dll
 .DS_Store
