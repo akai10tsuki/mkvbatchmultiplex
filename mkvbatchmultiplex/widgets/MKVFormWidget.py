@@ -5,8 +5,10 @@ MKVFormWidget:
 
 Main form
 
-LOG FW0013
 """
+
+#LOG FW0013
+
 
 import logging
 import platform
@@ -31,45 +33,6 @@ from .MKVOutputWidget import MKVOutputWidget
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
-
-
-class CurrentJob: # pylint: disable=R0903
-    """Helper class for working with a job"""
-
-    def __init__(self):
-
-        self.jobID = None
-        self.status = None
-        self.command = None
-        self.outputMain = None
-        self.outputJobMain = None
-        self.outputJobError = None
-        self.progressBar = None
-        self.controlQueue = None
-        self.spControlQueue = None
-
-
-class WorkerSignals(threads.WorkerSignals):
-    """Additional signals for QRunables"""
-
-    progress = Signal(int, int)
-    outputmain = Signal(str, dict)
-    outputcommand = Signal(str)
-
-
-class Worker(threads.Worker): # pylint: disable=R0903
-    """QRunnable worker with additional callbacks"""
-
-    def __init__(self, fn, *args, **kwargs):
-        super(Worker, self).__init__(fn, *args, **kwargs)
-
-        # Override signals variable with extended one
-        self.signals = WorkerSignals()
-
-        # Add the callback to kwargs
-        self.kwargs['cbProgress'] = self.signals.progress
-        self.kwargs['cbOutputMain'] = self.signals.outputmain
-        self.kwargs['cbOutputCommand'] = self.signals.outputcommand
 
 
 class MKVFormWidget(QWidget):
@@ -113,7 +76,7 @@ class MKVFormWidget(QWidget):
         # Command line input mkvtoolnix-gui: Multiplexer->Show command line
         self.leCommand = QLineEdit()
         self.leCommand.setClearButtonEnabled(True)
-        validator = self.ValidateCommand(self)
+        validator = ValidateCommand(self)
         self.leCommand.setValidator(validator)
 
         self.btnPasteClipboard = QPushButton(" Paste Clipboard ")
@@ -364,36 +327,6 @@ class MKVFormWidget(QWidget):
             cbOutputCommand.emit(clip)
 
         return None
-
-    class ValidateCommand(QValidator):
-        """Validate command line entered"""
-
-        def __init__(self, parent=None):
-            super(MKVFormWidget.ValidateCommand, self).__init__(parent)
-
-            self.parent = parent
-
-        def validate(self, inputStr, pos):
-            """Check regex in bLooksOk"""
-
-            bTest = MKVCommand.bLooksOk(inputStr)
-
-            if bTest:
-                self.parent.objCommand.command = inputStr
-
-                self.parent.buttonsState(True)
-
-                self.parent.btnReset.setEnabled(True)
-
-                if self.parent.log:
-                    MODULELOG.debug("FW0002: Command Ok: [%s]", inputStr)
-            else:
-                self.parent.buttonsState(False)
-
-                if self.parent.log:
-                    MODULELOG.debug("FW0003: Command not Ok: [%s]", inputStr)
-
-            return (QValidator.Acceptable, inputStr, pos)
 
     def qthAnalysis(self, **kwargs):
         """List the source files found"""
@@ -687,9 +620,6 @@ class MKVFormWidget(QWidget):
         self.jobs.jobsStatus(JobStatus.Running)
 
         MKVCommand.log = self.log
-
-        result = None
-
         objCommand = MKVCommand()
 
         while self.jobs:
@@ -746,6 +676,9 @@ class MKVFormWidget(QWidget):
                     currentStatus = self.jobs.status(currentJob.jobID)
 
                     if currentStatus == JobStatus.Abort:
+                        p = Path(objCommand[nFile - 1][3])
+                        if p.is_file():
+                            p.unlink()
                         break
 
                     if self.controlQueue is not None:
@@ -836,11 +769,6 @@ class MKVFormWidget(QWidget):
 
                 msg = "FM0026: Error in construction of command - {}\n\n".format(objCommand.error),
 
-                currentJob.outputMain.emit(
-                    msg,
-                    {'color': Qt.red}
-                )
-
                 currentJob.outputJobMain(
                     currentJob.jobID,
                     msg,
@@ -856,8 +784,77 @@ class MKVFormWidget(QWidget):
 
         self.parent.jobsLabel[1] = currentJob.jobID
         self.parent.jobsLabel[2] = 0
-        #self.parent.jobsLabel[3] = 0
 
         self.jobs.jobsStatus(JobStatus.Done)
 
-        return result
+        return None
+
+
+class CurrentJob: # pylint: disable=R0903
+    """Helper class for working with a job"""
+
+    def __init__(self):
+
+        self.jobID = None
+        self.status = None
+        self.command = None
+        self.outputMain = None
+        self.outputJobMain = None
+        self.outputJobError = None
+        self.progressBar = None
+        self.controlQueue = None
+        self.spControlQueue = None
+
+
+class ValidateCommand(QValidator):
+    """Validate command line entered"""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.parent = parent
+
+    def validate(self, inputStr, pos):
+        """Check regex in bLooksOk"""
+
+        bTest = MKVCommand.bLooksOk(inputStr)
+
+        if bTest:
+            self.parent.objCommand.command = inputStr
+
+            self.parent.buttonsState(True)
+
+            self.parent.btnReset.setEnabled(True)
+
+            if self.parent.log:
+                MODULELOG.debug("FW0002: Command Ok: [%s]", inputStr)
+        else:
+            self.parent.buttonsState(False)
+
+            if self.parent.log:
+                MODULELOG.debug("FW0003: Command not Ok: [%s]", inputStr)
+
+        return (QValidator.Acceptable, inputStr, pos)
+
+
+class WorkerSignals(threads.WorkerSignals):
+    """Additional signals for QRunables"""
+
+    progress = Signal(int, int)
+    outputmain = Signal(str, dict)
+    outputcommand = Signal(str)
+
+
+class Worker(threads.Worker): # pylint: disable=R0903
+    """QRunnable worker with additional callbacks"""
+
+    def __init__(self, fn, *args, **kwargs):
+        super(Worker, self).__init__(fn, *args, **kwargs)
+
+        # Override signals variable with extended one
+        self.signals = WorkerSignals()
+
+        # Add the callback to kwargs
+        self.kwargs['cbProgress'] = self.signals.progress
+        self.kwargs['cbOutputMain'] = self.signals.outputmain
+        self.kwargs['cbOutputCommand'] = self.signals.outputcommand
