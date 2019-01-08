@@ -81,10 +81,16 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         self.config = ConfigurationSettings()
         self.actEnableLogging = None
 
-        cwd = Path(os.path.realpath(__file__))
+        if getattr(sys, 'frozen', False):
+            # Running in pyinstaller bundle
+            cwd = Path(os.path.dirname(__file__)) # pylint: disable=E1101,W0212
+        else:
+            cwd = Path(os.path.realpath(__file__))
 
         self.setWindowTitle("MKVMERGE: Batch Multiplex")
         self.setWindowIcon(QIcon(str(cwd.parent) + "/images/mkvBatchMultiplex.png"))
+
+        print(str(cwd.parent))
 
         self._initMenu(cwd)
         self._initHelper()
