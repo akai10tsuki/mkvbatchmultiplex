@@ -108,7 +108,7 @@ class GenCommandApp(QMainWindow):
         if currentOS == "Windows":
             l = "--ui-language en"
         else:
-            l = "--ui-language-ui en_US"
+            l = "--ui-language en_US"
 
 
         p = os.path.dirname(os.path.realpath(__file__))
