@@ -106,9 +106,9 @@ class GenCommandApp(QMainWindow):
             mkvmerge = checkForQuote(mkvmergeex)
 
         if currentOS == "Windows":
-            l = "--language en"
+            l = "--ui-language en"
         else:
-            l = "--language en_US"
+            l = "--ui-language-ui en_US"
 
 
         p = os.path.dirname(os.path.realpath(__file__))
