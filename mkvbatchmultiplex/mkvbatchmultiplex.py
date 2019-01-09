@@ -38,6 +38,7 @@ import logging
 import logging.handlers
 import sys
 import os
+import webbrowser
 import xml
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -182,6 +183,12 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         settingsMenu.addAction(self.actEnableLogging)
         settingsMenu.addAction(actSelectFont)
         settingsMenu.addAction(actRestoreDefaults)
+
+        actWebHelp = QAction("Using", self)
+        actWebHelp.triggered.connect(_help)
+
+        helpMenu = menuBar.addMenu("&Help")
+        helpMenu.addAction(actWebHelp)
 
         tb = QToolBar("Exit", self)
         tb.addAction(actExit)
@@ -393,6 +400,12 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
                 {'color': Qt.red}
             )
             self.jobs.jobsStatus(JobStatus.Blocked)
+
+def _help():
+    """open web RTD page"""
+
+    url = "https://mkvbatchmultiplex.readthedocs.io/en/latest/using.html"
+    webbrowser.open(url, new=0, autoraise=True)
 
 def centerWidgets(widget, parent=None):
     """center widget based on parent or screen geometry"""
