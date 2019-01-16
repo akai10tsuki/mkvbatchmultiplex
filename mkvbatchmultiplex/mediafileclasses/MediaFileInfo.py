@@ -1,18 +1,16 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 """
-Get information from media file structure
-
-MC018
+Get file structure information from media file
 """
+
 
 import logging
 
 from pymediainfo import MediaInfo
 
+
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
+
 
 class MediaFileInfo(object):
     """

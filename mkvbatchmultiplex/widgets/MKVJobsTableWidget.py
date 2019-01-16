@@ -1,19 +1,12 @@
-#!/usr/bin/env python3
-
 """
-MKVOutputWidget:
+MKVJobsTableWidget:
 
-Queue Management
+Jobs table widget shows jobs and status
 
-Status:
-    Waiting
-    Running
-    Stopped
-    Skip
-    Finished
-
-JT001
+context menu on status can change it
 """
+# JT001
+
 
 import logging
 
@@ -23,9 +16,11 @@ from PySide2.QtWidgets import (QVBoxLayout, QTableWidget, QMenu, QWidget, QHeade
 
 from ..jobs import JobStatus
 
+
 MUTEX = QMutex()
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
+
 
 class MKVJobsTableWidget(QWidget):
     """

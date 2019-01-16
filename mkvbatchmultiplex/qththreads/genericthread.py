@@ -1,7 +1,6 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-"""Multithreading Class base on QThread"""
+"""
+Multithreading Class base on QThread
+"""
 
 
 from PySide2.QtCore import QThread
@@ -18,7 +17,7 @@ class GenericThread(QThread):
     :param kwargs: Keywords to pass to the callback function
     """
     def __init__(self, function, *args, **kwargs):
-        QThread.__init__(self)
+        super().__init__(self)
 
         self.function = function
         self.args = args

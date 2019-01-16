@@ -1,11 +1,7 @@
-#!/usr/bin/env python3
-
 """
-MKVFormWidget:
+qtUtils:
 
-Main form
-
-LOG UT009
+utility functions that use PySide2
 """
 
 

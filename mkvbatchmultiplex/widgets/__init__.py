@@ -1,4 +1,8 @@
-"""Import names from dualProgressBar module"""
+"""
+widget package impors
+"""
+
+
 from .dualProgressBar import DualProgressBar, SpacerWidget
 from .MKVFormWidget import MKVFormWidget
 from .MKVTabsWidget import MKVTabsWidget

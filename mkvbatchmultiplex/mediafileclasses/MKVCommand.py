@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 """
 This class is used to construct the list used to execute the MKVMerge
 command line
@@ -10,7 +7,6 @@ strCommand = Command obtained from mkvtoolnix-gui with the modifications
 
 path for executable and target options are parsed from the command line
 
-MC018
 """
 
 

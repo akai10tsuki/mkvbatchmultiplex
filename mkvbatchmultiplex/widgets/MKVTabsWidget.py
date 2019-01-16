@@ -1,5 +1,14 @@
-#!/usr/bin/env python3
-"""Tabs Widget"""
+"""
+Tabs Widget
+
+Central widget holds:
+
+    - Command widget
+    - Jobs table widget
+    - Jobs output
+    - Jobs errors
+
+"""
 
 
 import logging

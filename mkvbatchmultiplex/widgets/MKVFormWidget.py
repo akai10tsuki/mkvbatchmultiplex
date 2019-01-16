@@ -1,10 +1,8 @@
-#!/usr/bin/env python3
 
 """
 MKVFormWidget:
 
-Main form
-
+Command input widget
 """
 
 #LOG FW0013

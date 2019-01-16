@@ -1,9 +1,11 @@
-#!/usr/bin/env python3
+"""
+Decorators
+"""
 
-"""Decorators"""
 
 import functools
 import time
+
 
 def staticVars(**kwargs):
     """Add static variables to function"""
@@ -16,6 +18,8 @@ def staticVars(**kwargs):
 
 def callCounter(func):
     """count the number of times a function is called"""
+
+    @functools.wraps(func)
     def helper(*args, **kwargs):
         helper.calls += 1
         return func(*args, **kwargs)

@@ -1,6 +1,6 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""Helper classes for QThreadPool"""
+"""
+Helper classes for QThreadPool
+"""
 
 
 import traceback
@@ -42,7 +42,7 @@ class Worker(QRunnable):
     '''
 
     def __init__(self, function, *args, **kwargs):
-        super(Worker, self).__init__()
+        super().__init__()
 
         # Store constructor arguments (re-used for processing)
         self.function = function

@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 """
 DualProgressBar if for graphical representation of the inner (unit) and outer (total)
 loop work

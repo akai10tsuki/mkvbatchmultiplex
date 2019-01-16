@@ -1,14 +1,14 @@
-"""VS module names"""
-
+"""
+utils package imports
+"""
 # UT0008
 
-from .fileUtils import findFile, getFileList
 from .decorators import staticVars, functionTimer
-
-from .utils import isMacDarkMode, RunCommand
+from .fileUtils import findFile, getFileList
+from .qtUtils import bVerifyStructure, getFiles, runCommand
+from .runcommand import RunCommand
+from .utils import isMacDarkMode
 
 from .mkvUtils import (getMKVMerge, getBaseFiles, bCheckLenOfLists,
                        getSourceFiles, getMKVMergeVersion,
                        isMediaInfoLib)
-
-from .qtUtils import bVerifyStructure, getFiles, runCommand

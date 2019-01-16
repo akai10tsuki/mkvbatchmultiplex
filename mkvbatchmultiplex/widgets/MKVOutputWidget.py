@@ -1,12 +1,11 @@
-#!/usr/bin/env python3
-
 """
 MKVOutputWidget:
 
-Output Form
+Output widget form just to output text in color
 
-OW004
 """
+# OW004
+
 
 import logging
 
@@ -15,6 +14,7 @@ from PySide2.QtGui import QTextCursor
 from PySide2.QtWidgets import QTextEdit
 
 from .. import utils
+
 
 MUTEX = QMutex()
 MODULELOG = logging.getLogger(__name__)

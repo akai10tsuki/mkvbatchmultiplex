@@ -1,11 +1,11 @@
-#!/usr/bin/env python3
+"""
+File utilities
+"""
 
-"""File utilities"""
 
 import os
 from pathlib import Path, PurePath
 
-#class FindFileError(Exception): pass
 
 def findFile(element, dirPath=None):
     """find file in the path"""
@@ -24,7 +24,6 @@ def findFile(element, dirPath=None):
             return candidate
 
     return None
-
 
 def getFileList(strPath, strExtFilter=None, bFullPath=False):
     """
