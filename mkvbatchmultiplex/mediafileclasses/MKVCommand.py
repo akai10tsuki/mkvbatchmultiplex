@@ -482,7 +482,7 @@ class MKVCommand(object):
         # This check if for optional attachments files
         n = 1
         for match in matchAttachments:
-            f = _stripQuote(matchAttachments.group(1))
+            f = _stripQuote(match.group(1))
             f = f.replace(r"'\''", "'")
             p = Path(p)
             if not p.is_file():
