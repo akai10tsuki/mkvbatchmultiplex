@@ -102,6 +102,7 @@ class DualProgressBar(QWidget):
             self._vLayout()
             self.setLayout(self.vboxLayout)
 
+    @Slot(int, int)
     def setValues(self, unit, total):
         """
         Update values of progressbars
@@ -115,6 +116,7 @@ class DualProgressBar(QWidget):
         self.pbBarUnit.setValue(unit)
         self.pbBarTotal.setValue(total)
 
+    @Slot(int, int)
     def setMaximum(self, maxUnit=100, maxTotal=100):
         """
         Set maximum values
@@ -127,6 +129,7 @@ class DualProgressBar(QWidget):
         self.pbBarUnit.setMaximum(maxUnit)
         self.pbBarTotal.setMaximum(maxTotal)
 
+    @Slot(int, int)
     def setMinimum(self, minUnit=0, minTotal=0):
         """
         Set minimum values
@@ -140,6 +143,7 @@ class DualProgressBar(QWidget):
         self.pbBarUnit.setMinimum(minUnit)
         self.pbBarTotal.setMinimum(minTotal)
 
+    @Slot(int, int, int, int)
     def setRange(self, minUnit=0, maxUnit=100, minTotal=0, maxTotal=100):
         """
         Set minimum and maximum as a range
