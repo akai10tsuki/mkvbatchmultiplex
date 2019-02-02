@@ -168,6 +168,15 @@ def runCommand(command, currentJob, lstTotal, log=False):
                         {'color': Qt.red, 'appendLine': True},
                         True
                     )
+                elif line.find(u"Error") == 0:
+                    currentJob.outputJobMain(
+                        currentJob.jobID, line,
+                        {'color': Qt.red, 'appendLine': True},
+                        True
+                    )
+                    lstTotal[2] += 1
+                    if line.find("There is not enough space") >= 0:
+                        currentJob.controlQueue.put(JobStatus.AbortJob)
                 else:
                     currentJob.outputJobMain(
                         currentJob.jobID, line.strip(), {'appendLine': True}
@@ -175,6 +184,10 @@ def runCommand(command, currentJob, lstTotal, log=False):
 
             if not currentJob.spControlQueue.empty():
                 request = currentJob.spControlQueue.get()
+                if request == JobStatus.AbortJob:
+                    currentJob.controlQueue.put(JobStatus.AbortJob)
+                    p.kill()
+                    outs, errs = p.communicate()
                 if request == JobStatus.Abort:
                     currentJob.controlQueue.put(JobStatus.AbortForced)
                     p.kill()
