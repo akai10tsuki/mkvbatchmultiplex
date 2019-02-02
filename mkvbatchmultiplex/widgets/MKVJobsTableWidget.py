@@ -204,7 +204,7 @@ class JobsTableWidget(QTableWidget):
                 elif action == abortAction:
                     self.setRowStatus(row, self.actions.Abort)
                     if self.spCtrQueue is not None:
-                        self.spCtrlQueue.put(self.actions.Abort)
+                        self.spCtrlQueue.put(self.actions.AbortJob)
 
     def resizeEvent(self, event):
 
