@@ -6,3 +6,5 @@ VERSION = ".".join(map(str, __VERSION))
 AUTHOR = "Efrain Vergara"
 EMAIL = "akai10tsuki@gmail.com"
 QT_VERSION = "PYSIDE2"
+
+TOTALJOBS, CURRENTJOB, CURRENTFILE, TOTALFILES, TOTALERRORS = range(5)
