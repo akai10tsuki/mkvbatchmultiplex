@@ -220,6 +220,12 @@ class MKVFormWidget(QWidget):
         self.leCommand.setText(strCommand)
         self.leCommand.setCursorPosition(0)
 
+    @Slot(int, object)
+    def updateJobsLabel(self, index, value):
+        """Update Jobs Label"""
+
+        self.parent.jobsLabel[index] = value
+
     def watchJobs(self):
         """
         Enable <Process Jobs> button when needed
@@ -258,6 +264,7 @@ class MKVFormWidget(QWidget):
         worker.signals.outputmain.connect(self.textOutputWindow.insertText)
         worker.signals.progress.connect(self.progress)
         worker.signals.outputcommand.connect(self.updateCommand)
+        worker.signals.jobslabel.connect(self.updateJobsLabel)
 
         # Execute
         self.threadpool.start(worker)
@@ -346,7 +353,7 @@ class MKVFormWidget(QWidget):
         if lstAnalysis:
             for e in lstAnalysis:
                 i = e.find(r"ok")
-                if i > 0:
+                if i >= 0:
                     cbOutputMain.emit("{}\n".format(e), {'color': Qt.darkGreen})
                 else:
                     cbOutputMain.emit("{}\n".format(e), {'color': Qt.red})
@@ -363,7 +370,7 @@ class MKVFormWidget(QWidget):
             return JobStatus.Blocked
 
         # Get outputwindow signal function
-        kwargsKeys = ['cbOutputCommand', 'cbOutputMain']
+        kwargsKeys = ['cbOutputCommand', 'cbOutputMain', 'cbJobsLabel']
         for key in kwargsKeys:
             if not key in kwargs:
                 if self.log:
@@ -375,6 +382,7 @@ class MKVFormWidget(QWidget):
 
         cbOutputMain = kwargs['cbOutputMain']
         cbOutputCommand = kwargs['cbOutputCommand']
+        cbJobsLabel = kwargs['cbJobsLabel']
 
         cmd = self.leCommand.text()
 
@@ -389,7 +397,7 @@ class MKVFormWidget(QWidget):
                 )
             else:
 
-                jobID, _ = self._addQueue(cmd)
+                jobID, _ = self._addQueue(cmd, cbJobsLabel)
 
                 cbOutputMain.emit(
                     "Command added to queue:\n\nJob {0} - {1}\n\n".format(jobID, cmd),
@@ -406,13 +414,13 @@ class MKVFormWidget(QWidget):
 
         return "Ok"
 
-    def _addQueue(self, cmd):
+    def _addQueue(self, cmd, callback):
 
         jobStatus = JobStatus()
 
         jobID = self.jobs.append(cmd, jobStatus.Waiting)
 
-        self.parent.jobsLabel[0] = len(self.jobs)
+        callback.emit(0, len(self.jobs))
 
         return jobID, cmd
 
@@ -567,7 +575,7 @@ class MKVFormWidget(QWidget):
 
         if self.jobs.jobsStatus() != JobStatus.Running:
 
-            for key in ['cbOutputCommand', 'cbOutputMain', 'cbProgress']:
+            for key in ['cbOutputCommand', 'cbOutputMain', 'cbProgress', 'cbJobsLabel']:
                 if not key in kwargs:
                     if self.log:
                         MODULELOG.error(
@@ -580,12 +588,14 @@ class MKVFormWidget(QWidget):
 
             (currentJob.outputMain,
              currentJob.progressBar,
+             currentJob.jobsLabel,
              currentJob.outputJobMain,
              currentJob.outputJobError,
              currentJob.controlQueue,
              currentJob.spControlQueue) = (
                  kwargs['cbOutputMain'],
                  kwargs['cbProgress'],
+                 kwargs['cbJobsLabel'],
                  self.jobs.outputJob,
                  self.jobs.outputError,
                  self.controlQueue,
@@ -594,7 +604,7 @@ class MKVFormWidget(QWidget):
         if command:
             # This is Proccess button request use for TODO:immediate action
 
-            jobID, _ = self._addQueue(command)
+            jobID, _ = self._addQueue(command, kwargs['cbJobsLabel'])
 
             currentJob.outputMain.emit(
                 "Command added to queue:\n\nJob {} - {}\n\n".format(jobID, command),
@@ -657,12 +667,12 @@ class MKVFormWidget(QWidget):
 
             if objCommand:
 
-                self.parent.jobsLabel[1] = currentJob.jobID
-                self.parent.jobsLabel[3] = len(objCommand)
+                currentJob.jobsLabel.emit(1, currentJob.jobID)
+                currentJob.jobsLabel.emit(3, len(objCommand))
 
                 nTotal = len(objCommand) * 100
                 nFile = 0
-                lstTotal = [0, nTotal]
+                lstTotal = [0, nTotal, 0]
 
                 # Set the total for progressbar to increase gradually
                 self.parent.progressbar.pbBarTotal.setMaximum(nTotal)
@@ -673,15 +683,17 @@ class MKVFormWidget(QWidget):
 
                     currentStatus = self.jobs.status(currentJob.jobID)
 
-                    if currentStatus == JobStatus.Abort:
-                        p = Path(objCommand[nFile - 1][3])
-                        if p.is_file():
-                            p.unlink()
+                    if currentStatus == JobStatus.AbortJob:
                         break
 
                     if self.controlQueue is not None:
                         if not self.controlQueue.empty():
                             request = self.controlQueue.get()
+
+                            if request == JobStatus.AbortJob:
+                                self.jobs.status(currentJob.jobID, JobStatus.AbortJob)
+                                break
+
                             if request in [JobStatus.Abort, JobStatus.AbortForced]:
                                 if request == JobStatus.AbortForced:
                                     p = Path(objCommand[nFile - 1][3])
@@ -729,17 +741,18 @@ class MKVFormWidget(QWidget):
 
                     if bStructureOk:
                         nFile += 1
-                        self.parent.jobsLabel[2] = nFile
+                        currentJob.jobsLabel.emit(2, nFile)
                         utils.runCommand(
                             cmd,
                             currentJob,
                             lstTotal,
                             self.log
                         )
+                        currentJob.jobsLabel.emit(4, self.parent.jobsLabel[4] + lstTotal[2])
+                        lstTotal[2] = 0
                     else:
-                        self.parent.jobsLabel[4] += 1
+                        currentJob.jobsLabel.emit(4, self.parent.jobsLabel[4] + 1)
                         lstTotal[0] += 100
-
 
                 # End Processing
 
@@ -747,7 +760,7 @@ class MKVFormWidget(QWidget):
 
                 currentStatus = self.jobs.status(currentJob.jobID)
 
-                if currentStatus == JobStatus.Abort:
+                if currentStatus in [JobStatus.Abort, JobStatus.AbortJob]:
                     self.jobs.status(currentJob.jobID, JobStatus.Aborted)
                     currentJob.outputJobMain(
                         currentJob.jobID, "Job {} - Aborted.\n\n\n".format(currentJob.jobID),
@@ -780,9 +793,10 @@ class MKVFormWidget(QWidget):
                     MODULELOG.info("FW0012: Error Source files in Process: %s",
                                    str(objCommand.sourcefiles))
 
-        self.parent.jobsLabel[1] = currentJob.jobID
-        self.parent.jobsLabel[2] = 0
+        currentJob.jobsLabel.emit(1, currentJob.jobID)
+        currentJob.jobsLabel.emit(2, 0)
 
+        # No more jobs on queue
         self.jobs.jobsStatus(JobStatus.Done)
 
         return None
@@ -802,6 +816,7 @@ class CurrentJob: # pylint: disable=R0903
         self.progressBar = None
         self.controlQueue = None
         self.spControlQueue = None
+        self.jobsLabel = None
 
 
 class ValidateCommand(QValidator):
@@ -838,6 +853,7 @@ class ValidateCommand(QValidator):
 class WorkerSignals(threads.WorkerSignals):
     """Additional signals for QRunables"""
 
+    jobslabel = Signal(int, object)
     progress = Signal(int, int)
     outputmain = Signal(str, dict)
     outputcommand = Signal(str)
@@ -856,3 +872,4 @@ class Worker(threads.Worker): # pylint: disable=R0903
         self.kwargs['cbProgress'] = self.signals.progress
         self.kwargs['cbOutputMain'] = self.signals.outputmain
         self.kwargs['cbOutputCommand'] = self.signals.outputcommand
+        self.kwargs['cbJobsLabel'] = self.signals.jobslabel
