@@ -39,6 +39,7 @@ Fixed
 ~~~~~
 - fix line overwritten on mkvmerge output in Job(s) Output tab
 - fix detection of of files with quotes in macOS and ubuntu
+- fix match problem for attachments it failed check
 
 0.5.3a2.dev3 - 2018-12-18
 -------------------------
