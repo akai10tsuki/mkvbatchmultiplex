@@ -73,15 +73,30 @@ class FormatLabel(QLabel):
         strTmp = strTmp.format(*self._values)
         super().setText(strTmp)
 
-    @Slot(tuple)
+    @Slot(list)
     def setValues(self, args):
         """
         Set Values
 
-        : param align: Set alignment Qt.Horizontal or Qt.Vertical
-        : type align: Qt.AlignmentFlags
+        :param args: set values
+        :type args: list
         """
+
         self._values = list(args)
+        self._refresh()
+
+    @Slot(int, object)
+    def setValue(self, index, value):
+        """
+        Set value index based
+
+        :param index: index position
+        :type index: int
+        :param value: value to set
+        :type value: object
+        """
+
+        self._values[index] = value
         self._refresh()
 
     @property
@@ -90,10 +105,15 @@ class FormatLabel(QLabel):
 
         return self._values
 
-    def connect(self, signal):
+    def valuesConnect(self, signal):
         """make connection to setValues Slot"""
 
         signal.connect(self.setValues)
+
+    def valueConnect(self, signal):
+        """make connection to setValues Slot"""
+
+        signal.connect(self.setValue)
 
 if __name__ == '__main__':
 
