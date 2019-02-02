@@ -622,7 +622,7 @@ def _strStripEscapeChars(strCommand):
 
     strTmp = strCommand
 
-    if strTmp.find(r'^"^(^"') > 0:
+    if strTmp.find(r'^"^(^"') >= 0:
         # This is for cmd in Windows
         strTmp = strTmp.replace("'", r"'\''").replace('^', '').replace('/', '\\').replace('"', "'")
 
