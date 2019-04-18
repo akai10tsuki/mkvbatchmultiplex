@@ -343,7 +343,7 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
             self.actEnableLogging.setChecked(bLogging)
             self.enableLogging(bLogging)
             self.setGeometry(0, 0, 1280, 720)
-            self._center()
+            centerWidgets(self)
 
         else:
 
@@ -375,8 +375,6 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
 
                 self.setGeometry(0, 0, 1280, 720)
                 centerWidgets(self)
-
-                #self._center()
 
     def restoreDefaults(self):
         """restore defaults settings"""

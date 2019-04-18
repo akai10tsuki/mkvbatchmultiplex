@@ -181,12 +181,9 @@ class JobQueue(QObject): # pylint: disable=R0902
                 return self._jobs[nID].status
             return ""
 
-        #print("Update job = {} status = {}".format(nID, strStatus))
-
         self._jobs[nID].status = strStatus
 
         if self.emitStatusUpdates and bUpdate:
-            #print("Update table job = {} status = {}".format(nID, strStatus))
             self.updateStatusSignal.emit(nID, strStatus)
 
         return ""
