@@ -9,13 +9,7 @@ import re
 import sys
 from pathlib import Path
 
-from PySide2.QtCore import QMutex, QMutexLocker
-
-
-MUTEX = QMutex()
-
-
-class QthLogRotateHandler(logging.Handler):
+class LogRotateHandler(logging.Handler):
     """
     Custom logging handler that rotate files at the start
     and to make it thread safe
@@ -27,7 +21,7 @@ class QthLogRotateHandler(logging.Handler):
     """
 
     def __init__(self, logFile, backupCount=0):
-        super(QthLogRotateHandler, self).__init__()
+        super(LogRotateHandler, self).__init__()
         self.logFile = logFile
         self.backupCount = backupCount
         self._rollover()
@@ -86,7 +80,6 @@ class QthLogRotateHandler(logging.Handler):
         else:
             f = self.logFile
 
-        with QMutexLocker(MUTEX):
-            with codecs.open(f, "a", encoding="utf-8") as file:
-                logEntry = self.format(record)
-                file.write(logEntry + "\n")
+        with codecs.open(f, "a", encoding="utf-8") as file:
+            logEntry = self.format(record)
+            file.write(logEntry + "\n")

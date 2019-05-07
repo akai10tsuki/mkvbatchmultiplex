@@ -53,7 +53,7 @@ from PySide2.QtWidgets import (QAction, QApplication, QDesktopWidget, qApp,
                                QWidget, QFontDialog)
 
 from . import config
-from .loghandler import QthLogRotateHandler
+from .loghandler import LogRotateHandler
 from .widgets import (DualProgressBar, MKVFormWidget, MKVTabsWidget, FormatLabel,
                       MKVOutputWidget, MKVJobsTableWidget)
 from .jobs import JobQueue, JobStatus
@@ -432,7 +432,7 @@ def setupLogging():
     logFile = Path(Path.home(), ".mkvBatchMultiplex/mkvBatchMultiplex.log")
     logging.getLogger('').setLevel(logging.DEBUG)
 
-    loghandler = QthLogRotateHandler(logFile, backupCount=10)
+    loghandler = LogRotateHandler(logFile, backupCount=10)
 
     formatter = logging.Formatter(
         "%(asctime)s %(levelname)-8s %(name)s %(message)s"

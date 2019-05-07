@@ -13,10 +13,9 @@ Central widget holds:
 
 import logging
 
-from PySide2.QtCore import QMutex
 from PySide2.QtWidgets import QWidget, QTabWidget, QVBoxLayout
 
-MUTEX = QMutex()
+
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 

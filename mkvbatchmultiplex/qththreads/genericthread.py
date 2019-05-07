@@ -6,7 +6,7 @@ Multithreading Class base on QThread
 from PySide2.QtCore import QThread
 
 
-class GenericThread(QThread):
+class QthThread(QThread):
     """
     QThread generic class send function and arguments to start in thread
 

@@ -10,14 +10,13 @@ context menu on status can change it
 
 import logging
 
-from PySide2.QtCore import QMutex, QMutexLocker, Qt, Slot, Signal
+from PySide2.QtCore import Qt, Slot, Signal
 from PySide2.QtWidgets import (QVBoxLayout, QTableWidget, QMenu, QWidget, QHeaderView,
                                QTableWidgetItem, QAbstractScrollArea)
 
 from ..jobs import JobStatus
 
 
-MUTEX = QMutex()
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
@@ -221,32 +220,28 @@ class JobsTableWidget(QTableWidget):
     def addJob(self, jobID, status, cmd):
         """Add Job to Table"""
 
-        with QMutexLocker(MUTEX):
+        item0 = QTableWidgetItem(str(jobID))
+        item1 = QTableWidgetItem(status)
+        item2 = QTableWidgetItem(cmd)
+        item0.setFlags(Qt.ItemIsEnabled)
+        item1.setFlags(Qt.ItemIsEnabled)
+        item2.setFlags(Qt.ItemIsEnabled)
+        item2.setToolTip(cmd)
 
-            item0 = QTableWidgetItem(str(jobID))
-            item1 = QTableWidgetItem(status)
-            item2 = QTableWidgetItem(cmd)
-            item0.setFlags(Qt.ItemIsEnabled)
-            item1.setFlags(Qt.ItemIsEnabled)
-            item2.setFlags(Qt.ItemIsEnabled)
-            item2.setToolTip(cmd)
-
-            rowNumber = self.rowCount()
-            self.insertRow(rowNumber)
-            self.setItem(rowNumber, 0, item0)
-            self.setItem(rowNumber, 1, item1)
-            self.setItem(rowNumber, 2, item2)
+        rowNumber = self.rowCount()
+        self.insertRow(rowNumber)
+        self.setItem(rowNumber, 0, item0)
+        self.setItem(rowNumber, 1, item1)
+        self.setItem(rowNumber, 2, item2)
 
     @Slot(int, str)
     def setJobStatus(self, jobID, status):
         """Update the job status"""
 
-        with QMutexLocker(MUTEX):
+        for row in list(range(self.rowCount())):
 
-            for row in list(range(self.rowCount())):
+            rowJobID = self.getRowJobID(row)
+            #print("Lookup Row = {} Job = {}".format(row, rowJobID))
+            if int(rowJobID) == jobID:
 
-                rowJobID = self.getRowJobID(row)
-                #print("Lookup Row = {} Job = {}".format(row, rowJobID))
-                if int(rowJobID) == jobID:
-
-                    self.setItem(row, 1, QTableWidgetItem(status))
+                self.setItem(row, 1, QTableWidgetItem(status))
