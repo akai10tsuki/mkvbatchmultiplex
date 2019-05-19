@@ -455,6 +455,3 @@ def mainApp():
     win.show()
     app.exec_()
     logging.info("App End.")
-
-if __name__ == "__main__":
-    sys.exit(mainApp())
