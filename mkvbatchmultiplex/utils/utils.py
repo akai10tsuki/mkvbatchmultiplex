@@ -18,8 +18,8 @@ def isMacDarkMode():
             return False
 
         if cmd.run():
-            for e in cmd.output:
-                if e.find("Dark") >= 0:
+            for l in cmd.output:
+                if l.find("Dark") >= 0:
                     return True
 
     return False

@@ -208,6 +208,6 @@ def runCommand(command, currentJob, lstTotal, log=False):
     lstTotal[0] += 100
 
     if log:
-        MODULELOG.info("UT007: mkvmerge rc=%d - %s", rc, command)
+        MODULELOG.info("UT007: runCommand rc=%d - %s", rc, command)
 
     return rc
