@@ -16,7 +16,7 @@ DESCRIPTION = 'A mkv media batch multiplex.'
 KEYWORDS = 'mkv multimedia video'
 NAME = "mkvbatchmultiplex"
 REQUIRED = [
-    'pymediainfo>=2.2.1',
+    'pymediainfo>=4.0',
     'PySide2>=5.12'
 ]
 URL = 'https://github.com/akai10tsuki/mkvbatchmultiplex'

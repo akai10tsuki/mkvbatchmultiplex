@@ -39,7 +39,7 @@ copyright = '2018-2019, Efrain Vergara'
 author = 'Efrain Vergara'
 
 # The short X.Y version
-version = '0.5.3'
+version = '0.9'
 # The full version, including alpha/beta/rc tags
 #release = '0.5.3a3.dev1'
 release = config.VERSION

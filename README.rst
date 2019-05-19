@@ -49,9 +49,9 @@ Dependencies
     * Python_ 3.5 or greater on system
 
         - PySide2_ 5.12 or greater
-        - pymediainfo_ 2.2.1 or greater
+        - pymediainfo_ 4.0 or greater
     * MediaInfo_ tested with versions 17.10->18.12
-    * MKVToolNix_ tested with versions 17.00->30.1.00
+    * MKVToolNix_ tested with versions 17.00->34.0.0
 
 For now is a python package it can be installed:
 
@@ -84,8 +84,8 @@ This is just the base for the project.  The roadmap is:
     * Documentation
     * Work on job queue management
 
-If the the program generates interest any further changes and additions will
-depend on any user base needs.
+The application works for me as is. If the the program generates any interest
+any further changes and additions will depend on user base needs.
 
 Work on binaries started.
 

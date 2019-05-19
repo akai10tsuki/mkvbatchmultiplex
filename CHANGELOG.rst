@@ -4,7 +4,7 @@ Changelog
 
 Changes to to project should be listed here.
 
-(unreleased)
+0.9.1b1.dev1
 ------------
 
 Added
@@ -34,6 +34,8 @@ Changed
   mkvmerge binary
 - change from PyQt5 to PySide2 base on Qt 5.12 better for macOS Mojave
 - move progress bar to the status bar at the bottom of the window
+- bump requirement of pymediainfo to 4.0 no check needed for
+  MediaInfo library installation
 
 Fixed
 ~~~~~

@@ -101,7 +101,7 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         self.configuration()
         self.restoreConfig()
 
-        self._checkDependencies()
+        #self._checkDependencies()
 
     def _initHelper(self):
 

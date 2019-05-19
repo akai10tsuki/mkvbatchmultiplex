@@ -9,11 +9,10 @@
    using
    LICENSE
    acknowledgements
-   mkvbatchmultiplex reference <modules>
+   CHANGELOG
 
 Indices and tables
 ==================
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
