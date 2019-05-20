@@ -41,8 +41,6 @@ import sys
 import os
 import platform
 import webbrowser
-import xml
-import xml.etree.ElementTree as ET
 from pathlib import Path
 from queue import Queue
 from collections import deque
@@ -54,12 +52,11 @@ from PySide2.QtWidgets import (QAction, QApplication, QDesktopWidget, qApp,
                                QWidget, QFontDialog)
 
 from . import config
-from .loghandler import LogRotateHandler
 from .widgets import (DualProgressBar, MKVFormWidget, MKVTabsWidget, FormatLabel,
                       MKVOutputWidget, MKVJobsTableWidget)
 from .jobs import JobQueue, JobStatus
 from .configurationsettings import ConfigurationSettings
-from .utils import isMediaInfoLib
+from . import utils
 
 
 class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
@@ -100,7 +97,7 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         self.configuration()
         self.restoreConfig()
 
-        self._checkDependencies()
+        self.checkDependencies()
 
     def _initHelper(self):
 
@@ -122,16 +119,16 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
 
         # Connect signals to print in outputWidgets and update jobsWidget
         self.jobs.setOutputSignal(
-            self.outputQueueWidget.makeConnection,
-            self.outputErrorWidget.makeConnection,
-            self.jobsWidget.makeConnection0,
-            self.jobsWidget.makeConnection1,
-            self.clearOutput
+            outputJobSlotConnection=self.outputQueueWidget.makeConnection,
+            outputErrorSlotConnection=self.outputErrorWidget.makeConnection,
+            addJobToTableSlotConnection=self.jobsWidget.makeConnectionAddJob,
+            updateStatusSlotConnection=self.jobsWidget.makeConnectionSetJobStatus,
+            clearOutput=self.clearOutput
         )
 
         # Connect to signal when a row is clicked on jobsWidget job output
         # will update in outputWidgets
-        self.jobs.makeConnection(self.jobsWidget.showJobOutput)
+        self.jobs.connectToShowJobOutput(self.jobsWidget.showJobOutput)
         self.jobs.connectToStatus(self.jobsWidget.jobsTable.updateJobStatus)
 
         # Create tabs and insert Widgets
@@ -279,7 +276,7 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         font = self.font()
 
         fontDialog = QFontDialog()
-        centerWidgets(fontDialog, self)
+        utils.centerWidgets(fontDialog, self)
 
         valid, font = fontDialog.getFont(font)
 
@@ -288,13 +285,11 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
 
     def configuration(self, save=False):
         """Read and write configuration"""
-        configFile = Path(Path.home(), ".mkvBatchMultiplex/config-pyside2.xml")
-        xmlFile = str(configFile)
 
         if save:
 
-            self.config.set(
-                'logging', self.actEnableLogging.isChecked()
+            config.data.set(
+                Key.kLogging, self.actEnableLogging.isChecked()
             )
 
             base64Geometry = self.saveGeometry().toBase64()
@@ -302,34 +297,21 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
             s = str(base64Geometry)
             b = ast.literal_eval(s)
 
-            self.config.set(
-                'geometry', b
+            config.data.set(
+                Key.kGeometry, b
             )
 
             font = self.font()
 
-            self.config.set(
-                'font', font.toString()
+            config.data.set(
+                Key.kFont, font.toString()
             )
 
-            root = ET.Element("VergaraSoft")
-            root = self.config.toXML(root)
-            tree = ET.ElementTree(root)
-            tree.write(xmlFile)
+            config.data.saveToFile()
 
         else:
 
-            if configFile.is_file():
-                try:
-                    tree = ET.ElementTree(file=xmlFile)
-                    root = tree.getroot()
-                    self.config.fromXML(root)
-                except NameError:
-                    logging.info("MW0002: Bad configuration definition file.")
-                except xml.etree.ElementTree.ParseError:
-                    logging.info("MW0001: Bad or corrupt configuration file.")
-            else:
-                configFile.touch(exist_ok=True)
+            config.data.readFromFile()
 
     def restoreConfig(self, resetDefaults=False):
         """Restore configuration if any"""
@@ -342,11 +324,11 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
             self.actEnableLogging.setChecked(bLogging)
             self.enableLogging(bLogging)
             self.setGeometry(0, 0, 1280, 720)
-            centerWidgets(self)
+            utils.centerWidgets(self)
 
         else:
 
-            strFont = self.config.get('font')
+            strFont = config.data.get(Key.kFont)
 
             if strFont is not None:
                 restoreFont = QFont()
@@ -356,13 +338,13 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
             else:
                 self.setFont(defaultFont)
 
-            bLogging = self.config.get('logging')
+            bLogging = config.data.get(Key.kLogging)
 
             if bLogging is not None:
                 self.actEnableLogging.setChecked(bLogging)
                 self.enableLogging(bLogging)
 
-            byteGeometry = self.config.get('geometry')
+            byteGeometry = config.data.get(Key.kGeometry)
 
             if byteGeometry is not None:
                 # Test for value read if not continue
@@ -370,10 +352,11 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
                 byteGeometry = QByteArray(byteGeometry)
 
                 self.restoreGeometry(QByteArray.fromBase64(byteGeometry))
+
             else:
 
                 self.setGeometry(0, 0, 1280, 720)
-                centerWidgets(self)
+                utils.centerWidgets(self)
 
     def restoreDefaults(self):
         """restore defaults settings"""
@@ -388,11 +371,12 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         if result == QMessageBox.Yes:
             self.restoreConfig(resetDefaults=True)
 
-    def _checkDependencies(self):
+    def checkDependencies(self):
+        """check if MediaInfo library is present"""
 
         if platform.system() == "Linux":
 
-            libFiles = isMediaInfoLib()
+            libFiles = utils.isMediaInfoLib()
 
             if not libFiles:
                 self.formWidget.textOutputWindow.insertText(
@@ -401,13 +385,21 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
                 )
                 self.jobs.jobsStatus(JobStatus.Blocked)
 
+
+class Key:
+    """Keys for configuration"""
+
+    kLogging = "logging"
+    kGeometry = "geometry"
+    kFont = "font"
+
 def _help():
     """open web RTD page"""
 
     url = "https://mkvbatchmultiplex.readthedocs.io/en/latest/using.html"
     webbrowser.open(url, new=0, autoraise=True)
 
-def centerWidgets(widget, parent=None):
+def centerWidgetsToDelete(widget, parent=None):
     """center widget based on parent or screen geometry"""
 
     if parent is None:
@@ -424,35 +416,14 @@ def abort():
 
     qApp.quit()     # pylint: disable=E1101
 
-def setupLogging():
-    """Configure log"""
-
-    filesPath = Path(Path.home(), ".mkvBatchMultiplex")
-    filesPath.mkdir(parents=True, exist_ok=True)
-
-    logFile = Path(Path.home(), ".mkvBatchMultiplex/mkvBatchMultiplex.log")
-    logging.getLogger('').setLevel(logging.DEBUG)
-
-    loghandler = LogRotateHandler(logFile, backupCount=10)
-
-    formatter = logging.Formatter(
-        "%(asctime)s %(levelname)-8s %(name)s %(message)s"
-    )
-
-    loghandler.setFormatter(formatter)
-
-    logging.getLogger('').addHandler(loghandler)
-
 def mainApp():
     """Main"""
 
-    setupLogging()
+    config.init()
 
-    logging.info("App Start.")
-    logging.info("Python: %s", sys.version)
-    logging.info("mkvbatchmultiplex-%s", config.VERSION)
     app = QApplication(sys.argv)
     win = MKVMultiplexApp()
     win.show()
     app.exec_()
-    logging.info("App End.")
+
+    config.close()

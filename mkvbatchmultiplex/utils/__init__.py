@@ -5,7 +5,7 @@ utils package imports
 
 from .decorators import staticVars, functionTimer
 from .fileUtils import findFile, getFileList
-from .qtUtils import bVerifyStructure, getFiles, runCommand
+from .qtUtils import bVerifyStructure, getFiles, runCommand, centerWidgets
 from .runcommand import RunCommand
 from .utils import isMacDarkMode
 
