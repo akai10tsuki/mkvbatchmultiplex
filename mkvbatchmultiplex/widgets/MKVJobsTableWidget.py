@@ -60,12 +60,12 @@ class MKVJobsTableWidget(QWidget):
         self.jobsTable.clearContents()
         self.jobsTable.setRowCount(0)
 
-    def makeConnection0(self, objSignal):
+    def makeConnectionAddJob(self, objSignal):
         """Connect to signals"""
 
         objSignal.connect(self.jobsTable.addJob)
 
-    def makeConnection1(self, objSignal):
+    def makeConnectionSetJobStatus(self, objSignal):
         """Connect to signals"""
 
         objSignal.connect(self.jobsTable.setJobStatus)

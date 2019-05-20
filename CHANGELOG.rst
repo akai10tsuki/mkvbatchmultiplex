@@ -3,6 +3,15 @@ Changelog
 
 
 Changes to to project should be listed here.
+(Unreleased)
+
+Changed
+~~~~~~~
+- Major code cleanup and refactoring
+
+ * functions, methods and properties rename for clarity
+ * moving code on modules reusable in other apps to vsutillib modules
+   applications will depend on vsutillib
 
 0.9.1b1.dev1
 ------------

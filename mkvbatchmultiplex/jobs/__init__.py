@@ -279,9 +279,14 @@ class JobQueue(QObject): # pylint: disable=R0902
 
         return False
 
-    def setOutputSignal(self, outputJobSlotConnection=None, outputErrorSlotConnection=None,
-                        addJobToTableSlotConnection=None, updateStatusSlotConnection=None,
-                        clearOutput=None):
+    def setOutputSignal(
+            self,
+            outputJobSlotConnection=None,
+            outputErrorSlotConnection=None,
+            addJobToTableSlotConnection=None,
+            updateStatusSlotConnection=None,
+            clearOutput=None
+        ):
         """
         Setup output widget signals
 
@@ -345,7 +350,7 @@ class JobQueue(QObject): # pylint: disable=R0902
             if jobID in self._jobs:
                 self._jobs[jobID].errors.append([strMessage, dictAttributes])
 
-    def makeConnection(self, objSignal):
+    def connectToShowJobOutput(self, objSignal):
         """
         Connect to signals showJobOutput slot
 

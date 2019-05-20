@@ -117,16 +117,16 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
 
         # Connect signals to print in outputWidgets and update jobsWidget
         self.jobs.setOutputSignal(
-            self.outputQueueWidget.makeConnection,
-            self.outputErrorWidget.makeConnection,
-            self.jobsWidget.makeConnection0,
-            self.jobsWidget.makeConnection1,
-            self.clearOutput
+            outputJobSlotConnection=self.outputQueueWidget.makeConnection,
+            outputErrorSlotConnection=self.outputErrorWidget.makeConnection,
+            addJobToTableSlotConnection=self.jobsWidget.makeConnectionAddJob,
+            updateStatusSlotConnection=self.jobsWidget.makeConnectionSetJobStatus,
+            clearOutput=self.clearOutput
         )
 
         # Connect to signal when a row is clicked on jobsWidget job output
         # will update in outputWidgets
-        self.jobs.makeConnection(self.jobsWidget.showJobOutput)
+        self.jobs.connectToShowJobOutput(self.jobsWidget.showJobOutput)
         self.jobs.connectToStatus(self.jobsWidget.jobsTable.updateJobStatus)
 
         # Create tabs and insert Widgets
