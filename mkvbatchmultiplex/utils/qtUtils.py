@@ -9,17 +9,14 @@ import logging
 import re
 import subprocess
 
-from PySide2.QtCore import QMutex, QMutexLocker, Qt
+from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QDesktopWidget
 
 from ..mediafileclasses import MediaFileInfo
-from ..utils import staticVars
+
 from ..jobs import JobStatus
 
-from .mkvUtils import getBaseFiles, getSourceFiles
 
-
-MUTEX = QMutex()
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
@@ -62,55 +59,22 @@ def centerWidgets(widget, parent=None):
     """center widget based on parent or screen geometry"""
 
     if parent:
-        #widget.move(parent.frameGeometry().center() - widget.frameGeometry().center())
-        fg = parent.frameGeometry().center()
-        wfg = widget.frameGeometry()
-        print("({}, {}), height {} width {}".format(
-                fg.x(),
-                fg.y(),
-                wfg.height(),
-                wfg.width()
-            )
-        )
         widget.move(parent.frameGeometry().center() - widget.frameGeometry().center())
+
+        #hostRect = parent.geometry()
+        #widget.frameGeometry().moveCenter(hostRect.center())
+        #widget.move(hostRect.center() - widget.rect().center())
+
+        #parentCenter = parent.frameGeometry().center()
+        #widgetFrameGeometry = widget.frameGeometry()
+        #widgetFrameGeometry.moveCenter(parentCenter)
+        #widget.move(widgetFrameGeometry.topLeft())
 
 
     else:
         print("Second option...")
         widget.move(QDesktopWidget().availableGeometry().center() - widget.frameGeometry().center())
 
-@staticVars(strCommand="", lstBaseFiles=[], lstSourceFiles=[])
-def getFiles(objCommand=None, lbf=None, lsf=None, clear=False, log=False):
-    """Get the list of files to be worked on in thread safe manner"""
-
-    with QMutexLocker(MUTEX):
-        if clear:
-            getFiles.strCommand = ""
-            getFiles.lstBaseFiles = []
-            getFiles.lstSourceFiles = []
-
-        if objCommand is not None:
-            if objCommand.strShellcommand != getFiles.strCommand:
-                # Information not in cache.
-                getFiles.strCommand = objCommand.strShellcommand
-                getFiles.lstBaseFiles = getBaseFiles(objCommand, log=log)
-                getFiles.lstSourceFiles = getSourceFiles(objCommand, log=log)
-            else:
-                if log:
-                    MODULELOG.info("UT004: Hit cached information.")
-
-            # lbf and lsf are mutable pass information back here
-            # this approach should make it thread safe so
-            # qhtProcess command can work on a queue
-            if lbf is not None:
-                lbf.extend(getFiles.lstBaseFiles)
-
-            if lsf is not None:
-                lsf.extend(getFiles.lstSourceFiles)
-
-        if log:
-            MODULELOG.info("UT005: Base files: %s", str(getFiles.lstBaseFiles))
-            MODULELOG.info("UT006: Source files: %s", str(getFiles.lstSourceFiles))
 
 def runCommand(command, currentJob, lstTotal, log=False):
     """Execute command in a subprocess thread"""
