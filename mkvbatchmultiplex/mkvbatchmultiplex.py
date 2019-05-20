@@ -83,14 +83,14 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
 
         if getattr(sys, 'frozen', False):
             # Running in pyinstaller bundle
-            cwd = Path(os.path.dirname(__file__)) # pylint: disable=E1101,W0212
+            self.cwd = Path(os.path.dirname(__file__)) # pylint: disable=E1101,W0212
         else:
-            cwd = Path(os.path.realpath(__file__))
+            self.cwd = Path(os.path.realpath(__file__))
 
         self.setWindowTitle("MKVMERGE: Batch Multiplex")
-        self.setWindowIcon(QIcon(str(cwd.parent) + "/images/mkvBatchMultiplex.png"))
+        self.setWindowIcon(QIcon(str(self.cwd.parent) + "/images/mkvBatchMultiplex.png"))
 
-        self._initMenu(cwd)
+        self._initMenu()
         self._initHelper()
 
         # Read configuration elements
@@ -146,11 +146,11 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         layout.addWidget(self.tabsWidget)
         self.setCentralWidget(widget)
 
-    def _initMenu(self, cwd):
+    def _initMenu(self):
 
         menuBar = self.menuBar()
 
-        actExit = QAction(QIcon(str(cwd.parent) + "/images/cross-circle.png"), "&Exit", self)
+        actExit = QAction(QIcon(str(self.cwd.parent) + "/images/cross-circle.png"), "&Exit", self)
         actExit.setShortcut("Ctrl+E")
         actExit.setStatusTip("Exit application")
         actExit.triggered.connect(self.close)
@@ -181,10 +181,14 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         settingsMenu.addAction(actSelectFont)
         settingsMenu.addAction(actRestoreDefaults)
 
+        actAbout = QAction("About", self)
+        actAbout.triggered.connect(self.about)
+
         actWebHelp = QAction("Using", self)
-        actWebHelp.triggered.connect(_help)
+        actWebHelp.triggered.connect(self.help)
 
         helpMenu = menuBar.addMenu("&Help")
+        helpMenu.addAction(actAbout)
         helpMenu.addAction(actWebHelp)
 
         tb = QToolBar("Exit", self)
@@ -385,6 +389,30 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
                 )
                 self.jobs.jobsStatus(JobStatus.Blocked)
 
+    def help(self):
+        """open web RTD page"""
+
+        htmlPath = "file:///" + str(self.cwd.parent) + "/html/using.html"
+
+        webbrowser.open(htmlPath, new=2, autoraise=True)
+
+    def about(self):
+
+        aboutMsg = "MKVBatchMultiplex: {}\n\n"
+        aboutMsg += "Author: {}\n"
+        aboutMsg += "email: {}\n\n"
+        aboutMsg += "Python Vertion:\n{}\n"
+
+        aboutMsg = aboutMsg.format(
+            config.VERSION,
+            config.AUTHOR,
+            config.EMAIL,
+            sys.version
+        )
+        msgBox = QMessageBox()
+        utils.centerWidgets(msgBox, self)
+        msgBox.setText(aboutMsg)
+        msgBox.exec_()
 
 class Key:
     """Keys for configuration"""
@@ -392,12 +420,6 @@ class Key:
     kLogging = "logging"
     kGeometry = "geometry"
     kFont = "font"
-
-def _help():
-    """open web RTD page"""
-
-    url = "https://mkvbatchmultiplex.readthedocs.io/en/latest/using.html"
-    webbrowser.open(url, new=0, autoraise=True)
 
 def centerWidgetsToDelete(widget, parent=None):
     """center widget based on parent or screen geometry"""

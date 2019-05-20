@@ -61,24 +61,22 @@ def bVerifyStructure(lstBaseFiles, lstFiles, log=False, currentJob=None):
 def centerWidgets(widget, parent=None):
     """center widget based on parent or screen geometry"""
 
-    if parent is None:
-        parent = widget.parentWidget()
-
     if parent:
-        #hostRect = parent.geometry()
-        #widget.move(hostRect.center() - widget.rect().center())
+        #widget.move(parent.frameGeometry().center() - widget.frameGeometry().center())
+        fg = parent.frameGeometry().center()
+        wfg = widget.frameGeometry()
+        print("({}, {}), height {} width {}".format(
+                fg.x(),
+                fg.y(),
+                wfg.height(),
+                wfg.width()
+            )
+        )
+        widget.move(parent.frameGeometry().center() - widget.frameGeometry().center())
 
-        # cP = parent.rect().center
-
-        #qR = widget.frameGeometry()
-        #cP = parent.rect().center()
-        #qR.moveCenter(cP)
-        #widget.move(qR.topLeft())
-
-        widget.move(parent.rect().center() - widget.frameGeometry().center())
 
     else:
-
+        print("Second option...")
         widget.move(QDesktopWidget().availableGeometry().center() - widget.frameGeometry().center())
 
 @staticVars(strCommand="", lstBaseFiles=[], lstSourceFiles=[])
