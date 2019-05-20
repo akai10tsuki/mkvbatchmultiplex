@@ -64,6 +64,7 @@ tests/generatecommand.1.py
 .vscode/
 tmp/
 docs2/
+html/
 sources/
 *.nsi
 *.iss
