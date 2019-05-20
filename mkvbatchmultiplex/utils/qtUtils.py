@@ -32,10 +32,10 @@ def bVerifyStructure(lstBaseFiles, lstFiles, log=False, currentJob=None):
         try:
             objSource = MediaFileInfo(strSource, log)
             objFile = MediaFileInfo(strFile, log)
-        except OSError:
+        except OSError as error:
             if currentJob is not None:
-                msg = "Error: In structure \n{}\n{}\n"
-                msg = msg.format(str(objFile), str(objSource))
+                msg = "pytMediaInfo not found!!!\n"
+                msg = msg.format(error.strerror)
                 currentJob.outputJobMain(
                     currentJob.jobID,
                     msg,
