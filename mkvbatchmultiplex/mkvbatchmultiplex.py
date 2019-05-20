@@ -39,6 +39,7 @@ import logging
 import logging.handlers
 import sys
 import os
+import platform
 import webbrowser
 import xml
 import xml.etree.ElementTree as ET
@@ -92,8 +93,6 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         self.setWindowTitle("MKVMERGE: Batch Multiplex")
         self.setWindowIcon(QIcon(str(cwd.parent) + "/images/mkvBatchMultiplex.png"))
 
-        print(str(cwd.parent))
-
         self._initMenu(cwd)
         self._initHelper()
 
@@ -101,7 +100,7 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         self.configuration()
         self.restoreConfig()
 
-        #self._checkDependencies()
+        self._checkDependencies()
 
     def _initHelper(self):
 
@@ -391,14 +390,16 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
 
     def _checkDependencies(self):
 
-        libFiles = isMediaInfoLib()
+        if platform.system() == "Linux":
 
-        if not libFiles:
-            self.formWidget.textOutputWindow.insertText(
-                "\nMediaInfo library not found can not process jobs.\n\n",
-                {'color': Qt.red}
-            )
-            self.jobs.jobsStatus(JobStatus.Blocked)
+            libFiles = isMediaInfoLib()
+
+            if not libFiles:
+                self.formWidget.textOutputWindow.insertText(
+                    "\nMediaInfo library not found can not process jobs.\n\n",
+                    {'color': Qt.red}
+                )
+                self.jobs.jobsStatus(JobStatus.Blocked)
 
 def _help():
     """open web RTD page"""
