@@ -25,7 +25,7 @@ Works on:
 Libraries and programs used:
 
     python 3.6-3.7
-    pymediainfo 2.2.1-3.0
+    pymediainfo 4.0
     mediainfo-17.10->18.12
     PySide2 5.12
 
