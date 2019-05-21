@@ -62,23 +62,27 @@ class MKVOutputWidget(QTextEdit):
         if 'appendLine' in kwargs:
             appendLine = kwargs['appendLine']
 
-        #if utils.isMacDarkMode() and (color is None):
-        #    color = Qt.white
-        #    color = None
-        #elif color is None:
-        #    color = Qt.black
-        #    color = None
-
+        # still no restore to default the ideal configuration
+        # search will continue considering abandoning color
+        # in macOS
         saveColor = self.textColor()
 
+        if utils.isMacDarkMode() and (color is None):
+            print("Color None:")
+            color = Qt.white
+        elif color is None:
+            color = Qt.black
+
         if utils.isMacDarkMode() and (color is not None):
+            print("Clor Set")
             if color == Qt.red:
-                color = Qt.darkRed
-            elif color == Qt.green:
-                color = Qt.darkGreen
+                color = Qt.magenta
+            elif color == Qt.darkGreen:
+                color = Qt.green
+            elif color == Qt.blue:
+                coloer = Qt.cyan
 
         if color is not None:
-            # dark theme clash
             self.setTextColor(color)
 
         if replaceLine:
