@@ -4,8 +4,8 @@ Changelog
 
 Changes to to project should be listed here.
 
-0.9.1b1.dev1
-------------
+0.9.1b1.dev1 - 2019-5-21
+------------~~~~~~~~~~~~
 
 Added
 ~~~~~
