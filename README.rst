@@ -11,7 +11,7 @@ mkvbatchmultiplex: MKVMERGE batch multiplexing
   :target: https://pypi.org/project/mkvbatchmultiplex
 
 
-This project started out of the necessity to multiplex a library of many video
+This project started out of the need to multiplex a library of many video
 series using AVI_ container and SRT_ for subtitles to be maintained in a Media
 Server. And as the saying goes search for something to use did not find
 anything that met my requirements so program it myself.
