@@ -7,19 +7,43 @@ import logging
 import sys
 from pathlib import Path
 
+
 from vsutillib import ConfigurationSettings, LogRotateHandler
+
 
 data = ConfigurationSettings() # pylint: disable=invalid-name
 
 __VERSION = (0, 9, '1b1', 'dev1')
 
-VERSION = ".".join(map(str, __VERSION))
-AUTHOR = "Efrain Vergara"
-EMAIL = "akai10tsuki@gmail.com"
-URL = "https://github.com/akai10tsuki/mkvbatchmultiplex"
 APPNAME = "MKVBatchMultiplex"
+VERSION = ".".join(map(str, __VERSION))
+URL = "https://github.com/akai10tsuki/mkvbatchmultiplex"
 QT_VERSION = "PYSIDE2"
 
+AUTHOR = "Efrain Vergara"
+EMAIL = "akai10tsuki@gmail.com"
+
+# for setup.py
+DESCRIPTION = 'A mkv media batch multiplex.'
+ENTRYPOINTS = {
+    'console_scripts': [
+        'mkvbatchmultiplex=mkvbatchmultiplex:mainApp',
+    ],
+}
+KEYWORDS = 'mkv multimedia video'
+NAME = "mkvbatchmultiplex"
+PACKAGES = ['mkvbatchmultiplex']
+PROJECTURLS = {
+    'Bug Reports': 'https://github.com/akai10tsuki/mkvbatchmultiplex/issues',
+    'Source': 'https://github.com/akai10tsuki/mkvbatchmultiplex/',
+}
+PYTHONVERSIONS = '>=3.5, <4'
+REQUIRED = [
+    'pymediainfo>=4.0',
+    'PySide2>=5.12'
+]
+
+# label
 TOTALJOBS, CURRENTJOB, CURRENTFILE, TOTALFILES, TOTALERRORS = range(5)
 
 # Files are relative to home directory
