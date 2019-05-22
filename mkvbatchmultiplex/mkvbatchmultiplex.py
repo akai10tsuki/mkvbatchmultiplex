@@ -55,7 +55,6 @@ from . import config
 from .widgets import (DualProgressBar, MKVFormWidget, MKVTabsWidget, FormatLabel,
                       MKVOutputWidget, MKVJobsTableWidget)
 from .jobs import JobQueue, JobStatus
-from .configurationsettings import ConfigurationSettings
 from . import utils
 
 
@@ -78,7 +77,6 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         self.jobSubprocessQueue = Queue()
         self.threadpool = QThreadPool()
         self.jobs = JobQueue(self.workQueue)
-        self.config = ConfigurationSettings()
         self.actEnableLogging = None
 
         if getattr(sys, 'frozen', False):
