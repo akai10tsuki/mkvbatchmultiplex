@@ -9,11 +9,13 @@ Output widget form just to output text in color
 
 import logging
 
+
 from PySide2.QtCore import Qt, Slot
 from PySide2.QtGui import QTextCursor
 from PySide2.QtWidgets import QTextEdit
 
-from .. import utils
+
+import vsutillib as utils
 
 
 MODULELOG = logging.getLogger(__name__)
