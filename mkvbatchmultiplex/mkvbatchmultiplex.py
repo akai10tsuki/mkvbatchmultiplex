@@ -51,6 +51,8 @@ from PySide2.QtWidgets import (QAction, QApplication, QDesktopWidget, qApp,
                                QMainWindow, QMessageBox, QToolBar, QVBoxLayout,
                                QWidget, QFontDialog)
 
+
+import vsutillib
 from . import config
 from .widgets import (DualProgressBar, MKVFormWidget, MKVTabsWidget, FormatLabel,
                       MKVOutputWidget, MKVJobsTableWidget)
@@ -378,7 +380,7 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
 
         if platform.system() == "Linux":
 
-            libFiles = utils.isMediaInfoLib()
+            libFiles = vsutillib.isMediaInfoLib()
 
             if not libFiles:
                 self.formWidget.textOutputWindow.insertText(
