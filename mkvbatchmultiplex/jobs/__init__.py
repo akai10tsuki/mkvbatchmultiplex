@@ -340,7 +340,7 @@ class JobQueue(QObject): # pylint: disable=R0902
         """Update job output on screen and save it"""
 
         if self.emitError:
-            msg = "----------\nJob: {}\n{}\n----------\n\n"
+            msg = "----------\nJob: {}\n\n{}\n----------\n\n"
             msg = msg.format(str(jobID), strMessage.strip())
             self.outputErrorSignal.emit(
                 msg,

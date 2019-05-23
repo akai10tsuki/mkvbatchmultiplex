@@ -20,12 +20,15 @@ from PySide2.QtWidgets import (QApplication, QGridLayout, QGroupBox, QLabel,
                                QLineEdit, QMessageBox, QPushButton,
                                QWidget)
 
+
+import vsutillib.mkv as mkv
+
 from .. import qththreads as threads
 from .. import utils
 
-from ..mediafileclasses import MKVCommand
-from ..jobs import JobStatus
 
+#from ..mediafileclasses import MKVCommand
+from ..jobs import JobStatus
 from .MKVOutputWidget import MKVOutputWidget
 
 
@@ -48,7 +51,7 @@ class MKVFormWidget(QWidget):
         self.controlQueue = jobCtrlQueue
         self.spControlQueue = jobSpCtrlQueue
         self.controlRunCommand = Queue()
-        self.objCommand = MKVCommand()
+        self.objCommand = mkv.MKVCommand()
         self.lstSourceFiles = []
         self.lstBaseFiles = []
 
@@ -62,7 +65,7 @@ class MKVFormWidget(QWidget):
         self.timer.start()
 
     def _initHelper(self):
-        self.objCommand = MKVCommand()
+        self.objCommand = mkv.MKVCommand()
         self.lstSourceFiles = []
         self.lstBaseFiles = []
 
@@ -346,7 +349,7 @@ class MKVFormWidget(QWidget):
         lstAnalysis = []
         cmd = self.leCommand.text()
 
-        MKVCommand.bLooksOk(cmd, lstAnalysis)
+        mkv.MKVCommand.bLooksOk(cmd, lstAnalysis)
 
         cbOutputMain.emit("Analysis of command line:\n\n", {})
 
@@ -386,7 +389,7 @@ class MKVFormWidget(QWidget):
 
         cmd = self.leCommand.text()
 
-        bTest = MKVCommand.bLooksOk(cmd)
+        bTest = mkv.MKVCommand.bLooksOk(cmd)
 
         if bTest:
 
@@ -504,9 +507,14 @@ class MKVFormWidget(QWidget):
 
         if self.objCommand:
 
+            verify = mkv.VerifyStructure()
+
             for _, basefiles, sourcefiles, _ in self.objCommand:
 
-                if utils.bVerifyStructure(basefiles, sourcefiles, self.log):
+                mkv.VerifyStructure.log = self.log
+                verify.verifyStructure(basefiles, sourcefiles)
+
+                if verify:
                     cbOutputMain.emit(
                         "Structure looks OK:\n" \
                         + str(sourcefiles) + "\n\n",
@@ -514,8 +522,7 @@ class MKVFormWidget(QWidget):
                     )
                 else:
                     cbOutputMain.emit(
-                        "Error: In structure\n" \
-                        + str(sourcefiles) \
+                        str(verify) \
                         + "\n\n",
                         {'color': Qt.red}
                     )
@@ -627,8 +634,11 @@ class MKVFormWidget(QWidget):
 
         self.jobs.jobsStatus(JobStatus.Running)
 
-        MKVCommand.log = self.log
-        objCommand = MKVCommand()
+        mkv.MKVCommand.log = self.log
+        objCommand = mkv.MKVCommand()
+
+        mkv.VerifyStructure.log = self.log
+        verify = mkv.VerifyStructure()
 
         while self.jobs:
 
@@ -714,12 +724,12 @@ class MKVFormWidget(QWidget):
                     bStructureOk = False
 
                     try:
-                        bStructureOk = utils.bVerifyStructure(
-                            basefiles,
-                            sourcefiles,
-                            self.log,
-                            currentJob
-                        )
+                        mkv.VerifyStructure.log = self.log
+                        verify.verifyStructure(basefiles, sourcefiles)
+                        bStructureOk = verify.isOk
+
+                        if not verify.isOk:
+                            _outputError(currentJob, str(verify))
 
                     except OSError as e:
 
@@ -830,7 +840,7 @@ class ValidateCommand(QValidator):
     def validate(self, inputStr, pos):
         """Check regex in bLooksOk"""
 
-        bTest = MKVCommand.bLooksOk(inputStr)
+        bTest = mkv.MKVCommand.bLooksOk(inputStr)
 
         if bTest:
             self.parent.objCommand.command = inputStr
@@ -873,3 +883,18 @@ class Worker(threads.Worker): # pylint: disable=R0903
         self.kwargs['cbOutputMain'] = self.signals.outputmain
         self.kwargs['cbOutputCommand'] = self.signals.outputcommand
         self.kwargs['cbJobsLabel'] = self.signals.jobslabel
+
+
+def _outputError(currentJob, message):
+    """output error to job main and error output widgets"""
+
+    currentJob.outputJobMain(
+        currentJob.jobID,
+        message,
+        {'color': Qt.red}
+    )
+    currentJob.outputJobError(
+        currentJob.jobID,
+        message,
+        {'color': Qt.red}
+    )
