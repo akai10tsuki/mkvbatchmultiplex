@@ -1,7 +1,7 @@
 """
 mkvbatchmultiplex config file
 """
-
+#CF0005
 
 import logging
 import sys
@@ -78,8 +78,9 @@ def init():
 
     app = APPNAME + "-%s"
 
-    logging.info("App Start.")
-    logging.info("Python: %s", sys.version)
+    logging.info("CF0001: App Start.")
+    logging.info("CF0002: Python: %s", sys.version)
+    app = "CF0003: " + app
     logging.info(app, VERSION)
 
 
@@ -88,4 +89,4 @@ def close():
 
     data.saveToFile()
 
-    logging.info("App End.")
+    logging.info("CF0004: App End.")

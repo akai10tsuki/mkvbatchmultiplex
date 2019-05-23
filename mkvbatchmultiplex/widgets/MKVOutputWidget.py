@@ -25,6 +25,8 @@ MODULELOG.addHandler(logging.NullHandler())
 class MKVOutputWidget(QTextEdit):
     """Output for running queue"""
 
+    log = False
+
     def __init__(self, parent=None):
         super(MKVOutputWidget, self).__init__(parent)
 
@@ -99,7 +101,7 @@ class MKVOutputWidget(QTextEdit):
 
         self.setTextColor(saveColor)
 
-        if self.parent.log:
+        if self.log:
             strTmp = strTmp + strText
             strTmp = strTmp.replace("\n", " ")
             if strTmp != "" and strTmp.find(u"Progress:") != 0:

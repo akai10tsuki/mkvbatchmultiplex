@@ -41,11 +41,15 @@ class MKVFormWidget(QWidget):
     # pylint: disable=too-many-instance-attributes
     # Defining elements of a GUI
 
-    def __init__(self, parent, qthThread, jobs, jobCtrlQueue, jobSpCtrlQueue, log=False):
+    log = False
+
+    def __init__(self, parent, qthThread, jobs, jobCtrlQueue, jobSpCtrlQueue):
         super(MKVFormWidget, self).__init__(parent)
 
+        mkv.MKVCommand.log = self.log
+        mkv.VerifyStructure.log = self.log
+
         self.parent = parent
-        self.log = log
         self.threadpool = qthThread
         self.jobs = jobs
         self.controlQueue = jobCtrlQueue
@@ -511,7 +515,6 @@ class MKVFormWidget(QWidget):
 
             for _, basefiles, sourcefiles, _ in self.objCommand:
 
-                mkv.VerifyStructure.log = self.log
                 verify.verifyStructure(basefiles, sourcefiles)
 
                 if verify:
@@ -634,10 +637,7 @@ class MKVFormWidget(QWidget):
 
         self.jobs.jobsStatus(JobStatus.Running)
 
-        mkv.MKVCommand.log = self.log
         objCommand = mkv.MKVCommand()
-
-        mkv.VerifyStructure.log = self.log
         verify = mkv.VerifyStructure()
 
         while self.jobs:
@@ -724,7 +724,6 @@ class MKVFormWidget(QWidget):
                     bStructureOk = False
 
                     try:
-                        mkv.VerifyStructure.log = self.log
                         verify.verifyStructure(basefiles, sourcefiles)
                         bStructureOk = verify.isOk
 

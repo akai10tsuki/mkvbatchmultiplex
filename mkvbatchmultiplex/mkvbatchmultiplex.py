@@ -32,7 +32,7 @@ Libraries and programs used:
 Target program:
     MKVToolNix - tested with versions v17.0.0-29.0.0
 """
-
+#MW0001
 
 import ast
 import logging
@@ -102,12 +102,13 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
     def _initHelper(self):
 
         # Create Widgets
+        MKVFormWidget.log = True
+
         self.formWidget = MKVFormWidget(
             self, self.threadpool,
             self.jobs,
             self.jobProcessQueue,
-            self.jobSubprocessQueue,
-            log=True
+            self.jobSubprocessQueue
         )
         self.outputQueueWidget = MKVOutputWidget(self)
         self.outputErrorWidget = MKVOutputWidget(self)
@@ -269,10 +270,10 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         """Activate logging"""
         if state:
             self.log = True
-            logging.info("Start logging.")
+            logging.info("MW0001: Start logging.")
         else:
             self.log = False
-            logging.info("Stop logging.")
+            logging.info("MW0002: Stop logging.")
 
     def selectFont(self):
         """Select Font"""

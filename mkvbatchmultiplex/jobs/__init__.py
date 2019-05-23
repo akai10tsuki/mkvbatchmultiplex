@@ -61,6 +61,7 @@ class JobQueue(QObject): # pylint: disable=R0902
     :type jobWorkQueue: collections.deque
     """
 
+    log = False
     jobID = 1
     outputJobSignal = Signal(str, dict)
     outputErrorSignal = Signal(str, dict)

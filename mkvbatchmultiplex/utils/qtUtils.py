@@ -21,42 +21,6 @@ MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
 
-#def bVerifyStructure(lstBaseFiles, lstFiles, log=False, currentJob=None):
-#    """verify the file structure against the base files"""
-
-#    for strSource, strFile in zip(lstBaseFiles, lstFiles):
-
-#        try:
-#            utils.MediaFileInfo.log = log
-#            objSource = utils.MediaFileInfo(strSource)
-#            objFile = utils.MediaFileInfo(strFile)
-#        except OSError as error:
-#            if currentJob is not None:
-#                msg = "pyMediaInfo not found!!!\n"
-#                msg = msg.format(error.strerror)
-#                currentJob.outputJobMain(
-#                    currentJob.jobID,
-#                    msg,
-#                    {'color': Qt.red},
-#                    error=True
-#                )
-#            return False
-
-#        if objSource != objFile:
-#            if currentJob is not None:
-#                msg = "Error: In structure \n{}\n{}\n"
-#                msg = msg.format(str(objFile), str(objSource))
-#                currentJob.outputJobMain(
-#                    currentJob.jobID,
-#                    msg,
-#                    {'color': Qt.red},
-#                    error=True
-#                )
-#            return False
-
-#    return True
-
-
 def centerWidgets(widget, parent=None):
     """center widget based on parent or screen geometry"""
 

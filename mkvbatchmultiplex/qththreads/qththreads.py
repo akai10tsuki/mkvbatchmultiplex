@@ -3,10 +3,15 @@ Helper classes for QThreadPool
 """
 
 
+import logging
 import traceback
 import sys
 
 from PySide2.QtCore import QObject, QRunnable, Signal, Slot
+
+
+MODULELOG = logging.getLogger(__name__)
+MODULELOG.addHandler(logging.NullHandler())
 
 
 class WorkerSignals(QObject):
@@ -40,6 +45,8 @@ class Worker(QRunnable):
     :param args: Arguments to pass to the callback function
     :param kwargs: Keywords to pass to the callback function
     '''
+
+    log = False
 
     def __init__(self, function, *args, **kwargs):
         super().__init__()

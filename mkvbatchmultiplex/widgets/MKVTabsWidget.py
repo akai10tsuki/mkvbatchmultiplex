@@ -23,6 +23,8 @@ MODULELOG.addHandler(logging.NullHandler())
 class MKVTabsWidget(QWidget):
     """Main Widget"""
 
+    log = False
+
     def __init__(self, parent, tab1Widget, tab2Widget, tab3Widget, tab4Widget):
         super(MKVTabsWidget, self).__init__(parent)
 

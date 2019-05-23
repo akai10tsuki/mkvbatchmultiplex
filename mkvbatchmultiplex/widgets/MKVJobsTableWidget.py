@@ -27,6 +27,7 @@ class MKVJobsTableWidget(QWidget):
 
     Also shows status of job
     """
+    log = False
 
     showJobOutput = Signal(int, str, str)
 
