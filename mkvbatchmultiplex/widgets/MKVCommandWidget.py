@@ -420,11 +420,14 @@ class MKVCommandWidget(QWidget):
 
         return "Ok"
 
-    def _addQueue(self, cmd, callback):
+    def _addQueue(self, cmd, callback, appendLeft=False):
 
         jobStatus = JobStatus()
 
-        jobID = self.jobs.append(cmd, jobStatus.Waiting)
+        if appendLeft:
+            jobID = self.jobs.appendLeft(cmd, jobStatus.Waiting)
+        else:
+            jobID = self.jobs.append(cmd, jobStatus.Waiting)
 
         callback.emit(0, len(self.jobs))
 
@@ -611,9 +614,9 @@ class MKVCommandWidget(QWidget):
                  self.spControlQueue)
 
         if command:
-            # This is Proccess button request use for TODO:immediate action
+            # This is Proccess button request use for TODO:immediate action add to next job
 
-            jobID, _ = self._addQueue(command, kwargs['cbJobsLabel'])
+            jobID, _ = self._addQueue(command, kwargs['cbJobsLabel'], appendLeft=True)
 
             currentJob.outputMain.emit(
                 "Command added to queue:\n\nJob {} - {}\n\n".format(jobID, command),

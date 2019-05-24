@@ -208,6 +208,7 @@ class JobQueue(QObject): # pylint: disable=R0902
             self.jobID += 1
 
             self._workQueue.append([nID, command])
+
             jobInfo.status = status
             jobInfo.command = command
             self._jobs[nID] = jobInfo
