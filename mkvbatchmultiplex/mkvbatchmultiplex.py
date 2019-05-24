@@ -102,7 +102,13 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
     def _initHelper(self):
 
         # Create Widgets
-        MKVFormWidget.log = True
+
+        # Setup logging
+        MKVFormWidget.log = self.log
+        MKVTabsWidget.log = self.log
+        MKVOutputWidget.log = self.log
+        MKVJobsTableWidget.log = self.log
+        JobQueue.log = self.log
 
         self.formWidget = MKVFormWidget(
             self, self.threadpool,
@@ -182,15 +188,25 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         settingsMenu.addAction(actSelectFont)
         settingsMenu.addAction(actRestoreDefaults)
 
+        # Help Menu
+
+        actHelpContents = QAction("Contents...", self)
+        actHelpContents.triggered.connect(lambda: self.help(0))
+
+        actHelpUsing = QAction("Using", self)
+        actHelpUsing.triggered.connect(lambda: self.help(1))
+
         actAbout = QAction("About", self)
         actAbout.triggered.connect(self.about)
 
-        actWebHelp = QAction("Using", self)
-        actWebHelp.triggered.connect(self.help)
+        actAboutQt = QAction("About QT", self)
+        actAboutQt.triggered.connect(self.aboutQt)
 
         helpMenu = menuBar.addMenu("&Help")
+        helpMenu.addAction(actHelpContents)
+        helpMenu.addAction(actHelpUsing)
         helpMenu.addAction(actAbout)
-        helpMenu.addAction(actWebHelp)
+        helpMenu.addAction(actAboutQt)
 
         tb = QToolBar("Exit", self)
         tb.addAction(actExit)
@@ -381,7 +397,7 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
 
         if platform.system() == "Linux":
 
-            libFiles = vsutillib.isMediaInfoLib()
+            libFiles = vsutillib.media.isMediaInfoLib()
 
             if not libFiles:
                 self.formWidget.textOutputWindow.insertText(
@@ -390,15 +406,19 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
                 )
                 self.jobs.jobsStatus(JobStatus.Blocked)
 
-    def help(self):
+    def help(self, index=0):
         """open web RTD page"""
 
-        htmlPath = "file:///" + str(self.cwd.parent) + "/html/using.html"
+        if index == 1:
+            htmlPath = "file:///" + str(self.cwd.parent) + "/html/using.html"
+        else:
+            htmlPath = "file:///" + str(self.cwd.parent) + "/html/index.html"
+
 
         webbrowser.open(htmlPath, new=2, autoraise=True)
 
     def about(self):
-
+        """About"""
         aboutMsg = "MKVBatchMultiplex: {}\n\n"
         aboutMsg += "Author: {}\n"
         aboutMsg += "email: {}\n\n"
@@ -410,10 +430,11 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
             config.EMAIL,
             sys.version
         )
-        msgBox = QMessageBox()
-        utils.centerWidgets(msgBox, self)
-        msgBox.setText(aboutMsg)
-        msgBox.exec_()
+        QMessageBox.about(self, 'MKVBatchMultiplex', aboutMsg)
+
+    def aboutQt(self):
+        """About QT"""
+        QMessageBox.aboutQt(self, 'MKVBatchMultiplex')
 
 class Key:
     """Keys for configuration"""
