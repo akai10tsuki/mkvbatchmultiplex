@@ -84,7 +84,7 @@ class MKVOutputWidget(QTextEdit):
             elif color == Qt.darkGreen:
                 color = Qt.green
             elif color == Qt.blue:
-                coloer = Qt.cyan
+                color = Qt.cyan
 
         if color is not None:
             self.setTextColor(color)
@@ -99,7 +99,9 @@ class MKVOutputWidget(QTextEdit):
 
         self.ensureCursorVisible()
 
-        self.setTextColor(saveColor)
+        #self.setTextColor(saveColor)
+
+        QTextEdit.setStyleSheet('')
 
         if self.log:
             strTmp = strTmp + strText
