@@ -353,17 +353,16 @@ class MKVFormWidget(QWidget):
         lstAnalysis = []
         cmd = self.leCommand.text()
 
-        mkv.MKVCommand.bLooksOk(cmd, lstAnalysis)
+        verify = mkv.VerifyMKVCommand(cmd)
 
         cbOutputMain.emit("Analysis of command line:\n\n", {})
 
-        if lstAnalysis:
-            for e in lstAnalysis:
-                i = e.find(r"ok")
-                if i >= 0:
-                    cbOutputMain.emit("{}\n".format(e), {'color': Qt.darkGreen})
-                else:
-                    cbOutputMain.emit("{}\n".format(e), {'color': Qt.red})
+        for e in verify.analysis:
+            i = e.find(r"chk:")
+            if i >= 0:
+                cbOutputMain.emit("{}\n".format(e), {'color': Qt.darkGreen})
+            else:
+                cbOutputMain.emit("{}\n".format(e), {'color': Qt.red})
 
         cbOutputMain.emit("\n", {})
 
@@ -393,15 +392,16 @@ class MKVFormWidget(QWidget):
 
         cmd = self.leCommand.text()
 
-        bTest = mkv.MKVCommand.bLooksOk(cmd)
+        verify = mkv.VerifyMKVCommand(cmd)  #bTest = mkv.MKVCommand.bLooksOk(cmd)
 
-        if bTest:
+        if verify:
 
             if self.jobs.inQueue(cmd):
                 cbOutputMain.emit(
                     "Command already in queue:\n\n{}\n\n".format(cmd),
                     {'color': Qt.blue}
                 )
+
             else:
 
                 jobID, _ = self._addQueue(cmd, cbJobsLabel)
@@ -837,11 +837,11 @@ class ValidateCommand(QValidator):
         self.parent = parent
 
     def validate(self, inputStr, pos):
-        """Check regex in bLooksOk"""
+        """Check regex in VerifyMKVCommand"""
 
-        bTest = mkv.MKVCommand.bLooksOk(inputStr)
+        verify = mkv.VerifyMKVCommand(inputStr)
 
-        if bTest:
+        if verify:
             self.parent.objCommand.command = inputStr
 
             self.parent.buttonsState(True)
