@@ -32,7 +32,7 @@ Libraries and programs used:
 Target program:
     MKVToolNix - tested with versions v17.0.0-29.0.0
 """
-#MW0001
+# MWW0001
 
 import ast
 import logging
@@ -54,7 +54,7 @@ from PySide2.QtWidgets import (QAction, QApplication, QDesktopWidget, qApp,
 
 import vsutillib
 from . import config
-from .widgets import (DualProgressBar, MKVFormWidget, MKVTabsWidget, FormatLabel,
+from .widgets import (DualProgressBar, MKVCommandWidget, MKVTabsWidget, FormatLabel,
                       MKVOutputWidget, MKVJobsTableWidget)
 from .jobs import JobQueue, JobStatus
 from . import utils
@@ -104,13 +104,13 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         # Create Widgets
 
         # Setup logging
-        MKVFormWidget.log = self.log
+        MKVCommandWidget.log = self.log
         MKVTabsWidget.log = self.log
         MKVOutputWidget.log = self.log
         MKVJobsTableWidget.log = self.log
         JobQueue.log = self.log
 
-        self.formWidget = MKVFormWidget(
+        self.formWidget = MKVCommandWidget(
             self, self.threadpool,
             self.jobs,
             self.jobProcessQueue,

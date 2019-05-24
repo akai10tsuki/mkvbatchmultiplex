@@ -5,7 +5,7 @@ Jobs table widget shows jobs and status
 
 context menu on status can change it
 """
-# JT001
+# MJT0001
 
 
 import logging

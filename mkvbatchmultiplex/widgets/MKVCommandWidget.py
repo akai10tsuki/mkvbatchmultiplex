@@ -1,11 +1,11 @@
 
 """
-MKVFormWidget:
+MKVCommandWidget:
 
 Command input widget
 """
 
-#LOG FW0013
+#LOG MCW0013
 
 
 import logging
@@ -330,7 +330,7 @@ class MKVCommandWidget(QWidget):
             cbOutputCommand = kwargs['cbOutputCommand']
         else:
             if self.log:
-                MODULELOG.error("FW0001: No output command callback function")
+                MODULELOG.error("MCW0001: No output command callback function")
             return "No output command callback function"
 
         clip = QApplication.clipboard().text()
@@ -347,7 +347,7 @@ class MKVCommandWidget(QWidget):
             cbOutputMain = kwargs['cbOutputMain']
         else:
             if self.log:
-                MODULELOG.error("FW0004: No output callback function")
+                MODULELOG.error("MCW0004: No output callback function")
             return "No output callback function"
 
         cmd = self.leCommand.text()
@@ -380,7 +380,7 @@ class MKVCommandWidget(QWidget):
             if not key in kwargs:
                 if self.log:
                     MODULELOG.error(
-                        "FW0005: No output command callback function %s.",
+                        "MCW0005: No output command callback function %s.",
                         key
                     )
                 return "No output command callback function"
@@ -437,7 +437,7 @@ class MKVCommandWidget(QWidget):
             cbOutputMain = kwargs['cbOutputMain']
         else:
             if self.log:
-                MODULELOG.error("FW0006: No output callback function")
+                MODULELOG.error("MCW0006: No output callback function")
             return "No output callback function"
 
         msg = "Base Files:\n\n{}\n\nSource Files:\n\n".format(str(self.objCommand.baseFiles))
@@ -467,7 +467,7 @@ class MKVCommandWidget(QWidget):
             cbOutputMain = kwargs['cbOutputMain']
         else:
             if self.log:
-                MODULELOG.error("FW0007: No output callback function")
+                MODULELOG.error("MCW0007: No output callback function")
             return "No output callback function"
 
 
@@ -488,7 +488,7 @@ class MKVCommandWidget(QWidget):
                 )
         else:
             cbOutputMain.emit(
-                "FW0008: Error in command construction {}\n\n".format(self.objCommand.error),
+                "MCW0008: Error in command construction {}\n\n".format(self.objCommand.error),
                 {'color': Qt.red}
             )
 
@@ -503,7 +503,7 @@ class MKVCommandWidget(QWidget):
             cbOutputMain = kwargs['cbOutputMain']
         else:
             if self.log:
-                MODULELOG.error("FW0009: No output callback function")
+                MODULELOG.error("MCW0009: No output callback function")
             return "No output callback function"
 
         cbOutputMain.emit("Checking files...\n\n", {})
@@ -588,7 +588,7 @@ class MKVCommandWidget(QWidget):
                 if not key in kwargs:
                     if self.log:
                         MODULELOG.error(
-                            "FW0010: No output command callback function %s.",
+                            "MCW0010: No output command callback function %s.",
                             key
                         )
                     return "No output command callback function"
@@ -797,9 +797,9 @@ class MKVCommandWidget(QWidget):
                 )
 
                 if self.log:
-                    MODULELOG.info("FW0011: Error Base files in Process: %s",
+                    MODULELOG.info("MCW0011: Error Base files in Process: %s",
                                    str(objCommand.baseFiles))
-                    MODULELOG.info("FW0012: Error Source files in Process: %s",
+                    MODULELOG.info("MCW0012: Error Source files in Process: %s",
                                    str(objCommand.sourceFiles))
 
         currentJob.jobsLabel.emit(1, currentJob.jobID)
@@ -849,12 +849,12 @@ class ValidateCommand(QValidator):
             self.parent.btnReset.setEnabled(True)
 
             if self.parent.log:
-                MODULELOG.debug("FW0002: Command Ok: [%s]", inputStr)
+                MODULELOG.debug("MCW0002: Command Ok: [%s]", inputStr)
         else:
             self.parent.buttonsState(False)
 
             if self.parent.log:
-                MODULELOG.debug("FW0003: Command not Ok: [%s]", inputStr)
+                MODULELOG.debug("MCW0003: Command not Ok: [%s]", inputStr)
 
         return (QValidator.Acceptable, inputStr, pos)
 

@@ -4,15 +4,14 @@ qtUtils:
 utility functions that use PySide2
 """
 
-
 import logging
 import re
 import subprocess
 
+
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QDesktopWidget
 
-#from ..mediafileclasses import MediaFileInfo
 
 from ..jobs import JobStatus
 
@@ -136,6 +135,6 @@ def runCommand(command, currentJob, lstTotal, log=False):
     lstTotal[0] += 100
 
     if log:
-        MODULELOG.info("UT007: runCommand rc=%d - %s", rc, command)
+        MODULELOG.info("UTL0001: runCommand rc=%d - %s", rc, command)
 
     return rc

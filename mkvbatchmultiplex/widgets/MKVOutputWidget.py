@@ -4,7 +4,7 @@ MKVOutputWidget:
 Output widget form just to output text in color
 
 """
-# OW004
+# MOW0004
 
 
 import logging
@@ -106,8 +106,8 @@ class MKVOutputWidget(QTextEdit):
             strTmp = strTmp.replace("\n", " ")
             if strTmp != "" and strTmp.find(u"Progress:") != 0:
                 if strTmp.find(u"Warning") == 0:
-                    MODULELOG.warning("OW001: %s", strTmp)
+                    MODULELOG.warning("MOW0001: %s", strTmp)
                 elif strTmp.find(u"Error") == 0 or color == Qt.red:
-                    MODULELOG.error("OW002: %s", strTmp)
+                    MODULELOG.error("MOW0002: %s", strTmp)
                 else:
-                    MODULELOG.info("OW003: %s", strTmp)
+                    MODULELOG.info("MOW0003: %s", strTmp)
