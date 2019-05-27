@@ -198,7 +198,7 @@ class MKVCommand(object):
 
             self._workFiles.baseFiles = [x.fullPathName for x in self._oBaseSourceFilesList]
 
-            for objFile in self._oBaseSourceFilesList:
+            for index, objFile in enumerate(self._oBaseSourceFilesList):
                 lstMKVFiles.append(
                     utils.getFileList(
                         objFile.directory,
@@ -206,6 +206,7 @@ class MKVCommand(object):
                         True
                     )
                 )
+                lstMKVFiles[index].sort(key=_strPath)
 
             if _bCheckLenOfLists(lstMKVFiles, lstTypeTotal):
                 # Join all source files in a list of lists each element
@@ -627,3 +628,7 @@ def _strStripEscapeChars(strCommand):
         strTmp = strTmp.replace("'", r"'\''").replace('^', '').replace('/', '\\').replace('"', "'")
 
     return strTmp
+
+def _strPath(value):
+    """key for getFileList sort"""
+    return str(value)
