@@ -41,13 +41,10 @@ class MKVCommandWidget(QWidget):
     # pylint: disable=too-many-instance-attributes
     # Defining elements of a GUI
 
-    log = False
+    __log = False
 
     def __init__(self, parent, qthThread, jobs, jobCtrlQueue, jobSpCtrlQueue):
         super(MKVCommandWidget, self).__init__(parent)
-
-        mkv.MKVCommand.log = self.log
-        mkv.VerifyStructure.log = self.log
 
         self.parent = parent
         self.threadpool = qthThread
@@ -213,6 +210,32 @@ class MKVCommandWidget(QWidget):
         self.grid.addWidget(self.textOutputWindow, 2, 2, 10, 1)
 
         self.setLayout(self.grid)
+
+    @property
+    def log(self):
+        """return value of self._log"""
+        return self.__log
+
+    @log.setter
+    def log(self, value):
+        """
+        update self._log
+        and utility functions too
+        """
+        if isinstance(value, bool):
+            self.__log = value
+            mkv.MKVCommand.log = self.log
+            mkv.VerifyStructure.log = self.log
+
+    @staticmethod
+    def setLogging(value):
+        """
+        update self._log
+        and utility functions too
+        """
+        MKVCommandWidget.__log = value
+        mkv.MKVCommand.log = value
+        mkv.VerifyStructure.log = value
 
     @Slot(int, int)
     def progress(self, unit, total):

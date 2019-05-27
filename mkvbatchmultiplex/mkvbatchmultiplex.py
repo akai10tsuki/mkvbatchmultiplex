@@ -79,7 +79,7 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         self.jobSubprocessQueue = Queue()
         self.threadpool = QThreadPool()
         self.jobs = JobQueue(self.workQueue)
-        self.actEnableLogging = None
+        #self.actSetupLogging = None
 
         if getattr(sys, 'frozen', False):
             # Running in pyinstaller bundle
@@ -91,12 +91,12 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         self.setWindowIcon(QIcon(str(self.cwd.parent) + "/images/mkvBatchMultiplex.png"))
 
         self._initMenu()
-        self._initHelper()
 
         # Read configuration elements
         self.configuration()
         self.restoreConfig()
 
+        self._initHelper()
         self.checkDependencies()
 
     def _initHelper(self):
@@ -163,11 +163,11 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         fileMenu.addAction(actExit)
         fileMenu.addAction(actAbort)
 
-        self.actEnableLogging = QAction("Enable logging", self, checkable=True)
-        self.actEnableLogging.setStatusTip(
+        self.actSetupLogging = QAction("Enable logging", self, checkable=True)
+        self.actSetupLogging.setStatusTip(
             "Enable session logging in ~/.mkvBatchMultiplex/mkvBatchMultiplex.log"
         )
-        self.actEnableLogging.triggered.connect(self.enableLogging)
+        self.actSetupLogging.triggered.connect(self.setupLogging)
 
         actSelectFont = QAction("Font", self)
         actSelectFont.setStatusTip("")
@@ -177,7 +177,7 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         actRestoreDefaults.triggered.connect(self.restoreDefaults)
 
         settingsMenu = menuBar.addMenu("&Settings")
-        settingsMenu.addAction(self.actEnableLogging)
+        settingsMenu.addAction(self.actSetupLogging)
         settingsMenu.addAction(actSelectFont)
         settingsMenu.addAction(actRestoreDefaults)
 
@@ -275,7 +275,7 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
             else:
                 event.ignore()
 
-    def enableLogging(self, state):
+    def setupLogging(self, state):
         """Activate logging"""
         if state:
             self.log = True
@@ -285,7 +285,8 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
             logging.info("MW0002: Stop logging.")
 
         # Setup logging
-        MKVCommandWidget.log = self.log
+        MKVCommandWidget.setLogging(self.log)
+
         MKVTabsWidget.log = self.log
         MKVOutputWidget.log = self.log
         MKVJobsTableWidget.log = self.log
@@ -310,7 +311,7 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         if save:
 
             config.data.set(
-                Key.kLogging, self.actEnableLogging.isChecked()
+                Key.kLogging, self.actSetupLogging.isChecked()
             )
 
             base64Geometry = self.saveGeometry().toBase64()
@@ -343,8 +344,8 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
 
         if resetDefaults:
             self.setFont(defaultFont)
-            self.actEnableLogging.setChecked(bLogging)
-            self.enableLogging(bLogging)
+            self.actSetupLogging.setChecked(bLogging)
+            self.setupLogging(bLogging)
             self.setGeometry(0, 0, 1280, 720)
             utils.centerWidgets(self)
 
@@ -363,8 +364,8 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
             bLogging = config.data.get(Key.kLogging)
 
             if bLogging is not None:
-                self.actEnableLogging.setChecked(bLogging)
-                self.enableLogging(bLogging)
+                self.actSetupLogging.setChecked(bLogging)
+                self.setupLogging(bLogging)
 
             byteGeometry = config.data.get(Key.kGeometry)
 
