@@ -2,7 +2,12 @@ Changelog
 =========
 
 
-Changes to to project should be listed here.
+0.9.1b1.dev2 - 2019-5-27
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Fixed
+~~~~~
+- fix directory files read have to be sorted on macOS
 
 0.9.1b1.dev1 - 2019-5-21
 ------------~~~~~~~~~~~~
