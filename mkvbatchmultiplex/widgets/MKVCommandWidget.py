@@ -452,7 +452,7 @@ class MKVCommandWidget(QWidget):
 
         if self.objCommand:
             for _, _, lstFiles, dFile in self.objCommand:
-                cbOutputMain.emit(str(lstFiles) + "\n" + dFile + "\n\n", {})
+                cbOutputMain.emit(str(lstFiles) + "\n" + str(dFile) + "\n\n", {})
         else:
             cbOutputMain.emit(
                 self.objCommand.error + "\n\n",

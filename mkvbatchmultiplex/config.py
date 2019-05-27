@@ -8,8 +8,8 @@ import sys
 from pathlib import Path
 
 
-from vsutillib import ConfigurationSettings, LogRotateHandler
-
+from vsutillib.files import ConfigurationSettings
+from vsutillib.log import LogRotateHandler
 
 data = ConfigurationSettings() # pylint: disable=invalid-name
 
@@ -37,7 +37,7 @@ PROJECTURLS = {
     'Bug Reports': 'https://github.com/akai10tsuki/mkvbatchmultiplex/issues',
     'Source': 'https://github.com/akai10tsuki/mkvbatchmultiplex/',
 }
-PYTHONVERSIONS = '>=3.5, <4'
+PYTHONVERSIONS = '>=3.5, <=3.8'
 REQUIRED = [
     'pymediainfo>=4.0',
     'PySide2>=5.12'

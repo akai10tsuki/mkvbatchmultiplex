@@ -12,10 +12,10 @@ import logging
 
 from PySide2.QtCore import Qt, Slot
 from PySide2.QtGui import QTextCursor
-from PySide2.QtWidgets import QTextEdit
+from PySide2.QtWidgets import QTextEdit, QWidget, QStyleFactory
 
 
-import vsutillib as utils
+import vsutillib.macos as macos
 
 
 MODULELOG = logging.getLogger(__name__)
@@ -69,16 +69,15 @@ class MKVOutputWidget(QTextEdit):
         # still no restore to default the ideal configuration
         # search will continue considering abandoning color
         # in macOS
-        saveColor = self.textColor()
 
-        if utils.isMacDarkMode() and (color is None):
-            print("Color None:")
+        saveStyle = self.styleSheet()
+
+        if macos.isMacDarkMode() and (color is None):
             color = Qt.white
         elif color is None:
             color = Qt.black
 
-        if utils.isMacDarkMode() and (color is not None):
-            print("Clor Set")
+        if macos.isMacDarkMode() and (color is not None):
             if color == Qt.red:
                 color = Qt.magenta
             elif color == Qt.darkGreen:
@@ -99,9 +98,7 @@ class MKVOutputWidget(QTextEdit):
 
         self.ensureCursorVisible()
 
-        #self.setTextColor(saveColor)
-
-        QTextEdit.setStyleSheet('')
+        self.setStyleSheet(QStyleFactory.create(saveStyle))
 
         if self.log:
             strTmp = strTmp + strText

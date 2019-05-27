@@ -338,6 +338,7 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         """Restore configuration if any"""
 
         defaultFont = QFont("Segoe UI", 9)
+
         bLogging = False
 
         if resetDefaults:
