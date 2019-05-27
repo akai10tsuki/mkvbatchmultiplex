@@ -103,13 +103,6 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
 
         # Create Widgets
 
-        # Setup logging
-        MKVCommandWidget.log = self.log
-        MKVTabsWidget.log = self.log
-        MKVOutputWidget.log = self.log
-        MKVJobsTableWidget.log = self.log
-        JobQueue.log = self.log
-
         self.formWidget = MKVCommandWidget(
             self, self.threadpool,
             self.jobs,
@@ -290,6 +283,13 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         else:
             self.log = False
             logging.info("MW0002: Stop logging.")
+
+        # Setup logging
+        MKVCommandWidget.log = self.log
+        MKVTabsWidget.log = self.log
+        MKVOutputWidget.log = self.log
+        MKVJobsTableWidget.log = self.log
+        JobQueue.log = self.log
 
     def selectFont(self):
         """Select Font"""
