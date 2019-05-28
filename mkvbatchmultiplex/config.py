@@ -9,7 +9,7 @@ from pathlib import Path
 
 
 from vsutillib.files import ConfigurationSettings
-from vsutillib.log import LogRotateHandler
+from vsutillib.log import LogRotateFileHandler
 
 data = ConfigurationSettings() # pylint: disable=invalid-name
 
@@ -66,7 +66,7 @@ def init():
     logFile = Path(filesPath, LOGFILE)
     logging.getLogger('').setLevel(logging.DEBUG)
 
-    loghandler = LogRotateHandler(logFile, backupCount=10)
+    loghandler = LogRotateFileHandler(logFile, backupCount=10, encoding='utf-8')
 
     formatter = logging.Formatter(
         "%(asctime)s %(levelname)-8s %(name)s %(message)s"

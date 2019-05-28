@@ -43,8 +43,20 @@ class MKVCommandWidget(QWidget):
 
     __log = False
 
+    @classmethod
+    def classLog(cls, setLogging=None):
+        """get/set global logging"""
+
+        if setLogging is None:
+            return cls.__log
+        elif isinstance(setLogging, bool):
+            cls.__log = setLogging
+
     def __init__(self, parent, qthThread, jobs, jobCtrlQueue, jobSpCtrlQueue):
         super(MKVCommandWidget, self).__init__(parent)
+
+        mkv.MKVCommand.log = self.log
+        mkv.VerifyStructure.log = self.log
 
         self.parent = parent
         self.threadpool = qthThread
@@ -223,9 +235,9 @@ class MKVCommandWidget(QWidget):
         and utility functions too
         """
         if isinstance(value, bool):
-            self.__log = value
-            mkv.MKVCommand.log = self.log
-            mkv.VerifyStructure.log = self.log
+            self.log = value
+            mkv.MKVCommand.classLog(self.log)
+            mkv.VerifyStructure.classLog(self.log)
 
     @staticmethod
     def setLogging(value):
@@ -233,7 +245,7 @@ class MKVCommandWidget(QWidget):
         update self._log
         and utility functions too
         """
-        MKVCommandWidget.__log = value
+        MKVCommandWidget.log = value
         mkv.MKVCommand.log = value
         mkv.VerifyStructure.log = value
 
