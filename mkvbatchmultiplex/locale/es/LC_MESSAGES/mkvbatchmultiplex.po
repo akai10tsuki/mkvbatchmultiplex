@@ -1,0 +1,191 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-06-03 22:46-0400\n"
+"PO-Revision-Date: 2019-06-03 23:27-0400\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: es_PR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.2.3\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\regExpressions\utils\text.py:22
+msgid "Match"
+msgstr "Parear"
+
+#: .\regExpressions\utils\text.py:23
+msgid "Search"
+msgstr "Busqueda"
+
+#: .\regExpressions\utils\text.py:24
+msgid "Find All"
+msgstr "Encuentra todos"
+
+#: .\regExpressions\utils\text.py:25
+msgid "Substitution"
+msgid_plural "Substitutions"
+msgstr[0] "Substituir"
+msgstr[1] "Sustituciones"
+
+#: .\regExpressions\utils\text.py:26
+msgid "Regular expression"
+msgstr "Expresión regular"
+
+#: .\regExpressions\utils\text.py:27
+msgid "Enter regular expression."
+msgstr "Introduzca expresión regular."
+
+#: .\regExpressions\utils\text.py:28
+msgid "Substitution string"
+msgstr "Cadena de sustitución"
+
+#: .\regExpressions\utils\text.py:29
+msgid "Enter substitution string."
+msgstr "Introduzca la cadena de sustitución."
+
+#: .\regExpressions\utils\text.py:30
+msgid "Enter text"
+msgstr "Ingrese texto"
+
+#: .\regExpressions\utils\text.py:31
+msgid "Enter text to scan."
+msgstr "Introduzca texto para escanear."
+
+#: .\regExpressions\utils\text.py:32
+msgid "Bad regular expression."
+msgstr "Expresión regular."
+
+#: .\regExpressions\utils\text.py:33
+msgid "Match results output."
+msgstr "Resultados del partido de salida."
+
+#: .\regExpressions\utils\text.py:34
+msgid "Regular Expressions Tool"
+msgstr "Herramienta para expresiones regulares"
+
+#: .\regExpressions\utils\text.py:35
+msgid "Exit Application"
+msgstr "Salir de la applicación"
+
+#: .\regExpressions\utils\text.py:36
+msgid "Ctrl+E"
+msgstr "Ctrl+E"
+
+#: .\regExpressions\utils\text.py:37
+msgid "Confirm restore ..."
+msgstr "Confirmar restauración …"
+
+#: .\regExpressions\utils\text.py:38
+msgid "Abort"
+msgstr "Abortar ejecución"
+
+#: .\regExpressions\utils\text.py:39
+msgid "Force exit"
+msgstr "Forzar salida"
+
+#: .\regExpressions\utils\text.py:40
+msgid "Enable logging"
+msgstr "Habilitar registro"
+
+#: .\regExpressions\utils\text.py:41
+msgid "Enable session logging in {}"
+msgstr "Habilitar el registro session en {}"
+
+#: .\regExpressions\utils\text.py:42
+msgid "Font && size"
+msgstr "Fuente y tamaño"
+
+#: .\regExpressions\utils\text.py:43
+msgid "Select font & size"
+msgstr "Seleccionar fuente y tamaño de interfaz"
+
+#: .\regExpressions\utils\text.py:44
+msgid "Restore defaults"
+msgstr "Restaurar valores por defecto"
+
+#: .\regExpressions\utils\text.py:45
+msgid "Using"
+msgstr "Como utilizer"
+
+#: .\regExpressions\utils\text.py:46
+msgid "&Help"
+msgstr "A&yuda"
+
+#: .\regExpressions\utils\text.py:47
+msgid "&File"
+msgstr "&Archivo"
+
+#: .\regExpressions\utils\text.py:48
+msgid "&Settings"
+msgstr "&Preferencias"
+
+#: .\regExpressions\utils\text.py:49
+msgid "&Interface language"
+msgstr "Idioma del interfaz"
+
+#: .\regExpressions\utils\text.py:50
+msgid "Exit"
+msgstr "Salir"
+
+#: .\regExpressions\utils\text.py:51
+msgid "&Exit"
+msgstr "&Salir"
+
+#: .\regExpressions\utils\text.py:52
+msgid "Yes"
+msgstr "Si"
+
+#: .\regExpressions\utils\text.py:53
+msgid "Are you sure you want to exit?"
+msgstr "¿Seguro que desea salir?"
+
+#: .\regExpressions\utils\text.py:54
+msgid "Close App"
+msgstr "Cerrar la applicación"
+
+#: .\regExpressions\utils\text.py:55
+msgid "Result"
+msgid_plural "Results"
+msgstr[0] "Resultado"
+msgstr[1] "Resultados"
+
+#: .\regExpressions\utils\text.py:56
+msgid "Matched Group"
+msgid_plural "Matched Groups"
+msgstr[0] "Grupo pareado"
+msgstr[1] "Grupos pareados"
+
+#: .\regExpressions\utils\text.py:57
+msgid "Restore default settings?"
+msgstr "¿Restaurar valores por defecto?"
+
+#: .\regExpressions\utils\text.py:58
+msgid "Author"
+msgstr "Autor"
+
+#: .\regExpressions\utils\text.py:59
+msgid "email"
+msgstr "email"
+
+#: .\regExpressions\utils\text.py:60
+msgid "Python Version"
+msgstr "Versión de Python"
+
+#: .\regExpressions\utils\text.py:61
+msgid "About regExpressions"
+msgstr "Acerca de regExpressions"
+
+#~ msgid "Results"
+#~ msgstr "Resultados"
+
+#~ msgid "Font"
+#~ msgstr "Fuente"
