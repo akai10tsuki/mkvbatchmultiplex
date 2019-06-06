@@ -79,7 +79,8 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         self.jobSubprocessQueue = Queue()
         self.threadpool = QThreadPool()
         self.jobs = JobQueue(self.workQueue)
-        #self.actSetupLogging = None
+        self.actSetupLogging = None
+        self.menuItems = []
 
         if getattr(sys, 'frozen', False):
             # Running in pyinstaller bundle
@@ -163,6 +164,8 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         fileMenu.addAction(actExit)
         fileMenu.addAction(actAbort)
 
+        self.menuItems.append(fileMenu)
+
         self.actSetupLogging = QAction("Enable logging", self, checkable=True)
         self.actSetupLogging.setStatusTip(
             "Enable session logging in ~/.mkvBatchMultiplex/mkvBatchMultiplex.log"
@@ -180,6 +183,8 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         settingsMenu.addAction(self.actSetupLogging)
         settingsMenu.addAction(actSelectFont)
         settingsMenu.addAction(actRestoreDefaults)
+
+        self.menuItems.append(settingsMenu)
 
         # Help Menu
 
@@ -201,6 +206,8 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         helpMenu.addAction(actAbout)
         helpMenu.addAction(actAboutQt)
 
+        self.menuItems.append(helpMenu)
+
         tb = QToolBar("Exit", self)
         tb.addAction(actExit)
         self.addToolBar(tb)
@@ -214,6 +221,11 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         statusBar = self.statusBar()
         statusBar.addPermanentWidget(self.jobsLabel)
         statusBar.addPermanentWidget(self.progressbar)
+
+    def _setFont(self, font):
+
+        for m in self.menuItems:
+            m.setFont(font)
 
     def clearOutput(self):
         """Clear output for JobQueue"""
@@ -304,6 +316,7 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
 
         if valid:
             self.setFont(font)
+            self._setFont(font)
 
     def configuration(self, save=False):
         """Read and write configuration"""
@@ -344,6 +357,7 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
 
         if resetDefaults:
             self.setFont(defaultFont)
+            self._setFont(defaultFont)
             self.actSetupLogging.setChecked(bLogging)
             self.setupLogging(bLogging)
             self.setGeometry(0, 0, 1280, 720)
@@ -357,6 +371,7 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
                 restoreFont = QFont()
                 restoreFont.fromString(strFont)
                 self.setFont(restoreFont)
+                self._setFont(restoreFont)
 
             else:
                 self.setFont(defaultFont)
