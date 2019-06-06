@@ -519,7 +519,7 @@ class MKVCommandWidget(QWidget):
         )
 
         if self.objCommand:
-            for command, _, _, _ in self.objCommand:
+            for command, _, _, _, _ in self.objCommand:
                 cbOutputMain.emit(
                     str(command) + "\n\n",
                     {}
@@ -550,7 +550,7 @@ class MKVCommandWidget(QWidget):
 
             verify = mkv.VerifyStructure()
 
-            for _, basefiles, sourcefiles, _ in self.objCommand:
+            for _, basefiles, sourcefiles, _, _ in self.objCommand:
 
                 verify.verifyStructure(basefiles, sourcefiles)
 
@@ -727,7 +727,7 @@ class MKVCommandWidget(QWidget):
                 if len(self.jobs) == 1:
                     self.parent.tabs.setCurrentIndex(2)
 
-                for cmd, basefiles, sourcefiles, _ in objCommand:
+                for cmd, basefiles, sourcefiles, _, _ in objCommand:
 
                     currentStatus = self.jobs.status(currentJob.jobID)
 
