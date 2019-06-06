@@ -2,16 +2,27 @@ Changelog
 =========
 
 
-Changes to to project should be listed here.
+Changes to the project.
+
 (Unreleased)
+------------
+
+Added
+~~~~~
+- added support for external chapters files
 
 Changed
 ~~~~~~~
-- Major code cleanup and refactoring
+- Major code cleanup and refactoring making it easier to extend
 
- * functions, methods and properties rename for clarity
- * moving code on modules reusable in other apps to vsutillib modules
-   applications will depend on vsutillib
+  * functions, methods and properties rename for clarity
+  * moving code on modules reusable in other apps to vsutillib modules
+    applications will depend on vsutillib
+
+Fixed
+~~~~~
+- fix on macOS the read files have to be sorted in order to correctly
+  match the sources
 
 0.9.1b1.dev1
 ------------

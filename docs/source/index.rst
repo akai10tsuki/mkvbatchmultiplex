@@ -10,9 +10,3 @@
    LICENSE
    acknowledgements
    CHANGELOG
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`search`
