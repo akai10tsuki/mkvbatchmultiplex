@@ -240,7 +240,7 @@ class JobQueue(QObject): # pylint: disable=R0902
             self._jobs[nID] = jobInfo
 
             if self.emitAddJobToTable:
-                self.addJobToTableSignal.emit(nID, command)
+                self.addJobToTableSignal.emit(nID, status, command)
 
             return nID
 
