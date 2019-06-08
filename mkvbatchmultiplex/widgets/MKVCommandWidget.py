@@ -1,4 +1,3 @@
-
 """
 MKVCommandWidget:
 
@@ -6,7 +5,6 @@ Command input widget
 """
 
 #LOG MCW0013
-
 
 import logging
 import platform
@@ -17,20 +15,16 @@ from pathlib import Path
 from PySide2.QtCore import Qt, QTimer, Signal, Slot
 from PySide2.QtGui import QValidator
 from PySide2.QtWidgets import (QApplication, QGridLayout, QGroupBox, QLabel,
-                               QLineEdit, QMessageBox, QPushButton,
-                               QWidget)
-
+                               QLineEdit, QMessageBox, QPushButton, QWidget)
 
 import vsutillib.mkv as mkv
 
 from .. import qththreads as threads
 from .. import utils
 
-
 #from ..mediafileclasses import MKVCommand
 from ..jobs import JobStatus
 from .MKVOutputWidget import MKVOutputWidget
-
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -43,6 +37,8 @@ class MKVCommandWidget(QWidget):
 
     __log = False
 
+    setOutputFileSignal = Signal(str, object)
+
     @classmethod
     def classLog(cls, setLogging=None):
         """get/set global logging"""
@@ -52,7 +48,8 @@ class MKVCommandWidget(QWidget):
         elif isinstance(setLogging, bool):
             cls.__log = setLogging
 
-    def __init__(self, parent, qthThread, jobs, jobCtrlQueue, jobSpCtrlQueue):
+    def __init__(self, parent, qthThread, jobs, jobCtrlQueue, jobSpCtrlQueue,
+                 renameWidget):
         super(MKVCommandWidget, self).__init__(parent)
 
         mkv.MKVCommand.log = self.log
@@ -64,23 +61,23 @@ class MKVCommandWidget(QWidget):
         self.controlQueue = jobCtrlQueue
         self.spControlQueue = jobSpCtrlQueue
         self.controlRunCommand = Queue()
-        self.objCommand = mkv.MKVCommand()
-        self.lstSourceFiles = []
-        self.lstBaseFiles = []
+        self.objCommand = None
 
         self._initControls()
         self._initLayout()
 
-        self.requestedClose = False
+        #self.requestedClose = False
         self.timer = QTimer()
         self.timer.setInterval(2000)
         self.timer.timeout.connect(self.watchJobs)
         self.timer.start()
+        self.renameWidget = renameWidget
+
+        self.renameWidget.connectToSetOutputFile(self.setOutputFileSignal)
+        self.renameWidget.applyFileRenameSignal.connect(self._applyRename)
 
     def _initHelper(self):
-        self.objCommand = mkv.MKVCommand()
-        self.lstSourceFiles = []
-        self.lstBaseFiles = []
+        self.objCommand = None
 
     def _initControls(self):
         """Controls for Widget"""
@@ -101,75 +98,58 @@ class MKVCommandWidget(QWidget):
             #    from there on it work
             #windows - work
 
-            self.btnPasteClipboard.clicked.connect(
-                lambda: self.qthRunInThread(self.qthPasteClipboard)
-            )
+            self.btnPasteClipboard.clicked.connect(lambda: self.qthRunInThread(
+                self.qthPasteClipboard))
         else:
             #linux - ubuntu only refresh correctly this way
             #macOS - refresh doesn't work must use keyboard arrows to refresh
             #windows - work
 
-            self.btnPasteClipboard.clicked.connect(
-                self.pasteClipboard
-            )
+            self.btnPasteClipboard.clicked.connect(self.pasteClipboard)
         self.btnPasteClipboard.setToolTip(
-            "Paste copy of <b>mkvtoolnix-gui</b> Show command line"
-        )
+            "Paste copy of <b>mkvtoolnix-gui</b> Show command line")
 
         self.btnAnalysis = QPushButton(" Analysis ")
         self.btnAnalysis.resize(self.btnAnalysis.sizeHint())
-        self.btnAnalysis.clicked.connect(
-            lambda: self.qthRunInThread(self.qthAnalysis)
-        )
-        self.btnAnalysis.setToolTip(
-            "Print analysis of command line."
-        )
+        self.btnAnalysis.clicked.connect(lambda: self.qthRunInThread(
+            self.qthAnalysis))
+        self.btnAnalysis.setToolTip("Print analysis of command line.")
         self.leCommand.textChanged.connect(self.analysisButtonsState)
 
         self.btnAddQueue = QPushButton(" Add Job ")
         self.btnAddQueue.resize(self.btnAddQueue.sizeHint())
-        self.btnAddQueue.clicked.connect(
-            lambda: self.qthRunInThread(self.addQueue)
-        )
-        self.btnAddQueue.setToolTip(
-            "Add command to job queue."
-        )
+        self.btnAddQueue.clicked.connect(lambda: self.qthRunInThread(self.
+                                                                     addQueue))
+        self.btnAddQueue.setToolTip("Add command to job queue.")
 
         self.btnProcessQueue = QPushButton(" Process Jobs ")
         self.btnProcessQueue.resize(self.btnProcessQueue.sizeHint())
-        self.btnProcessQueue.clicked.connect(
-            lambda: self.qthRunInThread(self.qthProcessCommand)
-        )
+        self.btnProcessQueue.clicked.connect(lambda: self.qthRunInThread(
+            self.qthProcessCommand))
         self.btnProcessQueue.setToolTip("Execute commands on job queue.")
 
         self.btnProcess = QPushButton(" Process ")
         self.btnProcess.resize(self.btnProcess.sizeHint())
-        self.btnProcess.clicked.connect(
-            lambda: self.qthRunInThread(
-                self.qthProcessCommand, self.leCommand.text()
-            )
-        )
+        self.btnProcess.clicked.connect(lambda: self.qthRunInThread(
+            self.qthProcessCommand, self.objCommand))
         self.btnProcess.setToolTip("Execute batch command.")
 
         self.btnCheckFiles = QPushButton(" Check Files ")
         self.btnCheckFiles.resize(self.btnCheckFiles.sizeHint())
-        self.btnCheckFiles.clicked.connect(
-            lambda: self.qthRunInThread(self.qthCheckFiles)
-        )
+        self.btnCheckFiles.clicked.connect(lambda: self.qthRunInThread(
+            self.qthCheckFiles))
         self.btnCheckFiles.setToolTip("Check files for consistency.")
 
         self.btnShowSourceFiles = QPushButton(" Source Files ")
         self.btnShowSourceFiles.resize(self.btnShowSourceFiles.sizeHint())
-        self.btnShowSourceFiles.clicked.connect(
-            lambda: self.qthRunInThread(self.qthShowSourceFiles)
-        )
+        self.btnShowSourceFiles.clicked.connect(lambda: self.qthRunInThread(
+            self.qthShowSourceFiles))
         self.btnShowSourceFiles.setToolTip("Files to be processed.")
 
         self.btnShowCommands = QPushButton(" Commands ")
         self.btnShowCommands.resize(self.btnShowCommands.sizeHint())
-        self.btnShowCommands.clicked.connect(
-            lambda: self.qthRunInThread(self.qthShowCommands)
-        )
+        self.btnShowCommands.clicked.connect(lambda: self.qthRunInThread(
+            self.qthShowCommands))
         self.btnShowCommands.setToolTip("Commands to be applied.")
 
         self.btnClearOutputWindow = QPushButton(" Clear Output ")
@@ -181,7 +161,6 @@ class MKVCommandWidget(QWidget):
         self.btnReset.resize(self.btnReset.sizeHint())
         self.btnReset.clicked.connect(self.reset)
         self.btnReset.setToolTip("Reset state to work with another batch.")
-
 
         self.buttonsState(False)
         self.btnAnalysis.setEnabled(False)
@@ -248,6 +227,12 @@ class MKVCommandWidget(QWidget):
         MKVCommandWidget.log = value
         mkv.MKVCommand.log = value
         mkv.VerifyStructure.log = value
+
+    @Slot(list)
+    def _applyRename(self, renameFiles):
+
+        if self.objCommand:
+            self.objCommand.renameOutputFiles(renameFiles)
 
     @Slot(int, int)
     def progress(self, unit, total):
@@ -355,7 +340,7 @@ class MKVCommandWidget(QWidget):
         if clip:
             self.updateCommand(clip)
 
-    def qthPasteClipboard(self, **kwargs): # pylint: disable=W0613
+    def qthPasteClipboard(self, **kwargs):  # pylint: disable=W0613
         """
         Paste clipboard to command QLineEdit
         If not run in a separate thread on macOS does not refresh
@@ -416,34 +401,29 @@ class MKVCommandWidget(QWidget):
                 if self.log:
                     MODULELOG.error(
                         "MCW0005: No output command callback function %s.",
-                        key
-                    )
+                        key)
                 return "No output command callback function"
 
         cbOutputMain = kwargs['cbOutputMain']
         cbOutputCommand = kwargs['cbOutputCommand']
         cbJobsLabel = kwargs['cbJobsLabel']
 
-        cmd = self.leCommand.text()
+        if self.objCommand:
 
-        verify = mkv.VerifyMKVCommand(cmd)
-
-        if verify:
+            cmd = self.objCommand.command
 
             if self.jobs.inQueue(cmd):
                 cbOutputMain.emit(
                     "Command already in queue:\n\n{}\n\n".format(cmd),
-                    {'color': Qt.blue}
-                )
+                    {'color': Qt.blue})
 
             else:
 
-                jobID, _ = self._addQueue(cmd, cbJobsLabel)
+                jobID, _ = self._addQueue(self.objCommand, cbJobsLabel)
 
                 cbOutputMain.emit(
-                    "Command added to queue:\n\nJob {0} - {1}\n\n".format(jobID, cmd),
-                    {'color': Qt.blue}
-                )
+                    "Command added to queue:\n\nJob {0} - {1}\n\n".format(
+                        jobID, cmd), {'color': Qt.blue})
 
                 # Clear command
                 cbOutputCommand.emit("")
@@ -455,18 +435,19 @@ class MKVCommandWidget(QWidget):
 
         return "Ok"
 
-    def _addQueue(self, cmd, callback, appendLeft=False):
+    def _addQueue(self, objCommmad, callback, appendLeft=False):
 
         jobStatus = JobStatus()
 
+
         if appendLeft:
-            jobID = self.jobs.appendLeft(cmd, jobStatus.Waiting)
+            jobID = self.jobs.appendLeft(objCommmad, jobStatus.Waiting)
         else:
-            jobID = self.jobs.append(cmd, jobStatus.Waiting)
+            jobID = self.jobs.append(objCommmad, jobStatus.Waiting)
 
         callback.emit(0, len(self.jobs))
 
-        return jobID, cmd
+        return jobID, objCommmad.command
 
     def qthShowSourceFiles(self, **kwargs):
         """List the source files found"""
@@ -478,21 +459,22 @@ class MKVCommandWidget(QWidget):
                 MODULELOG.error("MCW0006: No output callback function")
             return "No output callback function"
 
-        msg = "Base Files:\n\n{}\n\nSource Files:\n\n".format(str(self.objCommand.baseFiles))
+        msg = "Base Files:\n\n{}\n\nSource Files:\n\n".format(
+            str(self.objCommand.baseFiles))
 
-        cbOutputMain.emit(
-            msg,
-            {}
-        )
+        cbOutputMain.emit(msg, {})
 
         if self.objCommand:
-            for _, _, lstFiles, dFile in self.objCommand:
-                cbOutputMain.emit(str(lstFiles) + "\n" + str(dFile) + "\n\n", {})
+            for _, _, lstFiles, dFile, _ in self.objCommand:
+                lstFile = []
+                for f in lstFiles:
+                    lstFile.append(str(f))
+
+                cbOutputMain.emit(
+                    str(lstFile) + "\n" + str(dFile) + "\n\n", {})
         else:
-            cbOutputMain.emit(
-                self.objCommand.error + "\n\n",
-                {'color': Qt.red}
-            )
+            cbOutputMain.emit(self.objCommand.error + "\n\n",
+                              {'color': Qt.red})
 
         cbOutputMain.emit("\n", {})
 
@@ -508,27 +490,19 @@ class MKVCommandWidget(QWidget):
                 MODULELOG.error("MCW0007: No output callback function")
             return "No output callback function"
 
-
+        cbOutputMain.emit("Shell:\n\n{}\n\n".format(self.objCommand.command),
+                          {})
         cbOutputMain.emit(
-            "Shell:\n\n{}\n\n".format(self.objCommand.command),
-            {}
-        )
-        cbOutputMain.emit(
-            "Command Template:\n\n{}\n\nCommands:\n\n".format(str(self.objCommand.template)),
-            {}
-        )
+            "Command Template:\n\n{}\n\nCommands:\n\n".format(
+                str(self.objCommand.template)), {})
 
         if self.objCommand:
             for command, _, _, _, _ in self.objCommand:
-                cbOutputMain.emit(
-                    str(command) + "\n\n",
-                    {}
-                )
+                cbOutputMain.emit(str(command) + "\n\n", {})
         else:
             cbOutputMain.emit(
-                "MCW0008: Error in command construction {}\n\n".format(self.objCommand.error),
-                {'color': Qt.red}
-            )
+                "MCW0008: Error in command construction {}\n\n".format(
+                    self.objCommand.error), {'color': Qt.red})
 
         cbOutputMain.emit("\n", {})
 
@@ -555,9 +529,13 @@ class MKVCommandWidget(QWidget):
                 verify.verifyStructure(basefiles, sourcefiles)
 
                 if verify:
+                    lstFile = []
+                    for f in sourcefiles:
+                        lstFile.append(str(f))
+
                     cbOutputMain.emit(
                         "Structure looks OK:\n" \
-                        + str(sourcefiles) + "\n\n",
+                        + str(lstFile) + "\n\n",
                         {'color': Qt.darkGreen}
                     )
                 else:
@@ -574,13 +552,10 @@ class MKVCommandWidget(QWidget):
     def clearOutputWindow(self):
         """Clear the QTextExit widget"""
 
-        result = QMessageBox.question(
-            self,
-            "Confirm Clear...",
-            "Clear output window?",
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No
-        )
+        result = QMessageBox.question(self, "Confirm Clear...",
+                                      "Clear output window?",
+                                      QMessageBox.Yes | QMessageBox.No,
+                                      QMessageBox.No)
 
         if result == QMessageBox.Yes:
             self.textOutputWindow.clear()
@@ -589,13 +564,10 @@ class MKVCommandWidget(QWidget):
     def reset(self):
         """Reset values to start over"""
 
-        result = QMessageBox.question(
-            self,
-            "Confirm Reset...",
-            "Reset and clear output?",
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No
-        )
+        result = QMessageBox.question(self, "Confirm Reset...",
+                                      "Reset and clear output?",
+                                      QMessageBox.Yes | QMessageBox.No,
+                                      QMessageBox.No)
 
         if result == QMessageBox.Yes:
             self._initHelper()
@@ -617,69 +589,71 @@ class MKVCommandWidget(QWidget):
 
             self.parent.jobsLabel.setValues(jobsLabelValues)
 
-    def qthProcessCommand(self, command=None, **kwargs):
+    def qthProcessCommand(self, oCommand=None, **kwargs):
         """Main worker function will process the commands"""
 
         if self.jobs.jobsStatus() != JobStatus.Running:
 
-            for key in ['cbOutputCommand', 'cbOutputMain', 'cbProgress', 'cbJobsLabel']:
+            for key in [
+                    'cbOutputCommand', 'cbOutputMain', 'cbProgress',
+                    'cbJobsLabel'
+            ]:
                 if not key in kwargs:
                     if self.log:
                         MODULELOG.error(
                             "MCW0010: No output command callback function %s.",
-                            key
-                        )
+                            key)
                     return "No output command callback function"
 
             currentJob = CurrentJob()
 
-            (currentJob.outputMain,
-             currentJob.progressBar,
-             currentJob.jobsLabel,
-             currentJob.outputJobMain,
-             currentJob.outputJobError,
-             currentJob.controlQueue,
-             currentJob.spControlQueue) = (
-                 kwargs['cbOutputMain'],
-                 kwargs['cbProgress'],
-                 kwargs['cbJobsLabel'],
-                 self.jobs.outputJob,
-                 self.jobs.outputError,
-                 self.controlQueue,
-                 self.spControlQueue)
+            (currentJob.outputMain, currentJob.progressBar,
+             currentJob.jobsLabel, currentJob.outputJobMain,
+             currentJob.outputJobError, currentJob.controlQueue,
+             currentJob.spControlQueue) = (kwargs['cbOutputMain'],
+                                           kwargs['cbProgress'],
+                                           kwargs['cbJobsLabel'],
+                                           self.jobs.outputJob,
+                                           self.jobs.outputError,
+                                           self.controlQueue,
+                                           self.spControlQueue)
 
-        if command:
+        if oCommand:
             # This is Proccess button request use for TODO:immediate action add to next job
 
-            jobID, _ = self._addQueue(command, kwargs['cbJobsLabel'], appendLeft=True)
+            jobID, _ = self._addQueue(oCommand,
+                                      kwargs['cbJobsLabel'],
+                                      appendLeft=True)
 
             currentJob.outputMain.emit(
-                "Command added to queue:\n\nJob {} - {}\n\n".format(jobID, command),
-                {'color': Qt.blue}
-            )
+                "Command added to queue:\n\nJob {} - {}\n\n".format(
+                    jobID, oCommand.command), {'color': Qt.blue})
 
             # Clear command line
             kwargs['cbOutputCommand'].emit("")
 
         if self.jobs.jobsStatus() == JobStatus.Running:
             # if RUNNING just add command to que if given
-            currentJob.outputMain.emit("\nProcessing Queue.\n", {'color': Qt.blue})
+            currentJob.outputMain.emit("\nProcessing Queue.\n",
+                                       {'color': Qt.blue})
             return "RUNNING"
 
         self.btnProcessQueue.setEnabled(False)
 
         if not self.jobs:
-            currentJob.outputMain.emit("\nNothing on Queue.\n", {'color': Qt.blue})
+            currentJob.outputMain.emit("\nNothing on Queue.\n",
+                                       {'color': Qt.blue})
             return "Queue empty"
 
         self.jobs.jobsStatus(JobStatus.Running)
 
-        objCommand = mkv.MKVCommand()
+        #objCommand = mkv.MKVCommand()
         verify = mkv.VerifyStructure()
 
         while self.jobs:
 
-            currentJob.jobID, currentJob.command = self.jobs.popLeft()
+            currentJob.jobID, currentJob.command, objCommand = self.jobs.popLeft(
+            )
 
             status = self.jobs.status(currentJob.jobID)
 
@@ -688,15 +662,11 @@ class MKVCommandWidget(QWidget):
                 msg = "**********\nSkip requested on Command:\nJob {0} - {1}\n**********\n\n"
                 msg = msg.format(str(currentJob.jobID), currentJob.command)
 
-                currentJob.outputJobMain(
-                    currentJob.jobID,
-                    msg,
-                    {'color': Qt.blue}
-                )
+                currentJob.outputJobMain(currentJob.jobID, msg,
+                                         {'color': Qt.blue})
                 continue
 
             if currentJob.command:
-                objCommand.command = currentJob.command
                 self.jobs.status(currentJob.jobID, JobStatus.Running)
             else:
                 # Skip empty command
@@ -706,11 +676,7 @@ class MKVCommandWidget(QWidget):
             msg = "**********\nWorking on Command:\nJob {0} - {1}\n**********\n\n"
             msg = msg.format(str(currentJob.jobID), currentJob.command)
 
-            currentJob.outputJobMain(
-                currentJob.jobID,
-                msg,
-                {'color': Qt.blue}
-            )
+            currentJob.outputJobMain(currentJob.jobID, msg, {'color': Qt.blue})
 
             if objCommand:
 
@@ -739,25 +705,27 @@ class MKVCommandWidget(QWidget):
                             request = self.controlQueue.get()
 
                             if request == JobStatus.AbortJob:
-                                self.jobs.status(currentJob.jobID, JobStatus.AbortJob)
+                                self.jobs.status(currentJob.jobID,
+                                                 JobStatus.AbortJob)
                                 break
 
-                            if request in [JobStatus.Abort, JobStatus.AbortForced]:
+                            if request in [
+                                    JobStatus.Abort, JobStatus.AbortForced
+                            ]:
                                 if request == JobStatus.AbortForced:
                                     p = Path(objCommand[nFile - 1][3])
                                     if p.is_file():
                                         p.unlink()
-                                self.jobs.status(currentJob.jobID, JobStatus.Aborted)
+                                self.jobs.status(currentJob.jobID,
+                                                 JobStatus.Aborted)
                                 self.jobs.clear()
                                 self.jobs.abortAll()
                                 self.jobs.jobsStatus(JobStatus.Aborted)
                                 return JobStatus.Aborted
 
                     currentJob.outputJobMain(
-                        currentJob.jobID,
-                        "Command:\n{}\n\n".format(str(cmd)),
-                        {'color': Qt.blue}
-                    )
+                        currentJob.jobID, "Command:\n{}\n\n".format(str(cmd)),
+                        {'color': Qt.blue})
 
                     bStructureOk = False
 
@@ -771,11 +739,8 @@ class MKVCommandWidget(QWidget):
                     except OSError as e:
 
                         msg = "MediaInfo not found.\n{}\n\n".format(e)
-                        currentJob.outputJobMain(
-                            currentJob.jobID,
-                            msg,
-                            {'color': Qt.red}
-                        )
+                        currentJob.outputJobMain(currentJob.jobID, msg,
+                                                 {'color': Qt.red})
                         # Error unable to continue
                         self.jobs.status(currentJob.jobID, JobStatus.Error)
                         self.jobs.clear()
@@ -789,16 +754,13 @@ class MKVCommandWidget(QWidget):
                     if bStructureOk:
                         nFile += 1
                         currentJob.jobsLabel.emit(2, nFile)
-                        utils.runCommand(
-                            cmd,
-                            currentJob,
-                            lstTotal,
-                            self.log
-                        )
-                        currentJob.jobsLabel.emit(4, self.parent.jobsLabel[4] + lstTotal[2])
+                        utils.runCommand(cmd, currentJob, lstTotal, self.log)
+                        currentJob.jobsLabel.emit(
+                            4, self.parent.jobsLabel[4] + lstTotal[2])
                         lstTotal[2] = 0
                     else:
-                        currentJob.jobsLabel.emit(4, self.parent.jobsLabel[4] + 1)
+                        currentJob.jobsLabel.emit(4,
+                                                  self.parent.jobsLabel[4] + 1)
                         lstTotal[0] += 100
 
                 # End Processing
@@ -810,35 +772,33 @@ class MKVCommandWidget(QWidget):
                 if currentStatus in [JobStatus.Abort, JobStatus.AbortJob]:
                     self.jobs.status(currentJob.jobID, JobStatus.Aborted)
                     currentJob.outputJobMain(
-                        currentJob.jobID, "Job {} - Aborted.\n\n\n".format(currentJob.jobID),
-                        {'color': Qt.blue}
-                    )
+                        currentJob.jobID,
+                        "Job {} - Aborted.\n\n\n".format(currentJob.jobID),
+                        {'color': Qt.blue})
                 else:
                     self.jobs.status(currentJob.jobID, JobStatus.Done)
                     currentJob.outputJobMain(
                         currentJob.jobID,
                         "Job {} - Done.\n\n\n".format(currentJob.jobID),
-                        {'color': Qt.blue}
-                    )
+                        {'color': Qt.blue})
 
             else:
 
                 self.jobs.status(currentJob.jobID, JobStatus.Error)
 
-                msg = "FM0026: Error in construction of command - {}\n\n".format(objCommand.error),
+                msg = "FM0026: Error in construction of command - {}\n\n".format(
+                    objCommand.error),
 
-                currentJob.outputJobMain(
-                    currentJob.jobID,
-                    msg,
-                    {'color': Qt.red},
-                    error=True
-                )
+                currentJob.outputJobMain(currentJob.jobID,
+                                         msg, {'color': Qt.red},
+                                         error=True)
 
                 if self.log:
                     MODULELOG.info("MCW0011: Error Base files in Process: %s",
                                    str(objCommand.baseFiles))
-                    MODULELOG.info("MCW0012: Error Source files in Process: %s",
-                                   str(objCommand.sourceFiles))
+                    MODULELOG.info(
+                        "MCW0012: Error Source files in Process: %s",
+                        str(objCommand.sourceFiles))
 
         currentJob.jobsLabel.emit(1, currentJob.jobID)
         currentJob.jobsLabel.emit(2, 0)
@@ -849,7 +809,7 @@ class MKVCommandWidget(QWidget):
         return None
 
 
-class CurrentJob: # pylint: disable=R0903
+class CurrentJob:  # pylint: disable=R0903
     """Helper class for working with a job"""
 
     def __init__(self):
@@ -880,7 +840,14 @@ class ValidateCommand(QValidator):
         verify = mkv.VerifyMKVCommand(inputStr)
 
         if verify:
-            self.parent.objCommand.command = inputStr
+            if self.parent.objCommand is None:
+                self.parent.objCommand = mkv.MKVCommand(inputStr)
+            else:
+                self.parent.objCommand.command = inputStr
+
+            self.parent.setOutputFileSignal.emit(
+                str(self.parent.objCommand.outputFileName),
+                self.parent.objCommand)
 
             self.parent.buttonsState(True)
 
@@ -890,6 +857,8 @@ class ValidateCommand(QValidator):
                 MODULELOG.debug("MCW0002: Command Ok: [%s]", inputStr)
         else:
             self.parent.buttonsState(False)
+            self.parent.renameWidget.clear()
+            self.parent.objCommand = None
 
             if self.parent.log:
                 MODULELOG.debug("MCW0003: Command not Ok: [%s]", inputStr)
@@ -906,7 +875,7 @@ class WorkerSignals(threads.WorkerSignals):
     outputcommand = Signal(str)
 
 
-class Worker(threads.Worker): # pylint: disable=R0903
+class Worker(threads.Worker):  # pylint: disable=R0903
     """QRunnable worker with additional callbacks"""
 
     def __init__(self, fn, *args, **kwargs):
@@ -925,13 +894,5 @@ class Worker(threads.Worker): # pylint: disable=R0903
 def _outputError(currentJob, message):
     """output error to job main and error output widgets"""
 
-    currentJob.outputJobMain(
-        currentJob.jobID,
-        message,
-        {'color': Qt.red}
-    )
-    currentJob.outputJobError(
-        currentJob.jobID,
-        message,
-        {'color': Qt.red}
-    )
+    currentJob.outputJobMain(currentJob.jobID, message, {'color': Qt.red})
+    currentJob.outputJobError(currentJob.jobID, message, {'color': Qt.red})

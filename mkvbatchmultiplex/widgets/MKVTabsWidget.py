@@ -25,11 +25,11 @@ class MKVTabsWidget(QWidget):
 
     log = False
 
-    def __init__(self, parent, tab1Widget, tab2Widget, tab3Widget, tab4Widget):
+    def __init__(self, parent, tab1Widget, tab2Widget, tab3Widget, tab4Widget, tab5Widget):
         super(MKVTabsWidget, self).__init__(parent)
 
         self._initControls()
-        self._initLayout(tab1Widget, tab2Widget, tab3Widget, tab4Widget)
+        self._initLayout(tab1Widget, tab2Widget, tab3Widget, tab4Widget, tab5Widget)
 
     def _initControls(self):
         """Controls for Widget"""
@@ -40,8 +40,9 @@ class MKVTabsWidget(QWidget):
         self.tab2 = QWidget()
         self.tab3 = QWidget()
         self.tab4 = QWidget()
+        self.tab5 = QWidget()
 
-    def _initLayout(self, tab1Widget, tab2Widget, tab3Widget, tab4Widget):
+    def _initLayout(self, tab1Widget, tab2Widget, tab3Widget, tab4Widget, tab5Widget):
         """Setup Widget Layout"""
 
         self.layout = QVBoxLayout()
@@ -51,6 +52,7 @@ class MKVTabsWidget(QWidget):
         self.tabs.addTab(self.tab2, "Job(s)")
         self.tabs.addTab(self.tab3, "Job(s) Output")
         self.tabs.addTab(self.tab4, "Job(s) Error(s)")
+        self.tabs.addTab(self.tab5, "Rename Files")
 
         # Create first tab
         self.tab1.layout = QVBoxLayout(self)
@@ -71,6 +73,11 @@ class MKVTabsWidget(QWidget):
         self.tab4.layout = QVBoxLayout(self)
         self.tab4.layout.addWidget(tab4Widget)
         self.tab4.setLayout(self.tab4.layout)
+
+        # Create fourth tab
+        self.tab5.layout = QVBoxLayout(self)
+        self.tab5.layout.addWidget(tab5Widget)
+        self.tab5.setLayout(self.tab5.layout)
 
         # Add tabs to widget
         self.layout.addWidget(self.tabs)

@@ -9,23 +9,17 @@ Command input widget
 import logging
 import re
 
-from PySide2.QtCore import Signal, Qt
-from PySide2.QtWidgets import (QGridLayout, QLabel, QWidget, QLineEdit,
-                               QHBoxLayout, QVBoxLayout, QSizePolicy)
+from pathlib import Path
 
-from vsutillib.pyqt import OutputTextWidget
-from ..utils import Text
+from PySide2.QtCore import Signal, Qt, Slot
+from PySide2.QtWidgets import (QGridLayout, QLabel, QWidget, QLineEdit,
+                               QHBoxLayout, QVBoxLayout, QSizePolicy,
+                               QPushButton, QGroupBox)
+
+from vsutillib.pyqt import OutputTextWidget, FileListWidget
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
-
-
-def _(s):  # pylint: disable=invalid-name
-    """
-    dummy function for pylint must be deleted when
-    translations are needed
-    """
-    return s
 
 
 class MKVRenameWidget(QWidget):
@@ -33,52 +27,72 @@ class MKVRenameWidget(QWidget):
     # pylint: disable=too-many-instance-attributes
     # Defining elements of a GUI
 
-    outputMatchResultsSignal = Signal(str, dict)
+    outputRenameResultsSignal = Signal(str, dict)
+    outputOriginalFileSignal = Signal(str, dict)
+    applyFileRenameSignal = Signal(list)
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self, parent):
+        super(MKVRenameWidget, self).__init__(parent)
 
         self.parent = parent
-
+        self._outputFileNames = []
+        self._renameFileNames = []
         self._initControls()
         self._initLayout()
+        self._bFilesDropped = False
 
     def _initControls(self):
 
         self.textFileName = RegExLineInputWidget(
             'Base File Name: ', 'Name parsed from command line.')
+        self.textFileName.lineEdit.setReadOnly(True)
         self.textRegEx = RegExLineInputWidget("Regular Expression: ",
                                               'Enter regular expression.')
         self.textSubString = RegExLineInputWidget(
             "Substitution String: ", 'Enter substitution string.')
         self.textRegEx.lineEdit.textChanged.connect(self._updateRegEx)
         self.textSubString.lineEdit.textChanged.connect(self._updateRegEx)
-        self.textSubString.lineEdit.setReadOnly(True)
 
-        self.textOriginalNames = RegExInputWidget(
+        self.buttonApplyRename = QPushButton(' Apply Rename ')
+        self.buttonApplyRename.resize(self.buttonApplyRename.sizeHint())
+        self.buttonApplyRename.clicked.connect(self._applyRename)
+        self.buttonApplyRename.setEnabled(False)
+
+        self.textOriginalNames = RegExFilesWidget(
             self, "Original names:", "Name generated base on parsed command.")
         self.textOriginalNames.textBox.setReadOnly(True)
-        self.textOriginalNames.textBox.textChanged.connect(self._updateRegEx)
+        self.textOriginalNames.textBox.connectToInsertText(
+            self.outputOriginalFileSignal)
+        self.textOriginalNames.textBox.filesDroppedUpdateSignal.connect(
+            self.setOutputFilesDropped)
 
         self.textRenameResults = RegExInputWidget(
             self, "Rename:", "Names that will be use for commands.")
         self.textRenameResults.textBox.setReadOnly(True)
         self.textRenameResults.textBox.connectToInsertText(
-            self.outputMatchResultsSignal)
+            self.outputRenameResultsSignal)
 
     def _initLayout(self):
 
-        gridWidget = QWidget()
+        btnGrid = QGridLayout()
+        btnGrid.addWidget(self.buttonApplyRename, 0, 0, Qt.AlignLeft)
+
+        btnGroup = QGroupBox()
+        btnGroup.setLayout(btnGrid)
+
         inputGrid = QGridLayout()
 
-        inputGrid.addWidget(self.textFileName.lblText, 0, 0, Qt.AlignRight)
-        inputGrid.addWidget(self.textRegEx.lblText, 1, 0, Qt.AlignRight)
-        inputGrid.addWidget(self.textSubString.lblText, 2, 0, Qt.AlignRight)
+        #inputGrid.addWidget(self.textFileName.lblText, 0, 0, Qt.AlignRight)
+        inputGrid.addWidget(self.textRegEx.lblText, 0, 0, Qt.AlignRight)
+        inputGrid.addWidget(self.textSubString.lblText, 1, 0, Qt.AlignRight)
 
-        inputGrid.addWidget(self.textFileName.lineEdit, 0, 1)
-        inputGrid.addWidget(self.textRegEx.lineEdit, 1, 1)
-        inputGrid.addWidget(self.textSubString.lineEdit, 2, 1)
+        #inputGrid.addWidget(self.textFileName.lineEdit, 0, 1)
+        inputGrid.addWidget(self.textRegEx.lineEdit, 0, 1)
+        inputGrid.addWidget(self.textSubString.lineEdit, 1, 1)
 
+        inputGrid.addWidget(btnGroup, 2, 0, 1, 2)
+
+        gridWidget = QWidget()
         gridWidget.setLayout(inputGrid)
         gridWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
@@ -99,50 +113,112 @@ class MKVRenameWidget(QWidget):
 
         rg = self.textRegEx.lineEdit.text()
         subText = self.textSubString.lineEdit.text()
-        strText = self.textOriginalNames.textBox.toPlainText()
         statusBar = self.parent.statusBar()
+        statusBar.showMessage("")
+        self.textRenameResults.textBox.clear()
+        self._renameFileNames = []
 
         try:
-
             regEx = re.compile(rg)
-            matchRegEx = regEx.sub(subText, strText)
-            bOk = True
-            statusBar.showMessage("")
-            self.textRenameResults.textBox.clear()
+            for f in self._outputFileNames:
+                strFile = f.stem
+                matchRegEx = regEx.sub(subText, strFile)
+
+                if matchRegEx:
+                    objName = f.parent.joinpath(matchRegEx + f.suffix)
+                    fileName = matchRegEx + f.suffix
+                else:
+                    objName = f
+                    fileName = f.name
+
+                self._renameFileNames.append(objName)
+                self.outputRenameResultsSignal.emit('{}\n'.format(fileName),
+                                                    {})
+            if self:
+                self.buttonApplyRename.setEnabled(True)
+            else:
+                self.buttonApplyRename.setEnabled(False)
 
         except re.error:
 
-            bOk = False
+            self.textRenameResults.textBox.clear()
+            statusBar.showMessage("Invalid regex.")
 
-        if bOk:
+    def _applyRename(self):
 
-            if matchRegEx:
-                print('sub line by line')
-
+        if self._bFilesDropped:
+            self.applyFileRenameSignal.emit(self._renameFileNames)
+            filesPair = zip(self._outputFileNames, self._renameFileNames)
+            for oldName, newName in filesPair:
+                try:
+                    oldName.rename(newName)
+                except FileExistsError:
+                    pass
 
         else:
+            self.applyFileRenameSignal.emit(self._renameFileNames)
+
+        self.buttonApplyRename.setEnabled(False)
+
+    def __bool__(self):
+
+        for n, r in zip(self._outputFileNames, self._renameFileNames):
+            if n != r:
+                return True
+        return False
+
+    def clear(self):
+
+        self._outputFileNames = []
+        self._renameFileNames = []
+        self._bFilesDropped = False
+
+        self.textFileName.lineEdit.clear()
+        self.textRegEx.lineEdit.clear()
+        self.textSubString.lineEdit.clear()
+
+        self.textOriginalNames.textBox.clear()
+        self.textRenameResults.textBox.clear()
+
+    def connectToSetOutputFile(self, objSignal):
+
+        objSignal.connect(self.setOutputFile)
+
+    @Slot(str, object, result=str)
+    def setOutputFile(self, fileName, objCommand):
+
+        f = Path(fileName)
+
+        self._outputFileNames = []
+
+        self.textOriginalNames.textBox.clear()
+        self.textRenameResults.textBox.clear()
+
+        for f in objCommand.destinationFiles:
+            # show files
+            self.outputOriginalFileSignal.emit(str(f.name) + '\n', {})
+            self.outputRenameResultsSignal.emit(str(f.name) + '\n', {})
+            # save files
+            self._outputFileNames.append(f)
+
+    @Slot(list)
+    def setOutputFilesDropped(self, filesDropped):
+
+        if filesDropped:
+            self._outputFileNames = []
+            self._outputFileNames.extend(filesDropped)
 
             self.textRenameResults.textBox.clear()
-            statusBar.showMessage(_(Text.txt0011))
 
-    def setLanguage(self, initLanguage=False):
-        """
-        assign text labels in current language
-        """
+            for f in self._outputFileNames:
+                self.outputRenameResultsSignal.emit(str(f.name) + '\n', {})
 
-        if initLanguage:
-            del globals()['_']
-
-        self.textRegEx.lblText.setText(_(Text.txt0005) + ': ')
-        self.textRegEx.lineEdit.setToolTip(_(Text.txt0006))
-        self.textSubString.lblText.setText(_(Text.txt0007) + ': ')
-        self.textSubString.lineEdit.setToolTip(_(Text.txt0008))
-
-        self.textOriginalNames.lblText.setText(_(Text.txt0009) + ':')
-        self.textOriginalNames.textBox.setToolTip(_(Text.txt0010))
-
-        self.textRenameResults.lblText.setText(Text.txt0034(1) + ':')
-        self.textRenameResults.textBox.setToolTip(_(Text.txt0012))
+            if not self._bFilesDropped:
+                self._bFilesDropped = True
+        else:
+            self._outputFileNames = []
+            self.textRenameResults.textBox.clear()
+            self._bFilesDropped = False
 
 
 class RegExLineInputWidget():
@@ -165,6 +241,22 @@ class RegExInputWidget(QWidget):
 
         self.lblText = QLabel(lblText)
         self.textBox = OutputTextWidget(self)
+        self.textBox.setToolTip(strToolTip)
+        vboxLayout = QVBoxLayout()
+        vboxLayout.addWidget(self.lblText)
+        vboxLayout.addWidget(self.textBox)
+
+        self.setLayout(vboxLayout)
+
+
+class RegExFilesWidget(QWidget):
+    """Input for with text Labels"""
+
+    def __init__(self, parent=None, lblText="", strToolTip=""):
+        super(RegExFilesWidget, self).__init__(parent)
+
+        self.lblText = QLabel(lblText)
+        self.textBox = FileListWidget(self)
         self.textBox.setToolTip(strToolTip)
         vboxLayout = QVBoxLayout()
         vboxLayout.addWidget(self.lblText)

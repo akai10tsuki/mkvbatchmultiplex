@@ -10,6 +10,7 @@ from collections import deque
 
 from PySide2.QtCore import QObject, QMutex, QMutexLocker, Qt, Slot, Signal
 
+from vsutillib.mkv import MKVCommand
 
 MUTEX = QMutex()
 MODULELOG = logging.getLogger(__name__)
@@ -201,20 +202,27 @@ class JobQueue(QObject): # pylint: disable=R0902
         :rtype: int
         """
 
+        if isinstance(command, MKVCommand):
+            cmd = command.command
+            oCmd = command
+        else:
+            oCmd = None
+            cmd = command
+
         with QMutexLocker(MUTEX):
 
             jobInfo = JobInfo()
             nID = self.jobID
             self.jobID += 1
 
-            self._workQueue.append([nID, command])
+            self._workQueue.append([nID, cmd, oCmd])
 
             jobInfo.status = status
-            jobInfo.command = command
+            jobInfo.command = cmd
             self._jobs[nID] = jobInfo
 
             if self.emitAddJobToTable:
-                self.addJobToTableSignal.emit(nID, status, command)
+                self.addJobToTableSignal.emit(nID, status, cmd)
 
             return nID
 
@@ -229,18 +237,26 @@ class JobQueue(QObject): # pylint: disable=R0902
         :rtype: int
         """
 
+        if isinstance(command, MKVCommand):
+            cmd = command.command
+            oCmd = command
+        else:
+            oCmd = None
+            cmd = command
+
         with QMutexLocker(MUTEX):
 
             nID = self.jobID
             jobInfo = JobInfo()
             self.jobID += 1
 
-            self._workQueue.appendleft([nID, command])
+            self._workQueue.appendleft([nID, cmd, oCmd])
             jobInfo.status = status
+            jobInfo.command = cmd
             self._jobs[nID] = jobInfo
 
             if self.emitAddJobToTable:
-                self.addJobToTableSignal.emit(nID, status, command)
+                self.addJobToTableSignal.emit(nID, status, cmd)
 
             return nID
 
@@ -255,7 +271,7 @@ class JobQueue(QObject): # pylint: disable=R0902
         if self._workQueue:
             return self._workQueue.pop()
 
-        return [None, None]
+        return [None, None, None]
 
     def popLeft(self):
         """
@@ -267,7 +283,7 @@ class JobQueue(QObject): # pylint: disable=R0902
         if self._workQueue:
             return self._workQueue.popleft()
 
-        return [None, None]
+        return [None, None, None]
 
     def inQueue(self, command):
         """

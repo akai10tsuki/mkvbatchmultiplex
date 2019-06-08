@@ -49,13 +49,15 @@ from PySide2.QtCore import QByteArray, Qt, QThreadPool, Signal
 from PySide2.QtGui import QIcon, QFont
 from PySide2.QtWidgets import (QAction, QApplication, QDesktopWidget, qApp,
                                QMainWindow, QMessageBox, QToolBar, QVBoxLayout,
-                               QWidget, QFontDialog)
+                               QWidget, QFontDialog, QToolTip)
 
 
 import vsutillib
+from vsutillib.pyqt import messageBoxYesNo
+
 from . import config
 from .widgets import (DualProgressBar, MKVCommandWidget, MKVTabsWidget, FormatLabel,
-                      MKVOutputWidget, MKVJobsTableWidget)
+                      MKVOutputWidget, MKVJobsTableWidget, MKVRenameWidget)
 from .jobs import JobQueue, JobStatus
 from . import utils
 
@@ -104,11 +106,14 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
 
         # Create Widgets
 
+        self.renameWidget = MKVRenameWidget(self)
+
         self.formWidget = MKVCommandWidget(
             self, self.threadpool,
             self.jobs,
             self.jobProcessQueue,
-            self.jobSubprocessQueue
+            self.jobSubprocessQueue,
+            self.renameWidget
         )
         self.outputQueueWidget = MKVOutputWidget(self)
         self.outputErrorWidget = MKVOutputWidget(self)
@@ -138,7 +143,8 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
             self.formWidget,
             self.jobsWidget,
             self.outputQueueWidget,
-            self.outputErrorWidget
+            self.outputErrorWidget,
+            self.renameWidget
         )
 
         self.tabs = self.tabsWidget.tabs
@@ -146,6 +152,11 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         layout = QVBoxLayout(widget)
         layout.addWidget(self.tabsWidget)
         self.setCentralWidget(widget)
+
+        # restore config
+        tabIndex = config.data.get(Key.kTab)
+        if tabIndex:
+            self.tabs.setCurrentIndex(tabIndex)
 
     def _initMenu(self):
 
@@ -222,10 +233,17 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         statusBar.addPermanentWidget(self.jobsLabel)
         statusBar.addPermanentWidget(self.progressbar)
 
-    def _setFont(self, font):
+    def resetFont(self, font):
+        """
+        Set font to the GUI elements
 
+        Args:
+            font (str): new font
+        """
         for m in self.menuItems:
             m.setFont(font)
+
+        QToolTip.setFont(font)
 
     def clearOutput(self):
         """Clear output for JobQueue"""
@@ -255,21 +273,34 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
 
             if jobsStatus == JobStatus.Running:
 
-                result = QMessageBox.warning(
+                result = messageBoxYesNo(
                     self,
                     "Confirm Abort...",
                     "Jobs running are you sure you want to stop them?",
-                    QMessageBox.Yes | QMessageBox.No
+                    QMessageBox.Warning
                 )
+                #result = QMessageBox.warning(
+                #    self,
+                #    "Confirm Abort...",
+                #    "Jobs running are you sure you want to stop them?",
+                #    QMessageBox.Yes | QMessageBox.No
+                #)
 
             else:
 
-                result = QMessageBox.question(
+                result = messageBoxYesNo(
                     self,
-                    "Confirm Exit...",
+                    "Confirm Exit...               ",
                     "Are you sure you want to exit?",
-                    QMessageBox.Yes | QMessageBox.No
+                    QMessageBox.Question
                 )
+
+                #result = QMessageBox.question(
+                #    self,
+                #    "Confirm Exit...",
+                #    "Are you sure you want to exit?",
+                #    QMessageBox.Yes | QMessageBox.No
+                #)
 
             if result == QMessageBox.Yes:
                 self.configuration(save=True)
@@ -316,7 +347,7 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
 
         if valid:
             self.setFont(font)
-            self._setFont(font)
+            self.resetFont(font)
 
     def configuration(self, save=False):
         """Read and write configuration"""
@@ -342,6 +373,9 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
                 Key.kFont, font.toString()
             )
 
+            config.data.set(
+                Key.kTab, self.tabs.currentIndex()
+             )
             config.data.saveToFile()
 
         else:
@@ -357,7 +391,7 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
 
         if resetDefaults:
             self.setFont(defaultFont)
-            self._setFont(defaultFont)
+            self.resetFont(defaultFont)
             self.actSetupLogging.setChecked(bLogging)
             self.setupLogging(bLogging)
             self.setGeometry(0, 0, 1280, 720)
@@ -371,7 +405,7 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
                 restoreFont = QFont()
                 restoreFont.fromString(strFont)
                 self.setFont(restoreFont)
-                self._setFont(restoreFont)
+                self.resetFont(restoreFont)
 
             else:
                 self.setFont(defaultFont)
@@ -459,6 +493,7 @@ class Key:
     kLogging = "logging"
     kGeometry = "geometry"
     kFont = "font"
+    kTab = "tab"
 
 def centerWidgetsToDelete(widget, parent=None):
     """center widget based on parent or screen geometry"""
