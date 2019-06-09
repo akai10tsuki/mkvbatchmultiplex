@@ -30,7 +30,7 @@ Libraries and programs used:
     PySide2 5.12
 
 Target program:
-    MKVToolNix - tested with versions v17.0.0-29.0.0
+    MKVToolNix - tested with versions v17.0.0-34.0.0
 """
 # MWW0001
 
@@ -93,13 +93,14 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         self.setWindowTitle("MKVMERGE: Batch Multiplex")
         self.setWindowIcon(QIcon(str(self.cwd.parent) + "/images/mkvBatchMultiplex.png"))
 
+        # menu and widgets
         self._initMenu()
+        self._initHelper()
 
         # Read configuration elements
         self.configuration()
         self.restoreConfig()
 
-        self._initHelper()
         self.checkDependencies()
 
     def _initHelper(self):
@@ -242,6 +243,10 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         """
         for m in self.menuItems:
             m.setFont(font)
+
+        # hack until discover why is ingnoring parent font or unable to use it
+        # using only family and point size on new QFont works??
+        self.jobsWidget.jobsTable.setFont(QFont(font.family(), font.pointSize()))
 
         QToolTip.setFont(font)
 
