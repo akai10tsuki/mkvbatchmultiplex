@@ -11,6 +11,7 @@ context menu on status can change it
 import logging
 
 from PySide2.QtCore import Qt, Slot, Signal
+from PySide2.QtGui import QFont
 from PySide2.QtWidgets import (QVBoxLayout, QTableWidget, QMenu, QWidget, QHeaderView,
                                QTableWidgetItem, QAbstractScrollArea)
 
@@ -99,7 +100,6 @@ class JobsTableWidget(QTableWidget):
         self.parent = parent
         self.ctrQueue = ctrlQueue
         self.actions = JobStatus()
-
         self.setColumnCount(3)
         self.setHorizontalHeaderLabels(["Jobs ID", "Status", "Description"])
         self.horizontalHeader().setStretchLastSection(True)
