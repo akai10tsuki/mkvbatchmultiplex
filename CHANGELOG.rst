@@ -9,6 +9,7 @@ Changes to the project.
 
 Added
 ~~~~~
+- added configuration files to create snap on ubuntu
 - added support for external chapters files
 - added ability to rename output files using regex
 
