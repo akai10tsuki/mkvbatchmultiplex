@@ -184,12 +184,8 @@ class MKVRenameWidget(QWidget):
 
         objSignal.connect(self.setOutputFile)
 
-    @Slot(str, object, result=str)
-    def setOutputFile(self, fileName, objCommand):
-
-        f = Path(fileName)
-
-        self._outputFileNames = []
+    @Slot(object)
+    def setOutputFile(self, objCommand):
 
         self.textOriginalNames.textBox.clear()
         self.textRenameResults.textBox.clear()

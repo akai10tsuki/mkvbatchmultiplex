@@ -37,7 +37,7 @@ class MKVCommandWidget(QWidget):
 
     __log = False
 
-    setOutputFileSignal = Signal(str, object)
+    setOutputFileSignal = Signal(object)
 
     @classmethod
     def classLog(cls, setLogging=None):
@@ -438,7 +438,6 @@ class MKVCommandWidget(QWidget):
     def _addQueue(self, objCommmad, callback, appendLeft=False):
 
         jobStatus = JobStatus()
-
 
         if appendLeft:
             jobID = self.jobs.appendLeft(objCommmad, jobStatus.Waiting)
@@ -845,9 +844,7 @@ class ValidateCommand(QValidator):
             else:
                 self.parent.objCommand.command = inputStr
 
-            self.parent.setOutputFileSignal.emit(
-                str(self.parent.objCommand.outputFileName),
-                self.parent.objCommand)
+            self.parent.setOutputFileSignal.emit(self.parent.objCommand)
 
             self.parent.buttonsState(True)
 
