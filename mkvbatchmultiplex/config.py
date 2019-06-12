@@ -13,7 +13,7 @@ from vsutillib.log import LogRotateFileHandler
 
 data = ConfigurationSettings() # pylint: disable=invalid-name
 
-__VERSION = (0, 9, '1b1', 'dev1')
+__VERSION = (0, 9, '2b1', 'dev1')
 
 APPNAME = "MKVBatchMultiplex"
 VERSION = ".".join(map(str, __VERSION))
@@ -40,7 +40,7 @@ PROJECTURLS = {
 PYTHONVERSIONS = '>=3.5, <=3.8'
 REQUIRED = [
     'pymediainfo>=4.0',
-    'PySide2>=5.12'
+    'PySide2>=5.12',
 ]
 
 # label
