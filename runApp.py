@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """Test application mkvbatchmultiplex"""
 
 import sys
