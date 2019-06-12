@@ -10,9 +10,12 @@ Changes to the project.
 Added
 ~~~~~
 - added support for external chapters files
+- added ability to rename output files using regex
 
 Changed
 ~~~~~~~
+- application opens on last tab used
+- documentation updates
 - Major code cleanup and refactoring making it easier to extend
 
   * functions, methods and properties rename for clarity
@@ -21,6 +24,8 @@ Changed
 
 Fixed
 ~~~~~
+- fix font for jobs table didn't change correctly
+- fix incorrect signal addJobToTableSignal on jobs module
 - fix on macOS the read files have to be sorted in order to correctly
   match the sources
 
