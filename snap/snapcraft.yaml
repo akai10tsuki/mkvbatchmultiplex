@@ -1,18 +1,41 @@
 name: mkvbatchmultiplex # you probably want to 'snapcraft register <name>'
 version: '0.9.1b1.dev1' # just for humans, typically '1.2+git' or '1.3.2'
-summary: Single-line elevator pitch for your amazing snap # 79 char long summary
+summary: MKVToolNix mkvmerge batch multiplex
 description: |
-  This is my-snap's description. You have a paragraph or two to tell the
-  most important story about your snap. Keep it under 100 words though,
-  we live in tweetspace and your description wants to look good in the snap
-  store.
+  This app takes a mkbtoolnix-gui generated cli and applies the same commands
+  to all the files in the source diretories. 
 
 base: core18
 
 grade: devel # must be 'stable' to release into candidate/stable channels
-confinement: devmode # use 'strict' once you have the right plugs and slots
+confinement: classic # use 'strict' once you have the right plugs and slots
+
+apps:
+  mkvbatchmultiplex:
+    command: bin/run.sh
+    plugs:
+      - desktop
+      - desktop-legacy
+      - wayland
+      - unity7
+      - x11
+      - gsettings
+      - home
+      - network-bind
+      - browser-support
+  gsettings:
+    command: desktop-launch gsettings
+    plugs:
+      - gsettings
 
 parts:
+
+  scripts:
+    plugin: dump
+    source: scripts
+    organize:
+      'run.sh': bin/
+      'mkvmerge': bin/
 
   desktop-gtk3:
     build-packages:
@@ -52,7 +75,6 @@ parts:
       - pyside2
     source: .
     stage-packages:
-    stage-packages:
       - libice-dev
       - libsm6
       - libevdev2
@@ -90,16 +112,3 @@ parts:
       - xfonts-base
       - xfonts-scalable
 
-apps:
-  mkvbatchmultiplex:
-    command: desktop-launch mkvbatchmultiplex
-    plugs:
-      - desktop
-      - desktop-legacy
-      - wayland
-      - unity7
-      - home
-      - network-bind
-      - opengl
-      - pulseaudio
-      - browser-support
