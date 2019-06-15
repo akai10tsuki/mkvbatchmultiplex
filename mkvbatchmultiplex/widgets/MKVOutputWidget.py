@@ -12,7 +12,7 @@ import logging
 
 from PySide2.QtCore import Qt, Slot
 from PySide2.QtGui import QTextCursor
-from PySide2.QtWidgets import QTextEdit, QWidget, QStyleFactory
+from PySide2.QtWidgets import QTextEdit, QStyleFactory
 
 
 import vsutillib.macos as macos

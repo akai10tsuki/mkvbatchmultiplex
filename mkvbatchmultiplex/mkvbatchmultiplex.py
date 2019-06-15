@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 r"""
 mkvBatchMultiplex
 =================
@@ -51,18 +50,18 @@ from PySide2.QtWidgets import (QAction, QApplication, QDesktopWidget, qApp,
                                QMainWindow, QMessageBox, QToolBar, QVBoxLayout,
                                QWidget, QFontDialog, QToolTip)
 
-
-import vsutillib
-from vsutillib.pyqt import messageBoxYesNo
+import vsutillib.media as media
+import vsutillib.pyqt as pyqt
 
 from . import config
-from .widgets import (DualProgressBar, MKVCommandWidget, MKVTabsWidget, FormatLabel,
-                      MKVOutputWidget, MKVJobsTableWidget, MKVRenameWidget)
+from .widgets import (DualProgressBar, MKVCommandWidget, MKVTabsWidget,
+                      FormatLabel, MKVOutputWidget, MKVJobsTableWidget,
+                      MKVRenameWidget)
 from .jobs import JobQueue, JobStatus
 from . import utils
 
 
-class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
+class MKVMultiplexApp(QMainWindow):  # pylint: disable=R0902
     """Main window of application"""
 
     log = False
@@ -86,19 +85,22 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
 
         if getattr(sys, 'frozen', False):
             # Running in pyinstaller bundle
-            self.cwd = Path(os.path.dirname(__file__)) # pylint: disable=E1101,W0212
+            self.appDirectory = Path(os.path.dirname(__file__))  # pylint: disable=E1101,W0212
         else:
-            self.cwd = Path(os.path.realpath(__file__))
+            self.appDirectory = Path(os.path.realpath(__file__))
 
         self.setWindowTitle("MKVMERGE: Batch Multiplex")
-        self.setWindowIcon(QIcon(str(self.cwd.parent) + "/images/mkvBatchMultiplex.png"))
+        self.setWindowIcon(
+            QIcon(
+                str(self.appDirectory.parent) +
+                "/images/mkvBatchMultiplex.png"))
 
         # menu and widgets
         self._initMenu()
         self._initHelper()
 
         # Read configuration elements
-        self.configuration()
+        #self.configuration()
         self.restoreConfig()
 
         self.checkDependencies()
@@ -109,44 +111,36 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
 
         self.renameWidget = MKVRenameWidget(self)
 
-        self.formWidget = MKVCommandWidget(
-            self, self.threadpool,
-            self.jobs,
-            self.jobProcessQueue,
-            self.jobSubprocessQueue,
-            self.renameWidget
-        )
+        self.commandWidget = MKVCommandWidget(self, self.threadpool, self.jobs,
+                                              self.jobProcessQueue,
+                                              self.jobSubprocessQueue,
+                                              self.renameWidget)
         self.outputQueueWidget = MKVOutputWidget(self)
         self.outputErrorWidget = MKVOutputWidget(self)
-        self.jobsWidget = MKVJobsTableWidget(
-            self,
-            self.jobProcessQueue,
-            self.jobSubprocessQueue
-        )
+        self.jobsWidget = MKVJobsTableWidget(self, self.jobProcessQueue,
+                                             self.jobSubprocessQueue)
 
         # Connect signals to print in outputWidgets and update jobsWidget
         self.jobs.setOutputSignal(
             outputJobSlotConnection=self.outputQueueWidget.makeConnection,
             outputErrorSlotConnection=self.outputErrorWidget.makeConnection,
             addJobToTableSlotConnection=self.jobsWidget.makeConnectionAddJob,
-            updateStatusSlotConnection=self.jobsWidget.makeConnectionSetJobStatus,
-            clearOutput=self.clearOutput
-        )
+            updateStatusSlotConnection=self.jobsWidget.
+            makeConnectionSetJobStatus,
+            clearOutput=self.clearOutput)
 
         # Connect to signal when a row is clicked on jobsWidget job output
         # will update in outputWidgets
         self.jobs.connectToShowJobOutput(self.jobsWidget.showJobOutput)
         self.jobs.connectToStatus(self.jobsWidget.jobsTable.updateJobStatus)
 
+        self.renameWidget.setAccessibleName('renameWidget')
         # Create tabs and insert Widgets
-        self.tabsWidget = MKVTabsWidget(
-            self,
-            self.formWidget,
-            self.jobsWidget,
-            self.outputQueueWidget,
-            self.outputErrorWidget,
-            self.renameWidget
-        )
+        self.tabsWidget = MKVTabsWidget(self, self.commandWidget,
+                                        self.jobsWidget,
+                                        self.outputQueueWidget,
+                                        self.outputErrorWidget,
+                                        self.renameWidget)
 
         self.tabs = self.tabsWidget.tabs
         widget = QWidget()
@@ -155,15 +149,14 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         self.setCentralWidget(widget)
 
         # restore config
-        tabIndex = config.data.get(Key.kTab)
-        if tabIndex:
-            self.tabs.setCurrentIndex(tabIndex)
 
     def _initMenu(self):
 
         menuBar = self.menuBar()
 
-        actExit = QAction(QIcon(str(self.cwd.parent) + "/images/cross-circle.png"), "&Exit", self)
+        actExit = QAction(
+            QIcon(str(self.appDirectory.parent) + "/images/cross-circle.png"),
+            "&Exit", self)
         actExit.setShortcut("Ctrl+E")
         actExit.setStatusTip("Exit application")
         actExit.triggered.connect(self.close)
@@ -227,8 +220,7 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         self.progressbar = DualProgressBar(align=Qt.Horizontal)
         self.jobsLabel = FormatLabel(
             "Job(s): {0:3d} Current: {1:3d} File: {2:3d} of {3:3d} Errors: {4:3d}",
-            init=[0, 0, 0, 0, 0]
-        )
+            init=[0, 0, 0, 0, 0])
 
         statusBar = self.statusBar()
         statusBar.addPermanentWidget(self.jobsLabel)
@@ -246,7 +238,8 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
 
         # hack until discover why is ingnoring parent font or unable to use it
         # using only family and point size on new QFont works??
-        self.jobsWidget.jobsTable.setFont(QFont(font.family(), font.pointSize()))
+        self.jobsWidget.jobsTable.setFont(
+            QFont(font.family(), font.pointSize()))
 
         QToolTip.setFont(font)
 
@@ -267,7 +260,8 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         result = m.exec_()
         """
 
-        self.formWidget.textOutputWindow.makeConnection(self.outputMainSignal)
+        self.commandWidget.textOutputWindow.makeConnection(
+            self.outputMainSignal)
         jobsStatus = self.jobs.jobsStatus()
 
         if jobsStatus == JobStatus.Aborted:
@@ -278,12 +272,10 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
 
             if jobsStatus == JobStatus.Running:
 
-                result = messageBoxYesNo(
-                    self,
-                    "Confirm Abort...",
+                result = pyqt.messageBoxYesNo(
+                    self, "Confirm Abort...",
                     "Jobs running are you sure you want to stop them?",
-                    QMessageBox.Warning
-                )
+                    QMessageBox.Warning)
                 #result = QMessageBox.warning(
                 #    self,
                 #    "Confirm Abort...",
@@ -293,12 +285,9 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
 
             else:
 
-                result = messageBoxYesNo(
-                    self,
-                    "Confirm Exit...               ",
-                    "Are you sure you want to exit?",
-                    QMessageBox.Question
-                )
+                result = pyqt.messageBoxYesNo(
+                    self, "Confirm Exit...               ",
+                    "Are you sure you want to exit?", QMessageBox.Question)
 
                 #result = QMessageBox.question(
                 #    self,
@@ -313,8 +302,7 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
                 if jobsStatus == JobStatus.Running:
                     self.outputMainSignal.emit(
                         "\nJobs running aborting jobs...\n\n",
-                        {'color': Qt.blue}
-                    )
+                        {'color': Qt.blue})
                     self.jobSubprocessQueue.put(JobStatus.Abort)
                     event.ignore()
 
@@ -359,28 +347,26 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
 
         if save:
 
-            config.data.set(
-                Key.kLogging, self.actSetupLogging.isChecked()
-            )
+            config.data.set(Key.kLogging, self.actSetupLogging.isChecked())
 
             base64Geometry = self.saveGeometry().toBase64()
 
             s = str(base64Geometry)
             b = ast.literal_eval(s)
 
-            config.data.set(
-                Key.kGeometry, b
-            )
+            config.data.set(Key.kGeometry, b)
 
             font = self.font()
 
-            config.data.set(
-                Key.kFont, font.toString()
-            )
+            config.data.set(Key.kFont, font.toString())
 
-            config.data.set(
-                Key.kTab, self.tabs.currentIndex()
-             )
+            index = self.tabs.currentIndex()
+            config.data.set(Key.kTab, index)
+            config.data.set(Key.kTabText,
+                            (self.tabs.currentWidget().accessibleName()))
+            widget = self.tabs.widget(index)
+            print("rename = {} text {}".format(widget.accessibleName(),
+                                               self.tabs.tabText(index)))
             config.data.saveToFile()
 
         else:
@@ -400,6 +386,8 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
             self.actSetupLogging.setChecked(bLogging)
             self.setupLogging(bLogging)
             self.setGeometry(0, 0, 1280, 720)
+            self.tabs.setCurrentIndex(1)
+
             utils.centerWidgets(self)
 
         else:
@@ -435,15 +423,21 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
                 self.setGeometry(0, 0, 1280, 720)
                 utils.centerWidgets(self)
 
+        tabIndex = config.data.get(Key.kTab)
+        tabName = config.data.get(Key.kTabText)
+        if tabIndex:
+            self.tabs.setCurrentIndex(tabIndex)
+            page = self.tabs.findChild(QWidget, tabName)
+            index = self.tabs.indexOf(page)
+            print("Tab Index {} Page Index {} ObjName {}".format(
+                tabIndex, index, tabName))
+
     def restoreDefaults(self):
         """restore defaults settings"""
 
-        result = QMessageBox.question(
-            self,
-            "Confirm Restore...",
-            "Restore default settings ?",
-            QMessageBox.Yes | QMessageBox.No
-        )
+        result = QMessageBox.question(self, "Confirm Restore...",
+                                      "Restore default settings ?",
+                                      QMessageBox.Yes | QMessageBox.No)
 
         if result == QMessageBox.Yes:
             self.restoreConfig(resetDefaults=True)
@@ -453,23 +447,23 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
 
         if platform.system() == "Linux":
 
-            libFiles = vsutillib.media.isMediaInfoLib()
+            libFiles = media.isMediaInfoLib()
 
             if not libFiles:
-                self.formWidget.textOutputWindow.insertText(
+                self.commandWidget.textOutputWindow.insertText(
                     "\nMediaInfo library not found can not process jobs.\n\n",
-                    {'color': Qt.red}
-                )
+                    {'color': Qt.red})
                 self.jobs.jobsStatus(JobStatus.Blocked)
 
     def help(self, index=0):
         """open web RTD page"""
 
         if index == 1:
-            htmlPath = "file:///" + str(self.cwd.parent) + "/html/using.html"
+            htmlPath = "file:///" + str(
+                self.appDirectory.parent) + "/html/using.html"
         else:
-            htmlPath = "file:///" + str(self.cwd.parent) + "/html/index.html"
-
+            htmlPath = "file:///" + str(
+                self.appDirectory.parent) + "/html/index.html"
 
         webbrowser.open(htmlPath, new=2, autoraise=True)
 
@@ -480,17 +474,14 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         aboutMsg += "email: {}\n\n"
         aboutMsg += "Python Vertion:\n{}\n"
 
-        aboutMsg = aboutMsg.format(
-            config.VERSION,
-            config.AUTHOR,
-            config.EMAIL,
-            sys.version
-        )
+        aboutMsg = aboutMsg.format(config.VERSION, config.AUTHOR, config.EMAIL,
+                                   sys.version)
         QMessageBox.about(self, 'MKVBatchMultiplex', aboutMsg)
 
     def aboutQt(self):
         """About QT"""
         QMessageBox.aboutQt(self, 'MKVBatchMultiplex')
+
 
 class Key:
     """Keys for configuration"""
@@ -499,6 +490,8 @@ class Key:
     kGeometry = "geometry"
     kFont = "font"
     kTab = "tab"
+    kTabText = "tabText"
+
 
 def centerWidgetsToDelete(widget, parent=None):
     """center widget based on parent or screen geometry"""
@@ -507,15 +500,19 @@ def centerWidgetsToDelete(widget, parent=None):
         parent = widget.parentWidget()
 
     if parent:
-        widget.move(parent.frameGeometry().center() - widget.frameGeometry().center())
+        widget.move(parent.frameGeometry().center() -
+                    widget.frameGeometry().center())
 
     else:
-        widget.move(QDesktopWidget().availableGeometry().center() - widget.frameGeometry().center())
+        widget.move(QDesktopWidget().availableGeometry().center() -
+                    widget.frameGeometry().center())
+
 
 def abort():
     """Force Quit"""
 
-    qApp.quit()     # pylint: disable=E1101
+    qApp.quit()  # pylint: disable=E1101
+
 
 def mainApp():
     """Main"""

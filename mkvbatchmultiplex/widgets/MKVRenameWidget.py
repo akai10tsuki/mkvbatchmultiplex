@@ -16,7 +16,7 @@ from PySide2.QtWidgets import (QGridLayout, QLabel, QWidget, QLineEdit,
                                QHBoxLayout, QVBoxLayout, QSizePolicy,
                                QPushButton, QGroupBox)
 
-from vsutillib.pyqt import OutputTextWidget, FileListWidget
+import vsutillib.pyqt as pyqt
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -236,7 +236,7 @@ class RegExInputWidget(QWidget):
         super(RegExInputWidget, self).__init__(parent)
 
         self.lblText = QLabel(lblText)
-        self.textBox = OutputTextWidget(self)
+        self.textBox = pyqt.OutputTextWidget(self)
         self.textBox.setToolTip(strToolTip)
         vboxLayout = QVBoxLayout()
         vboxLayout.addWidget(self.lblText)
@@ -252,7 +252,7 @@ class RegExFilesWidget(QWidget):
         super(RegExFilesWidget, self).__init__(parent)
 
         self.lblText = QLabel(lblText)
-        self.textBox = FileListWidget(self)
+        self.textBox = pyqt.FileListWidget(self)
         self.textBox.setToolTip(strToolTip)
         vboxLayout = QVBoxLayout()
         vboxLayout.addWidget(self.lblText)
