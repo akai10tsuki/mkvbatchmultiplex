@@ -1,17 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-"""Setup.py for mkvbatchmultiplex"""
-
 """setup file to build python distributions"""
-
 
 import io
 import os
 
 from setuptools import setup, find_packages
 
-
 from mkvbatchmultiplex import config
-
 
 ROOT = os.path.abspath(os.path.dirname(__file__))
 
@@ -26,8 +22,8 @@ def readme():
         long_description = config.DESCRIPTION
     return long_description
 
-setup(
 
+setup(
     name=config.NAME,  # Required
     version=config.VERSION,  # Required
     #version='0.5.3.a2.dev3',
@@ -37,11 +33,9 @@ setup(
     author_email=config.EMAIL,  # Optional
     url=config.URL,
     license='MIT',
-
     classifiers=[  # Optional
         # Trove classifiers
         # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
-
         'Development Status :: 3 - Alpha',
         'Environment :: MacOS X',
         'Environment :: Win32 (MS Windows)',
@@ -68,20 +62,11 @@ setup(
         # Implementation
         "Programming Language :: Python :: Implementation :: CPython",
     ],
-
-    keywords=config.KEYWORDS,  # Optional
-
-    #packages=find_packages(exclude=['docs', 'tests*',]),  # Required
-
+    keywords=config.KEYWORDS,
     packages=config.PACKAGES,  # Required
-
     install_requires=config.REQUIRED,
-
     python_requires=config.PYTHONVERSIONS,
-
     include_package_data=True,
-
     entry_points=config.ENTRYPOINTS,  # Optional
-
     project_urls=config.PROJECTURLS,
 )

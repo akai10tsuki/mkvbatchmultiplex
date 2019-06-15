@@ -7,11 +7,10 @@ import logging
 import sys
 from pathlib import Path
 
-
 from vsutillib.files import ConfigurationSettings
 from vsutillib.log import LogRotateFileHandler
 
-data = ConfigurationSettings() # pylint: disable=invalid-name
+data = ConfigurationSettings()  # pylint: disable=invalid-name
 
 __VERSION = (1, 0, '1rc1', '')
 
@@ -39,8 +38,8 @@ PROJECTURLS = {
 }
 PYTHONVERSIONS = '>=3.5, <=3.8'
 REQUIRED = [
-    'pymediainfo>=4.0',
-    'PySide2>=5.12',
+    'PySide2>=5.12', 'vsutillib.mkv', 'vsutillib.media', 'vsutillib.macos',
+    'vsutillib.files', 'vsutillib.log', 'vsutillib.pyqt'
 ]
 
 # label
@@ -66,11 +65,12 @@ def init():
     logFile = Path(filesPath, LOGFILE)
     logging.getLogger('').setLevel(logging.DEBUG)
 
-    loghandler = LogRotateFileHandler(logFile, backupCount=10, encoding='utf-8')
+    loghandler = LogRotateFileHandler(logFile,
+                                      backupCount=10,
+                                      encoding='utf-8')
 
     formatter = logging.Formatter(
-        "%(asctime)s %(levelname)-8s %(name)s %(message)s"
-    )
+        "%(asctime)s %(levelname)-8s %(name)s %(message)s")
 
     loghandler.setFormatter(formatter)
 
