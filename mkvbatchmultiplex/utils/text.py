@@ -59,3 +59,4 @@ class Text():
     txt0038 = S_('email')
     txt0039 = S_('Python Version')
     txt0040 = S_('About regExpressions')
+    txt0041 = S_('Undo')
