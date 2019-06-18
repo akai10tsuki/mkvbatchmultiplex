@@ -128,7 +128,6 @@ class MKVRenameWidget(QWidget):
         statusBar.showMessage("")
         self.textRenameResults.textBox.clear()
         self._renameFileNames = []
-        bError = False
 
         try:
             regEx = re.compile(rg)
@@ -158,14 +157,16 @@ class MKVRenameWidget(QWidget):
 
             self.textRenameResults.textBox.clear()
             statusBar.showMessage("Invalid regex.")
-            bError = True
 
         if _resolveIncrements(self._outputFileNames, self._renameFileNames,
-                                subText):
+                              subText):
             for f in self._renameFileNames:
-                print("new {}".format(f))
-                self.outputRenameResultsSignal.emit(
-                    '{}\n'.format(f.name), {})
+                self.outputRenameResultsSignal.emit('{}\n'.format(f.name), {})
+
+            if self:
+                self.buttonApplyRename.setEnabled(True)
+            else:
+                self.buttonApplyRename.setEnabled(False)
 
     def _applyRename(self):
 
