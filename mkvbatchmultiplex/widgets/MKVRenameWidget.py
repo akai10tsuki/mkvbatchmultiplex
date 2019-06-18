@@ -55,8 +55,17 @@ class MKVRenameWidget(QWidget):
 
         self.buttonApplyRename = QPushButton(' Apply Rename ')
         self.buttonApplyRename.resize(self.buttonApplyRename.sizeHint())
+        self.buttonApplyRename.setSizePolicy(QSizePolicy.Fixed,
+                                             QSizePolicy.Fixed)
         self.buttonApplyRename.clicked.connect(self._applyRename)
         self.buttonApplyRename.setEnabled(False)
+
+        self.buttonUndoRename = QPushButton(' Undo ')
+        self.buttonUndoRename.resize(self.buttonUndoRename.sizeHint())
+        self.buttonUndoRename.setSizePolicy(QSizePolicy.Fixed,
+                                            QSizePolicy.Fixed)
+        self.buttonUndoRename.clicked.connect(self._undoRename)
+        self.buttonUndoRename.setEnabled(False)
 
         self.textOriginalNames = RegExFilesWidget(
             self, "Original names:", "Name generated base on parsed command.")
@@ -74,8 +83,10 @@ class MKVRenameWidget(QWidget):
 
     def _initLayout(self):
 
-        btnGrid = QGridLayout()
-        btnGrid.addWidget(self.buttonApplyRename, 0, 0, Qt.AlignLeft)
+        btnGrid = QHBoxLayout()
+        btnGrid.addWidget(self.buttonApplyRename)
+        btnGrid.addWidget(self.buttonUndoRename)
+        btnGrid.addStretch()
 
         btnGroup = QGroupBox()
         btnGroup.setLayout(btnGrid)
@@ -117,6 +128,7 @@ class MKVRenameWidget(QWidget):
         statusBar.showMessage("")
         self.textRenameResults.textBox.clear()
         self._renameFileNames = []
+        bError = False
 
         try:
             regEx = re.compile(rg)
@@ -126,14 +138,17 @@ class MKVRenameWidget(QWidget):
 
                 if matchRegEx:
                     objName = f.parent.joinpath(matchRegEx + f.suffix)
-                    fileName = matchRegEx + f.suffix
                 else:
                     objName = f
-                    fileName = f.name
 
                 self._renameFileNames.append(objName)
-                self.outputRenameResultsSignal.emit('{}\n'.format(fileName),
-                                                    {})
+
+            _resolveIncrements(self._outputFileNames, self._renameFileNames,
+                               subText)
+
+            for f in self._renameFileNames:
+                self.outputRenameResultsSignal.emit('{}\n'.format(f.name), {})
+
             if self:
                 self.buttonApplyRename.setEnabled(True)
             else:
@@ -143,11 +158,19 @@ class MKVRenameWidget(QWidget):
 
             self.textRenameResults.textBox.clear()
             statusBar.showMessage("Invalid regex.")
+            bError = True
+
+        if _resolveIncrements(self._outputFileNames, self._renameFileNames,
+                                subText):
+            for f in self._renameFileNames:
+                print("new {}".format(f))
+                self.outputRenameResultsSignal.emit(
+                    '{}\n'.format(f.name), {})
 
     def _applyRename(self):
 
         if self._bFilesDropped:
-            self.applyFileRenameSignal.emit(self._renameFileNames)
+            #self.applyFileRenameSignal.emit(self._renameFileNames)
             filesPair = zip(self._outputFileNames, self._renameFileNames)
             for oldName, newName in filesPair:
                 try:
@@ -159,6 +182,22 @@ class MKVRenameWidget(QWidget):
             self.applyFileRenameSignal.emit(self._renameFileNames)
 
         self.buttonApplyRename.setEnabled(False)
+        self.buttonUndoRename.setEnabled(True)
+
+    def _undoRename(self):
+
+        if self._bFilesDropped:
+            filesPair = zip(self._renameFileNames, self._outputFileNames)
+            for oldName, newName in filesPair:
+                try:
+                    oldName.rename(newName)
+                except FileExistsError:
+                    pass
+        else:
+            self.applyFileRenameSignal.emit(self._outputFileNames)
+
+        self.buttonApplyRename.setEnabled(True)
+        self.buttonUndoRename.setEnabled(False)
 
     def __bool__(self):
 
@@ -259,3 +298,59 @@ class RegExFilesWidget(QWidget):
         vboxLayout.addWidget(self.textBox)
 
         self.setLayout(vboxLayout)
+
+
+def _resolveIncrements(oNames, rNames, subText):
+
+    incMatch = []
+    reEx = r"<i\: (\d+)>"
+    reSearchIncEx = re.compile(reEx)
+    match = reSearchIncEx.findall(subText)
+    fileNames = []
+    bFullName = False
+
+    if not match:
+        return False
+
+    fileNames = [subText] * len(oNames)
+
+    if rNames:
+        testFNames = reSearchIncEx.findall(str(rNames[0]))
+
+        if testFNames and (len(match) == len(testFNames)):
+            bFullName = True
+            fileNames = []
+            for f in rNames:
+                fileNames.append(str(f))
+
+    for m in match:
+        incMatch.append(
+            [int(m), "<i: {}>".format(m), "{:0" + str(len(m)) + "d}"])
+
+    for e in incMatch:
+        i = e[0]
+        for index, n in enumerate(fileNames):
+            nName = re.sub(e[1], e[2], n)
+            nName = nName.format(i)
+            fileNames[index] = nName
+            i += 1
+
+    oFileNames = []
+    if bFullName:
+        for f in fileNames:
+            oFileNames = Path(f)
+    else:
+        for index, f in enumerate(oNames):
+            oFileNames.append(f.parent.joinpath(fileNames[index] + f.suffix))
+
+    bAppend = True
+    if rNames:
+        bAppend = False
+
+    for index, f in enumerate(oFileNames):
+        if bAppend:
+            rNames.append(f)
+        else:
+            rNames[index] = f
+
+    return True
