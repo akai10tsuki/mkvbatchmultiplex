@@ -233,5 +233,65 @@ Tabs
     Language: None
     Format: MPEG Audio
 
+* Rename Files
+
+  For the majority of media servers a good naming scheme for the episodes of
+  a series is: ::
+
+    Series Name - S01E01.mkv
+
+
+  The part S01E01 represents season 1 episode 1.  If the files been process
+  don't follow this scheme the system provides the ability to rename the
+  output files. Using regular expressions you can rename the output file
+  names.  Also if regular expressions are to difficult a new name with and
+  index in the form: ::
+
+    Series Name - S01E<i: NN>
+
+
+  <i: NN> where NN is a number can be 0 padded. It will be substituted by a
+  number starting with the value NN.
+
+  .. figure:: images/mkvbatchmultiplex-renameindex.png
+    :align: left
+
+    Rename with incremental index.
+
+  As shown in the figure to rename using and index set the regex to * (asterisk,
+  and invalid regex to use).  Then enter the new name with the increment mark
+  in the desired position.  Once satisfied push button Apply Rename
+
+  Examples:
+
+  .. figure:: images/mkvbatchmultiplex-renamegoodindex.png
+    :align: left
+
+    Rename with incremental index.
+
+    The rename added season 02 to the name.
+
+
+  .. figure:: images/mkvbatchmultiplex-renamebadindex.png
+    :align: left
+
+    Rename with incremental index.
+
+    In this example we see that the rename result would be wrong.  The order of the
+    original files is not sorted.
+
+  .. figure:: images/mkvbatchmultiplex-renameregex.png
+    :align: left
+
+    Rename with regex.
+
+    For regular expressions the order is not important the episode number is taken
+    from the name.  Also missing episodes won't affect the rename of the files.
+
+  The operation can be undone with the **Undo** pushbutton before starting the
+  execution of the batch operation.
+
 Know Issues
 ===========
+
+Work on documentation.

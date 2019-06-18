@@ -12,6 +12,7 @@ Added
 - added configuration files to create snap on ubuntu
 - added support for external chapters files
 - added ability to rename output files using regex
+- added rename can be done with and index if regex is to complex
 
 Changed
 ~~~~~~~
