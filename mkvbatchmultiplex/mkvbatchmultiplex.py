@@ -33,7 +33,6 @@ Target program:
 """
 # MWW0001
 
-import ast
 import logging
 import logging.handlers
 import sys
@@ -100,7 +99,6 @@ class MKVMultiplexApp(QMainWindow):  # pylint: disable=R0902
         self._initHelper()
 
         # Read configuration elements
-        #self.configuration()
         self.restoreConfig()
 
         self.checkDependencies()
@@ -297,7 +295,7 @@ class MKVMultiplexApp(QMainWindow):  # pylint: disable=R0902
                 #)
 
             if result == QMessageBox.Yes:
-                self.configuration(save=True)
+                self.saveConfig()
 
                 if jobsStatus == JobStatus.Running:
                     self.outputMainSignal.emit(
@@ -342,36 +340,22 @@ class MKVMultiplexApp(QMainWindow):  # pylint: disable=R0902
             self.setFont(font)
             self.resetFont(font)
 
-    def configuration(self, save=False):
-        """Read and write configuration"""
+    def saveConfig(self):
+        """
+        set configuration data to save
+        """
 
-        if save:
+        config.data.set(Key.kLogging, self.actSetupLogging.isChecked())
 
-            config.data.set(Key.kLogging, self.actSetupLogging.isChecked())
+        base64Geometry = self.saveGeometry().toBase64()
+        b = base64Geometry.data()
+        config.data.set(Key.kGeometry, b)
 
-            base64Geometry = self.saveGeometry().toBase64()
+        font = self.font()
+        config.data.set(Key.kFont, font.toString())
 
-            s = str(base64Geometry)
-            b = ast.literal_eval(s)
-
-            config.data.set(Key.kGeometry, b)
-
-            font = self.font()
-
-            config.data.set(Key.kFont, font.toString())
-
-            index = self.tabs.currentIndex()
-            config.data.set(Key.kTab, index)
-            config.data.set(Key.kTabText,
-                            (self.tabs.currentWidget().accessibleName()))
-            widget = self.tabs.widget(index)
-            print("rename = {} text {}".format(widget.accessibleName(),
-                                               self.tabs.tabText(index)))
-            config.data.saveToFile()
-
-        else:
-
-            config.data.readFromFile()
+        index = self.tabs.currentIndex()
+        config.data.set(Key.kTab, index)
 
     def restoreConfig(self, resetDefaults=False):
         """Restore configuration if any"""
@@ -392,45 +376,36 @@ class MKVMultiplexApp(QMainWindow):  # pylint: disable=R0902
 
         else:
 
+            # restore font
             strFont = config.data.get(Key.kFont)
-
             if strFont is not None:
                 restoreFont = QFont()
                 restoreFont.fromString(strFont)
                 self.setFont(restoreFont)
                 self.resetFont(restoreFont)
-
             else:
                 self.setFont(defaultFont)
 
+            # restore logging status
             bLogging = config.data.get(Key.kLogging)
-
             if bLogging is not None:
                 self.actSetupLogging.setChecked(bLogging)
                 self.setupLogging(bLogging)
 
+            # restore window size and position
             byteGeometry = config.data.get(Key.kGeometry)
-
             if byteGeometry is not None:
-                # Test for value read if not continue
-                #byte = ast.literal_eval(strGeometry)
-                byteGeometry = QByteArray(byteGeometry)
-
-                self.restoreGeometry(QByteArray.fromBase64(byteGeometry))
-
+                # byteGeometry is bytes string
+                self.restoreGeometry(
+                    QByteArray.fromBase64(QByteArray(byteGeometry)))
             else:
-
                 self.setGeometry(0, 0, 1280, 720)
                 utils.centerWidgets(self)
 
-        tabIndex = config.data.get(Key.kTab)
-        tabName = config.data.get(Key.kTabText)
-        if tabIndex:
-            self.tabs.setCurrentIndex(tabIndex)
-            page = self.tabs.findChild(QWidget, tabName)
-            index = self.tabs.indexOf(page)
-            print("Tab Index {} Page Index {} ObjName {}".format(
-                tabIndex, index, tabName))
+            # restore open tab
+            tabIndex = config.data.get(Key.kTab)
+            if tabIndex:
+                self.tabs.setCurrentIndex(tabIndex)
 
     def restoreDefaults(self):
         """restore defaults settings"""
