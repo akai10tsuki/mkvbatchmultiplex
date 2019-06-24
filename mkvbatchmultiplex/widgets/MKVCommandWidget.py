@@ -708,6 +708,14 @@ class MKVCommandWidget(QWidget):
                                                  JobStatus.AbortJob)
                                 break
 
+                            if request == JobStatus.AbortJobError:
+                                self.jobs.status(currentJob.jobID,
+                                                 JobStatus.Error)
+                                p = Path(objCommand[nFile - 1][3])
+                                if p.is_file():
+                                    p.unlink()
+                                break
+
                             if request in [
                                     JobStatus.Abort, JobStatus.AbortForced
                             ]:
