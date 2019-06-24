@@ -30,6 +30,7 @@ class JobStatus: # pylint: disable=R0903
     Error = "Error"
     AbortForced = "AbortForced"
     AbortJob = "AbortJob"
+    AbortJobError = "AbortJobError"
     Blocked = "Blocked"
 
 

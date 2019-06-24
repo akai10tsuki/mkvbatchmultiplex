@@ -103,7 +103,7 @@ def runCommand(command, currentJob, lstTotal, log=False):
                     )
                     lstTotal[2] += 1
                     if line.find("There is not enough space") >= 0:
-                        currentJob.controlQueue.put(JobStatus.AbortJob)
+                        currentJob.controlQueue.put(JobStatus.AbortJobError)
                 else:
                     currentJob.outputJobMain(
                         currentJob.jobID, line.strip(), {'appendLine': True}
