@@ -16,6 +16,8 @@ Added
 
 Changed
 ~~~~~~~
+- highlight errors in rename
+- remove current working file if job aborted by an error
 - application opens on last tab used
 - documentation updates
 - Major code cleanup and refactoring making it easier to extend
@@ -26,6 +28,7 @@ Changed
 
 Fixed
 ~~~~~
+- fix regression single quotes escapes on file path mishandled
 - fix font for jobs table didn't change correctly
 - fix incorrect signal addJobToTableSignal on jobs module
 - fix on macOS the read files have to be sorted in order to correctly
