@@ -40,6 +40,7 @@ class MKVRenameWidget(QWidget):
         self._initControls()
         self._initLayout()
         self._bFilesDropped = False
+        self._bDuplicateRename = False
 
     def _initControls(self):
 
@@ -73,7 +74,7 @@ class MKVRenameWidget(QWidget):
         self.textOriginalNames.textBox.connectToInsertText(
             self.outputOriginalFileSignal)
         self.textOriginalNames.textBox.filesDroppedUpdateSignal.connect(
-            self.setOutputFilesDropped)
+            self._setOutputFilesDropped)
 
         self.textRenameResults = RegExInputWidget(
             self, "Rename:", "Names that will be use for commands.")
@@ -93,11 +94,9 @@ class MKVRenameWidget(QWidget):
 
         inputGrid = QGridLayout()
 
-        #inputGrid.addWidget(self.textFileName.lblText, 0, 0, Qt.AlignRight)
         inputGrid.addWidget(self.textRegEx.lblText, 0, 0, Qt.AlignRight)
         inputGrid.addWidget(self.textSubString.lblText, 1, 0, Qt.AlignRight)
 
-        #inputGrid.addWidget(self.textFileName.lineEdit, 0, 1)
         inputGrid.addWidget(self.textRegEx.lineEdit, 0, 1)
         inputGrid.addWidget(self.textSubString.lineEdit, 1, 1)
 
@@ -119,6 +118,77 @@ class MKVRenameWidget(QWidget):
         grid.addWidget(boxWidget, 2, 0)
 
         self.setLayout(grid)
+
+    def __bool__(self):
+
+        for n, r in zip(self._outputFileNames, self._renameFileNames):
+            if n != r:
+                return True
+        return False
+
+    def clear(self):
+
+        self._outputFileNames = []
+        self._renameFileNames = []
+        self._bFilesDropped = False
+
+        self.textFileName.lineEdit.clear()
+        self.textRegEx.lineEdit.clear()
+        self.textSubString.lineEdit.clear()
+
+        self.textOriginalNames.textBox.clear()
+        self.textRenameResults.textBox.clear()
+
+    def connectToSetOutputFile(self, objSignal):
+
+        objSignal.connect(self.setOutputFile)
+
+    @Slot(object)
+    def setOutputFile(self, objCommand):
+
+        self.textOriginalNames.textBox.clear()
+        self.textRenameResults.textBox.clear()
+
+        for f in objCommand.destinationFiles:
+            # show files
+            self.outputOriginalFileSignal.emit(str(f.name) + '\n', {})
+            #self.outputRenameResultsSignal.emit(str(f.name) + '\n', {})
+            # save files
+            self._outputFileNames.append(f)
+
+    def _setOutputFilesDropped(self, filesDropped):
+
+        if filesDropped:
+            self._outputFileNames = []
+            self._outputFileNames.extend(filesDropped)
+
+            self.textRenameResults.textBox.clear()
+
+            #for f in self._outputFileNames:
+            #    self.outputRenameResultsSignal.emit(str(f.name) + '\n', {})
+
+            if not self._bFilesDropped:
+                self._bFilesDropped = True
+        else:
+            # receive when clear issued to FilesListWidget
+            self._outputFileNames = []
+            self.textRenameResults.textBox.clear()
+            self._bFilesDropped = False
+
+    def _displayRenames(self):
+
+        duplicateNames = _findDuplicates(self._renameFileNames)
+        if duplicateNames:
+            self._bDuplicateRename = True
+        else:
+            self._bDuplicateRename = False
+
+        for f in self._renameFileNames:
+            of = Path(f)
+            if (f in duplicateNames) or of.is_file():
+                self.outputRenameResultsSignal.emit(str(f.name) + '\n', {'color': Qt.red})
+            else:
+                self.outputRenameResultsSignal.emit(str(f.name) + '\n', {})
 
     def _updateRegEx(self):
 
@@ -145,8 +215,7 @@ class MKVRenameWidget(QWidget):
             _resolveIncrements(self._outputFileNames, self._renameFileNames,
                                subText)
 
-            for f in self._renameFileNames:
-                self.outputRenameResultsSignal.emit('{}\n'.format(f.name), {})
+            self._displayRenames()
 
             if self:
                 self.buttonApplyRename.setEnabled(True)
@@ -160,8 +229,7 @@ class MKVRenameWidget(QWidget):
 
         if _resolveIncrements(self._outputFileNames, self._renameFileNames,
                               subText):
-            for f in self._renameFileNames:
-                self.outputRenameResultsSignal.emit('{}\n'.format(f.name), {})
+            self._displayRenames()
 
             if self:
                 self.buttonApplyRename.setEnabled(True)
@@ -199,62 +267,6 @@ class MKVRenameWidget(QWidget):
 
         self.buttonApplyRename.setEnabled(True)
         self.buttonUndoRename.setEnabled(False)
-
-    def __bool__(self):
-
-        for n, r in zip(self._outputFileNames, self._renameFileNames):
-            if n != r:
-                return True
-        return False
-
-    def clear(self):
-
-        self._outputFileNames = []
-        self._renameFileNames = []
-        self._bFilesDropped = False
-
-        self.textFileName.lineEdit.clear()
-        self.textRegEx.lineEdit.clear()
-        self.textSubString.lineEdit.clear()
-
-        self.textOriginalNames.textBox.clear()
-        self.textRenameResults.textBox.clear()
-
-    def connectToSetOutputFile(self, objSignal):
-
-        objSignal.connect(self.setOutputFile)
-
-    @Slot(object)
-    def setOutputFile(self, objCommand):
-
-        self.textOriginalNames.textBox.clear()
-        self.textRenameResults.textBox.clear()
-
-        for f in objCommand.destinationFiles:
-            # show files
-            self.outputOriginalFileSignal.emit(str(f.name) + '\n', {})
-            self.outputRenameResultsSignal.emit(str(f.name) + '\n', {})
-            # save files
-            self._outputFileNames.append(f)
-
-    @Slot(list)
-    def setOutputFilesDropped(self, filesDropped):
-
-        if filesDropped:
-            self._outputFileNames = []
-            self._outputFileNames.extend(filesDropped)
-
-            self.textRenameResults.textBox.clear()
-
-            for f in self._outputFileNames:
-                self.outputRenameResultsSignal.emit(str(f.name) + '\n', {})
-
-            if not self._bFilesDropped:
-                self._bFilesDropped = True
-        else:
-            self._outputFileNames = []
-            self.textRenameResults.textBox.clear()
-            self._bFilesDropped = False
 
 
 class RegExLineInputWidget():
@@ -301,57 +313,94 @@ class RegExFilesWidget(QWidget):
         self.setLayout(vboxLayout)
 
 
-def _resolveIncrements(oNames, rNames, subText):
+def _resolveIncrements(currentNames, newNames, subText):
 
-    incMatch = []
-    reEx = r"<i\: (\d+)>"
-    reSearchIncEx = re.compile(reEx)
+    #incMatch = []
+    reSearchIncEx = re.compile(r"<i\:(\d+)>")
     match = reSearchIncEx.findall(subText)
-    fileNames = []
-    bFullName = False
+    fileNames = None
+    bAppend = True
+    #bFullName = False
 
     if not match:
         return False
 
-    fileNames = [subText] * len(oNames)
+    # assume if for invalid regex
+    fileNames = [subText] * len(currentNames)
 
-    if rNames:
-        testFNames = reSearchIncEx.findall(str(rNames[0]))
+    if newNames:
+        bAppend = False
+        testFNames = reSearchIncEx.findall(str(newNames[0]))
 
+        # valid regex can duplicate index in rename name
         if testFNames and (len(match) == len(testFNames)):
-            bFullName = True
+            #bFullName = True
             fileNames = []
-            for f in rNames:
+            for f in newNames:
                 fileNames.append(str(f))
+        else:
+            return False
 
+    # [ first index, increment index, string format]
     for m in match:
-        incMatch.append(
-            [int(m), "<i: {}>".format(m), "{:0" + str(len(m)) + "d}"])
+        #incMatch.append(
+        #    [int(m), "<i: {}>".format(m), "{:0" + str(len(m)) + "d}"])
+        i = int(m)  # start index
+        ii = "<i:{}>".format(m)  # increment index token
+        sf = "{:0" + str(len(m)) + "d}"  # string format for index
 
-    for e in incMatch:
-        i = e[0]
-        for index, n in enumerate(fileNames):
-            nName = re.sub(e[1], e[2], n)
-            nName = nName.format(i)
+        for index, newName in enumerate(fileNames):
+            # change increment index for string format in name n
+            nName = re.sub(ii, sf, newName)
+            nName = nName.format(i)  # change string format for index
+            # substitute newName with substitution in index fileNames
             fileNames[index] = nName
             i += 1
 
-    oFileNames = []
-    if bFullName:
-        for f in fileNames:
-            oFileNames = Path(f)
-    else:
-        for index, f in enumerate(oNames):
-            oFileNames.append(f.parent.joinpath(fileNames[index] + f.suffix))
+    #for e in incMatch:
+    #    i = e[0]
+    #    for index, n in enumerate(fileNames):
+    #        nName = re.sub(e[1], e[2], n) # change increment index for string format in name n
+    #        nName = nName.format(i)       # change string format for index
+    #        fileNames[index] = nName      # substitute n with new name in index fileNames
+    #        i += 1
 
-    bAppend = True
-    if rNames:
-        bAppend = False
+    # convert to pathlib.Path object
+    #oFileNames = []
+    #if bFullName:
+    #    for f in fileNames:
+    #        oFileNames.append(Path(f))
+    #else:
+    #    for index, f in enumerate(currentNames):
+    #        oFileNames.append(f.parent.joinpath(fileNames[index] + f.suffix))
 
-    for index, f in enumerate(oFileNames):
-        if bAppend:
-            rNames.append(f)
+    for index, f in enumerate(currentNames):
+        # Path('.') is not full path use original name to get path
+        if Path(fileNames[index]).parent == Path('.'):
+            nf = f.parent.joinpath(fileNames[index] + f.suffix)
         else:
-            rNames[index] = f
+            nf = Path(f)
+
+        if bAppend:
+            newNames.append(nf)
+        else:
+            newNames[index] = nf
 
     return True
+
+
+def _findDuplicates(fileNames):
+
+    seen = {}
+    duplicates = []
+
+    if fileNames:
+        for x in fileNames:
+            if x not in seen:
+                seen[x] = 1
+            else:
+                if seen[x] == 1:
+                    duplicates.append(x)
+                seen[x] += 1
+
+    return duplicates
