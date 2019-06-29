@@ -1,6 +1,7 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-"""Setup.py for mkvbatchmultiplex"""
-"""setup file to build python distributions"""
+# -*- coding: utf-8 -*-
+
+"""Setup.py for mkvbatchmultiplex"""
 
 import io
 import os
@@ -14,14 +15,17 @@ from mkvbatchmultiplex import config
 ROOT = os.path.abspath(os.path.dirname(__file__))
 
 
-def removeBuild():
+def removeTmpDirs():
     """
     delete build directory setup was including files from other builds
     """
-    b = Path('build')
+    p = Path('.')
+    eggDirs = [x for x in p.glob('*.egg-info') if x.is_dir()]
+    eggDirs.append(Path('build'))
 
-    if b.is_dir():
-        shutil.rmtree('build')
+    for d in eggDirs:
+        if d.is_dir():
+            shutil.rmtree(d)
 
 
 def readme():
@@ -33,8 +37,6 @@ def readme():
     except FileNotFoundError:
         long_description = config.DESCRIPTION
     return long_description
-
-removeBuild()
 
 setup(
     name=config.NAME,  # Required
@@ -83,3 +85,5 @@ setup(
     entry_points=config.ENTRYPOINTS,  # Optional
     project_urls=config.PROJECTURLS,
 )
+
+removeTmpDirs()
