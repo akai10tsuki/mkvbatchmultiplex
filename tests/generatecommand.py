@@ -7,79 +7,86 @@ Generate command line for testing
 run this script and it will paste to the clipboard a command for testing
 """
 
-import glob
 import os
 import platform
 import sys
+import shlex
 
 from pathlib import Path, PurePath
+
 
 from PySide2.QtWidgets import (
     QApplication, QMainWindow, QTextEdit, QPushButton, QGridLayout, QWidget
 )
 
 
-def findFile(element, dirPath=None):
-    """find file in the path"""
+import vsutillib as utils
 
-    if dirPath is None:
-        dirPath = os.getenv('PATH')
 
-    dirs = dirPath.split(os.pathsep)
 
-    for dirname in dirs:
-        candidate = Path(PurePath(dirname).joinpath(element))
-        if candidate.is_file():
-            return candidate
+#def findFile(element, dirPath=None):
+#    """find file in the path"""
 
-    return None
+#    if dirPath is None:
+#        dirPath = os.getenv('PATH')
 
-def getMKVMerge():
-    """Looks for mkvmerge executable in the system"""
+#    dirs = dirPath.split(os.pathsep)
+
+#    for dirname in dirs:
+#        candidate = Path(PurePath(dirname).joinpath(element))
+#        if candidate.is_file():
+#            return candidate
+
+#    return None
+
+
+#def getMKVMerge():
+#    """Looks for mkvmerge executable in the system"""
 
     # /Applications/MKVToolNix-29.0.0.app/Contents/MacOS/mkvmerge
-    currentOS = platform.system()
+#    currentOS = platform.system()
 
-    if currentOS == "Darwin":
-        lstTest = glob.glob("/Applications/MKVToolNix*")
-        if lstTest:
-            f = lstTest[0] + "/Contents/MacOS/mkvmerge"
-            mkvmerge = Path(f)
-            if mkvmerge.is_file():
-                return mkvmerge
+#    if currentOS == "Darwin":
+#        lstTest = glob.glob("/Applications/MKVToolNix*")
+#        if lstTest:
+#            f = lstTest[0] + "/Contents/MacOS/mkvmerge"
+#            mkvmerge = Path(f)
+#            if mkvmerge.is_file():
+#                return mkvmerge
 
-    elif currentOS == "Windows":
+#    elif currentOS == "Windows":
         #ProgramFiles=C:\Program Files
         #ProgramFiles(x86)=C:\Program Files (x86)
 
-        defPrograms64 = os.environ.get('ProgramFiles')
-        defPrograms32 = os.environ.get('ProgramFiles(x86)')
+#        defPrograms64 = os.environ.get('ProgramFiles')
+#        defPrograms32 = os.environ.get('ProgramFiles(x86)')
 
-        dirs = []
-        if defPrograms64 is not None:
-            dirs.append(defPrograms64)
+#        dirs = []
+#        if defPrograms64 is not None:
+#            dirs.append(defPrograms64)
 
-        if defPrograms32 is not None:
-            dirs.append(defPrograms32)
+#        if defPrograms32 is not None:
+#            dirs.append(defPrograms32)
 
         # search 64 bits
-        for d in dirs:
-            search = sorted(Path(d).rglob("mkvmerge.exe"))
-            if search:
-                mkvmerge = Path(search[0])
-                if mkvmerge.is_file():
-                    return mkvmerge
+#        for d in dirs:
+#            search = sorted(Path(d).rglob("mkvmerge.exe"))
+#            if search:
+#                mkvmerge = Path(search[0])
+#                if mkvmerge.is_file():
+#                    return mkvmerge
 
-    elif currentOS == "Linux":
+#    elif currentOS == "Linux":
 
-        search = findFile("mkvmerge")
+#        search = findFile("mkvmerge")
 
-        if search is not None:
-            mkvmerge = Path(search)
-            if mkvmerge.is_file():
-                return mkvmerge
+#        if search is not None:
+#            mkvmerge = Path(search)
+#            if mkvmerge.is_file():
+#                return mkvmerge
 
-    return None
+#    return None
+
 
 def checkForQuote(file):
     """add quotes if find spaces in file name"""
@@ -98,12 +105,14 @@ class GenCommandApp(QMainWindow):
     def __init__(self, parent=None):
         super(GenCommandApp, self).__init__(parent)
 
-        mkvmergeex = getMKVMerge()
+        mkvmergeex = utils.mkv.getMKVMerge()
 
         currentOS = platform.system()
 
-        if mkvmergeex:
-            mkvmerge = checkForQuote(mkvmergeex)
+        mkvmerge = shlex.quote(str(mkvmergeex))
+
+        print(type(mkvmergeex).__name__)
+        print(mkvmerge)
 
         if currentOS == "Windows":
             l = "--ui-language en"

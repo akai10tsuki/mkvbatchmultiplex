@@ -3,7 +3,14 @@ Multithreading Class base on QThread
 """
 
 
+import logging
+
+
 from PySide2.QtCore import QThread
+
+
+MODULELOG = logging.getLogger(__name__)
+MODULELOG.addHandler(logging.NullHandler())
 
 
 class QthThread(QThread):
@@ -16,6 +23,9 @@ class QthThread(QThread):
     :param args: Arguments to pass to the callback function
     :param kwargs: Keywords to pass to the callback function
     """
+
+    log = False
+
     def __init__(self, function, *args, **kwargs):
         super().__init__(self)
 

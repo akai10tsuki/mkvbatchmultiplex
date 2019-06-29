@@ -62,6 +62,7 @@ target/
 tests/NewFiles/
 tests/generatecommand.1.py
 .vscode/
+html/
 tmp/
 docs2/
 html/

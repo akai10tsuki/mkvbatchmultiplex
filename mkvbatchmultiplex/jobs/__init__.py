@@ -2,6 +2,7 @@
 Class to manage jobs.
 """
 
+# JOB0001
 
 import logging
 
@@ -9,6 +10,7 @@ from collections import deque
 
 from PySide2.QtCore import QObject, QMutex, QMutexLocker, Qt, Slot, Signal
 
+from vsutillib.mkv import MKVCommand
 
 MUTEX = QMutex()
 MODULELOG = logging.getLogger(__name__)
@@ -28,6 +30,7 @@ class JobStatus: # pylint: disable=R0903
     Error = "Error"
     AbortForced = "AbortForced"
     AbortJob = "AbortJob"
+    AbortJobError = "AbortJobError"
     Blocked = "Blocked"
 
 
@@ -61,6 +64,7 @@ class JobQueue(QObject): # pylint: disable=R0902
     :type jobWorkQueue: collections.deque
     """
 
+    log = False
     jobID = 1
     outputJobSignal = Signal(str, dict)
     outputErrorSignal = Signal(str, dict)
@@ -199,19 +203,27 @@ class JobQueue(QObject): # pylint: disable=R0902
         :rtype: int
         """
 
+        if isinstance(command, MKVCommand):
+            cmd = command.command
+            oCmd = command
+        else:
+            oCmd = None
+            cmd = command
+
         with QMutexLocker(MUTEX):
 
             jobInfo = JobInfo()
             nID = self.jobID
             self.jobID += 1
 
-            self._workQueue.append([nID, command])
+            self._workQueue.append([nID, cmd, oCmd])
+
             jobInfo.status = status
-            jobInfo.command = command
+            jobInfo.command = cmd
             self._jobs[nID] = jobInfo
 
             if self.emitAddJobToTable:
-                self.addJobToTableSignal.emit(nID, status, command)
+                self.addJobToTableSignal.emit(nID, status, cmd)
 
             return nID
 
@@ -226,18 +238,26 @@ class JobQueue(QObject): # pylint: disable=R0902
         :rtype: int
         """
 
+        if isinstance(command, MKVCommand):
+            cmd = command.command
+            oCmd = command
+        else:
+            oCmd = None
+            cmd = command
+
         with QMutexLocker(MUTEX):
 
             nID = self.jobID
             jobInfo = JobInfo()
             self.jobID += 1
 
-            self._workQueue.appendleft([nID, command])
+            self._workQueue.appendleft([nID, cmd, oCmd])
             jobInfo.status = status
+            jobInfo.command = cmd
             self._jobs[nID] = jobInfo
 
             if self.emitAddJobToTable:
-                self.addJobToTableSignal.emit(nID, command)
+                self.addJobToTableSignal.emit(nID, status, cmd)
 
             return nID
 
@@ -252,7 +272,7 @@ class JobQueue(QObject): # pylint: disable=R0902
         if self._workQueue:
             return self._workQueue.pop()
 
-        return [None, None]
+        return [None, None, None]
 
     def popLeft(self):
         """
@@ -264,7 +284,7 @@ class JobQueue(QObject): # pylint: disable=R0902
         if self._workQueue:
             return self._workQueue.popleft()
 
-        return [None, None]
+        return [None, None, None]
 
     def inQueue(self, command):
         """
@@ -279,9 +299,14 @@ class JobQueue(QObject): # pylint: disable=R0902
 
         return False
 
-    def setOutputSignal(self, outputJobSlotConnection=None, outputErrorSlotConnection=None,
-                        addJobToTableSlotConnection=None, updateStatusSlotConnection=None,
-                        clearOutput=None):
+    def setOutputSignal(
+            self,
+            outputJobSlotConnection=None,
+            outputErrorSlotConnection=None,
+            addJobToTableSlotConnection=None,
+            updateStatusSlotConnection=None,
+            clearOutput=None
+        ):
         """
         Setup output widget signals
 
@@ -335,7 +360,7 @@ class JobQueue(QObject): # pylint: disable=R0902
         """Update job output on screen and save it"""
 
         if self.emitError:
-            msg = "----------\nJob: {}\n{}\n----------\n\n"
+            msg = "----------\nJob: {}\n\n{}\n----------\n\n"
             msg = msg.format(str(jobID), strMessage.strip())
             self.outputErrorSignal.emit(
                 msg,
@@ -345,7 +370,7 @@ class JobQueue(QObject): # pylint: disable=R0902
             if jobID in self._jobs:
                 self._jobs[jobID].errors.append([strMessage, dictAttributes])
 
-    def makeConnection(self, objSignal):
+    def connectToShowJobOutput(self, objSignal):
         """
         Connect to signals showJobOutput slot
 

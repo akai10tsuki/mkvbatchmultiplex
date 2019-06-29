@@ -2,8 +2,37 @@ Changelog
 =========
 
 
-0.9.1b1.dev2 - 2019-5-27
-~~~~~~~~~~~~~~~~~~~~~~~~
+Changes to the project.
+
+(Unreleased)
+------------
+
+Added
+~~~~~
+- added configuration files to create snap on ubuntu
+- added support for external chapters files
+- added ability to rename output files using regex
+- added rename can be done with and index if regex is to complex
+
+Changed
+~~~~~~~
+- highlight errors in rename
+- remove current working file if job aborted by an error
+- application opens on last tab used
+- documentation updates
+- Major code cleanup and refactoring making it easier to extend
+
+  * functions, methods and properties rename for clarity
+  * moving code on modules reusable in other apps to vsutillib modules
+    applications will depend on vsutillib
+
+Fixed
+~~~~~
+- fix regression single quotes escapes on file path mishandled
+- fix font for jobs table didn't change correctly
+- fix incorrect signal addJobToTableSignal on jobs module
+- fix on macOS the read files have to be sorted in order to correctly
+  match the sources
 
 Fixed
 ~~~~~

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 r"""
 mkvBatchMultiplex
 =================
@@ -30,19 +29,16 @@ Libraries and programs used:
     PySide2 5.12
 
 Target program:
-    MKVToolNix - tested with versions v17.0.0-29.0.0
+    MKVToolNix - tested with versions v17.0.0-34.0.0
 """
+# MWW0001
 
-
-import ast
 import logging
 import logging.handlers
 import sys
 import os
 import platform
 import webbrowser
-import xml
-import xml.etree.ElementTree as ET
 from pathlib import Path
 from queue import Queue
 from collections import deque
@@ -51,18 +47,20 @@ from PySide2.QtCore import QByteArray, Qt, QThreadPool, Signal
 from PySide2.QtGui import QIcon, QFont
 from PySide2.QtWidgets import (QAction, QApplication, QDesktopWidget, qApp,
                                QMainWindow, QMessageBox, QToolBar, QVBoxLayout,
-                               QWidget, QFontDialog)
+                               QWidget, QFontDialog, QToolTip)
+
+import vsutillib.media as media
+import vsutillib.pyqt as pyqt
 
 from . import config
-from .loghandler import LogRotateHandler
-from .widgets import (DualProgressBar, MKVFormWidget, MKVTabsWidget, FormatLabel,
-                      MKVOutputWidget, MKVJobsTableWidget)
+from .widgets import (DualProgressBar, MKVCommandWidget, MKVTabsWidget,
+                      FormatLabel, MKVOutputWidget, MKVJobsTableWidget,
+                      MKVRenameWidget)
 from .jobs import JobQueue, JobStatus
-from .configurationsettings import ConfigurationSettings
-from .utils import isMediaInfoLib
+from . import utils
 
 
-class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
+class MKVMultiplexApp(QMainWindow):  # pylint: disable=R0902
     """Main window of application"""
 
     log = False
@@ -81,67 +79,66 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         self.jobSubprocessQueue = Queue()
         self.threadpool = QThreadPool()
         self.jobs = JobQueue(self.workQueue)
-        self.config = ConfigurationSettings()
-        self.actEnableLogging = None
+        self.actSetupLogging = None
+        self.menuItems = []
 
         if getattr(sys, 'frozen', False):
             # Running in pyinstaller bundle
-            cwd = Path(os.path.dirname(__file__)) # pylint: disable=E1101,W0212
+            self.appDirectory = Path(os.path.dirname(__file__))  # pylint: disable=E1101,W0212
         else:
-            cwd = Path(os.path.realpath(__file__))
+            self.appDirectory = Path(os.path.realpath(__file__))
 
         self.setWindowTitle("MKVMERGE: Batch Multiplex")
-        self.setWindowIcon(QIcon(str(cwd.parent) + "/images/mkvBatchMultiplex.png"))
+        self.setWindowIcon(
+            QIcon(
+                str(self.appDirectory.parent) +
+                "/images/mkvBatchMultiplex.png"))
 
-        self._initMenu(cwd)
+        # menu and widgets
+        self._initMenu()
         self._initHelper()
 
         # Read configuration elements
-        self.configuration()
         self.restoreConfig()
 
-        self._checkDependencies()
+        self.checkDependencies()
 
     def _initHelper(self):
 
         # Create Widgets
-        self.formWidget = MKVFormWidget(
-            self, self.threadpool,
-            self.jobs,
-            self.jobProcessQueue,
-            self.jobSubprocessQueue,
-            log=True
-        )
+
+        self.renameWidget = MKVRenameWidget(self)
+
+        self.commandWidget = MKVCommandWidget(self, self.threadpool, self.jobs,
+                                              self.jobProcessQueue,
+                                              self.jobSubprocessQueue,
+                                              self.renameWidget)
         self.outputQueueWidget = MKVOutputWidget(self)
         self.outputErrorWidget = MKVOutputWidget(self)
-        self.jobsWidget = MKVJobsTableWidget(
-            self,
-            self.jobProcessQueue,
-            self.jobSubprocessQueue
-        )
+        self.jobsWidget = MKVJobsTableWidget(self, self.jobProcessQueue,
+                                             self.jobSubprocessQueue)
 
         # Connect signals to print in outputWidgets and update jobsWidget
         self.jobs.setOutputSignal(
-            self.outputQueueWidget.makeConnection,
-            self.outputErrorWidget.makeConnection,
-            self.jobsWidget.makeConnection0,
-            self.jobsWidget.makeConnection1,
-            self.clearOutput
-        )
+            outputJobSlotConnection=self.outputQueueWidget.makeConnection,
+            outputErrorSlotConnection=self.outputErrorWidget.makeConnection,
+            addJobToTableSlotConnection=self.jobsWidget.makeConnectionAddJob,
+            updateStatusSlotConnection=self.jobsWidget.
+            makeConnectionSetJobStatus,
+            clearOutput=self.clearOutput)
 
         # Connect to signal when a row is clicked on jobsWidget job output
         # will update in outputWidgets
-        self.jobs.makeConnection(self.jobsWidget.showJobOutput)
+        self.jobs.connectToShowJobOutput(self.jobsWidget.showJobOutput)
         self.jobs.connectToStatus(self.jobsWidget.jobsTable.updateJobStatus)
 
+        self.renameWidget.setAccessibleName('renameWidget')
         # Create tabs and insert Widgets
-        self.tabsWidget = MKVTabsWidget(
-            self,
-            self.formWidget,
-            self.jobsWidget,
-            self.outputQueueWidget,
-            self.outputErrorWidget
-        )
+        self.tabsWidget = MKVTabsWidget(self, self.commandWidget,
+                                        self.jobsWidget,
+                                        self.outputQueueWidget,
+                                        self.outputErrorWidget,
+                                        self.renameWidget)
 
         self.tabs = self.tabsWidget.tabs
         widget = QWidget()
@@ -149,11 +146,15 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         layout.addWidget(self.tabsWidget)
         self.setCentralWidget(widget)
 
-    def _initMenu(self, cwd):
+        # restore config
+
+    def _initMenu(self):
 
         menuBar = self.menuBar()
 
-        actExit = QAction(QIcon(str(cwd.parent) + "/images/cross-circle.png"), "&Exit", self)
+        actExit = QAction(
+            QIcon(str(self.appDirectory.parent) + "/images/cross-circle.png"),
+            "&Exit", self)
         actExit.setShortcut("Ctrl+E")
         actExit.setStatusTip("Exit application")
         actExit.triggered.connect(self.close)
@@ -166,11 +167,13 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         fileMenu.addAction(actExit)
         fileMenu.addAction(actAbort)
 
-        self.actEnableLogging = QAction("Enable logging", self, checkable=True)
-        self.actEnableLogging.setStatusTip(
+        self.menuItems.append(fileMenu)
+
+        self.actSetupLogging = QAction("Enable logging", self, checkable=True)
+        self.actSetupLogging.setStatusTip(
             "Enable session logging in ~/.mkvBatchMultiplex/mkvBatchMultiplex.log"
         )
-        self.actEnableLogging.triggered.connect(self.enableLogging)
+        self.actSetupLogging.triggered.connect(self.setupLogging)
 
         actSelectFont = QAction("Font", self)
         actSelectFont.setStatusTip("")
@@ -180,15 +183,33 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         actRestoreDefaults.triggered.connect(self.restoreDefaults)
 
         settingsMenu = menuBar.addMenu("&Settings")
-        settingsMenu.addAction(self.actEnableLogging)
+        settingsMenu.addAction(self.actSetupLogging)
         settingsMenu.addAction(actSelectFont)
         settingsMenu.addAction(actRestoreDefaults)
 
-        actWebHelp = QAction("Using", self)
-        actWebHelp.triggered.connect(_help)
+        self.menuItems.append(settingsMenu)
+
+        # Help Menu
+
+        actHelpContents = QAction("Contents...", self)
+        actHelpContents.triggered.connect(lambda: self.help(0))
+
+        actHelpUsing = QAction("Using", self)
+        actHelpUsing.triggered.connect(lambda: self.help(1))
+
+        actAbout = QAction("About", self)
+        actAbout.triggered.connect(self.about)
+
+        actAboutQt = QAction("About QT", self)
+        actAboutQt.triggered.connect(self.aboutQt)
 
         helpMenu = menuBar.addMenu("&Help")
-        helpMenu.addAction(actWebHelp)
+        helpMenu.addAction(actHelpContents)
+        helpMenu.addAction(actHelpUsing)
+        helpMenu.addAction(actAbout)
+        helpMenu.addAction(actAboutQt)
+
+        self.menuItems.append(helpMenu)
 
         tb = QToolBar("Exit", self)
         tb.addAction(actExit)
@@ -197,12 +218,28 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         self.progressbar = DualProgressBar(align=Qt.Horizontal)
         self.jobsLabel = FormatLabel(
             "Job(s): {0:3d} Current: {1:3d} File: {2:3d} of {3:3d} Errors: {4:3d}",
-            init=[0, 0, 0, 0, 0]
-        )
+            init=[0, 0, 0, 0, 0])
 
         statusBar = self.statusBar()
         statusBar.addPermanentWidget(self.jobsLabel)
         statusBar.addPermanentWidget(self.progressbar)
+
+    def resetFont(self, font):
+        """
+        Set font to the GUI elements
+
+        Args:
+            font (str): new font
+        """
+        for m in self.menuItems:
+            m.setFont(font)
+
+        # hack until discover why is ingnoring parent font or unable to use it
+        # using only family and point size on new QFont works??
+        self.jobsWidget.jobsTable.setFont(
+            QFont(font.family(), font.pointSize()))
+
+        QToolTip.setFont(font)
 
     def clearOutput(self):
         """Clear output for JobQueue"""
@@ -213,15 +250,10 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
     def closeEvent(self, event):
         """
         Save window state before exit
-        m = QMessageBox(self)
-        m.setText("Are you sure you want to exit?")
-        m.setIcon(QMessageBox.Question)
-        m.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        m.setDefaultButton(QMessageBox.Yes)
-        result = m.exec_()
         """
 
-        self.formWidget.textOutputWindow.makeConnection(self.outputMainSignal)
+        self.commandWidget.textOutputWindow.makeConnection(
+            self.outputMainSignal)
         jobsStatus = self.jobs.jobsStatus()
 
         if jobsStatus == JobStatus.Aborted:
@@ -232,30 +264,24 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
 
             if jobsStatus == JobStatus.Running:
 
-                result = QMessageBox.warning(
-                    self,
-                    "Confirm Abort...",
+                result = pyqt.messageBoxYesNo(
+                    self, "Confirm Abort...",
                     "Jobs running are you sure you want to stop them?",
-                    QMessageBox.Yes | QMessageBox.No
-                )
+                    QMessageBox.Warning)
 
             else:
 
-                result = QMessageBox.question(
-                    self,
-                    "Confirm Exit...",
-                    "Are you sure you want to exit?",
-                    QMessageBox.Yes | QMessageBox.No
-                )
+                result = pyqt.messageBoxYesNo(
+                    self, "Confirm Exit...               ",
+                    "Are you sure you want to exit?", QMessageBox.Question)
 
             if result == QMessageBox.Yes:
-                self.configuration(save=True)
+                self.saveConfig()
 
                 if jobsStatus == JobStatus.Running:
                     self.outputMainSignal.emit(
                         "\nJobs running aborting jobs...\n\n",
-                        {'color': Qt.blue}
-                    )
+                        {'color': Qt.blue})
                     self.jobSubprocessQueue.put(JobStatus.Abort)
                     event.ignore()
 
@@ -264,14 +290,22 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
             else:
                 event.ignore()
 
-    def enableLogging(self, state):
+    def setupLogging(self, state):
         """Activate logging"""
         if state:
             self.log = True
-            logging.info("Start logging.")
+            logging.info("MW0001: Start logging.")
         else:
             self.log = False
-            logging.info("Stop logging.")
+            logging.info("MW0002: Stop logging.")
+
+        # Setup logging
+        MKVCommandWidget.setLogging(self.log)
+
+        MKVTabsWidget.log = self.log
+        MKVOutputWidget.log = self.log
+        MKVJobsTableWidget.log = self.log
+        JobQueue.log = self.log
 
     def selectFont(self):
         """Select Font"""
@@ -279,180 +313,173 @@ class MKVMultiplexApp(QMainWindow): # pylint: disable=R0902
         font = self.font()
 
         fontDialog = QFontDialog()
-        centerWidgets(fontDialog, self)
+        utils.centerWidgets(fontDialog, self)
 
         valid, font = fontDialog.getFont(font)
 
         if valid:
             self.setFont(font)
+            self.resetFont(font)
 
-    def configuration(self, save=False):
-        """Read and write configuration"""
-        configFile = Path(Path.home(), ".mkvBatchMultiplex/config-pyside2.xml")
-        xmlFile = str(configFile)
+    def saveConfig(self):
+        """
+        set configuration data to save
+        """
 
-        if save:
+        config.data.set(Key.kLogging, self.actSetupLogging.isChecked())
 
-            self.config.set(
-                'logging', self.actEnableLogging.isChecked()
-            )
+        base64Geometry = self.saveGeometry().toBase64()
+        b = base64Geometry.data()
+        config.data.set(Key.kGeometry, b)
 
-            base64Geometry = self.saveGeometry().toBase64()
+        font = self.font()
+        config.data.set(Key.kFont, font.toString())
 
-            s = str(base64Geometry)
-            b = ast.literal_eval(s)
-
-            self.config.set(
-                'geometry', b
-            )
-
-            font = self.font()
-
-            self.config.set(
-                'font', font.toString()
-            )
-
-            root = ET.Element("VergaraSoft")
-            root = self.config.toXML(root)
-            tree = ET.ElementTree(root)
-            tree.write(xmlFile)
-
-        else:
-
-            if configFile.is_file():
-                try:
-                    tree = ET.ElementTree(file=xmlFile)
-                    root = tree.getroot()
-                    self.config.fromXML(root)
-                except NameError:
-                    logging.info("MW0002: Bad configuration definition file.")
-                except xml.etree.ElementTree.ParseError:
-                    logging.info("MW0001: Bad or corrupt configuration file.")
-            else:
-                configFile.touch(exist_ok=True)
+        index = self.tabs.currentIndex()
+        if index != 4:
+            index = 0
+        config.data.set(Key.kTab, index)
 
     def restoreConfig(self, resetDefaults=False):
         """Restore configuration if any"""
 
         defaultFont = QFont("Segoe UI", 9)
+
         bLogging = False
 
         if resetDefaults:
             self.setFont(defaultFont)
-            self.actEnableLogging.setChecked(bLogging)
-            self.enableLogging(bLogging)
+            self.resetFont(defaultFont)
+            self.actSetupLogging.setChecked(bLogging)
+            self.setupLogging(bLogging)
             self.setGeometry(0, 0, 1280, 720)
-            centerWidgets(self)
+            self.tabs.setCurrentIndex(1)
+
+            utils.centerWidgets(self)
 
         else:
 
-            strFont = self.config.get('font')
-
+            # restore font
+            strFont = config.data.get(Key.kFont)
             if strFont is not None:
                 restoreFont = QFont()
                 restoreFont.fromString(strFont)
                 self.setFont(restoreFont)
-
+                self.resetFont(restoreFont)
             else:
                 self.setFont(defaultFont)
 
-            bLogging = self.config.get('logging')
-
+            # restore logging status
+            bLogging = config.data.get(Key.kLogging)
             if bLogging is not None:
-                self.actEnableLogging.setChecked(bLogging)
-                self.enableLogging(bLogging)
+                self.actSetupLogging.setChecked(bLogging)
+                self.setupLogging(bLogging)
 
-            byteGeometry = self.config.get('geometry')
-
+            # restore window size and position
+            byteGeometry = config.data.get(Key.kGeometry)
             if byteGeometry is not None:
-                # Test for value read if not continue
-                #byte = ast.literal_eval(strGeometry)
-                byteGeometry = QByteArray(byteGeometry)
-
-                self.restoreGeometry(QByteArray.fromBase64(byteGeometry))
+                # byteGeometry is bytes string
+                self.restoreGeometry(
+                    QByteArray.fromBase64(QByteArray(byteGeometry)))
             else:
-
                 self.setGeometry(0, 0, 1280, 720)
-                centerWidgets(self)
+                utils.centerWidgets(self)
+
+            # restore open tab
+            tabIndex = config.data.get(Key.kTab)
+            if tabIndex:
+                self.tabs.setCurrentIndex(tabIndex)
 
     def restoreDefaults(self):
         """restore defaults settings"""
 
-        result = QMessageBox.question(
-            self,
-            "Confirm Restore...",
-            "Restore default settings ?",
-            QMessageBox.Yes | QMessageBox.No
-        )
+        result = QMessageBox.question(self, "Confirm Restore...",
+                                      "Restore default settings ?",
+                                      QMessageBox.Yes | QMessageBox.No)
 
         if result == QMessageBox.Yes:
             self.restoreConfig(resetDefaults=True)
 
-    def _checkDependencies(self):
+    def checkDependencies(self):
+        """check if MediaInfo library is present"""
 
         if platform.system() == "Linux":
 
-            libFiles = isMediaInfoLib()
+            libFiles = media.isMediaInfoLib()
 
             if not libFiles:
-                self.formWidget.textOutputWindow.insertText(
+                self.commandWidget.textOutputWindow.insertText(
                     "\nMediaInfo library not found can not process jobs.\n\n",
-                    {'color': Qt.red}
-                )
+                    {'color': Qt.red})
                 self.jobs.jobsStatus(JobStatus.Blocked)
 
-def _help():
-    """open web RTD page"""
+    def help(self, index=0):
+        """open web RTD page"""
 
-    url = "https://mkvbatchmultiplex.readthedocs.io/en/latest/using.html"
-    webbrowser.open(url, new=0, autoraise=True)
+        if index == 1:
+            htmlPath = "file:///" + str(
+                self.appDirectory.parent) + "/html/using.html"
+        else:
+            htmlPath = "file:///" + str(
+                self.appDirectory.parent) + "/html/index.html"
 
-def centerWidgets(widget, parent=None):
+        webbrowser.open(htmlPath, new=2, autoraise=True)
+
+    def about(self):
+        """About"""
+        aboutMsg = "MKVBatchMultiplex: {}\n\n"
+        aboutMsg += "Author: {}\n"
+        aboutMsg += "email: {}\n\n"
+        aboutMsg += "Python Vertion:\n{}\n"
+
+        aboutMsg = aboutMsg.format(config.VERSION, config.AUTHOR, config.EMAIL,
+                                   sys.version)
+        QMessageBox.about(self, 'MKVBatchMultiplex', aboutMsg)
+
+    def aboutQt(self):
+        """About QT"""
+        QMessageBox.aboutQt(self, 'MKVBatchMultiplex')
+
+
+class Key:
+    """Keys for configuration"""
+
+    kLogging = "logging"
+    kGeometry = "geometry"
+    kFont = "font"
+    kTab = "tab"
+    kTabText = "tabText"
+
+
+def centerWidgetsToDelete(widget, parent=None):
     """center widget based on parent or screen geometry"""
 
     if parent is None:
         parent = widget.parentWidget()
 
     if parent:
-        widget.move(parent.frameGeometry().center() - widget.frameGeometry().center())
+        widget.move(parent.frameGeometry().center() -
+                    widget.frameGeometry().center())
 
     else:
-        widget.move(QDesktopWidget().availableGeometry().center() - widget.frameGeometry().center())
+        widget.move(QDesktopWidget().availableGeometry().center() -
+                    widget.frameGeometry().center())
+
 
 def abort():
     """Force Quit"""
 
-    qApp.quit()     # pylint: disable=E1101
+    qApp.quit()  # pylint: disable=E1101
 
-def setupLogging():
-    """Configure log"""
-
-    filesPath = Path(Path.home(), ".mkvBatchMultiplex")
-    filesPath.mkdir(parents=True, exist_ok=True)
-
-    logFile = Path(Path.home(), ".mkvBatchMultiplex/mkvBatchMultiplex.log")
-    logging.getLogger('').setLevel(logging.DEBUG)
-
-    loghandler = LogRotateHandler(logFile, backupCount=10)
-
-    formatter = logging.Formatter(
-        "%(asctime)s %(levelname)-8s %(name)s %(message)s"
-    )
-
-    loghandler.setFormatter(formatter)
-
-    logging.getLogger('').addHandler(loghandler)
 
 def mainApp():
     """Main"""
 
-    setupLogging()
+    config.init()
 
-    logging.info("App Start.")
-    logging.info("Python: %s", sys.version)
-    logging.info("mkvbatchmultiplex-%s", config.VERSION)
     app = QApplication(sys.argv)
     win = MKVMultiplexApp()
     win.show()
     app.exec_()
-    logging.info("App End.")
+
+    config.close()

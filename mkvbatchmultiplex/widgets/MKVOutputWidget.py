@@ -4,16 +4,18 @@ MKVOutputWidget:
 Output widget form just to output text in color
 
 """
-# OW004
+# MOW0004
 
 
 import logging
 
+
 from PySide2.QtCore import Qt, Slot
 from PySide2.QtGui import QTextCursor
-from PySide2.QtWidgets import QTextEdit
+from PySide2.QtWidgets import QTextEdit, QStyleFactory
 
-from .. import utils
+
+import vsutillib.macos as macos
 
 
 MODULELOG = logging.getLogger(__name__)
@@ -22,6 +24,8 @@ MODULELOG.addHandler(logging.NullHandler())
 
 class MKVOutputWidget(QTextEdit):
     """Output for running queue"""
+
+    log = False
 
     def __init__(self, parent=None):
         super(MKVOutputWidget, self).__init__(parent)
@@ -62,13 +66,26 @@ class MKVOutputWidget(QTextEdit):
         if 'appendLine' in kwargs:
             appendLine = kwargs['appendLine']
 
-        if utils.isMacDarkMode() and (color is None):
+        # still no restore to default the ideal configuration
+        # search will continue considering abandoning color
+        # in macOS
+
+        saveStyle = self.styleSheet()
+
+        if macos.isMacDarkMode() and (color is None):
             color = Qt.white
         elif color is None:
             color = Qt.black
 
+        if macos.isMacDarkMode() and (color is not None):
+            if color == Qt.red:
+                color = Qt.magenta
+            elif color == Qt.darkGreen:
+                color = Qt.green
+            elif color == Qt.blue:
+                color = Qt.cyan
+
         if color is not None:
-            # dark theme clash
             self.setTextColor(color)
 
         if replaceLine:
@@ -81,13 +98,15 @@ class MKVOutputWidget(QTextEdit):
 
         self.ensureCursorVisible()
 
-        if self.parent.log:
+        self.setStyleSheet(QStyleFactory.create(saveStyle))
+
+        if self.log:
             strTmp = strTmp + strText
             strTmp = strTmp.replace("\n", " ")
             if strTmp != "" and strTmp.find(u"Progress:") != 0:
                 if strTmp.find(u"Warning") == 0:
-                    MODULELOG.warning("OW001: %s", strTmp)
+                    MODULELOG.warning("MOW0001: %s", strTmp)
                 elif strTmp.find(u"Error") == 0 or color == Qt.red:
-                    MODULELOG.error("OW002: %s", strTmp)
+                    MODULELOG.error("MOW0002: %s", strTmp)
                 else:
-                    MODULELOG.info("OW003: %s", strTmp)
+                    MODULELOG.info("MOW0003: %s", strTmp)

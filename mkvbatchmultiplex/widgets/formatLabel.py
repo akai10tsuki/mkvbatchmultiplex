@@ -16,6 +16,7 @@ align:
 
 import random
 
+
 from PySide2.QtWidgets import QWidget, QLabel
 from PySide2.QtCore import Slot
 

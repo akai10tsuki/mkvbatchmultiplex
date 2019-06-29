@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-"""Setup.py for mkvbatchmultiplex"""
-
 """setup file to build python distributions"""
-
 
 import io
 import os
@@ -11,17 +9,8 @@ from setuptools import setup, find_packages
 
 from mkvbatchmultiplex import config
 
-
-DESCRIPTION = 'A mkv media batch multiplex.'
-KEYWORDS = 'mkv multimedia video'
-NAME = "mkvbatchmultiplex"
-REQUIRED = [
-    'pymediainfo>=4.0',
-    'PySide2>=5.12'
-]
-URL = 'https://github.com/akai10tsuki/mkvbatchmultiplex'
-VERSION = None
 ROOT = os.path.abspath(os.path.dirname(__file__))
+
 
 def readme():
     """get README.rst"""
@@ -30,25 +19,23 @@ def readme():
         with io.open(os.path.join(ROOT, 'README.rst'), encoding='utf-8') as f:
             long_description = '\n' + f.read()
     except FileNotFoundError:
-        long_description = DESCRIPTION
+        long_description = config.DESCRIPTION
     return long_description
 
-setup(
 
-    name=NAME,  # Required
+setup(
+    name=config.NAME,  # Required
     version=config.VERSION,  # Required
     #version='0.5.3.a2.dev3',
-    description=DESCRIPTION,  # Required
+    description=config.DESCRIPTION,  # Required
     long_description=readme(),  # Optional
-    author='Efrain Vergara',  # Optional
-    author_email='akai10tsuki@gmail.com',  # Optional
-    url=URL,
+    author=config.AUTHOR,  # Optional
+    author_email=config.EMAIL,  # Optional
+    url=config.URL,
     license='MIT',
-
     classifiers=[  # Optional
         # Trove classifiers
         # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
-
         'Development Status :: 3 - Alpha',
         'Environment :: MacOS X',
         'Environment :: Win32 (MS Windows)',
@@ -75,25 +62,11 @@ setup(
         # Implementation
         "Programming Language :: Python :: Implementation :: CPython",
     ],
-
-    keywords=KEYWORDS,  # Optional
-
-    packages=find_packages(exclude=['docs', 'tests*',]),  # Required
-
-    install_requires=REQUIRED,
-
-    python_requires='>=3.5, <4',
-
+    keywords=config.KEYWORDS,
+    packages=config.PACKAGES,  # Required
+    install_requires=config.REQUIRED,
+    python_requires=config.PYTHONVERSIONS,
     include_package_data=True,
-
-    entry_points={  # Optional
-        'console_scripts': [
-            'mkvbatchmultiplex=mkvbatchmultiplex.mkvbatchmultiplex:mainApp',
-        ],
-    },
-
-    project_urls={  # Optional
-        'Bug Reports': 'https://github.com/akai10tsuki/mkvbatchmultiplex/issues',
-        'Source': 'https://github.com/akai10tsuki/mkvbatchmultiplex/',
-    },
+    entry_points=config.ENTRYPOINTS,  # Optional
+    project_urls=config.PROJECTURLS,
 )

@@ -5,12 +5,13 @@ Jobs table widget shows jobs and status
 
 context menu on status can change it
 """
-# JT001
+# MJT0001
 
 
 import logging
 
 from PySide2.QtCore import Qt, Slot, Signal
+from PySide2.QtGui import QFont
 from PySide2.QtWidgets import (QVBoxLayout, QTableWidget, QMenu, QWidget, QHeaderView,
                                QTableWidgetItem, QAbstractScrollArea)
 
@@ -27,6 +28,7 @@ class MKVJobsTableWidget(QWidget):
 
     Also shows status of job
     """
+    log = False
 
     showJobOutput = Signal(int, str, str)
 
@@ -60,12 +62,12 @@ class MKVJobsTableWidget(QWidget):
         self.jobsTable.clearContents()
         self.jobsTable.setRowCount(0)
 
-    def makeConnection0(self, objSignal):
+    def makeConnectionAddJob(self, objSignal):
         """Connect to signals"""
 
         objSignal.connect(self.jobsTable.addJob)
 
-    def makeConnection1(self, objSignal):
+    def makeConnectionSetJobStatus(self, objSignal):
         """Connect to signals"""
 
         objSignal.connect(self.jobsTable.setJobStatus)
@@ -98,7 +100,6 @@ class JobsTableWidget(QTableWidget):
         self.parent = parent
         self.ctrQueue = ctrlQueue
         self.actions = JobStatus()
-
         self.setColumnCount(3)
         self.setHorizontalHeaderLabels(["Jobs ID", "Status", "Description"])
         self.horizontalHeader().setStretchLastSection(True)
