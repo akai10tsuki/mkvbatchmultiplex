@@ -12,7 +12,7 @@ from vsutillib.log import LogRotateFileHandler
 
 data = ConfigurationSettings()  # pylint: disable=invalid-name
 
-__VERSION = (1, 0, '1rc1', '')
+__VERSION = (1, 0, '1', '')
 
 APPNAME = "MKVBatchMultiplex"
 VERSION = ".".join(map(str, __VERSION))
