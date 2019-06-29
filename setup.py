@@ -4,12 +4,24 @@
 
 import io
 import os
+import shutil
 
-from setuptools import setup, find_packages
+from pathlib import Path
+from setuptools import setup
 
 from mkvbatchmultiplex import config
 
 ROOT = os.path.abspath(os.path.dirname(__file__))
+
+
+def removeBuild():
+    """
+    delete build directory setup was including files from other builds
+    """
+    b = Path('build')
+
+    if b.is_dir():
+        shutil.rmtree('build')
 
 
 def readme():
@@ -22,6 +34,7 @@ def readme():
         long_description = config.DESCRIPTION
     return long_description
 
+removeBuild()
 
 setup(
     name=config.NAME,  # Required
@@ -36,7 +49,7 @@ setup(
     classifiers=[  # Optional
         # Trove classifiers
         # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 5 - Production/Stable',
         'Environment :: MacOS X',
         'Environment :: Win32 (MS Windows)',
         'Environment :: X11 Applications :: Qt',

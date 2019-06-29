@@ -36,10 +36,11 @@ PROJECTURLS = {
     'Bug Reports': 'https://github.com/akai10tsuki/mkvbatchmultiplex/issues',
     'Source': 'https://github.com/akai10tsuki/mkvbatchmultiplex/',
 }
-PYTHONVERSIONS = '>=3.5, <=3.8'
+PYTHONVERSIONS = '>=3.5, <3.8'
 REQUIRED = [
-    'PySide2>=5.12', 'vsutillib.mkv', 'vsutillib.media', 'vsutillib.macos',
-    'vsutillib.files', 'vsutillib.log', 'vsutillib.pyqt'
+    'PySide2>=5.12', 'vsutillib.mkv>=1.0.2', 'vsutillib.media>=1.0.2',
+    'vsutillib.macos>=1.0.2', 'vsutillib.files>=1.0.2', 'vsutillib.log>=1.0.1',
+    'vsutillib.pyqt>=1.0.2'
 ]
 
 # label

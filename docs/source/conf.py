@@ -39,7 +39,7 @@ copyright = '2018-2019, Efrain Vergara'
 author = 'Efrain Vergara'
 
 # The short X.Y version
-version = '0.9'
+version = '1.0'
 # The full version, including alpha/beta/rc tags
 #release = '0.5.3a3.dev1'
 release = config.VERSION
@@ -128,7 +128,7 @@ htmlhelp_basename = 'mkvbatchmultiplexdoc'
 
 # -- Options for LaTeX output ------------------------------------------------
 
-latex_elements = {
+#latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     #
     # 'papersize': 'letterpaper',
@@ -144,25 +144,25 @@ latex_elements = {
     # Latex figure (float) alignment
     #
     # 'figure_align': 'htbp',
-}
+#}
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
-latex_documents = [
-    (master_doc, 'mkvbatchmultiplex.tex', 'mkvbatchmultiplex Documentation',
-     'Efrain Vergara', 'manual'),
-]
+#latex_documents = [
+#    (master_doc, 'mkvbatchmultiplex.tex', 'mkvbatchmultiplex Documentation',
+#     'Efrain Vergara', 'manual'),
+#]
 
 
 # -- Options for manual page output ------------------------------------------
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, 'mkvbatchmultiplex', 'mkvbatchmultiplex Documentation',
-     [author], 1)
-]
+#man_pages = [
+#    (master_doc, 'mkvbatchmultiplex', 'mkvbatchmultiplex Documentation',
+#     [author], 1)
+#]
 
 
 # -- Options for Texinfo output ----------------------------------------------
@@ -170,17 +170,17 @@ man_pages = [
 # Grouping the document tree into Texinfo files. List of tuples
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
-texinfo_documents = [
-    (master_doc, 'mkvbatchmultiplex', 'mkvbatchmultiplex Documentation',
-     author, 'mkvbatchmultiplex', 'One line description of project.',
-     'Miscellaneous'),
-]
+#texinfo_documents = [
+#    (master_doc, 'mkvbatchmultiplex', 'mkvbatchmultiplex Documentation',
+#     author, 'mkvbatchmultiplex', 'One line description of project.',
+#     'Miscellaneous'),
+#]
 
 
 # -- Options for Epub output -------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = project
+#epub_title = project
 
 # The unique identifier of the text. This can be a ISBN number
 # or the project homepage.
@@ -192,7 +192,7 @@ epub_title = project
 # epub_uid = ''
 
 # A list of files that should not be packed into the epub file.
-epub_exclude_files = ['search.html']
+#epub_exclude_files = ['search.html']
 
 
 # -- Extension configuration -------------------------------------------------
