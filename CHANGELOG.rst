@@ -4,8 +4,8 @@ Changelog
 
 Changes to the project.
 
-(Unreleased)
-------------
+1.0.1 - 2019-06-29
+------------------
 
 Added
 ~~~~~
@@ -33,9 +33,6 @@ Fixed
 - fix incorrect signal addJobToTableSignal on jobs module
 - fix on macOS the read files have to be sorted in order to correctly
   match the sources
-
-Fixed
-~~~~~
 - fix directory files read have to be sorted on macOS
 
 0.9.1b1.dev1 - 2019-5-21
