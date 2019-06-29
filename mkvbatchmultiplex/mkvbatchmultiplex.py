@@ -250,12 +250,6 @@ class MKVMultiplexApp(QMainWindow):  # pylint: disable=R0902
     def closeEvent(self, event):
         """
         Save window state before exit
-        m = QMessageBox(self)
-        m.setText("Are you sure you want to exit?")
-        m.setIcon(QMessageBox.Question)
-        m.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        m.setDefaultButton(QMessageBox.Yes)
-        result = m.exec_()
         """
 
         self.commandWidget.textOutputWindow.makeConnection(
@@ -274,25 +268,12 @@ class MKVMultiplexApp(QMainWindow):  # pylint: disable=R0902
                     self, "Confirm Abort...",
                     "Jobs running are you sure you want to stop them?",
                     QMessageBox.Warning)
-                #result = QMessageBox.warning(
-                #    self,
-                #    "Confirm Abort...",
-                #    "Jobs running are you sure you want to stop them?",
-                #    QMessageBox.Yes | QMessageBox.No
-                #)
 
             else:
 
                 result = pyqt.messageBoxYesNo(
                     self, "Confirm Exit...               ",
                     "Are you sure you want to exit?", QMessageBox.Question)
-
-                #result = QMessageBox.question(
-                #    self,
-                #    "Confirm Exit...",
-                #    "Are you sure you want to exit?",
-                #    QMessageBox.Yes | QMessageBox.No
-                #)
 
             if result == QMessageBox.Yes:
                 self.saveConfig()
@@ -355,6 +336,8 @@ class MKVMultiplexApp(QMainWindow):  # pylint: disable=R0902
         config.data.set(Key.kFont, font.toString())
 
         index = self.tabs.currentIndex()
+        if index != 4:
+            index = 0
         config.data.set(Key.kTab, index)
 
     def restoreConfig(self, resetDefaults=False):

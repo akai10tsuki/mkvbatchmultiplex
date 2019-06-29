@@ -152,7 +152,6 @@ class MKVRenameWidget(QWidget):
         for f in objCommand.destinationFiles:
             # show files
             self.outputOriginalFileSignal.emit(str(f.name) + '\n', {})
-            #self.outputRenameResultsSignal.emit(str(f.name) + '\n', {})
             # save files
             self._outputFileNames.append(f)
 
@@ -164,15 +163,15 @@ class MKVRenameWidget(QWidget):
 
             self.textRenameResults.textBox.clear()
 
-            #for f in self._outputFileNames:
-            #    self.outputRenameResultsSignal.emit(str(f.name) + '\n', {})
-
             if not self._bFilesDropped:
                 self._bFilesDropped = True
+
+            self._updateRegEx()
         else:
             # receive when clear issued to FilesListWidget
             self._outputFileNames = []
             self.textRenameResults.textBox.clear()
+            self.buttonUndoRename.setEnabled(False)
             self._bFilesDropped = False
 
     def _displayRenames(self):
@@ -315,12 +314,10 @@ class RegExFilesWidget(QWidget):
 
 def _resolveIncrements(currentNames, newNames, subText):
 
-    #incMatch = []
-    reSearchIncEx = re.compile(r"<i\:(\d+)>")
+    reSearchIncEx = re.compile(r"<i\:.*?(\d+)>")
     match = reSearchIncEx.findall(subText)
     fileNames = None
     bAppend = True
-    #bFullName = False
 
     if not match:
         return False
@@ -334,19 +331,18 @@ def _resolveIncrements(currentNames, newNames, subText):
 
         # valid regex can duplicate index in rename name
         if testFNames and (len(match) == len(testFNames)):
-            #bFullName = True
             fileNames = []
             for f in newNames:
                 fileNames.append(str(f))
         else:
             return False
 
-    # [ first index, increment index, string format]
-    for m in match:
-        #incMatch.append(
-        #    [int(m), "<i: {}>".format(m), "{:0" + str(len(m)) + "d}"])
+    matchGroups = _matchGroups(subText, r"<i\:.*?(\d+)>")
+
+    for item in zip(match, matchGroups):
+        m, ii = item
+        #    [int(m), "<i: NN>", "{:0" + str(len(m)) + "d}"]
         i = int(m)  # start index
-        ii = "<i:{}>".format(m)  # increment index token
         sf = "{:0" + str(len(m)) + "d}"  # string format for index
 
         for index, newName in enumerate(fileNames):
@@ -356,23 +352,6 @@ def _resolveIncrements(currentNames, newNames, subText):
             # substitute newName with substitution in index fileNames
             fileNames[index] = nName
             i += 1
-
-    #for e in incMatch:
-    #    i = e[0]
-    #    for index, n in enumerate(fileNames):
-    #        nName = re.sub(e[1], e[2], n) # change increment index for string format in name n
-    #        nName = nName.format(i)       # change string format for index
-    #        fileNames[index] = nName      # substitute n with new name in index fileNames
-    #        i += 1
-
-    # convert to pathlib.Path object
-    #oFileNames = []
-    #if bFullName:
-    #    for f in fileNames:
-    #        oFileNames.append(Path(f))
-    #else:
-    #    for index, f in enumerate(currentNames):
-    #        oFileNames.append(f.parent.joinpath(fileNames[index] + f.suffix))
 
     for index, f in enumerate(currentNames):
         # Path('.') is not full path use original name to get path
@@ -387,6 +366,24 @@ def _resolveIncrements(currentNames, newNames, subText):
             newNames[index] = nf
 
     return True
+
+
+def _matchGroups(strText, strMatch):
+
+    tmp = strText
+    result = []
+    reSearchEx = re.compile(strMatch)
+
+    while True:
+        matchGroup = reSearchEx.search(tmp)
+        if matchGroup:
+            group = matchGroup.group()
+            result.append(group)
+            tmp = re.sub(group, '', tmp)
+        else:
+            break
+
+    return result
 
 
 def _findDuplicates(fileNames):
