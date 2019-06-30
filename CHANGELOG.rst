@@ -36,7 +36,7 @@ Fixed
 - fix directory files read have to be sorted on macOS
 
 0.9.1b1.dev1 - 2019-5-21
-------------~~~~~~~~~~~~
+------------------------
 
 Added
 ~~~~~
