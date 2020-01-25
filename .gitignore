@@ -74,5 +74,5 @@ sources/
 test.py
 .DS_Store
 .gitchangelog.rc
-/html/
+html
 *.code-workspace
