@@ -1,0 +1,17 @@
+Create pot file
+
+xgettext  -L Python -s -o .\mkvbatchmultiplex\locale\mkvbatchmultiplex.pot -kS_ .\MKVBatchMultiplex\utils\text.py
+
+Add to pot file
+
+xgettext  -L Python -j -s -kS_ -o .\mkvbatchmultiplex\locale\mkvbatchmultiplex.pot  .\MKVBatchMultiplex\MKVBatchMultiplex.py
+
+Merge to new one
+
+msgmerge -o .\mkvbatchmultiplex\locale\es\LC_MESSAGES\mkvbatchmultiplex-new.po .\mkvbatchmultiplex\locale\es\LC_MESSAGES\mkvbatchmultiplex.po .\mkvbatchmultiplex.pot
+msgmerge -o .\mkvbatchmultiplex\locale\en\LC_MESSAGES\mkvbatchmultiplex-new.po .\mkvbatchmultiplex\locale\en\LC_MESSAGES\mkvbatchmultiplex.po .\mkvbatchmultiplex.pot
+
+Update with new phrases
+
+msgmerge -U .\mkvbatchmultiplex\locale\es\LC_MESSAGES\mkvbatchmultiplex.po .\mkvbatchmultiplex.pot
+msgmerge -U .\mkvbatchmultiplex\locale\en\LC_MESSAGES\mkvbatchmultiplex.po .\mkvbatchmultiplex.pot

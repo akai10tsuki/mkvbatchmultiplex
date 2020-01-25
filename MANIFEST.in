@@ -1,0 +1,12 @@
+include AUTHORS
+include LICENSE.txt
+include README.rst
+
+graft docs
+graft fileRename
+
+prune docs/_build
+
+global-exclude __pycache__
+global-exclude *.py[co]
+global-exclude *.po~

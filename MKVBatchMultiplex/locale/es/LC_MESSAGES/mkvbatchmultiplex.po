@@ -1,0 +1,138 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: MKVBatchMultiplex\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2020-01-24 23:46-0500\n"
+"PO-Revision-Date: 2020-01-24 23:59-0500\n"
+"Last-Translator: \n"
+"Language-Team: Efrain Vergara <akai10tsuki@gmail.com>\n"
+"Language: es_PR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.2.4\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: MKVBatchMultiplex/utils/text.py:15
+msgid "MKVMERGE: Batch Multiplex"
+msgstr "MKVMERGE: Multiplexor en lote"
+
+#: MKVBatchMultiplex/utils/text.py:16
+msgid "Restore"
+msgstr "Restaurar"
+
+#: MKVBatchMultiplex/utils/text.py:17
+msgid "Exit Application"
+msgstr "Salir de la applicación"
+
+#: MKVBatchMultiplex/utils/text.py:18
+msgid "Ctrl+E"
+msgstr "Ctrl+E"
+
+#: MKVBatchMultiplex/utils/text.py:19
+msgid "Confirm restore ..."
+msgstr "Confirmar restauración …"
+
+#: MKVBatchMultiplex/utils/text.py:20
+msgid "Abort"
+msgstr "Abortar ejecución"
+
+#: MKVBatchMultiplex/utils/text.py:21
+msgid "Force exit"
+msgstr "Forzar salida"
+
+#: MKVBatchMultiplex/utils/text.py:22
+msgid "Enable logging"
+msgstr "Habilitar registro"
+
+#: MKVBatchMultiplex/utils/text.py:23
+msgid "Enable session logging in {}"
+msgstr "Habilitar el registro de sessión en {}"
+
+#: MKVBatchMultiplex/utils/text.py:24
+msgid "Font && size"
+msgstr "Fuente y tamaño"
+
+#: MKVBatchMultiplex/utils/text.py:25
+msgid "Select font & size"
+msgstr "Seleccionar fuente y tamaño de interfaz"
+
+#: MKVBatchMultiplex/utils/text.py:26
+msgid "Restore defaults"
+msgstr "Restaurar valores predeterminados"
+
+#: MKVBatchMultiplex/utils/text.py:27
+msgid "Using"
+msgstr "Como utilizer"
+
+#: MKVBatchMultiplex/utils/text.py:28
+msgid "&Help"
+msgstr "A&yuda"
+
+#: MKVBatchMultiplex/utils/text.py:29
+msgid "&File"
+msgstr "&Archivo"
+
+#: MKVBatchMultiplex/utils/text.py:30
+msgid "&Settings"
+msgstr "&Preferencias"
+
+#: MKVBatchMultiplex/utils/text.py:31
+msgid "&Interface language"
+msgstr "Idioma del interfaz"
+
+#: MKVBatchMultiplex/utils/text.py:32
+msgid "Exit"
+msgstr "Salir"
+
+#: MKVBatchMultiplex/utils/text.py:33
+msgid "&Exit"
+msgstr "&Salir"
+
+#: MKVBatchMultiplex/utils/text.py:34
+msgid "Yes"
+msgstr "Si"
+
+#: MKVBatchMultiplex/utils/text.py:35
+msgid "Are you sure you want to exit"
+msgstr "Seguro que desea salir"
+
+#: MKVBatchMultiplex/utils/text.py:36
+msgid "Close App"
+msgstr "Cerrar la applicación"
+
+#: MKVBatchMultiplex/utils/text.py:37
+msgid "Restore default settings"
+msgstr "Restaurar la configuración predeterminada"
+
+#: MKVBatchMultiplex/utils/text.py:38
+msgid "Author"
+msgstr "Autor"
+
+#: MKVBatchMultiplex/utils/text.py:39
+msgid "email"
+msgstr "email"
+
+#: MKVBatchMultiplex/utils/text.py:40
+msgid "Python Version"
+msgstr "Versión de Python"
+
+#: MKVBatchMultiplex/utils/text.py:41
+msgid "About"
+msgstr "Acerca"
+
+#: MKVBatchMultiplex/utils/text.py:42
+msgid "This is the Application"
+msgstr "Este es el Programa"
+
+#: MKVBatchMultiplex/utils/text.py:43
+msgid "Contents"
+msgstr "Contenido"
+
+#~ msgid "Search"
+#~ msgstr "Busqueda"
