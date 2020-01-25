@@ -14,6 +14,8 @@ mkvbatchmultiplex: MKVMERGE batch multiplexing
   :target: https://mkvbatchmultiplex.readthedocs.io/en/latest/?badge=latest
   :alt: Documentation Status
 
+**Development of this branch stopped working on full re-write on master.v2**
+
 This project started out of the need to multiplex a library of many video
 series using AVI_ container and SRT_ for subtitles to be maintained in a Media
 Server. And as the saying goes search for something to use did not find
