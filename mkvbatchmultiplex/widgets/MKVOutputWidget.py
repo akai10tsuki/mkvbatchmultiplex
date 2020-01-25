@@ -17,6 +17,7 @@ from PySide2.QtWidgets import QTextEdit, QStyleFactory
 
 import vsutillib.macos as macos
 
+from .. import config
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -72,7 +73,7 @@ class MKVOutputWidget(QTextEdit):
 
         saveStyle = self.styleSheet()
 
-        if macos.isMacDarkMode() and (color is None):
+        if (macos.isMacDarkMode() or config.DARKTHEME) and (color is None):
             color = Qt.white
         elif color is None:
             color = Qt.black

@@ -15,6 +15,8 @@ It will analyze the command and apply the same multiplex instructions to all
 the files in the same directory if more than one file is involved in the
 command they must match in numbers.
 
+Starting to use new features of Python 3.8
+
 Develop on Windows
 
 Works on:
@@ -23,13 +25,13 @@ Works on:
 
 Libraries and programs used:
 
-    python 3.6-3.7
-    pymediainfo 4.0
+    python 3.6-3.8
+    pymediainfo 4.0-4.1
     mediainfo-17.10->18.12
-    PySide2 5.12
+    PySide2 5.12-5.14
 
 Target program:
-    MKVToolNix - tested with versions v17.0.0-34.0.0
+    MKVToolNix - tested with versions v17.0.0-42.0.0
 """
 # MWW0001
 
@@ -44,10 +46,12 @@ from queue import Queue
 from collections import deque
 
 from PySide2.QtCore import QByteArray, Qt, QThreadPool, Signal
-from PySide2.QtGui import QIcon, QFont
+from PySide2.QtGui import QIcon, QFont, QPalette, QColor
 from PySide2.QtWidgets import (QAction, QApplication, QDesktopWidget, qApp,
                                QMainWindow, QMessageBox, QToolBar, QVBoxLayout,
                                QWidget, QFontDialog, QToolTip)
+
+#import qdarkstyle
 
 import vsutillib.media as media
 import vsutillib.pyqt as pyqt
@@ -100,6 +104,9 @@ class MKVMultiplexApp(QMainWindow):  # pylint: disable=R0902
 
         # Read configuration elements
         self.restoreConfig()
+
+        #dark_stylesheet = qdarkstyle.load_stylesheet_pyside2()
+        #self.setStyleSheet(dark_stylesheet)
 
         self.checkDependencies()
 
@@ -472,12 +479,51 @@ def abort():
     qApp.quit()  # pylint: disable=E1101
 
 
+def setDarkPalette(app):
+    """
+    Set dark theme palette
+
+    :param app: Application main window
+    :type app: QApplication
+    """
+
+    # Palette will change on macOS according to current theme
+    # will create a poor mans dark theme for windows
+    if platform.system() == "Windows":
+
+        # Force the style to be the same on all OSs:
+        app.setStyle("Fusion")
+
+        # Now use a palette to switch to dark colors:
+        palette = QPalette()
+        palette.setColor(QPalette.Window, QColor(53, 53, 53))
+        palette.setColor(QPalette.WindowText, Qt.white)
+        palette.setColor(QPalette.Base, QColor(25, 25, 25))
+        palette.setColor(QPalette.AlternateBase, QColor(53, 53, 53))
+        palette.setColor(QPalette.ToolTipBase, Qt.white)
+        palette.setColor(QPalette.ToolTipText, Qt.white)
+        palette.setColor(QPalette.Text, Qt.white)
+        palette.setColor(QPalette.Button, QColor(53, 53, 53))
+        palette.setColor(QPalette.ButtonText, Qt.white)
+        palette.setColor(QPalette.BrightText, Qt.red)
+        palette.setColor(QPalette.Link, QColor(42, 130, 218))
+        palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
+        palette.setColor(QPalette.HighlightedText, Qt.black)
+        palette.setColor(QPalette.Disabled, QPalette.Text, Qt.darkGray)
+        palette.setColor(QPalette.Disabled, QPalette.ButtonText, Qt.darkGray)
+        app.setPalette(palette)
+
+        #dark_stylesheet = qdarkstyle.load_stylesheet_pyside2()
+        #app.setStyleSheet(dark_stylesheet)
+
 def mainApp():
     """Main"""
 
     config.init()
 
     app = QApplication(sys.argv)
+    if config.DARKTHEME:
+        setDarkPalette(app)
     win = MKVMultiplexApp()
     win.show()
     app.exec_()

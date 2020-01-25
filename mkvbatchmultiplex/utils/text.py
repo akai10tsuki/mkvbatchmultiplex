@@ -6,7 +6,7 @@ def ngettext(s1, s2, n): # pylint: disable=invalid-name
     """Dummy"""
     return s1 + s2 + str(n)
 
-class Text():
+class Text:
     """
     Text strings used in the application
     """

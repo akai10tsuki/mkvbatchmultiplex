@@ -37,7 +37,6 @@ def centerWidgets(widget, parent=None):
 
 
     else:
-        print("Second option...")
         widget.move(QDesktopWidget().availableGeometry().center() - widget.frameGeometry().center())
 
 
@@ -71,9 +70,11 @@ def runCommand(command, currentJob, lstTotal, log=False):
                     )
                     addNewline = False
 
-                m = regEx.search(line)
+                #m = regEx.search(line)
+                #if m:
+                #    n = int(m.group(1))
 
-                if m:
+                if m := regEx.search(line):
                     n = int(m.group(1))
 
                 if n > 0:
@@ -112,9 +113,16 @@ def runCommand(command, currentJob, lstTotal, log=False):
             if not currentJob.spControlQueue.empty():
                 request = currentJob.spControlQueue.get()
                 if request == JobStatus.AbortJob:
+                    print("Abort Job Request")
                     currentJob.controlQueue.put(JobStatus.AbortJob)
                     p.kill()
                     outs, errs = p.communicate()
+                    if outs:
+                        print(outs)
+                    if errs:
+                        print(errs)
+                    print(p.returncode)
+                    break
                 if request == JobStatus.Abort:
                     currentJob.controlQueue.put(JobStatus.AbortForced)
                     p.kill()
@@ -126,6 +134,8 @@ def runCommand(command, currentJob, lstTotal, log=False):
                     print(p.returncode)
                     break
 
+        rc = p.returncode
+
         currentJob.outputJobMain(
             currentJob.jobID,
             "\n",
@@ -135,6 +145,7 @@ def runCommand(command, currentJob, lstTotal, log=False):
     lstTotal[0] += 100
 
     if log:
-        MODULELOG.info("UTL0001: runCommand rc=%d - %s", rc, command)
+        if isinstance(rc, int):
+            MODULELOG.info("UTL0001: runCommand rc=%d - %s", rc, command)
 
     return rc

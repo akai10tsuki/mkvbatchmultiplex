@@ -10,6 +10,9 @@ mkvbatchmultiplex: MKVMERGE batch multiplexing
 .. image:: https://img.shields.io/pypi/pyversions/mkvbatchmultiplex.svg
   :target: https://pypi.org/project/mkvbatchmultiplex
 
+.. image:: https://readthedocs.org/projects/mkvbatchmultiplex/badge/?version=latest
+  :target: https://mkvbatchmultiplex.readthedocs.io/en/latest/?badge=latest
+  :alt: Documentation Status
 
 This project started out of the need to multiplex a library of many video
 series using AVI_ container and SRT_ for subtitles to be maintained in a Media

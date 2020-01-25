@@ -4,6 +4,19 @@ Changelog
 
 Changes to the project.
 
+(Unreleased)
+------------
+
+Added
+~~~~~
+
+Changed
+~~~~~~~
+
+Fixed
+~~~~~
+- fix abort job leaving unfinished file
+
 1.0.1 - 2019-06-29
 ------------------
 

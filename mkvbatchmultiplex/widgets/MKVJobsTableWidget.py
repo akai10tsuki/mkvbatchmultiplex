@@ -11,7 +11,6 @@ context menu on status can change it
 import logging
 
 from PySide2.QtCore import Qt, Slot, Signal
-from PySide2.QtGui import QFont
 from PySide2.QtWidgets import (QVBoxLayout, QTableWidget, QMenu, QWidget, QHeaderView,
                                QTableWidgetItem, QAbstractScrollArea)
 
@@ -43,7 +42,7 @@ class MKVJobsTableWidget(QWidget):
 
     def _initControls(self):
 
-        self.jobsTable = JobsTableWidget(self, self.ctrlQueue)
+        self.jobsTable = JobsTableWidget(self, self.spCtrlQueue)
 
         # table selection change
         self.jobsTable.cellDoubleClicked.connect(self.onDoubleClick)
@@ -94,11 +93,11 @@ class JobsTableWidget(QTableWidget):
 
     updateJobStatus = Signal(int, str, bool)
 
-    def __init__(self, parent=None, ctrlQueue=None):
+    def __init__(self, parent=None, spCtrlQueue=None):
         super(JobsTableWidget, self).__init__(parent)
 
         self.parent = parent
-        self.ctrQueue = ctrlQueue
+        self.spCtrlQueue = spCtrlQueue
         self.actions = JobStatus()
         self.setColumnCount(3)
         self.setHorizontalHeaderLabels(["Jobs ID", "Status", "Description"])
@@ -180,7 +179,7 @@ class JobsTableWidget(QTableWidget):
 
         #print("row = {} col = {} status = {} job = {}".format(row, col, status, jobID))
 
-        if (0 <= row < totalRows) and (col == 1):
+        if (0 <= row < totalRows) and (col == 1) and (status != JobStatus.Error):
 
             menu = QMenu()
             skipAction = None
@@ -203,7 +202,7 @@ class JobsTableWidget(QTableWidget):
                     self.setRowStatus(row, self.actions.Waiting)
                 elif action == abortAction:
                     self.setRowStatus(row, self.actions.Abort)
-                    if self.spCtrQueue is not None:
+                    if self.spCtrlQueue is not None:
                         self.spCtrlQueue.put(self.actions.AbortJob)
 
     def resizeEvent(self, event):

@@ -151,7 +151,7 @@ class MKVRenameWidget(QWidget):
 
         for f in objCommand.destinationFiles:
             # show files
-            self.outputOriginalFileSignal.emit(str(f.name) + '\n', {})
+            self.outputOriginalFileSignal.emit(str(f.name) + '\n', {'color': Qt.white})
             # save files
             self._outputFileNames.append(f)
 
@@ -187,7 +187,8 @@ class MKVRenameWidget(QWidget):
             if (f in duplicateNames) or of.is_file():
                 self.outputRenameResultsSignal.emit(str(f.name) + '\n', {'color': Qt.red})
             else:
-                self.outputRenameResultsSignal.emit(str(f.name) + '\n', {})
+                # check theme
+                self.outputRenameResultsSignal.emit(str(f.name) + '\n', {'color': Qt.white})
 
     def _updateRegEx(self):
 

@@ -115,7 +115,6 @@ class JobQueue(QObject): # pylint: disable=R0902
 
         self._jobsStatus = setStatus
 
-
     def abortAll(self):
         """abort any pending jobs"""
 
@@ -157,7 +156,8 @@ class JobQueue(QObject): # pylint: disable=R0902
         for key, value in self._jobs.items():
             if value.status == JobStatus.Waiting:
                 if not self.inQueue(value.command):
-                    self._workQueue.append([key, value.command])
+                    oCmd = MKVCommand(value.command)
+                    self._workQueue.append([key, value.command, oCmd])
 
     def connectToStatus(self, objSignal):
         """

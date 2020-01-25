@@ -4,7 +4,7 @@ MKVCommandWidget:
 Command input widget
 """
 
-#LOG MCW0013
+# LOG MCW0013
 
 import logging
 import platform
@@ -45,8 +45,11 @@ class MKVCommandWidget(QWidget):
 
         if setLogging is None:
             return cls.__log
-        elif isinstance(setLogging, bool):
+
+        if isinstance(setLogging, bool):
             cls.__log = setLogging
+
+        return None
 
     def __init__(self, parent, qthThread, jobs, jobCtrlQueue, jobSpCtrlQueue,
                  renameWidget):
@@ -66,7 +69,6 @@ class MKVCommandWidget(QWidget):
         self._initControls()
         self._initLayout()
 
-        #self.requestedClose = False
         self.timer = QTimer()
         self.timer.setInterval(2000)
         self.timer.timeout.connect(self.watchJobs)
@@ -93,16 +95,16 @@ class MKVCommandWidget(QWidget):
         self.btnPasteClipboard = QPushButton(" Paste Clipboard ")
         self.btnPasteClipboard.resize(self.btnPasteClipboard.sizeHint())
         if platform.system() != "Linux":
-            #macOS will not update if a thread is not used
-            #linux - ubuntu won't work with this the first click fails
+            # macOS will not update if a thread is not used
+            # linux - ubuntu won't work with this the first click fails
             #    from there on it work
             #windows - work
 
             self.btnPasteClipboard.clicked.connect(lambda: self.qthRunInThread(
                 self.qthPasteClipboard))
         else:
-            #linux - ubuntu only refresh correctly this way
-            #macOS - refresh doesn't work must use keyboard arrows to refresh
+            # linux - ubuntu only refresh correctly this way
+            # macOS - refresh doesn't work must use keyboard arrows to refresh
             #windows - work
 
             self.btnPasteClipboard.clicked.connect(self.pasteClipboard)
@@ -259,10 +261,10 @@ class MKVCommandWidget(QWidget):
         Hack until job queue is reworked
         """
 
-        #while True:
-        if self.jobs.jobsAreWaiting():
+        jobsCurrentStatus = self.jobs.jobsStatus()
 
-            jobsCurrentStatus = self.jobs.jobsStatus()
+        # while True:
+        if self.jobs.jobsAreWaiting():
 
             if jobsCurrentStatus == JobStatus.Blocked:
                 self.btnProcess.setEnabled(False)
@@ -275,12 +277,12 @@ class MKVCommandWidget(QWidget):
                     self.jobs.requeueWaiting()
                     self.btnProcessQueue.setEnabled(True)
 
-        js = self.jobs.jobsStatus()
+        else:
 
-        if js == JobStatus.Aborted:
+            self.btnProcessQueue.setEnabled(False)
+
+        if jobsCurrentStatus == JobStatus.Aborted:
             self.parent.close()
-
-        #time.sleep(2)
 
     def qthRunInThread(self, function, *args, **kwargs):
         """
@@ -316,9 +318,9 @@ class MKVCommandWidget(QWidget):
         """Change button state"""
 
         if bState is not None:
-            #self.btnCheckFiles.setEnabled(bState)
-            #self.btnShowSourceFiles.setEnabled(bState)
-            #self.btnShowCommands.setEnabled(bState)
+            # self.btnCheckFiles.setEnabled(bState)
+            # self.btnShowSourceFiles.setEnabled(bState)
+            # self.btnShowCommands.setEnabled(bState)
 
             self.btnShowSourceFiles.setEnabled(bState)
             self.btnShowCommands.setEnabled(bState)
@@ -376,9 +378,15 @@ class MKVCommandWidget(QWidget):
 
         cbOutputMain.emit("Analysis of command line:\n\n", {})
 
+        #for e in verify.analysis:
+        #    i = e.find(r"chk:")
+        #    if i >= 0:
+        #        cbOutputMain.emit("{}\n".format(e), {'color': Qt.darkGreen})
+        #    else:
+        #        cbOutputMain.emit("{}\n".format(e), {'color': Qt.red})
+
         for e in verify.analysis:
-            i = e.find(r"chk:")
-            if i >= 0:
+            if e.find(r"chk:") >= 0:
                 cbOutputMain.emit("{}\n".format(e), {'color': Qt.darkGreen})
             else:
                 cbOutputMain.emit("{}\n".format(e), {'color': Qt.red})
@@ -533,13 +541,13 @@ class MKVCommandWidget(QWidget):
                         lstFile.append(str(f))
 
                     cbOutputMain.emit(
-                        "Structure looks OK:\n" \
+                        "Structure looks OK:\n"
                         + str(lstFile) + "\n\n",
                         {'color': Qt.darkGreen}
                     )
                 else:
                     cbOutputMain.emit(
-                        str(verify) \
+                        str(verify)
                         + "\n\n",
                         {'color': Qt.red}
                     )
@@ -694,23 +702,18 @@ class MKVCommandWidget(QWidget):
 
                 for cmd, basefiles, sourcefiles, _, _ in objCommand:
 
-                    currentStatus = self.jobs.status(currentJob.jobID)
-
-                    if currentStatus == JobStatus.AbortJob:
-                        break
-
                     if self.controlQueue is not None:
                         if not self.controlQueue.empty():
                             request = self.controlQueue.get()
 
-                            if request == JobStatus.AbortJob:
+                            if request in [JobStatus.AbortJob, JobStatus.AbortJobError
+                                           ]:
+                                status = \
+                                    JobStatus.Error \
+                                    if request == JobStatus.AbortJobError \
+                                    else JobStatus.Abort
                                 self.jobs.status(currentJob.jobID,
-                                                 JobStatus.AbortJob)
-                                break
-
-                            if request == JobStatus.AbortJobError:
-                                self.jobs.status(currentJob.jobID,
-                                                 JobStatus.Error)
+                                                 status)
                                 p = Path(objCommand[nFile - 1][3])
                                 if p.is_file():
                                     p.unlink()
@@ -776,7 +779,12 @@ class MKVCommandWidget(QWidget):
 
                 currentStatus = self.jobs.status(currentJob.jobID)
 
-                if currentStatus in [JobStatus.Abort, JobStatus.AbortJob]:
+                if currentStatus == JobStatus.Error:
+                    currentJob.outputJobMain(
+                        currentJob.jobID,
+                        "Job {} - Error.\n\n\n".format(currentJob.jobID),
+                        {'color': Qt.red})
+                elif currentStatus in [JobStatus.Abort, JobStatus.AbortJob]:
                     self.jobs.status(currentJob.jobID, JobStatus.Aborted)
                     currentJob.outputJobMain(
                         currentJob.jobID,
