@@ -45,7 +45,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
     log = False
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, palette=None):
         super(MainWindow, self).__init__(parent)
 
         self.actEnableLogging = None
@@ -53,6 +53,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.actES = None
         self.languageMenu = None
         self.jobQueue = JobQueue(self)
+        self.defaultPalette = palette
 
         #
         # Where am I running from
@@ -526,10 +527,13 @@ def abort():
 def mainApp():
     """Main"""
 
+    from vsutillib.pyqt import darkPalette
+
     config.init()
 
     # PySide2 app
     app = QApplication(sys.argv)
+    app.setPalette(darkPalette())
     win = MainWindow()
     win.show()
     app.exec_()

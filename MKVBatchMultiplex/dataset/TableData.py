@@ -282,7 +282,7 @@ class TableData:
 
         return element
 
-    def insertColumn(self, index=0, columnHeader=None, columnData=None):
+    def insertColumn(self, position=0, columnHeader=None, columnData=None):
         """
         Insert a data column
 
@@ -292,8 +292,8 @@ class TableData:
         """
 
         if columnHeader is None:
-            self.headers.insert(index, HeaderInfo())
-            self.headerName.insert(index, "")
+            self.headers.insert(position, HeaderInfo())
+            self.headerName.insert(position, "")
 
         else:
 
@@ -304,13 +304,13 @@ class TableData:
                 oHeader.attribute = columnHeader[1]
                 oHeader.headerList = columnHeader
 
-                self.headers.insert(index, oHeader)
-                self.headerName.insert(index, oHeader.header)
+                self.headers.insert(position, oHeader)
+                self.headerName.insert(position, oHeader.header)
 
             elif isinstance(columnHeader, HeaderInfo):
 
-                self.headers.insert(index, columnHeader)
-                self.headers.insert(index, columnHeader.header)
+                self.headers.insert(position, columnHeader)
+                self.headers.insert(position, columnHeader.header)
 
             else:
 
@@ -318,10 +318,12 @@ class TableData:
 
         if columnData is None:
             for r in self.data:
-                r.insert(index, "")
+                r.insert(position, DataItem())
         else:
             for i, r in enumerate(self.data):
-                r.insert(index, columnData[i])
+                element = DataItem()
+                element.data = columnData[0]
+                r.insert(position, columnData[1])
 
     def deleteColumn(self, index):
         """

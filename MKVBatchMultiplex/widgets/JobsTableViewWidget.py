@@ -6,9 +6,9 @@ import logging
 import time
 
 from PySide2.QtCore import QThreadPool, Qt
-from PySide2.QtWidgets import QWidget, QGroupBox, QGridLayout
+from PySide2.QtWidgets import QWidget, QGroupBox, QGridLayout, QApplication
 
-from vsutillib.pyqt import QthThreadWorker, QPushButtonWidget
+from vsutillib.pyqt import QthThreadWorker, QPushButtonWidget, darkPalette
 
 from ..jobs import JobStatus
 from ..delegates import StatusComboBoxDelegate
@@ -195,6 +195,8 @@ class JobsTableViewWidget(QWidget):
         """
         printDataset development debug
         """
+
+        QApplication.setPalette(darkPalette())
 
         dataset = self.tableModel.dataset
         for r in range(0, len(dataset)):
