@@ -2,5 +2,5 @@
 Import jobs module entry point
 """
 
-from .jobStatus import JobStatus
+from .jobKeys import JobKey, JobStatus
 from .jobs import JobInfo, JobQueue
