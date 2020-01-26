@@ -26,6 +26,7 @@ from PySide2.QtWidgets import (
     QWidget,
     QFontDialog,
     QToolTip,
+    QStyle,
 )
 
 from vsutillib.pyqt import centerWidgets, QActionWidget, QMenuWidget, DualProgressBar
@@ -107,9 +108,12 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         # File SubMenu
         fileMenu = QMenuWidget(Text.txt0026)
 
+        closeIcon = self.style().standardIcon(QStyle.SP_DialogCloseButton)
+
         # Exit application
+        #QIcon(str(self.appDirectory.parent) + "/images/cross-circle.png"),
         actExit = QActionWidget(
-            QIcon(str(self.appDirectory.parent) + "/images/cross-circle.png"),
+            closeIcon,
             Text.txt0030,
             self,
             shortcut=Text.txt0015,
@@ -533,6 +537,7 @@ def mainApp():
 
     # PySide2 app
     app = QApplication(sys.argv)
+    app.setStyle("Fusion")
     app.setPalette(darkPalette())
     win = MainWindow()
     win.show()
