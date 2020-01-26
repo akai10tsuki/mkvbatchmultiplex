@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MKVBatchMultiplex\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-01-24 23:46-0500\n"
-"PO-Revision-Date: 2020-01-24 23:59-0500\n"
+"POT-Creation-Date: 2020-01-25 18:51-0500\n"
+"PO-Revision-Date: 2020-01-25 19:01-0500\n"
 "Last-Translator: \n"
 "Language-Team: Efrain Vergara <akai10tsuki@gmail.com>\n"
 "Language: es_PR\n"
@@ -23,116 +23,169 @@ msgid "MKVMERGE: Batch Multiplex"
 msgstr "MKVMERGE: Multiplexor en lote"
 
 #: MKVBatchMultiplex/utils/text.py:16
-msgid "Restore"
-msgstr "Restaurar"
+msgid "Author"
+msgstr "Autor"
 
 #: MKVBatchMultiplex/utils/text.py:17
-msgid "Exit Application"
-msgstr "Salir de la applicación"
+msgid "email"
+msgstr "email"
 
 #: MKVBatchMultiplex/utils/text.py:18
+msgid "Python Version"
+msgstr "Versión de Python"
+
+#: MKVBatchMultiplex/utils/text.py:21
+msgid "&File"
+msgstr "&Archivo"
+
+#: MKVBatchMultiplex/utils/text.py:22
+msgid "&Exit"
+msgstr "&Salir"
+
+#: MKVBatchMultiplex/utils/text.py:23
 msgid "Ctrl+E"
 msgstr "Ctrl+E"
 
-#: MKVBatchMultiplex/utils/text.py:19
-msgid "Confirm restore ..."
-msgstr "Confirmar restauración …"
+#: MKVBatchMultiplex/utils/text.py:24
+msgid "Exit Application"
+msgstr "Salir de la applicación"
 
-#: MKVBatchMultiplex/utils/text.py:20
+#: MKVBatchMultiplex/utils/text.py:25
 msgid "Abort"
 msgstr "Abortar ejecución"
 
-#: MKVBatchMultiplex/utils/text.py:21
+#: MKVBatchMultiplex/utils/text.py:26
 msgid "Force exit"
 msgstr "Forzar salida"
-
-#: MKVBatchMultiplex/utils/text.py:22
-msgid "Enable logging"
-msgstr "Habilitar registro"
-
-#: MKVBatchMultiplex/utils/text.py:23
-msgid "Enable session logging in {}"
-msgstr "Habilitar el registro de sessión en {}"
-
-#: MKVBatchMultiplex/utils/text.py:24
-msgid "Font && size"
-msgstr "Fuente y tamaño"
-
-#: MKVBatchMultiplex/utils/text.py:25
-msgid "Select font & size"
-msgstr "Seleccionar fuente y tamaño de interfaz"
-
-#: MKVBatchMultiplex/utils/text.py:26
-msgid "Restore defaults"
-msgstr "Restaurar valores predeterminados"
-
-#: MKVBatchMultiplex/utils/text.py:27
-msgid "Using"
-msgstr "Como utilizer"
-
-#: MKVBatchMultiplex/utils/text.py:28
-msgid "&Help"
-msgstr "A&yuda"
-
-#: MKVBatchMultiplex/utils/text.py:29
-msgid "&File"
-msgstr "&Archivo"
 
 #: MKVBatchMultiplex/utils/text.py:30
 msgid "&Settings"
 msgstr "&Preferencias"
 
 #: MKVBatchMultiplex/utils/text.py:31
+msgid "Enable logging"
+msgstr "Habilitar registro"
+
+#: MKVBatchMultiplex/utils/text.py:32
+msgid "Enable session logging in {}"
+msgstr "Habilitar el registro de sessión en {}"
+
+#: MKVBatchMultiplex/utils/text.py:33
+msgid "Font && size"
+msgstr "Fuente y tamaño"
+
+#: MKVBatchMultiplex/utils/text.py:34
+msgid "Select font & size"
+msgstr "Seleccionar fuente y tamaño de interfaz"
+
+#: MKVBatchMultiplex/utils/text.py:36
 msgid "&Interface language"
 msgstr "Idioma del interfaz"
 
-#: MKVBatchMultiplex/utils/text.py:32
-msgid "Exit"
-msgstr "Salir"
-
-#: MKVBatchMultiplex/utils/text.py:33
-msgid "&Exit"
-msgstr "&Salir"
-
-#: MKVBatchMultiplex/utils/text.py:34
-msgid "Yes"
-msgstr "Si"
-
-#: MKVBatchMultiplex/utils/text.py:35
-msgid "Are you sure you want to exit"
-msgstr "Seguro que desea salir"
-
-#: MKVBatchMultiplex/utils/text.py:36
-msgid "Close App"
-msgstr "Cerrar la applicación"
-
-#: MKVBatchMultiplex/utils/text.py:37
-msgid "Restore default settings"
-msgstr "Restaurar la configuración predeterminada"
-
 #: MKVBatchMultiplex/utils/text.py:38
-msgid "Author"
-msgstr "Autor"
+msgid "Restore defaults"
+msgstr "Restaurar valores predeterminados"
 
 #: MKVBatchMultiplex/utils/text.py:39
-msgid "email"
-msgstr "email"
-
-#: MKVBatchMultiplex/utils/text.py:40
-msgid "Python Version"
-msgstr "Versión de Python"
-
-#: MKVBatchMultiplex/utils/text.py:41
-msgid "About"
-msgstr "Acerca"
+msgid "Restore settings for font, window size and position"
+msgstr ""
 
 #: MKVBatchMultiplex/utils/text.py:42
-msgid "This is the Application"
-msgstr "Este es el Programa"
+msgid "&Help"
+msgstr "A&yuda"
 
 #: MKVBatchMultiplex/utils/text.py:43
 msgid "Contents"
 msgstr "Contenido"
+
+#: MKVBatchMultiplex/utils/text.py:44
+msgid "Using"
+msgstr "Como utilizer"
+
+#: MKVBatchMultiplex/utils/text.py:45
+msgid "About"
+msgstr "Acerca"
+
+#: MKVBatchMultiplex/utils/text.py:49
+msgid "Close App"
+msgstr "Cerrar la applicación"
+
+#: MKVBatchMultiplex/utils/text.py:50
+msgid "Are you sure you want to exit"
+msgstr "Seguro que desea salir"
+
+#: MKVBatchMultiplex/utils/text.py:51
+msgid "Yes"
+msgstr "Si"
+
+#: MKVBatchMultiplex/utils/text.py:53
+msgid "Confirm restore ..."
+msgstr "Confirmar restauración …"
+
+#: MKVBatchMultiplex/utils/text.py:54
+msgid "Restore default settings"
+msgstr "Restaurar la configuración predeterminada"
+
+#: MKVBatchMultiplex/utils/text.py:58
+msgid "Populate"
+msgstr "Poblar"
+
+#: MKVBatchMultiplex/utils/text.py:59
+msgid "Add test jobs to table"
+msgstr "Agregar trabajos de prueba a la tabla"
+
+#: MKVBatchMultiplex/utils/text.py:60
+msgid "Queue Waiting Jobs"
+msgstr "Agrejar tragajos es espera"
+
+#: MKVBatchMultiplex/utils/text.py:61
+msgid "Add all Waiting jobs to the Queue"
+msgstr "Agregar todos los trabajos en espera a la cola"
+
+#: MKVBatchMultiplex/utils/text.py:62
+msgid "Clear Queue"
+msgstr "Borrar la cola"
+
+#: MKVBatchMultiplex/utils/text.py:63
+msgid "Remove jobs from Queue"
+msgstr "Eliminar trabajos de la cola"
+
+#: MKVBatchMultiplex/utils/text.py:64
+msgid "Simulate Run"
+msgstr "Ejecutar simulación"
+
+#: MKVBatchMultiplex/utils/text.py:65
+msgid "Clear Queue simulating a run"
+msgstr "Borrar la cola simulando una ejecución"
+
+#: MKVBatchMultiplex/utils/text.py:66
+msgid "Debug"
+msgstr "Depurar"
+
+#: MKVBatchMultiplex/utils/text.py:67
+msgid "Print current dataset to console"
+msgstr "Imprimir conjunto de datos actual a la consola"
+
+#: MKVBatchMultiplex/utils/text.py:68
+msgid "Jobs Table"
+msgstr "Tabla de trabajos"
+
+#: MKVBatchMultiplex/utils/text.py:69
+msgid "Status"
+msgstr "Estado"
+
+#: MKVBatchMultiplex/utils/text.py:70
+msgid "Command"
+msgstr "Commando"
+
+#~ msgid "Restore"
+#~ msgstr "Restaurar"
+
+#~ msgid "Exit"
+#~ msgstr "Salir"
+
+#~ msgid "This is the Application"
+#~ msgstr "Este es el Programa"
 
 #~ msgid "Search"
 #~ msgstr "Busqueda"
