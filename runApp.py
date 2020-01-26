@@ -4,7 +4,7 @@
 
 import sys
 
-from mkvbatchmultiplex import mainApp # pylint: disable=C0413
+from MKVBatchMultiplex import mainApp # pylint: disable=C0413
 
 def main():
     """Entry point for mkvbatchmultiplex"""
