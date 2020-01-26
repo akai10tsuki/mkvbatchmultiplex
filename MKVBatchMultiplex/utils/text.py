@@ -44,10 +44,27 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0024 = S_("Using")
     txt0040 = S_("About")
 
-    #Double Change 80
+    # Dialogs
+    # 80
     txt0080 = S_("Close App")
     txt0081 = S_("Are you sure you want to exit")
     txt0082 = S_("Yes")
 
     txt0083 = S_("Confirm restore ...")
     txt0084 = S_("Restore default settings")
+
+    # JobTableWidgets
+    # 120
+    txt0120 = S_("Populate")
+    txt0121 = S_("Add test jobs to table")
+    txt0122 = S_("Queue Waiting Jobs")
+    txt0123 = S_("Add all Waiting jobs to the Queue")
+    txt0124 = S_("Clear Queue")
+    txt0125 = S_("Remove jobs from Queue")
+    txt0126 = S_("Simulate Run")
+    txt0127 = S_("Clear Queue simulating a run")
+    txt0128 = S_("Debug")
+    txt0129 = S_("Print current dataset to console")
+    txt0130 = S_("Jobs Table")
+    txt0131 = S_("Status")
+    txt0132 = S_("Command")
