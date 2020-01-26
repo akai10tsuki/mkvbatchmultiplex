@@ -14,6 +14,7 @@
 #
 import os
 import sys
+from pathlib import Path
 
 #from unittest.mock import MagicMock
 
@@ -25,8 +26,9 @@ import sys
 #        return MagicMock()
 
 #sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+
 sys.path.insert(0, os.path.abspath('../..'))
-from mkvbatchmultiplex import config
+from MKVBatchMultiplex import config
 
 html_show_sourcelink=False
 
@@ -35,11 +37,11 @@ html_show_sourcelink=False
 # -- Project information -----------------------------------------------------
 
 project = 'mkvbatchmultiplex'
-copyright = '2018-2019, Efrain Vergara'
+copyright = '2018-2020, Efrain Vergara'
 author = 'Efrain Vergara'
 
 # The short X.Y version
-version = '1.0'
+version = '2.0'
 # The full version, including alpha/beta/rc tags
 #release = '0.5.3a3.dev1'
 release = config.VERSION
