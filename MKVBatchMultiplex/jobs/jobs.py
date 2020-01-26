@@ -12,7 +12,7 @@ from PySide2.QtCore import QObject, QMutex, QMutexLocker, Qt, Slot, Signal
 from vsutillib.mkv import MKVCommand
 
 from ..models import TableProxyModel
-from .jobStatus import JobStatus
+from .jobKeys import JobStatus
 
 MUTEX = QMutex()
 MODULELOG = logging.getLogger(__name__)
