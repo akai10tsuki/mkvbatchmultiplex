@@ -103,6 +103,7 @@ Class for a table model with horizontal headers
 
 from PySide2.QtCore import QAbstractTableModel, Qt, QSortFilterProxyModel, QModelIndex
 
+JOBID, JOBSTATUS, JOBCOMMAND = range(3)
 
 class TableModel(QAbstractTableModel):
     """Model for table view
@@ -160,7 +161,15 @@ class TableModel(QAbstractTableModel):
         if role == Qt.DisplayRole:
 
             if orientation == Qt.Horizontal:
-                return self.dataset[section].attribute["Label"]
+                return self.dataset[section]
+
+            if orientation == Qt.Vertical:
+                # For the implementation of row headers
+                pass
+
+        elif role == Qt.ToolTipRole:
+            if orientation == Qt.Horizontal:
+                return self.dataset.headers[section].attribute["ToolTip"]
 
             if orientation == Qt.Vertical:
                 # For the implementation of row headers
@@ -170,7 +179,7 @@ class TableModel(QAbstractTableModel):
 
             if orientation == Qt.Horizontal:
 
-                alignment = self.dataset[section].attribute["Alignment"]
+                alignment = self.dataset.headers[section].attribute["Alignment"]
 
                 if alignment == "right":
                     return Qt.AlignRight
@@ -207,16 +216,24 @@ class TableModel(QAbstractTableModel):
 
             if role in [Qt.DisplayRole, Qt.EditRole]:
 
-                if self.dataset[row, column] != "":
-                    return self.dataset[column].attribute["CastFunction"](
-                        self.dataset[row, column]
+                if self.dataset.data[row][column].data != "":
+                    return self.dataset.headers[column].attribute["CastFunction"](
+                        self.dataset.data[row][column].data
                     )
+
+            elif role == Qt.ToolTipRole:
+                toolTip = None
+
+                if column == JOBCOMMAND:
+                    toolTip = self.dataset.data[row][column].toolTip
+
+                return toolTip
 
             elif role == Qt.TextAlignmentRole:
 
-                if self.dataset[column].attribute["Alignment"] == "right":
+                if self.dataset.headers[column].attribute["Alignment"] == "right":
                     return Qt.AlignRight
-                if self.dataset[column].attribute["Alignment"] == "center":
+                if self.dataset.headers[column].attribute["Alignment"] == "center":
                     return Qt.AlignCenter
                 return Qt.AlignLeft
 
@@ -253,14 +270,19 @@ class TableModel(QAbstractTableModel):
 
         if role == Qt.EditRole:
 
-            row = index.row()
-            column = index.column()
-            self.dataset[row, column] = value
+            self.dataset.setData(index, value)
             self.dataChanged.emit(index, index)
 
             return True
 
         return False
+
+    def setHeaderData(self, section, orientation, value, role=Qt.EditRole):
+
+        if role == Qt.EditRole:
+            if orientation == Qt.Horizontal:
+                self.dataset[section] = value
+                self.headerDataChanged.emit(orientation, section, section)
 
     #
     # Used by Editable and Read-Only Items Models
@@ -306,9 +328,12 @@ class TableModel(QAbstractTableModel):
 
             for row in range(0, rows):
                 if dataCount >= rows:
-                    newRow = data[row]
+                    if rows > 1:
+                        newRow = data[row]
+                    else:
+                        newRow = data
                 else:
-                    newRow = ["", "", ""]
+                    newRow = [None, None, None]
 
                 self.dataset.insertRow(position + row, newRow)
 

@@ -20,10 +20,23 @@ Header:
                 "Width": 80,
             },
         ],
-
-TODO: Add capacity to remove rows and columns
 """
 
+# pylint: disable=too-few-public-methods
+
+
+class HeaderAttributeKey:
+
+    Alignment = "Alignment"
+    CastFunction = "CastFunction"
+    Label = "Label"
+    Type = "Type"
+    Width = "Width"
+
+class DataKey:
+
+    Data = 0
+    ToolTip = 1
 
 class HeaderInfo:
     """
@@ -33,7 +46,40 @@ class HeaderInfo:
     header = None
     attribute = None
     headerList = None
+    toolTip = None
 
+class DataItem:
+    """
+    Data item information
+    """
+
+    data = None
+    toolTip = None
+
+class Index:
+    """
+     Dummy QModelIndex
+
+    Returns:
+        Index: Dummy QModelIndex
+    """
+
+    def __init__(self, row, column):
+
+        self._row = row
+        self._column = column
+
+    def row(self):
+
+        return self._row
+
+    def column(self):
+
+        return self._column
+
+    def isValid(self):
+
+        return True
 
 class TableData:
     """
@@ -46,10 +92,11 @@ class TableData:
         [
             "Column Name",
             {
-                "Type": "str",
+                "Alignment": "center",
                 "CastFunction": str,
                 "Label": "Column Label",
-                "Alignment": "center",
+                "ToolTip": "Tool Tip string"
+                "Type": "str",
                 "Width": 220,
             },
         ]
@@ -74,16 +121,20 @@ class TableData:
             for h in headerList:
                 self.addHeader(h)
 
-            if dataList is not None:
-                for d in dataList:
-                    self.addData(d)
+        if dataList is not None:
+            if len(dataList) == 1:
+                self.insertRow(0, dataList)
+            else:
+                for position, data in enumerate(dataList):
+                    self.insertRow(position, data)
 
     def __getitem__(self, index):
 
         if isinstance(index, (int, slice)):
             if (index < 0) or (index > len(self.headers) - 1):
                 raise IndexError("list index [{}] out of range".format(index))
-            return self.headers[index]
+
+            return self.headers[index].attribute['Label']
 
         if isinstance(index, tuple):
 
@@ -97,22 +148,37 @@ class TableData:
                 raise IndexError("Bad index format: {}".format(index))
 
             if col is None:
-                return self.data[row]
 
-            return self.data[row][col]
+                returnRow = []
+                currentRow = self.data[row]
+                for r in currentRow:
+                    returnRow.append(r.data)
+
+                return returnRow
+
+            return self.data[row][col].data
 
         raise TypeError("Invalid index type")
 
     def __setitem__(self, index, value):
 
-        if isinstance(index, tuple):
+        if isinstance(index, int):
+            self.headers[index].attribute['Label'] = value
+
+        elif isinstance(index, tuple):
             # Only update members of the data table no headers
+
+            print("Bad Bad")
+
             if len(index) == 2:
+
                 row, col = index
             else:
                 raise IndexError("Bad index format: {}".format(index))
 
-            self.data[row][col] = value
+            index = Index(row, col) # Simulate index
+
+            self.setData(index, value)
 
         else:
             raise TypeError("Invalid index type")
@@ -139,7 +205,7 @@ class TableData:
 
             self.headers.append(oHeader)
 
-    def addData(self, dataItem=None):
+    def setData(self, index, value):
         """
         Insert row at the end of the data table
 
@@ -147,14 +213,39 @@ class TableData:
             dataItem {list} -- list containing a data row (default: {None})
         """
 
-        if dataItem is not None:
+        if (value is not None) and index.isValid():
             # Use self.insertRow() so only one method add data
             # better for logging purposes
+            row = index.row()
+            column = index.column()
+            if isinstance(value, DataItem):
+                self.data[row][column].data = value.data
+                self.data[row][column].toolTip = value.toolTip
+            else:
+                self.data[row][column].data = value
+            return True
 
-            index = len(self) + 1
-            self.insertRow(index, dataItem)
+        return False
 
-    def insertRow(self, index, row):
+    def setToolTip(self, index, value):
+        """
+        Insert row at the end of the data table
+
+        Keyword Arguments:
+            dataItem {list} -- list containing a data row (default: {None})
+        """
+
+        if (value is not None) and index.isValid():
+            # Use self.insertRow() so only one method add data
+            # better for logging purposes
+            row = index.row()
+            column = index.column()
+            self.data[row][column].toolTip = value
+            return True
+
+        return False
+
+    def insertRow(self, position, row):
         """
         Insert a data row
 
@@ -162,7 +253,20 @@ class TableData:
             index {int} -- row number where to insert the data
             row {list} -- list with row data
         """
-        self.data.insert(index, row)
+        emptyRow = [DataItem(), DataItem(), DataItem()]
+
+        self.data.insert(position, emptyRow)
+
+        for column, value in enumerate(row):
+            if isinstance(value, list):
+                newItem = DataItem()
+                newItem.data = value[DataKey.Data]
+                newItem.toolTip = value[DataKey.ToolTip]
+                index = Index(position, column)
+                self.setData(index, newItem)
+            else:
+                if value is not None:
+                    raise ValueError('Item at index {} is invalid'.format(column))
 
     def deleteRow(self, index):
         """
