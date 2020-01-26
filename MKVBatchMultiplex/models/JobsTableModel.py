@@ -56,12 +56,10 @@ class JobsTableModel(TableModel):
         if role == Qt.EditRole:
 
             row = index.row()
-            column = index.column()
 
             super(JobsTableModel, self).setData(index, value, role)
 
             if value == JobStatus.AddToQueue:
-                print("Add to Queue {Row}".format(Row=row))
                 self.jobQueue.append(row)
 
             return True
