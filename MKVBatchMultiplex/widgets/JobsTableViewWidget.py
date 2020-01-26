@@ -5,13 +5,14 @@ JobsTableWidget
 import logging
 import time
 
-from PySide2.QtCore import QThreadPool, Slot
-from PySide2.QtWidgets import QWidget, QGroupBox, QGridLayout, QPushButton
+from PySide2.QtCore import QThreadPool, Qt
+from PySide2.QtWidgets import QWidget, QGroupBox, QGridLayout
 
-from vsutillib.pyqt import QthThreadWorker
+from vsutillib.pyqt import QthThreadWorker, QPushButtonWidget
 
 from ..jobs import JobStatus
 from ..delegates import StatusComboBoxDelegate
+from ..utils import populate, Text
 
 from .JobsTableView import JobsTableView
 
@@ -51,38 +52,47 @@ class JobsTableViewWidget(QWidget):
     def _initUI(self, title):
 
         grid = QGridLayout()
-        grpGrid = QGridLayout()
-        grpBox = QGroupBox(title)
+        self.grpGrid = QGridLayout()
+        self.grpBox = QGroupBox(title)
 
-        btnAddWaitingJobsToQueue = QPushButton(" Queue Waiting Jobs ")
-        btnAddWaitingJobsToQueue.resize(btnAddWaitingJobsToQueue.sizeHint())
-        btnAddWaitingJobsToQueue.clicked.connect(self.addWaitingJobsToQueue)
-        btnAddWaitingJobsToQueue.setToolTip("Add all Waiting jobs to the queue.")
+        btnPopulate = QPushButtonWidget(
+            "Populate",
+            function=lambda: populate(self.tableModel),
+            toolTip="Add test jobs to table",
+        )
 
-        btnClearJobsQueue = QPushButton(" Clear Queue ")
-        btnClearJobsQueue.resize(btnClearJobsQueue.sizeHint())
-        btnClearJobsQueue.clicked.connect(self.clearJobsQueue)
-        btnClearJobsQueue.setToolTip("Remove Jobs from Queue.")
+        btnAddWaitingJobsToQueue = QPushButtonWidget(
+            "Queue Waiting Jobs",
+            function=self.addWaitingJobsToQueue,
+            toolTip="Add all Waiting jobs to the queue",
+        )
 
-        btnRun = QPushButton(" Simulate Run ")
-        btnRun.resize(btnRun.sizeHint())
-        btnRun.clicked.connect(self.run)
-        btnRun.setToolTip("Clear Queue simulating a run")
+        btnClearJobsQueue = QPushButtonWidget(
+            "Clear Queue",
+            function=self.clearJobsQueue,
+            toolTip="Remove Jobs from Queue",
+        )
 
-        btnPrintDataset = QPushButton(" Debug ")
-        btnPrintDataset.resize(btnClearJobsQueue.sizeHint())
-        btnPrintDataset.clicked.connect(self.printDataset)
-        btnPrintDataset.setToolTip("Print current dataset to console")
+        btnRun = QPushButtonWidget(
+            "Simulate Run", function=self.run, toolTip="Clear Queue simulating a run"
+        )
 
-        grpGrid.addWidget(self.tableView, 0, 0, 1, 4)
-        grpGrid.addWidget(btnAddWaitingJobsToQueue, 1, 0)
-        grpGrid.addWidget(btnClearJobsQueue, 1, 1)
-        grpGrid.addWidget(btnRun, 1, 2)
-        grpGrid.addWidget(btnPrintDataset, 1, 3)
+        btnPrintDataset = QPushButtonWidget(
+            "Debug",
+            function=self.printDataset,
+            toolTip="Print current dataset to console",
+        )
 
-        grpBox.setLayout(grpGrid)
+        self.grpGrid.addWidget(self.tableView, 0, 0, 1, 5)
+        self.grpGrid.addWidget(btnPopulate, 1, 0)
+        self.grpGrid.addWidget(btnAddWaitingJobsToQueue, 1, 1)
+        self.grpGrid.addWidget(btnClearJobsQueue, 1, 2)
+        self.grpGrid.addWidget(btnRun, 1, 3)
+        self.grpGrid.addWidget(btnPrintDataset, 1, 4)
 
-        grid.addWidget(grpBox)
+        self.grpBox.setLayout(self.grpGrid)
+
+        grid.addWidget(self.grpBox)
 
         self.setLayout(grid)
 
@@ -166,16 +176,35 @@ class JobsTableViewWidget(QWidget):
         else:
             print("Nothing here")
 
+    def setLanguage(self):
+        """
+        setLanguage set labels according to locale
+        """
+
+        for index in range(self.grpGrid.count()):
+            widget = self.grpGrid.itemAt(index).widget()
+            if isinstance(widget, QPushButtonWidget):
+                widget.setText(_(widget.originalText))
+                widget.setStatusTip(_(widget.toolTip))
+
+        self.grpBox.setTitle(_(Text.txt0130))
+        self.tableModel.setHeaderData(JOBSTATUS, Qt.Horizontal, _(Text.txt0131))
+        self.tableModel.setHeaderData(JOBCOMMAND, Qt.Horizontal, _(Text.txt0132))
+
     def printDataset(self):
+        """
+        printDataset development debug
+        """
 
         dataset = self.tableModel.dataset
-
         for r in range(0, len(dataset)):
             print("Row {} ID {} Status {}".format(r, dataset[r, 0], dataset[r, 1]))
-
         print()
 
     def run(self):
+        """
+        run test run worker thread
+        """
 
         if self.jobsQueue:
             jobToRun = QthThreadWorker(
