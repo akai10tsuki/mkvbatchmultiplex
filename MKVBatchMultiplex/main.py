@@ -9,6 +9,7 @@ JobsTable
 import logging
 import sys
 import os
+import platform
 import webbrowser
 import gettext
 
@@ -537,8 +538,17 @@ def mainApp():
 
     # PySide2 app
     app = QApplication(sys.argv)
-    app.setStyle("Fusion")
-    app.setPalette(darkPalette())
+
+    # Palette will change on macOS according to current theme
+    # will create a poor mans dark theme for windows
+    if platform.system() == "Windows":
+
+        # Force the style to be the same on all OSs:
+        app.setStyle("Fusion")
+        app.setPalette(darkPalette())
+    else:
+        app.setPalette()
+
     win = MainWindow()
     win.show()
     app.exec_()
