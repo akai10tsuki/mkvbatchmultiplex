@@ -1,22 +1,23 @@
 # SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# Copyright (C) 2020 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: MKVBatchMultiplex\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-01-25 18:51-0500\n"
-"PO-Revision-Date: 2020-01-25 19:01-0500\n"
+"POT-Creation-Date: 2020-01-27 06:51-0500\n"
+"PO-Revision-Date: 2020-01-27 07:04-0500\n"
 "Last-Translator: \n"
-"Language-Team: Efrain Vergara <akai10tsuki@gmail.com>\n"
 "Language: es_PR\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.2.4\n"
+"Language-Team: Efrain Vergara <akai10tsuki@gmail.com>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.8.0\n"
+"X-Generator: Poedit 2.2.4\n"
 
 #: MKVBatchMultiplex/utils/text.py:15
 msgid "MKVMERGE: Batch Multiplex"
@@ -44,7 +45,7 @@ msgstr "&Salir"
 
 #: MKVBatchMultiplex/utils/text.py:23
 msgid "Ctrl+E"
-msgstr "Ctrl+E"
+msgstr "Ctrl+S"
 
 #: MKVBatchMultiplex/utils/text.py:24
 msgid "Exit Application"
@@ -80,7 +81,7 @@ msgstr "Seleccionar fuente y tamaño de interfaz"
 
 #: MKVBatchMultiplex/utils/text.py:36
 msgid "&Interface language"
-msgstr "Idioma del interfaz"
+msgstr "&Idioma del interfaz"
 
 #: MKVBatchMultiplex/utils/text.py:38
 msgid "Restore defaults"
@@ -88,7 +89,7 @@ msgstr "Restaurar valores predeterminados"
 
 #: MKVBatchMultiplex/utils/text.py:39
 msgid "Restore settings for font, window size and position"
-msgstr ""
+msgstr "Restaurar la configuración de fuente, tamaño de ventana y posición"
 
 #: MKVBatchMultiplex/utils/text.py:42
 msgid "&Help"
@@ -126,66 +127,70 @@ msgstr "Confirmar restauración …"
 msgid "Restore default settings"
 msgstr "Restaurar la configuración predeterminada"
 
+#: MKVBatchMultiplex/utils/text.py:56
+msgid "Job(s): {0:3d} Current: {1:3d} File: {2:3d} of {3:3d} Errors: {4:3d}"
+msgstr "Trabajo(s): {0: 3d} Actual: {1: 3d} Archivo: {2: 3d} de {3: 3d} Errores: {4: 3d}"
+
 #: MKVBatchMultiplex/utils/text.py:58
+msgid "Job identification number"
+msgstr "Número de identificación del trabajo"
+
+#: MKVBatchMultiplex/utils/text.py:59
+msgid "Application code for the job status"
+msgstr "Código de la applicación para el estado del trabajo"
+
+#: MKVBatchMultiplex/utils/text.py:60
+msgid "Command generated for MKVMERGE by MKVToolNix"
+msgstr "Comando generado para MKVMERGE por MKVToolNix"
+
+#: MKVBatchMultiplex/utils/text.py:64
 msgid "Populate"
 msgstr "Poblar"
 
-#: MKVBatchMultiplex/utils/text.py:59
+#: MKVBatchMultiplex/utils/text.py:65
 msgid "Add test jobs to table"
 msgstr "Agregar trabajos de prueba a la tabla"
 
-#: MKVBatchMultiplex/utils/text.py:60
+#: MKVBatchMultiplex/utils/text.py:66
 msgid "Queue Waiting Jobs"
 msgstr "Agrejar tragajos es espera"
 
-#: MKVBatchMultiplex/utils/text.py:61
+#: MKVBatchMultiplex/utils/text.py:67
 msgid "Add all Waiting jobs to the Queue"
 msgstr "Agregar todos los trabajos en espera a la cola"
 
-#: MKVBatchMultiplex/utils/text.py:62
+#: MKVBatchMultiplex/utils/text.py:68
 msgid "Clear Queue"
 msgstr "Borrar la cola"
 
-#: MKVBatchMultiplex/utils/text.py:63
+#: MKVBatchMultiplex/utils/text.py:69
 msgid "Remove jobs from Queue"
 msgstr "Eliminar trabajos de la cola"
 
-#: MKVBatchMultiplex/utils/text.py:64
+#: MKVBatchMultiplex/utils/text.py:70
 msgid "Simulate Run"
 msgstr "Ejecutar simulación"
 
-#: MKVBatchMultiplex/utils/text.py:65
+#: MKVBatchMultiplex/utils/text.py:71
 msgid "Clear Queue simulating a run"
 msgstr "Borrar la cola simulando una ejecución"
 
-#: MKVBatchMultiplex/utils/text.py:66
+#: MKVBatchMultiplex/utils/text.py:72
 msgid "Debug"
 msgstr "Depurar"
 
-#: MKVBatchMultiplex/utils/text.py:67
+#: MKVBatchMultiplex/utils/text.py:73
 msgid "Print current dataset to console"
 msgstr "Imprimir conjunto de datos actual a la consola"
 
-#: MKVBatchMultiplex/utils/text.py:68
+#: MKVBatchMultiplex/utils/text.py:74
 msgid "Jobs Table"
 msgstr "Tabla de trabajos"
 
-#: MKVBatchMultiplex/utils/text.py:69
+#: MKVBatchMultiplex/utils/text.py:75
 msgid "Status"
 msgstr "Estado"
 
-#: MKVBatchMultiplex/utils/text.py:70
+#: MKVBatchMultiplex/utils/text.py:76
 msgid "Command"
 msgstr "Commando"
-
-#~ msgid "Restore"
-#~ msgstr "Restaurar"
-
-#~ msgid "Exit"
-#~ msgstr "Salir"
-
-#~ msgid "This is the Application"
-#~ msgstr "Este es el Programa"
-
-#~ msgid "Search"
-#~ msgstr "Busqueda"
