@@ -34,7 +34,7 @@ class JobsTableViewWidget(QWidget):
     # Class logging state
     __log = False
 
-    def __init__(self, parent=None, proxyModel=None, jobQueue=None, title=None):
+    def __init__(self, parent=None, proxyModel=None, jobQueue=None, progress=None, title=None):
 
         super(JobsTableViewWidget, self).__init__(parent)
 
@@ -42,7 +42,7 @@ class JobsTableViewWidget(QWidget):
         self.proxyModel = proxyModel
         self.tableModel = proxyModel.sourceModel()
         self.jobsQueue = jobQueue
-        self.progress = self.parent.progress
+        self.progress = progress
 
         self.tableView = JobsTableView(self, proxyModel, title)
         self.threadpool = QThreadPool()

@@ -94,7 +94,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.proxyModel = TableProxyModel(self.tableModel)
         self.jobQueue.model = self.proxyModel
         self.tableViewWidget = JobsTableViewWidget(
-            self, self.proxyModel, self.jobQueue, "Jobs Table"
+            self, self.proxyModel, self.jobQueue, self.progress, "Jobs Table"
         )
         self.tableViewWidget.tableView.sortByColumn(0, Qt.AscendingOrder)
 
