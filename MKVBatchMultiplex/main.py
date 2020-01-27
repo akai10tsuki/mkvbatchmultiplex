@@ -546,8 +546,6 @@ def mainApp():
         # Force the style to be the same on all OSs:
         app.setStyle("Fusion")
         app.setPalette(darkPalette())
-    else:
-        app.setPalette()
 
     win = MainWindow()
     win.show()
