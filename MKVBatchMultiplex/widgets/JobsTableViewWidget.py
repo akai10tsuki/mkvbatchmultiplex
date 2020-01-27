@@ -5,7 +5,8 @@ JobsTableWidget
 import logging
 import time
 
-from PySide2.QtCore import QThreadPool, Qt
+from PySide2.QtCore import QThreadPool, Qt, QEventLoop
+
 from PySide2.QtWidgets import QWidget, QGroupBox, QGridLayout, QApplication
 
 from vsutillib.pyqt import QthThreadWorker, QPushButtonWidget, darkPalette
@@ -41,6 +42,7 @@ class JobsTableViewWidget(QWidget):
         self.proxyModel = proxyModel
         self.tableModel = proxyModel.sourceModel()
         self.jobsQueue = jobQueue
+        self.progress = self.parent.progress
 
         self.tableView = JobsTableView(self, proxyModel, title)
         self.threadpool = QThreadPool()
@@ -210,7 +212,10 @@ class JobsTableViewWidget(QWidget):
 
         if self.jobsQueue:
             jobToRun = QthThreadWorker(
-                runJobs, self.tableModel, self.jobsQueue, funcResult=result
+                runJobs,
+                self.jobsQueue,
+                funcResult=result,
+                funcProgress=self.progress,
             )
 
             self.threadpool.start(jobToRun)
@@ -223,11 +228,6 @@ class JobsTableViewWidget(QWidget):
 def result(funcResult):
 
     print(funcResult)
-
-
-def progress(job):
-
-    print("progress")
 
 
 def runJobs(jobQueue, funcProgress=None):
@@ -252,7 +252,23 @@ def runJobs(jobQueue, funcProgress=None):
             )
         )
 
-        time.sleep(10)
+        """Test"""
+        i = 0
+        j = 0
+        t = 0
+
+        funcProgress.pbSetMaximum.emit(100, 300)
+
+        while j < 3:
+            while i < 100:
+                i += 0.01
+                funcProgress.pbSetValues.emit(i, t + i)
+                time.sleep(0.0001)
+
+            t += 100
+            j += 1
+            i = 0
+
 
         jobQueue.statusUpdateSignal.emit(job, JobStatus.Done)
 

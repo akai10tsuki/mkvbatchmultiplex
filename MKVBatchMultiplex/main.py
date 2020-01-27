@@ -30,14 +30,22 @@ from PySide2.QtWidgets import (
     QStyle,
 )
 
-from vsutillib.pyqt import centerWidgets, QActionWidget, QMenuWidget, DualProgressBar
+from vsutillib.pyqt import (
+    centerWidgets,
+    darkPalette,
+    DualProgressBar,
+    FormatLabel,
+    QActionWidget,
+    QMenuWidget,
+)
+
 
 from . import config
 from .dataset import TableData
 from .jobs import JobQueue
 from .models import TableProxyModel, JobsTableModel
 from .widgets import JobsTableViewWidget
-from .utils import Text
+from .utils import Text, Progress
 
 DEFAULTFONT = QFont("Segoe UI", 16)
 
@@ -70,9 +78,9 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.setWindowIcon(QIcon(str(self.appDirectory.parent) + "/images/Itsue.png"))
 
         # Setup User Interface
+        self._initMenu()
         self._initHelper()
         self._initUI()
-        self._initMenu()
 
         # Restore configuration elements
         self.configuration(action=config.Action.Restore)
@@ -112,13 +120,9 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         closeIcon = self.style().standardIcon(QStyle.SP_DialogCloseButton)
 
         # Exit application
-        #QIcon(str(self.appDirectory.parent) + "/images/cross-circle.png"),
+        # QIcon(str(self.appDirectory.parent) + "/images/cross-circle.png"),
         actExit = QActionWidget(
-            closeIcon,
-            Text.txt0030,
-            self,
-            shortcut=Text.txt0015,
-            tooltip=Text.txt0014,
+            closeIcon, Text.txt0030, self, shortcut=Text.txt0015, tooltip=Text.txt0014,
         )
         actExit.triggered.connect(self.close)
 
@@ -200,7 +204,18 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         menuBar.addMenu(helpMenu)
 
         # Init status var
+
+        self.progressBar = DualProgressBar(align=Qt.Horizontal)
+        self.jobsLabel = FormatLabel(
+            "Job(s): {0:3d} Current: {1:3d} File: {2:3d} of {3:3d} Errors: {4:3d}",
+            init=[0, 0, 0, 0, 0])
+
         statusBar = self.statusBar()  # pylint: disable=unused-variable
+        statusBar.addPermanentWidget(self.jobsLabel)
+        statusBar.addPermanentWidget(self.progressBar)
+
+        self.progress = Progress(self, self.progressBar, self.jobsLabel)
+
 
     def configuration(self, action=None):
         """
@@ -531,8 +546,6 @@ def abort():
 
 def mainApp():
     """Main"""
-
-    from vsutillib.pyqt import darkPalette
 
     config.init()
 
