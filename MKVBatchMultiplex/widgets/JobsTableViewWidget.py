@@ -5,7 +5,7 @@ JobsTableWidget
 import logging
 import time
 
-from PySide2.QtCore import QThreadPool, Qt, QEventLoop
+from PySide2.QtCore import QThreadPool, Qt
 
 from PySide2.QtWidgets import QWidget, QGroupBox, QGridLayout, QApplication
 
@@ -252,7 +252,8 @@ def runJobs(jobQueue, funcProgress=None):
             )
         )
 
-        """Test"""
+        #Test
+
         i = 0
         j = 0
         t = 0
