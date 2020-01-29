@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MKVBatchMultiplex\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-01-27 06:51-0500\n"
-"PO-Revision-Date: 2020-01-27 07:04-0500\n"
+"POT-Creation-Date: 2020-01-28 21:39-0500\n"
+"PO-Revision-Date: 2020-01-28 21:42-0500\n"
 "Last-Translator: \n"
 "Language: es_PR\n"
 "Language-Team: Efrain Vergara <akai10tsuki@gmail.com>\n"
@@ -129,68 +129,94 @@ msgstr "Restaurar la configuración predeterminada"
 
 #: MKVBatchMultiplex/utils/text.py:56
 msgid "Job(s): {0:3d} Current: {1:3d} File: {2:3d} of {3:3d} Errors: {4:3d}"
-msgstr "Trabajo(s): {0: 3d} Actual: {1: 3d} Archivo: {2: 3d} de {3: 3d} Errores: {4: 3d}"
+msgstr ""
+"Trabajo(s): {0: 3d} Procesando: {1: 3d} Archivo: {2: 3d} de {3: 3d} "
+"Errores: {4: 3d}"
 
-#: MKVBatchMultiplex/utils/text.py:58
+#: MKVBatchMultiplex/utils/text.py:57
 msgid "Job identification number"
 msgstr "Número de identificación del trabajo"
 
-#: MKVBatchMultiplex/utils/text.py:59
+#: MKVBatchMultiplex/utils/text.py:58
 msgid "Application code for the job status"
 msgstr "Código de la applicación para el estado del trabajo"
 
-#: MKVBatchMultiplex/utils/text.py:60
+#: MKVBatchMultiplex/utils/text.py:59
 msgid "Command generated for MKVMERGE by MKVToolNix"
 msgstr "Comando generado para MKVMERGE por MKVToolNix"
 
-#: MKVBatchMultiplex/utils/text.py:64
+#: MKVBatchMultiplex/utils/text.py:60
+msgid "Jobs are still running"
+msgstr "Trabajos aún están ejecutando"
+
+#: MKVBatchMultiplex/utils/text.py:61
+msgid "Exit"
+msgstr "Salir"
+
+#: MKVBatchMultiplex/utils/text.py:65
 msgid "Populate"
 msgstr "Poblar"
 
-#: MKVBatchMultiplex/utils/text.py:65
+#: MKVBatchMultiplex/utils/text.py:66
 msgid "Add test jobs to table"
 msgstr "Agregar trabajos de prueba a la tabla"
 
-#: MKVBatchMultiplex/utils/text.py:66
+#: MKVBatchMultiplex/utils/text.py:67
 msgid "Queue Waiting Jobs"
 msgstr "Agrejar tragajos es espera"
 
-#: MKVBatchMultiplex/utils/text.py:67
+#: MKVBatchMultiplex/utils/text.py:68
 msgid "Add all Waiting jobs to the Queue"
 msgstr "Agregar todos los trabajos en espera a la cola"
 
-#: MKVBatchMultiplex/utils/text.py:68
+#: MKVBatchMultiplex/utils/text.py:69
 msgid "Clear Queue"
 msgstr "Borrar la cola"
 
-#: MKVBatchMultiplex/utils/text.py:69
+#: MKVBatchMultiplex/utils/text.py:70
 msgid "Remove jobs from Queue"
 msgstr "Eliminar trabajos de la cola"
 
-#: MKVBatchMultiplex/utils/text.py:70
+#: MKVBatchMultiplex/utils/text.py:71
 msgid "Simulate Run"
 msgstr "Ejecutar simulación"
 
-#: MKVBatchMultiplex/utils/text.py:71
+#: MKVBatchMultiplex/utils/text.py:72
 msgid "Clear Queue simulating a run"
 msgstr "Borrar la cola simulando una ejecución"
 
-#: MKVBatchMultiplex/utils/text.py:72
+#: MKVBatchMultiplex/utils/text.py:73
 msgid "Debug"
 msgstr "Depurar"
 
-#: MKVBatchMultiplex/utils/text.py:73
+#: MKVBatchMultiplex/utils/text.py:74
 msgid "Print current dataset to console"
 msgstr "Imprimir conjunto de datos actual a la consola"
 
-#: MKVBatchMultiplex/utils/text.py:74
+#: MKVBatchMultiplex/utils/text.py:75
 msgid "Jobs Table"
 msgstr "Tabla de trabajos"
 
-#: MKVBatchMultiplex/utils/text.py:75
+#: MKVBatchMultiplex/utils/text.py:76
 msgid "Status"
 msgstr "Estado"
 
-#: MKVBatchMultiplex/utils/text.py:76
+#: MKVBatchMultiplex/utils/text.py:77
 msgid "Command"
 msgstr "Commando"
+
+#: MKVBatchMultiplex/utils/text.py:80
+msgid "Job"
+msgstr "Trabajo"
+
+#: MKVBatchMultiplex/utils/text.py:81
+msgid "Job(s) Output"
+msgstr "Registro de Trabajo(s)"
+
+#: MKVBatchMultiplex/utils/text.py:82
+msgid "Job(s) Error(s)"
+msgstr "Errores de Ejecución"
+
+#: MKVBatchMultiplex/utils/text.py:83
+msgid "Rename Files"
+msgstr "Renonmbrar Archivos"
