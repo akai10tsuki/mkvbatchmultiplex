@@ -22,8 +22,8 @@ class Progress(QObject):
     pbSetMaximum = Signal(int, int)
     pbSetMinimum = Signal(int, int)
     pbSetRange = Signal(int, int, int, int)
-    lblSetValue = Signal(list)
-    lblSetValues = Signal(int, object)
+    lblSetValues = Signal(list)
+    lblSetValue = Signal(int, object)
 
     def __init__(self, parent, progressBar, formatLabel=None):
         super(Progress, self).__init__()
