@@ -27,13 +27,13 @@ ENTRYPOINTS = {
     "console_scripts": ["mkvbatchmultiplex=mkvbatchmultiplex:mainApp",],
 }
 KEYWORDS = "mkv multimedia video"
-NAME = "mkvbatchmultiplex"
+NAME = APPNAME.lower()
 PACKAGES = ["mkvbatchmultiplex"]
 PROJECTURLS = {
     "Bug Reports": "https://github.com/akai10tsuki/mkvbatchmultiplex/issues",
     "Source": "https://github.com/akai10tsuki/mkvbatchmultiplex/",
 }
-PYTHONVERSIONS = ">=3.5, <3.8"
+PYTHONVERSIONS = ">=3.8, <3.9"
 REQUIRED = [
     "PySide2>=5.12",
     "vsutillib.mkv>=1.0.2",
@@ -50,12 +50,6 @@ __version__ = VERSION
 # label
 #TOTALJOBS, CURRENTJOB, CURRENTFILE, TOTALFILES, TOTALERRORS = range(5)
 
-# Files are relative to home directory
-#CONFIGFILE = "config.xml"
-#FILESROOT = ".MKVBatchMultiplex"
-#IMAGEFILESPATH = "images"
-#LOGFILE = "MKVBatchMultiplex.log"
-
 CONFIGFILE = "config.xml"
 FILESROOT = "." + APPNAME
 LOGFILE = APPNAME + ".log"
@@ -71,6 +65,12 @@ else:
 LOCALE = CWD.joinpath("locale")
 
 data = ConfigurationSettings()  # pylint: disable=invalid-name
+
+######################
+# Application specific
+######################
+
+JOBID, JOBSTATUS, JOBCOMMAND = range(3)
 
 class Action: # pylint: disable=too-few-public-methods
 
