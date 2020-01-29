@@ -54,10 +54,11 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0084 = S_("Restore default settings")
 
     txt0085 = S_("Job(s): {0:3d} Current: {1:3d} File: {2:3d} of {3:3d} Errors: {4:3d}")
-
     txt0086 = S_("Job identification number")
     txt0087 = S_("Application code for the job status")
     txt0088 = S_("Command generated for MKVMERGE by MKVToolNix")
+    txt0089 = S_("Jobs are still running")
+    txt0090 = S_("Exit")
 
     # JobTableWidgets
     # 120
@@ -74,3 +75,9 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0130 = S_("Jobs Table")
     txt0131 = S_("Status")
     txt0132 = S_("Command")
+
+    # 140
+    txt0140 = S_("Job")
+    txt0141 = S_("Job(s) Output")
+    txt0142 = S_("Job(s) Error(s)")
+    txt0143 = S_("Rename Files")
