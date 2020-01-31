@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MKVBatchMultiplex\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-01-28 21:39-0500\n"
-"PO-Revision-Date: 2020-01-28 21:42-0500\n"
+"POT-Creation-Date: 2020-01-31 01:27-0500\n"
+"PO-Revision-Date: 2020-01-31 01:30-0500\n"
 "Last-Translator: \n"
 "Language: es_PR\n"
 "Language-Team: Efrain Vergara <akai10tsuki@gmail.com>\n"
@@ -153,70 +153,98 @@ msgstr "Trabajos aún están ejecutando"
 msgid "Exit"
 msgstr "Salir"
 
-#: MKVBatchMultiplex/utils/text.py:65
+#: MKVBatchMultiplex/utils/text.py:62
+msgid "Progress"
+msgstr "Progreso"
+
+#: MKVBatchMultiplex/utils/text.py:66
 msgid "Populate"
 msgstr "Poblar"
 
-#: MKVBatchMultiplex/utils/text.py:66
+#: MKVBatchMultiplex/utils/text.py:67
 msgid "Add test jobs to table"
 msgstr "Agregar trabajos de prueba a la tabla"
 
-#: MKVBatchMultiplex/utils/text.py:67
+#: MKVBatchMultiplex/utils/text.py:68
 msgid "Queue Waiting Jobs"
 msgstr "Agrejar tragajos es espera"
 
-#: MKVBatchMultiplex/utils/text.py:68
+#: MKVBatchMultiplex/utils/text.py:69
 msgid "Add all Waiting jobs to the Queue"
 msgstr "Agregar todos los trabajos en espera a la cola"
 
-#: MKVBatchMultiplex/utils/text.py:69
+#: MKVBatchMultiplex/utils/text.py:70
 msgid "Clear Queue"
 msgstr "Borrar la cola"
 
-#: MKVBatchMultiplex/utils/text.py:70
+#: MKVBatchMultiplex/utils/text.py:71
 msgid "Remove jobs from Queue"
 msgstr "Eliminar trabajos de la cola"
 
-#: MKVBatchMultiplex/utils/text.py:71
+#: MKVBatchMultiplex/utils/text.py:72
 msgid "Simulate Run"
 msgstr "Ejecutar simulación"
 
-#: MKVBatchMultiplex/utils/text.py:72
+#: MKVBatchMultiplex/utils/text.py:73
 msgid "Clear Queue simulating a run"
 msgstr "Borrar la cola simulando una ejecución"
 
-#: MKVBatchMultiplex/utils/text.py:73
+#: MKVBatchMultiplex/utils/text.py:74
 msgid "Debug"
 msgstr "Depurar"
 
-#: MKVBatchMultiplex/utils/text.py:74
+#: MKVBatchMultiplex/utils/text.py:75
 msgid "Print current dataset to console"
 msgstr "Imprimir conjunto de datos actual a la consola"
 
-#: MKVBatchMultiplex/utils/text.py:75
+#: MKVBatchMultiplex/utils/text.py:76
 msgid "Jobs Table"
 msgstr "Tabla de trabajos"
 
-#: MKVBatchMultiplex/utils/text.py:76
+#: MKVBatchMultiplex/utils/text.py:77
 msgid "Status"
 msgstr "Estado"
 
-#: MKVBatchMultiplex/utils/text.py:77
+#: MKVBatchMultiplex/utils/text.py:78
 msgid "Command"
 msgstr "Commando"
 
-#: MKVBatchMultiplex/utils/text.py:80
+#: MKVBatchMultiplex/utils/text.py:82
 msgid "Job"
 msgstr "Trabajo"
 
-#: MKVBatchMultiplex/utils/text.py:81
+#: MKVBatchMultiplex/utils/text.py:83
 msgid "Job(s) Output"
 msgstr "Registro de Trabajo(s)"
 
-#: MKVBatchMultiplex/utils/text.py:82
+#: MKVBatchMultiplex/utils/text.py:84
 msgid "Job(s) Error(s)"
 msgstr "Errores de Ejecución"
 
-#: MKVBatchMultiplex/utils/text.py:83
+#: MKVBatchMultiplex/utils/text.py:85
 msgid "Rename Files"
 msgstr "Renonmbrar Archivos"
+
+#: MKVBatchMultiplex/utils/text.py:89
+msgid "Add Command"
+msgstr "Añadir Commando"
+
+#: MKVBatchMultiplex/utils/text.py:90
+msgid "Add command to jobs table with Waiting status"
+msgstr "Agregar comando a la tabla de trabajos con estado Waiting"
+
+#: MKVBatchMultiplex/utils/text.py:91
+msgid "Clear Output"
+msgstr "Borrar texto"
+
+#: MKVBatchMultiplex/utils/text.py:92
+msgid "Erase text in output window"
+msgstr "Borrar el texto de la ventana de salida"
+
+#: MKVBatchMultiplex/utils/text.py:93
+msgid "Paste"
+msgstr "Pegar"
+
+#: MKVBatchMultiplex/utils/text.py:94
+msgid "Paste Clipboard contents in command line"
+msgstr "Pegar contenido del portapapeles en la linea de comando"

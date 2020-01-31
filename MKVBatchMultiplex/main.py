@@ -6,16 +6,17 @@ JobsTable
 
 """
 
+import gettext
 import logging
-import sys
 import os
 import platform
+import sys
+import threading
 import webbrowser
-import gettext
 
 from pathlib import Path
 
-from PySide2.QtCore import QByteArray
+from PySide2.QtCore import QByteArray, Slot
 from PySide2.QtGui import QIcon, QFont, Qt
 from PySide2.QtWidgets import (
     QAction,
@@ -35,19 +36,19 @@ from vsutillib.pyqt import (
     darkPalette,
     DualProgressBar,
     FormatLabel,
+    OutputTextWidget,
     QActionWidget,
     QMenuWidget,
 )
 
-
 from . import config
-from .dataset import TableData
+from .dataset import TableData, tableHeaders
 from .jobs import JobQueue
 from .models import TableProxyModel, JobsTableModel
-from .widgets import JobsTableViewWidget
-from .utils import Text, Progress
+from .widgets import CommandWidget, JobsTableViewWidget, TabsWidget
+from .utils import Text, Progress, yesNoDialog, setLanguageMenus, SetLanguage
 
-DEFAULTFONT = QFont("Segoe UI", 16)
+DEFAULTFONT = QFont("Segoe UI", 14)
 
 
 class MainWindow(QMainWindow):  # pylint: disable=R0902
@@ -64,6 +65,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.languageMenu = None
         self.jobQueue = JobQueue(self)
         self.defaultPalette = palette
+        self.widgetSetLanguage = SetLanguage()
 
         #
         # Where am I running from
@@ -79,24 +81,62 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
         # Setup User Interface
         self._initMenu()
-        self._initHelper()
+        self._initControls()
         self._initUI()
+        self._initHelper()
 
         # Restore configuration elements
         self.configuration(action=config.Action.Restore)
         self.setLanguage()
 
-    def _initHelper(self):
+    def _initControls(self):
 
         headers = tableHeaders()
         self.tableData = TableData(headerList=headers, dataList=[])
         self.tableModel = JobsTableModel(self.tableData, self.jobQueue)
         self.proxyModel = TableProxyModel(self.tableModel)
+
+        self.progress = Progress(self, self.progressBar, self.jobsLabel)
+
         self.jobQueue.model = self.proxyModel
+        self.jobQueue.progress = self.progress
+
+        # Widgets for tabs
         self.tableViewWidget = JobsTableViewWidget(
             self, self.proxyModel, self.jobQueue, self.progress, "Jobs Table"
         )
         self.tableViewWidget.tableView.sortByColumn(0, Qt.AscendingOrder)
+
+        self.comandWidget = CommandWidget(self, self.proxyModel)
+        self.jobsOutput = OutputTextWidget(self)
+        self.errorOutput = OutputTextWidget(self)
+
+        self.tabs = TabsWidget(
+            self,
+            self.comandWidget,
+            self.tableViewWidget,
+            self.jobsOutput,
+            self.errorOutput,
+            QWidget(),
+        )
+
+    def _initHelper(self):
+        """
+        _initHelper setup signals
+        """
+
+        # map output widgets inserTextSignal to local ones
+        self.outputMainSignal = self.comandWidget.insertTextSignal
+        self.jobsOutputSignal = self.jobsOutput.insertTextSignal
+        self.errorOutputSignal = self.jobsOutput.insertTextSignal
+
+        # setup widgets setLanguage to SetLanguage change signal
+        self.widgetSetLanguage.addSlot(self.tableViewWidget.setLanguage)
+        self.widgetSetLanguage.addSlot(self.comandWidget.setLanguage)
+        self.widgetSetLanguage.addSlot(self.tabs.setLanguage)
+
+        # connect to tabs widget tab change Signal
+        self.tabs.currentChanged.connect(tabChange)
 
     def _initUI(self):
 
@@ -104,13 +144,13 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         widget = QWidget()
 
         layout = QVBoxLayout(widget)
-        layout.addWidget(self.tableViewWidget)
+        layout.addWidget(self.tabs)
 
         widget.setLayout(layout)
 
         self.setCentralWidget(widget)
 
-    def _initMenu(self):
+    def _initMenu(self):  # pylint: disable=too-many-statements
 
         menuBar = self.menuBar()
 
@@ -120,7 +160,6 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         closeIcon = self.style().standardIcon(QStyle.SP_DialogCloseButton)
 
         # Exit application
-        # QIcon(str(self.appDirectory.parent) + "/images/cross-circle.png"),
         actExit = QActionWidget(
             closeIcon, Text.txt0030, self, shortcut=Text.txt0015, tooltip=Text.txt0014,
         )
@@ -141,7 +180,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         # Enable logging
         self.actEnableLogging = QActionWidget(Text.txt0019, self, checkable=True)
         self.actEnableLogging.setStatusTip(Text.txt0020)
-        self.actEnableLogging.triggered.connect(self.enableLoggin)
+        self.actEnableLogging.triggered.connect(self.enableLogging)
 
         # Font
         actSelectFont = QActionWidget(Text.txt0021, self)
@@ -154,7 +193,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         actRestoreDefaults.triggered.connect(self.restoreDefaults)
 
         self.actEN = QActionWidget(
-            "English (Ingles)",
+            "English (Inglés)",
             self,
             checkable=True,
             tooltip="Select english language for the interface",
@@ -215,7 +254,16 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         statusBar.addPermanentWidget(self.jobsLabel)
         statusBar.addPermanentWidget(self.progressBar)
 
-        self.progress = Progress(self, self.progressBar, self.jobsLabel)
+
+    def enableLogging(self, state):
+        """Activate logging"""
+
+        if state:
+            self.log = True
+            logging.info("Start logging.")
+        else:
+            self.log = False
+            logging.info("Stop logging.")
 
     def configuration(self, action=None):
         """
@@ -237,7 +285,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
         elif action == config.Action.Restore:
 
-            if strFont := config.data.get("font"):
+            if strFont := config.data.get(config.ConfigKey.Font):
                 restoreFont = QFont()
                 restoreFont.fromString(strFont)
                 self.setFont(restoreFont)
@@ -246,43 +294,37 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
                 self.setFont(defaultFont)
                 self.setAppFont(defaultFont)
 
-            if bLogging := config.data.get("logging"):
+            if bLogging := config.data.get(config.ConfigKey.Logging):
                 self.actEnableLogging.setChecked(bLogging)
                 self.enableLoggin(bLogging)
 
-            if byteGeometry := config.data.get("geometry"):
+            if byteGeometry := config.data.get(config.ConfigKey.Geometry):
                 self.restoreGeometry(QByteArray.fromBase64(QByteArray(byteGeometry)))
             else:
                 self.setGeometry(0, 0, 1280, 720)
                 centerWidgets(self)
 
+            if tabIndex := config.data.get("Tab"):
+                # setting tab to jobs
+                self.tabs.setCurrentIndexSignal.emit(tabIndex)
+
         elif action in (config.Action.Save, config.Action.Update):
 
             # Update Logging
-            config.data.set("logging", self.actEnableLogging.isChecked())
+            config.data.set(config.ConfigKey.Logging, self.actEnableLogging.isChecked())
 
             # Update current font
             font = self.font()
-            config.data.set("font", font.toString())
+            config.data.set(config.ConfigKey.Font, font.toString())
 
             # Update geometry includes position
             base64Geometry = self.saveGeometry().toBase64()
             b = base64Geometry.data()  # b is a bytes string
-            config.data.set("geometry", b)
+            config.data.set(config.ConfigKey.Geometry, b)
 
             if action == config.Action.Save:
 
                 config.data.saveToFile()
-
-    def enableLoggin(self, state):
-        """Activate logging"""
-
-        if state:
-            self.log = True
-            logging.info("Start logging.")
-        else:
-            self.log = False
-            logging.info("Stop logging.")
 
     def restoreDefaults(self):
         """
@@ -292,21 +334,15 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         """
 
         language = config.data.get(config.ConfigKey.Language)
+        bAnswer = False
 
+        title = _(Text.txt0083)
         msg = "¿" if language == "es" else ""
         msg += _(Text.txt0084) + "?"
 
-        m = QMessageBox(self)
-        m.setText(msg)
-        m.setIcon(QMessageBox.Question)
-        yesButton = m.addButton(_(Text.txt0082), QMessageBox.ButtonRole.YesRole)
-        noButton = m.addButton(" No ", QMessageBox.ButtonRole.NoRole)
-        m.setDefaultButton(noButton)
-        m.setFont(self.font())
-        m.setWindowTitle(_(Text.txt0083))
-        m.exec_()
+        bAnswer = yesNoDialog(self, msg, title)
 
-        if m.clickedButton() == yesButton:
+        if bAnswer:
             self.configuration(action=config.Action.Reset)
 
     def setAppFont(self, font):
@@ -352,6 +388,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         if valid:
             self.setFont(font)
             self.setAppFont(font)
+            config.data.set(config.ConfigKey.Font, font.toString())
 
     def setLanguage(self, language=None, menuItem=None):
         """
@@ -375,9 +412,11 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         config.data.set(config.ConfigKey.Language, language)
 
         self.setWindowTitle(Text.txt0001)
+        self.jobsLabel.template = _(Text.txt0085)
+        self.progressBar.label = _(Text.txt0091) + ':'
 
         # Set langque main windows
-        _setLanguageMenus(self.menuBar().actions())
+        setLanguageMenus(self.menuBar().actions())
 
         # Update checkboxes in the select language menu
         if menuItem is not None:
@@ -393,7 +432,34 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
                 self.actEN.setChecked(True)
 
         # Update language on other window widgets
-        self.tableViewWidget.setLanguage()
+        self.widgetSetLanguage.emitSignal()
+
+    def closeEvent(self, event):
+        """
+        Override QMainWindow.closeEvent
+
+        Save configuration state before exit
+        """
+
+        language = config.data.get(config.ConfigKey.Language)
+        bAnswer = False
+
+        title = _(Text.txt0080)
+
+        leadQuestionMark = "¿" if language == "es" else ""
+
+        if threading.activeCount() > 1:
+            msg = _(Text.txt0089) + ". " + leadQuestionMark + _(Text.txt0090) + "?"
+        else:
+            msg = leadQuestionMark + _(Text.txt0081) + "?"
+
+        bAnswer = yesNoDialog(self, msg, title)
+
+        if bAnswer:
+            self.configuration(action=config.Action.Save)
+            event.accept()
+        else:
+            event.ignore()
 
     def about(self):
         """About"""
@@ -412,33 +478,17 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
         QMessageBox.aboutQt(self, config.APPNAME)
 
-    def closeEvent(self, event):
-        """
-        Override QMainWindow.closeEvent
 
-        Save configuration state before exit
-        """
+@Slot(int)
+def tabChange(index):
+    """
+    tabChange take action when the tab change for save current tab index
 
-        language = config.data.get(config.ConfigKey.Language)
+    Args:
+        index (int): index of current tab
+    """
 
-        msg = "¿" if language == "es" else ""
-        msg += _(Text.txt0081) + "?"
-
-        m = QMessageBox(self)
-        m.setText(msg)
-        m.setIcon(QMessageBox.Question)
-        yesButton = m.addButton(_(Text.txt0082), QMessageBox.ButtonRole.YesRole)
-        noButton = m.addButton(" No ", QMessageBox.ButtonRole.NoRole)
-        m.setDefaultButton(noButton)
-        m.setFont(self.font())
-        m.setWindowTitle(_(Text.txt0080))
-        m.exec_()
-
-        if m.clickedButton() == yesButton:
-            self.configuration(action=config.Action.Save)
-            event.accept()
-        else:
-            event.ignore()
+    config.data.set("Tab", index)
 
 
 def _help(pth, index=0):
@@ -450,92 +500,6 @@ def _help(pth, index=0):
         htmlPath = "file:///" + str(pth.parent) + "/html/index.html"
 
     webbrowser.open(htmlPath, new=2, autoraise=True)
-
-
-def _setLanguageMenus(menuActions):
-
-    for m in menuActions:
-        # menus on menu bar
-        t = m.menu()
-
-        if isinstance(t, QMenuWidget):
-            t.setTitle(_(t.originaltitle))
-
-        for a in t.actions():
-            if a.isSeparator():
-                continue
-
-            if isinstance(a, QActionWidget):
-                if a.shortcut is not None:
-                    a.setShortcut(_(a.shortcut))
-
-                if a.tooltip is not None:
-                    if a.tooltip == Text.txt0020:
-                        msg = _(a.tooltip).format(
-                            "~/" + config.FILESROOT + "/" + config.LOGFILE
-                        )
-                        a.setStatusTip(msg)
-                    else:
-                        a.setStatusTip(_(a.tooltip))
-
-                if a.text is not None:
-                    a.setText(_(a.originaltext))
-
-            elif isinstance(a, QMenuWidget):
-                a.setTitle(_(a.originaltitle))
-
-            elif isinstance(a, QAction):
-                i = a.menu()
-
-                if isinstance(t, QMenuWidget):
-                    i.setTitle(_(i.originaltitle))
-
-
-def tableHeaders():
-    """
-    tableHeaders table model headers
-
-    Returns:
-        list: header definitions
-    """
-
-    data = [
-        [
-            "jobID",
-            {
-                "Type": "int",
-                "CastFunction": int,
-                "Label": " " + "ID" + "  ",
-                "Alignment": "right",
-                "Width": 80,
-                "ToolTip": "Job identification number",
-            },
-        ],
-        [
-            "status",
-            {
-                "Type": "str",
-                "CastFunction": str,
-                "Label": "       " + "Status" + "       ",
-                "Alignment": "center",
-                "Width": 220,
-                "ToolTip": "Application code for the job status",
-            },
-        ],
-        [
-            "command",
-            {
-                "Type": "str",
-                "CastFunction": str,
-                "Label": "Command",
-                "Alignment": "center",
-                "Width": 4096,
-                "ToolTip": "Command generated for MKVMERGE by MKVToolNix",
-            },
-        ],
-    ]
-
-    return data
 
 
 def abort():

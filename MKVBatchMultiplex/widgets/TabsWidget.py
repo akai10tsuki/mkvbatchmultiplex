@@ -13,8 +13,8 @@ Central widget holds:
 
 import logging
 
-from PySide2.QtCore import Signal, Slot
-from PySide2.QtWidgets import QWidget, QTabWidget, QVBoxLayout, QHBoxLayout
+from PySide2.QtCore import Signal
+from PySide2.QtWidgets import QTabWidget
 
 from ..utils import Text
 
@@ -52,7 +52,7 @@ class TabsWidget(QTabWidget):
         #self.tab2 = tab2Widget
         #self.tab3 = tab3Widget
         #self.tab4 = tab4Widget
-        #self.tab5 = tab5Widget
+        self.tab5 = tab5Widget
 
         self.addTab(tab1Widget, 'Command(s)')
         self.addTab(tab2Widget, 'Job(s)')
@@ -120,10 +120,6 @@ class TabsWidget(QTabWidget):
         """set instance log variable"""
         if isinstance(value, bool) or value is None:
             self.__log = value
-
-    def currentChange(self, index):
-
-        print(index)
 
     def setLanguage(self):
         """

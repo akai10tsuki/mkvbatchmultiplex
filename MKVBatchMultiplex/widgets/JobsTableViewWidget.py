@@ -3,15 +3,14 @@ JobsTableWidget
 """
 
 import logging
-import time
 
 from PySide2.QtCore import QThreadPool, Qt
 
 from PySide2.QtWidgets import QWidget, QGroupBox, QGridLayout, QApplication
 
-from vsutillib.pyqt import QthThreadWorker, QPushButtonWidget, darkPalette
+from vsutillib.pyqt import QPushButtonWidget, darkPalette
 
-from ..jobs import JobStatus
+from ..jobs import JobStatus, RunJobs
 from ..delegates import StatusComboBoxDelegate
 from ..utils import populate, Text
 
@@ -34,8 +33,9 @@ class JobsTableViewWidget(QWidget):
     # Class logging state
     __log = False
 
-    def __init__(self, parent=None, proxyModel=None, jobQueue=None, progress=None, title=None):
-
+    def __init__(
+        self, parent=None, proxyModel=None, jobQueue=None, progress=None, title=None
+    ):
         super(JobsTableViewWidget, self).__init__(parent)
 
         self.parent = parent
@@ -43,6 +43,7 @@ class JobsTableViewWidget(QWidget):
         self.tableModel = proxyModel.sourceModel()
         self.jobsQueue = jobQueue
         self.progress = progress
+        self.jobsWorker = None
 
         self.tableView = JobsTableView(self, proxyModel, title)
         self.threadpool = QThreadPool()
@@ -202,75 +203,18 @@ class JobsTableViewWidget(QWidget):
 
         dataset = self.tableModel.dataset
         for r in range(0, len(dataset)):
-            print("Row {} ID {} Status {}".format(r, dataset[r, 0], dataset[r, 1]))
-        print()
+            self.parent.outputMainSignal.emit(
+                "Row {} ID {} Status {}\n".format(r, dataset[r, 0], dataset[r, 1]), {}
+            )
+            #print("Row {} ID {} Status {}".format(r, dataset[r, 0], dataset[r, 1]))
+
+        self.parent.outputMainSignal.emit("\n", {})
+        #self.parent.outputMainSignal.emit("The Color Red\n", {"color": Qt.red})
+        #print()
 
     def run(self):
         """
         run test run worker thread
         """
 
-        if self.jobsQueue:
-            jobToRun = QthThreadWorker(
-                runJobs,
-                self.jobsQueue,
-                funcResult=result,
-                funcProgress=self.progress,
-            )
-
-            self.threadpool.start(jobToRun)
-
-        else:
-
-            print("No work to be done...")
-
-
-def result(funcResult):
-
-    print(funcResult)
-
-
-def runJobs(jobQueue, funcProgress=None):
-    """
-    runJobs execute jobs on queue
-
-    Args:
-        jobQueue (JobQueue): Job queue has all related information for the job
-        funcProgress (func, optional): function to call to report job progress. Defaults to None.
-
-    Returns:
-        str: Dummy  return value
-    """
-
-    while job := jobQueue.popLeft():
-
-        jobQueue.statusUpdateSignal.emit(job, JobStatus.Running)
-
-        print(
-            "({}, {}) {} Running.. ".format(
-                job.statusIndex.row(), job.statusIndex.column(), job.job[JOBID],
-            )
-        )
-
-        #Test
-
-        i = 0
-        j = 0
-        t = 0
-
-        funcProgress.pbSetMaximum.emit(100, 300)
-
-        while j < 3:
-            while i < 100:
-                i += 0.01
-                funcProgress.pbSetValues.emit(i, t + i)
-                time.sleep(0.0001)
-
-            t += 100
-            j += 1
-            i = 0
-
-
-        jobQueue.statusUpdateSignal.emit(job, JobStatus.Done)
-
-    return "Job queue empty."
+        self.jobsQueue.run()

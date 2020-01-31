@@ -29,7 +29,8 @@ def testData():
             [1, ""],
             [JobStatus.AddToQueue, "Status code"],
             [
-                (   r"'C:/Program Files/MKVToolNix\mkvmerge.exe' --ui-language en --output "
+                (
+                    r"'C:/Program Files/MKVToolNix\mkvmerge.exe' --ui-language en --output "
                     r"'F:\New folder\[FFF] Dungeon ni Deai wo Motomeru no wa Machigatteiru Darou"
                     r" ka - 01 [BD][1080p-FLAC][8B5184BF] (1).mkv' --language 0:jpn --track-name"
                     r" '0:10bit H.264 - 1080p' --default-track 0:yes --display-dimensions "

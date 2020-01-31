@@ -7,14 +7,16 @@ import logging
 
 from collections import deque
 
-from PySide2.QtCore import QObject, QMutex, QMutexLocker, Qt, Slot, Signal
+from PySide2.QtCore import QObject, Slot, Signal
 
 from vsutillib.mkv import MKVCommand
 
+from .. import config
 from ..models import TableProxyModel
 from .jobKeys import JobStatus
+from .RunJobs import RunJobs
 
-MUTEX = QMutex()
+
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 JOBID, JOBSTATUS, JOBCOMMAND = range(3)
@@ -34,12 +36,12 @@ class JobInfo:  # pylint: disable=R0903
 
     def __init__(self, index=None, job=None, errors=None, output=None):
 
-        self.jobIndex = index[JOBID]
-        self.statusIndex = index[JOBSTATUS]
-        self.commandIndex = index[JOBCOMMAND]
+        self.jobIndex = index[config.JOBID]
+        self.statusIndex = index[config.JOBSTATUS]
+        self.commandIndex = index[config.JOBCOMMAND]
         self.job = job
-        self.command = job[JOBCOMMAND]
-        self.oCommand = MKVCommand(job[JOBCOMMAND])
+        self.command = job[config.JOBCOMMAND]
+        self.oCommand = MKVCommand(job[config.JOBCOMMAND])
         self.errors = [] if errors is None else errors
         self.output = [] if output is None else output
 
@@ -58,30 +60,7 @@ class JobQueue(QObject):
     __jobID = 10
 
     statusUpdateSignal = Signal(object, str)
-
-    def __init__(self, parent=None, model=None, jobWorkQueue=None):
-        super(JobQueue, self).__init__(parent)
-
-        self.parent = parent
-        self.tableModel = None
-
-        if model is not None:
-            self.tableModel = model.sourceModel()
-
-        if jobWorkQueue is None:
-            self._workQueue = deque()
-        else:
-            self._workQueue = jobWorkQueue
-
-        self.statusUpdateSignal.connect(self.statusUpdate)
-
-    def __bool__(self):
-        if self._workQueue:
-            return True
-        return False
-
-    def __len__(self):
-        return len(self._workQueue)
+    runSignal = Signal()
 
     @classmethod
     def classLog(cls, setLogging=None):
@@ -106,6 +85,29 @@ class JobQueue(QObject):
                 cls.__log = setLogging
 
         return cls.__log
+
+    def __init__(self, parent, model=None, progress=None, jobWorkQueue=None):
+        super(JobQueue, self).__init__(parent)
+
+        self.parent = parent
+        self.tableModel = model
+        self.progress = progress
+
+        if jobWorkQueue is None:
+            self._workQueue = deque()
+        else:
+            self._workQueue = jobWorkQueue
+
+        self.statusUpdateSignal.connect(self.statusUpdate)
+        self.runSignal.connect(self.run)
+
+    def __bool__(self):
+        if self._workQueue:
+            return True
+        return False
+
+    def __len__(self):
+        return len(self._workQueue)
 
     @property
     def log(self):
@@ -138,6 +140,16 @@ class JobQueue(QObject):
         if isinstance(value, TableProxyModel):
             self.tableModel = value.sourceModel()
 
+    @property
+    def progress(self):
+        return self.progress
+
+    @model.setter
+    def model(self, value):
+        if isinstance(value, TableProxyModel):
+            self.tableModel = value.sourceModel()
+
+
     @Slot(object, str)
     def statusUpdate(self, job, status):
 
@@ -156,11 +168,11 @@ class JobQueue(QObject):
         """
 
         job = self.tableModel.dataset[jobRow, ]
-        status = job[JOBSTATUS]
+        status = job[config.JOBSTATUS]
         if status != JobStatus.AddToQueue:
             return False
 
-        jobID = job[JOBID]
+        jobID = job[config.JOBID]
         jobIndex = self.tableModel.index(jobRow, JOBID)
         statusIndex = self.tableModel.index(jobRow, JOBSTATUS)
         commandIndex = self.tableModel.index(jobRow, JOBCOMMAND)
@@ -183,7 +195,7 @@ class JobQueue(QObject):
         """Clear the job queue"""
 
         while job := self.pop():
-            print("Clearing the way")
+            print("Clearing the way {}".format(job.job[config.JOBID]))
 
     def popLeft(self):
         """
@@ -223,3 +235,12 @@ class JobQueue(QObject):
             return self._workQueue.pop()
 
         return None
+
+    @Slot()
+    def run(self):
+        """
+        run test run worker thread
+        """
+
+        runJobsWorker = RunJobs(self, self.jobsQueue, self.progress)
+        runJobsWorker.run()

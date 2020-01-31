@@ -59,6 +59,7 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0088 = S_("Command generated for MKVMERGE by MKVToolNix")
     txt0089 = S_("Jobs are still running")
     txt0090 = S_("Exit")
+    txt0091 = S_("Progress")
 
     # JobTableWidgets
     # 120
@@ -76,8 +77,18 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0131 = S_("Status")
     txt0132 = S_("Command")
 
+    # TabsWidget
     # 140
     txt0140 = S_("Job")
     txt0141 = S_("Job(s) Output")
     txt0142 = S_("Job(s) Error(s)")
     txt0143 = S_("Rename Files")
+
+    # CommandWidget
+    # 160
+    txt0160 = S_("Add Command")
+    txt0161 = S_("Add command to jobs table with Waiting status")
+    txt0162 = S_("Clear Output")
+    txt0163 = S_("Erase text in output window")
+    txt0164 = S_("Paste")
+    txt0165 = S_("Paste Clipboard contents in command line")

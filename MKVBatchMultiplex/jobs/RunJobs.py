@@ -4,14 +4,16 @@ Class to process jobs queue
 # RJB0001
 
 import logging
-import threading
+import re
+
+# import threading
 import time
 
-from PySide2.QtCore import QObject
+from PySide2.QtCore import QObject, Signal
 
 import vsutillib.mkv as mkv
 
-from vsutillib.process import ThreadWorker
+from vsutillib.process import ThreadWorker, RunCommand, isThreadRunning
 from vsutillib.misc import staticVars
 
 from .. import config
@@ -27,63 +29,95 @@ class RunJobs(QObject):
     run test run worker thread
     """
 
+    finishedSignal = Signal()
+    startSignal = Signal()
+
     # Class logging state
     __log = False
 
-    def __init__(self, jobsQueue, progressFunc):
+    def __init__(self, parent, jobsQueue, progressFunc):
         super(RunJobs, self).__init__()
 
-        self.jobsQueue = jobsQueue
+        self.__parent = None
+        self.__jobsQueue = None
+        self.__process = None
+
+        self.parent = parent
+        self.jobsqueue = jobsQueue
         self.progress = progressFunc
+
+        self.mainWindow = self.__parent.parent
         self.jobsWorker = None
         self.__logging = False
+        self.__running = False
+
+    @property
+    def running(self):
+        return self.__running
+
+    @property
+    def jobsqueue(self):
+        return self.__jobsQueue
+
+    @jobsqueue.setter
+    def jobsqueue(self, value):
+        self.__jobsQueue = value
+
+    @property
+    def process(self):
+        return self.__process
+
+    @process.setter
+    def process(self, value):
+        self.__process = value
 
     def run(self):
         """
         run summit jobs to worker
         """
 
-        if self.jobsQueue:
-            # jobToRun = QthThreadWorker(
-            if isinstance(self.jobsWorker, ThreadWorker):
-                print(
-                    "Create threads total {} ID = {}".format(
-                        threading.activeCount(), self.jobsWorker.native_id
-                    )
-                )
-            else:
-                print("Check failed.")
+        if self.jobsQueue and not isThreadRunning("jobsWorker"):
 
             self.jobsWorker = ThreadWorker(
                 runJobs,
                 self.jobsQueue,
+                self.mainWindow,
                 funcResult=self.result,
                 funcProgress=self.progress,
                 funcFinished=self.finished,
             )
 
-            print("Before threads total {}".format(threading.activeCount()))
+            # print("Before threads total {}".format(threading.activeCount()))
             if not self.jobsWorker.isAlive():
                 self.jobsWorker.name = "jobsWorker"
                 self.jobsWorker.start()
-                print(
-                    "After threads total {} ID = {}".format(
-                        threading.activeCount(), self.jobsWorker.native_id
-                    )
-                )
-            else:
-                print("Worker active.")
-                print("Alive threads total {}".format(threading.activeCount()))
+                self.__running = True
+                # print(
+                #    "After threads total {} ID = {}".format(
+                #        threading.activeCount(), self.jobsWorker.native_id
+                #    )
+                # )
+            # else:
+            # print("Worker active.")
+            # print("Alive threads total {}".format(threading.activeCount()))
 
-        else:
+        # else:
 
-            print("No work to be done Queue empty...")
+        #    print("No work to be done Queue empty...")
+
+    def start(self):
+        """
+        start generate signal for start of run
+        """
+        self.__running = True
+        self.startSignal.emit()
 
     def finished(self):
         """
-        finished delete Thread object
+        finished generate signal for finished run
         """
-
+        self.__running = False
+        self.finishedSignal.emit()
         print("finished")
 
     def result(self, funcResult):
@@ -97,8 +131,42 @@ class RunJobs(QObject):
         print(funcResult)
 
 
+@staticVars(newJob=False)
+def displayRunJobs(line, job, mainWindow, indexTotal, funcProgress=None):
+    """
+    Convenience function used by runJobs
+    to display lines of the mkvmerge
+    execution
+
+    Args:
+        line (str): line to display
+    """
+    regEx = re.compile(r"(\d+)")
+
+    funcProgress.lblSetValue.emit(2, indexTotal[0] + 1)
+    n = 0
+
+    if line.find("Progress:") >= 0:
+        print("\r" + line[:-1], end="")
+
+        if m := regEx.search(line):
+            n = int(m.group(1))
+
+        if n > 0:
+            mainWindow.jobsOutputSignal.emit(line[:-1], {"replaceLine": True})
+            funcProgress.pbSetValues.emit(n, indexTotal[1] + n)
+
+    else:
+
+        print(line, end="")
+        mainWindow.jobsOutputSignal.emit(line[:-1], {"appendLine": True})
+
+    if (line.find("writing.") > 0) or (line.find("Multiplexing took") == 0):
+        mainWindow.jobsOutputSignal.emit("\n", {})
+
+
 @staticVars(running=False)
-def runJobs(jobQueue, funcProgress=None):
+def runJobs(jobQueue, mainWindow, funcProgress=None):
     """
     runJobs execute jobs on queue
 
@@ -119,6 +187,9 @@ def runJobs(jobQueue, funcProgress=None):
     totalJobs = len(jobQueue)
     remainingJobs = totalJobs - 1
     currentJob = 0
+    indexTotal = [0, 0]
+
+    verify = mkv.VerifyStructure()
 
     while job := jobQueue.popLeft():
 
@@ -140,15 +211,14 @@ def runJobs(jobQueue, funcProgress=None):
 
         # Test
 
-        i = 0
-        j = 0
-        t = 0
+        indexTotal[0] = 0  # file index
+        indexTotal[1] = 0  # current max progress bar
 
         # Job(s): {0:3d} Current: {1:3d} File: {2:3d} of {3:3d} Errors: {4:3d}
 
         totalFiles = 0
         if job.oCommand:
-            print("Total files {}".format(len(job.oCommand)))
+            # print("Total files {}".format(len(job.oCommand)))
             totalFiles = len(job.oCommand)
 
         maxBar = totalFiles * 100
@@ -158,30 +228,44 @@ def runJobs(jobQueue, funcProgress=None):
         funcProgress.lblSetValue.emit(1, currentJob)
         funcProgress.lblSetValue.emit(3, totalFiles)
 
-        if job.oCommand:
-            print("Total files {}".format(len(job.oCommand)))
+        indexTotal[0] = 0
 
-        # while j < totalFiles:
-        #    funcProgress.lblSetValue.emit(2, j + 1)
-        #    while i < 100:
-        #        i += 0.1
-        #        funcProgress.pbSetValues.emit(i, t + i)
-        #        time.sleep(0.0001)
+        cli = RunCommand(
+            processLine=displayRunJobs,
+            processArgs=[job, mainWindow, indexTotal],
+            processKWArgs={"funcProgress": funcProgress},
+            commandShlex=True,
+            universalNewLines=True,
+        )
 
-        j = 0
-        for cmd, basefiles, sourcefiles, _, _ in job.oCommand:
+        for cmd, baseFiles, sourceFiles, destinationFiles, _ in job.oCommand:
 
-            funcProgress.lblSetValue.emit(2, j + 1)
+            funcProgress.lblSetValue.emit(2, indexTotal[0] + 1)
 
-            ###
-            # Execute cmd
-            ###
+            verify.verifyStructure(baseFiles, sourceFiles)
 
-            dummyRunCommand(cmd, job, funcProgress, j, t)
+            if verify:
+                ###
+                # Execute cmd
+                ###
+                msg = "\nCommand: {}\nBase Files: {}\nSource Files: {}\nDestination Files: {}\n\n"
+                msg = msg.format(cmd, baseFiles, sourceFiles, destinationFiles)
+                mainWindow.jobsOutputSignal.emit(msg, {})
 
-            t += 100
-            j += 1
-            i = 0
+                cli.command = cmd
+                cli.run()
+
+                # dummyRunCommand(cmd, job, funcProgress, mainWindow, indexTotal[0], indexForTotal)
+
+            else:
+
+                msg = "\nDestination Files: {}\n".format(destinationFiles)
+                mainWindow.jobsOutputSignal.emit(msg, {})
+                for m in verify.analysis:
+                    mainWindow.jobsOutputSignal.emit(m, {})
+
+            indexTotal[1] += 100
+            indexTotal[0] += 1
 
         jobQueue.statusUpdateSignal.emit(job, JobStatus.Done)
 
@@ -196,14 +280,16 @@ def runJobs(jobQueue, funcProgress=None):
     return "Job queue empty."
 
 
-def dummyRunCommand(command, job, funcProgress, j, t):
-
+def dummyRunCommand(command, job, funcProgress, indexTotal):
+    """
+    dummyRunCommand dummy run job function
+    """
     print("\nJob ID: {} \nCommand: {}\n".format(job.job[config.JOBID], command))
 
     # j current file
-    funcProgress.lblSetValue.emit(2, j + 1)
+    funcProgress.lblSetValue.emit(2, indexTotal[0] + 1)
     i = 0
     while i < 100:
         i += 0.1
-        funcProgress.pbSetValues.emit(i, t + i)
+        funcProgress.pbSetValues.emit(i, indexTotal[1] + i)
         time.sleep(0.0001)
