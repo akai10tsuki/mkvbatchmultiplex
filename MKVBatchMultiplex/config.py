@@ -71,6 +71,7 @@ data = ConfigurationSettings()  # pylint: disable=invalid-name
 ######################
 
 JOBID, JOBSTATUS, JOBCOMMAND = range(3)
+BTNADDCOMMAND = 0
 BTNPASTE = 0
 BTNADDQUEUE = 1
 BTNCLEAR = 2
