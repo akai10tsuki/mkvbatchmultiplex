@@ -35,18 +35,18 @@ class RunJobs(QObject):
     # Class logging state
     __log = False
 
-    def __init__(self, parent, jobsQueue, progressFunc):
+    def __init__(self, parent, jobsQueue=None, progressFunc=None):
         super(RunJobs, self).__init__()
 
-        self.__parent = None
         self.__jobsQueue = None
         self.__process = None
+        self.__progress = None
 
         self.parent = parent
         self.jobsqueue = jobsQueue
         self.progress = progressFunc
 
-        self.mainWindow = self.__parent.parent
+        self.mainWindow = self.parent.parent
         self.jobsWorker = None
         self.__logging = False
         self.__running = False
@@ -71,39 +71,34 @@ class RunJobs(QObject):
     def process(self, value):
         self.__process = value
 
+    @property
+    def progress(self):
+        return self.__progress
+
+    @progress.setter
+    def progress(self, value):
+        self.__progress = value
+
     def run(self):
         """
         run summit jobs to worker
         """
 
-        if self.jobsQueue and not isThreadRunning("jobsWorker"):
+        if self.jobsqueue and not isThreadRunning(config.WORKERTHREADNAME):
 
             self.jobsWorker = ThreadWorker(
                 runJobs,
-                self.jobsQueue,
+                self.jobsqueue,
                 self.mainWindow,
+                funcStart=self.start,
                 funcResult=self.result,
                 funcProgress=self.progress,
                 funcFinished=self.finished,
             )
 
-            # print("Before threads total {}".format(threading.activeCount()))
-            if not self.jobsWorker.isAlive():
-                self.jobsWorker.name = "jobsWorker"
-                self.jobsWorker.start()
-                self.__running = True
-                # print(
-                #    "After threads total {} ID = {}".format(
-                #        threading.activeCount(), self.jobsWorker.native_id
-                #    )
-                # )
-            # else:
-            # print("Worker active.")
-            # print("Alive threads total {}".format(threading.activeCount()))
-
-        # else:
-
-        #    print("No work to be done Queue empty...")
+            self.jobsWorker.name = config.WORKERTHREADNAME
+            self.jobsWorker.start()
+            self.__running = True
 
     def start(self):
         """
@@ -118,7 +113,6 @@ class RunJobs(QObject):
         """
         self.__running = False
         self.finishedSignal.emit()
-        print("finished")
 
     def result(self, funcResult):
         """
@@ -253,9 +247,9 @@ def runJobs(jobQueue, mainWindow, funcProgress=None):
                 mainWindow.jobsOutputSignal.emit(msg, {})
 
                 cli.command = cmd
-                cli.run()
+                #cli.run()
 
-                # dummyRunCommand(cmd, job, funcProgress, mainWindow, indexTotal[0], indexForTotal)
+                dummyRunCommand(cmd, job, funcProgress, indexTotal)
 
             else:
 
