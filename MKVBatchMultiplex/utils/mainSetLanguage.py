@@ -7,7 +7,7 @@ from PySide2.QtWidgets import QAction
 from vsutillib.pyqt import QMenuWidget, QActionWidget
 
 from .. import config
-from . import Text
+from .text import Text
 
 def setLanguageMenus(menuActions):
 
