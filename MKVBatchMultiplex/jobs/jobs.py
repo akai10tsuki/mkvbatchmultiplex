@@ -61,6 +61,8 @@ class JobQueue(QObject):
 
     statusUpdateSignal = Signal(object, str)
     runSignal = Signal()
+    addQueueItemSignal = Signal()
+    queueEmptiedSignal = Signal()
 
     @classmethod
     def classLog(cls, setLogging=None):
@@ -86,17 +88,19 @@ class JobQueue(QObject):
 
         return cls.__log
 
-    def __init__(self, parent, model=None, progress=None, jobWorkQueue=None):
+    def __init__(self, parent, model=None, funcProgress=None, jobWorkQueue=None):
         super(JobQueue, self).__init__(parent)
 
+        self.__progress = None
         self.parent = parent
         self.tableModel = model
-        self.progress = progress
 
         if jobWorkQueue is None:
             self._workQueue = deque()
         else:
             self._workQueue = jobWorkQueue
+
+        self.runJobs = RunJobs(self, self, self.progress)
 
         self.statusUpdateSignal.connect(self.statusUpdate)
         self.runSignal.connect(self.run)
@@ -142,13 +146,17 @@ class JobQueue(QObject):
 
     @property
     def progress(self):
-        return self.progress
+        return self.__progress
+
+    @progress.setter
+    def progress(self, value):
+        self.__progress = value
+        self.runJobs.progress = value
 
     @model.setter
     def model(self, value):
         if isinstance(value, TableProxyModel):
             self.tableModel = value.sourceModel()
-
 
     @Slot(object, str)
     def statusUpdate(self, job, status):
@@ -187,6 +195,7 @@ class JobQueue(QObject):
         self.tableModel.setData(statusIndex, JobStatus.Queue)
 
         if self._workQueue:
+            self.addQueueItemSignal.emit()
             return True
 
         return False
@@ -242,5 +251,4 @@ class JobQueue(QObject):
         run test run worker thread
         """
 
-        runJobsWorker = RunJobs(self, self.jobsQueue, self.progress)
-        runJobsWorker.run()
+        self.runJobs.run()
