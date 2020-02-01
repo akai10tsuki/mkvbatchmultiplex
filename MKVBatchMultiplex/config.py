@@ -71,10 +71,26 @@ data = ConfigurationSettings()  # pylint: disable=invalid-name
 ######################
 
 JOBID, JOBSTATUS, JOBCOMMAND = range(3)
+
 BTNADDCOMMAND = 0
+
 BTNPASTE = 0
 BTNADDQUEUE = 1
-BTNCLEAR = 2
+BTNSTARTQUEUE = 2
+
+BTNANALYSIS = 4
+BTNSHOWCOMMANDS = 5
+BTNCHECKFILES = 6
+
+BTNCLEAR = 8
+BTNRESET = 9
+
+WORKERTHREADNAME = "jobsWorker"
+
+JTVBTNRUN = 4
+
+#######################
+#######################
 
 class Action: # pylint: disable=too-few-public-methods
 
