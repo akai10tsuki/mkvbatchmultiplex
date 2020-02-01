@@ -94,13 +94,14 @@ class JobQueue(QObject):
         self.__progress = None
         self.parent = parent
         self.tableModel = model
+        self.progress = funcProgress
 
         if jobWorkQueue is None:
             self._workQueue = deque()
         else:
             self._workQueue = jobWorkQueue
 
-        self.runJobs = RunJobs(self, self, self.progress)
+        self.runJobs = RunJobs(self, self) # progress function is a late bind
 
         self.statusUpdateSignal.connect(self.statusUpdate)
         self.runSignal.connect(self.run)
@@ -151,7 +152,6 @@ class JobQueue(QObject):
     @progress.setter
     def progress(self, value):
         self.__progress = value
-        self.runJobs.progress = value
 
     @model.setter
     def model(self, value):
@@ -250,5 +250,5 @@ class JobQueue(QObject):
         """
         run test run worker thread
         """
-
+        self.runJobs.progress  = self.progress
         self.runJobs.run()
