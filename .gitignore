@@ -46,7 +46,7 @@ coverage.xml
 .hypothesis/
 
 # Translations
-*.po
+*.mo
 *.pot
 
 # Backcup translations
