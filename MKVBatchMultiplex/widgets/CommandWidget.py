@@ -1,10 +1,12 @@
 """
 class CommandWidget
 """
-import logging
-import threading
 
-from PySide2.QtCore import Qt, Signal, Slot, QTimer
+# pylint: disable=bad-continuation
+
+import logging
+
+from PySide2.QtCore import Signal, Slot
 from PySide2.QtWidgets import (
     QApplication,
     QWidget,
@@ -15,9 +17,11 @@ from PySide2.QtWidgets import (
     QLineEdit,
 )
 
-import vsutillib.mkv as mkv
-
-from vsutillib.pyqt import OutputTextWidget, QPushButtonWidget, RunInThread
+from vsutillib.pyqt import (
+    OutputTextWidget,
+    QPushButtonWidget,
+    runFunctionInThread,
+)
 from vsutillib.process import isThreadRunning
 
 from .. import config
@@ -76,11 +80,6 @@ class CommandWidget(QWidget):
         self.parent.jobsQueue.addQueueItemSignal.connect(
             lambda: self.jobStartQueueState(True)
         )
-
-        self.timer = QTimer()
-        self.timer.setInterval(2000)
-        self.timer.timeout.connect(self.watchJobs)
-        # self.timer.start()
 
         self._initControls()
         self._initUI()
@@ -148,7 +147,7 @@ class CommandWidget(QWidget):
 
         btnAnalysis = QPushButtonWidget(
             "Analysis",
-            function=lambda: self.runFunctionInThread(
+            function=lambda: runFunctionInThread(
                 runAnalysis, output=self.output, command=self.cmdLine.text()
             ),
             toolTip="Print analysis of command line",
@@ -156,16 +155,18 @@ class CommandWidget(QWidget):
 
         btnShowCommands = QPushButtonWidget(
             "Commands",
-            function=lambda: self.runFunctionInThread(
+            function=lambda: runFunctionInThread(
                 showCommands, output=self.output, command=self.cmdLine.text()
             ),
             toolTip="Commands to be applied",
         )
 
         btnCheckFiles = QPushButtonWidget(
-            "Check Files", function=lambda: self.runFunctionInThread(
+            "Check Files",
+            function=lambda: runFunctionInThread(
                 checkFiles, output=self.output, command=self.cmdLine.text()
-            ), toolTip="Check files for consistency"
+            ),
+            toolTip="Check files for consistency",
         )
 
         btnClear = QPushButtonWidget(
@@ -258,16 +259,14 @@ class CommandWidget(QWidget):
     def output(self, value):
         self.__output = value
 
-    def watchJobs(self):
-
-        totalThreads = threading.activeCount()
-        print(f"Running threads = {totalThreads}")
-
-        bTest = isThreadRunning(config.WORKERTHREADNAME)
-
-        print(f"Jobs worker running {bTest}")
-
     def addCommand(self, status):
+        """
+        addCommand add command row in jobs table
+
+        Args:
+            status (JobStatus): Status for job to be added should be either
+                                JobStatus.Waiting or JobStatus.AddToQueue
+        """
 
         totalJobs = self.tableModel.rowCount()
         command = self.cmdLine.text()
@@ -286,6 +285,12 @@ class CommandWidget(QWidget):
 
     @Slot(bool)
     def cliButtonsState(self, validateOK):
+        """
+        cliButtonsState change enabled status for buttons related with command line
+
+        Args:
+            validateOK (bool): True to enable, False to disable
+        """
 
         addCommand = self.frmCmdLine.itemAt(
             config.BTNADDCOMMAND, QFormLayout.LabelRole
@@ -346,20 +351,6 @@ class CommandWidget(QWidget):
     def jobStatus(self, running):
         if running:
             self.jobStartQueueState(False)
-            print("running signal jobStatus CommandWidget")
-        else:
-            print("ended signal jobStatus CommandWidget")
-
-    def runFunctionInThread(self, function, *args, **kwargs):
-        """
-        Pass the function to execute Other args,
-        kwargs are passed to the run function
-        """
-
-        worker = RunInThread(function, *args, **kwargs)
-
-        # Execute
-        worker.run()
 
     def setLanguage(self):
         """
