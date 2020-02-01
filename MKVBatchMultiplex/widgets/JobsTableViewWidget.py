@@ -4,12 +4,14 @@ JobsTableWidget
 
 import logging
 
-from PySide2.QtCore import QThreadPool, Qt
+from PySide2.QtCore import QThreadPool, Qt, Slot
 
 from PySide2.QtWidgets import QWidget, QGroupBox, QGridLayout, QApplication
 
 from vsutillib.pyqt import QPushButtonWidget, darkPalette
+from vsutillib.process import isThreadRunning
 
+from .. import config
 from ..jobs import JobStatus, RunJobs
 from ..delegates import StatusComboBoxDelegate
 from ..utils import populate, Text
@@ -33,17 +35,14 @@ class JobsTableViewWidget(QWidget):
     # Class logging state
     __log = False
 
-    def __init__(
-        self, parent=None, proxyModel=None, jobQueue=None, progress=None, title=None
-    ):
+    def __init__(self, parent, proxyModel, title=None):
         super(JobsTableViewWidget, self).__init__(parent)
+
+        self.__output = None
 
         self.parent = parent
         self.proxyModel = proxyModel
         self.tableModel = proxyModel.sourceModel()
-        self.jobsQueue = jobQueue
-        self.progress = progress
-        self.jobsWorker = None
 
         self.tableView = JobsTableView(self, proxyModel, title)
         self.threadpool = QThreadPool()
@@ -51,6 +50,7 @@ class JobsTableViewWidget(QWidget):
 
         self._initUI(title)
         self._setupDelegates()
+        self._initHelper()
 
     def _initUI(self, title):
 
@@ -77,7 +77,7 @@ class JobsTableViewWidget(QWidget):
         )
 
         btnRun = QPushButtonWidget(
-            "Simulate Run", function=self.run, toolTip="Clear Queue simulating a run"
+            "Start Queue", function=self.run, toolTip="Start processing jobs on Queue"
         )
 
         btnPrintDataset = QPushButtonWidget(
@@ -113,6 +113,18 @@ class JobsTableViewWidget(QWidget):
 
                 if column == columnName:
                     self.tableView.setItemDelegateForColumn(i, delegate)
+
+    def _initHelper(self):
+
+        # Job Queue related
+        self.parent.jobsQueue.addQueueItemSignal.connect(
+            lambda: self.jobRunQueueState(True)
+        )
+
+        self.parent.jobsQueue.runJobs.startSignal.connect(lambda: self.jobStatus(True))
+        self.parent.jobsQueue.runJobs.finishedSignal.connect(lambda: self.jobStatus(False))
+
+        self.grpGrid.itemAt(config.JTVBTNRUN).widget().setEnabled(False)
 
     @classmethod
     def classLog(cls, setLogging=None):
@@ -160,6 +172,14 @@ class JobsTableViewWidget(QWidget):
         if isinstance(value, bool) or value is None:
             self.__log = value
 
+    @property
+    def output(self):
+        return self.__output
+
+    @output.setter
+    def output(self, value):
+        self.__output = value
+
     def addWaitingJobsToQueue(self):
         """
         addWaitingJobsToQueue adds any Waiting job to job queue
@@ -173,9 +193,10 @@ class JobsTableViewWidget(QWidget):
                 self.tableModel.setData(index, JobStatus.AddToQueue)
 
     def clearJobsQueue(self):
-
-        if self.jobsQueue:
-            print("Something to Clear Total Jobs = {}".format(len(self.jobsQueue)))
+        if self.parent.jobsQueue:
+            print(
+                "Something to Clear Total Jobs = {}".format(len(self.parent.jobsQueue))
+            )
         else:
             print("Nothing here")
 
@@ -206,15 +227,33 @@ class JobsTableViewWidget(QWidget):
             self.parent.outputMainSignal.emit(
                 "Row {} ID {} Status {}\n".format(r, dataset[r, 0], dataset[r, 1]), {}
             )
-            #print("Row {} ID {} Status {}".format(r, dataset[r, 0], dataset[r, 1]))
+            # print("Row {} ID {} Status {}".format(r, dataset[r, 0], dataset[r, 1]))
 
         self.parent.outputMainSignal.emit("\n", {})
-        #self.parent.outputMainSignal.emit("The Color Red\n", {"color": Qt.red})
-        #print()
+        # self.parent.outputMainSignal.emit("The Color Red\n", {"color": Qt.red})
+        # print()
+
+    @Slot(bool)
+    def jobRunQueueState(self, state):
+
+        if state and not isThreadRunning(config.WORKERTHREADNAME):
+            self.grpGrid.itemAt(config.JTVBTNRUN).widget().setEnabled(state)
+        else:
+            self.grpGrid.itemAt(config.JTVBTNRUN).widget().setEnabled(state)
+
+    @Slot(bool)
+    def jobStatus(self, running):
+        if running:
+            self.jobRunQueueState(False)
+            print('running signal jobStatus CommandWidget')
+        else:
+            print('ended signal jobStatus CommandWidget')
 
     def run(self):
         """
         run test run worker thread
         """
 
-        self.jobsQueue.run()
+        # self.runJobs = RunJobs(self, self.parent.jobsQueue, self.parent.progress)
+        # self.runJobs.run()
+        self.parent.jobsQueue.run()
