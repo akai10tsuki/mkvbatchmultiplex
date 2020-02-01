@@ -46,7 +46,14 @@ from .dataset import TableData, tableHeaders
 from .jobs import JobQueue
 from .models import TableProxyModel, JobsTableModel
 from .widgets import CommandWidget, JobsTableViewWidget, TabsWidget
-from .utils import Text, Progress, yesNoDialog, setLanguageMenus, SetLanguage
+from .utils import (
+    Text,
+    OutputWindows,
+    Progress,
+    yesNoDialog,
+    setLanguageMenus,
+    SetLanguage,
+)
 
 DEFAULTFONT = QFont("Segoe UI", 14)
 
@@ -63,7 +70,8 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.actEN = None
         self.actES = None
         self.languageMenu = None
-        self.jobQueue = JobQueue(self)
+        self.progress = None
+        self.jobsQueue = JobQueue(self)
         self.defaultPalette = palette
         self.widgetSetLanguage = SetLanguage()
 
@@ -93,18 +101,14 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
         headers = tableHeaders()
         self.tableData = TableData(headerList=headers, dataList=[])
-        self.tableModel = JobsTableModel(self.tableData, self.jobQueue)
+        self.tableModel = JobsTableModel(self.tableData, self.jobsQueue)
         self.proxyModel = TableProxyModel(self.tableModel)
 
-        self.progress = Progress(self, self.progressBar, self.jobsLabel)
-
-        self.jobQueue.model = self.proxyModel
-        self.jobQueue.progress = self.progress
+        self.jobsQueue.model = self.proxyModel
+        self.jobsQueue.progress = self.progress
 
         # Widgets for tabs
-        self.tableViewWidget = JobsTableViewWidget(
-            self, self.proxyModel, self.jobQueue, self.progress, "Jobs Table"
-        )
+        self.tableViewWidget = JobsTableViewWidget(self, self.proxyModel, "Jobs Table")
         self.tableViewWidget.tableView.sortByColumn(0, Qt.AscendingOrder)
 
         self.comandWidget = CommandWidget(self, self.proxyModel)
@@ -125,10 +129,19 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         _initHelper setup signals
         """
 
+        # Set output to contain output windows insertText Signals
+        self.output = OutputWindows(
+            self.comandWidget.insertText,
+            self.jobsOutput.insertText,
+            self.errorOutput.insertText,
+        )
+        self.comandWidget.output = self.output
+        self.tableViewWidget.output = self.output
+
         # map output widgets inserTextSignal to local ones
         self.outputMainSignal = self.comandWidget.insertTextSignal
         self.jobsOutputSignal = self.jobsOutput.insertTextSignal
-        self.errorOutputSignal = self.jobsOutput.insertTextSignal
+        self.errorOutputSignal = self.errorOutput.insertTextSignal
 
         # setup widgets setLanguage to SetLanguage change signal
         self.widgetSetLanguage.addSlot(self.tableViewWidget.setLanguage)
@@ -254,6 +267,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         statusBar.addPermanentWidget(self.jobsLabel)
         statusBar.addPermanentWidget(self.progressBar)
 
+        self.progress = Progress(self, self.progressBar, self.jobsLabel)
 
     def enableLogging(self, state):
         """Activate logging"""
@@ -413,7 +427,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
         self.setWindowTitle(Text.txt0001)
         self.jobsLabel.template = _(Text.txt0085)
-        self.progressBar.label = _(Text.txt0091) + ':'
+        self.progressBar.label = _(Text.txt0091) + ":"
 
         # Set langque main windows
         setLanguageMenus(self.menuBar().actions())
