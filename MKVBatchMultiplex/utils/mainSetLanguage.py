@@ -10,7 +10,12 @@ from .. import config
 from .text import Text
 
 def setLanguageMenus(menuActions):
+    """
+    setLanguageMenus set language locale on menu items
 
+    Args:
+        menuActions (QMenu): item to transverse to set labels in correct locale
+    """
     for m in menuActions:
         # menus on menu bar
         t = m.menu()
