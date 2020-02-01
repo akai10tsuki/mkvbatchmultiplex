@@ -2,17 +2,23 @@
 OutputWindows class
 """
 
-from PySide2.QtCore import QObject
+from PySide2.QtCore import QObject, Signal
 
-class OutputWindow(QObject):
+class OutputWindows(QObject):
+    """
+    OutputWindow class contain pointers to output windows inertText slots
 
-    outCommand = None
-    outJobs = None
-    outError = None
+    Args:
+        QObject ([type]): [description]
+    """
 
-    def __init__(self, outCommand, outJobs, outError):
-        super(OutputWindow, self).__init__()
+    command = Signal(str, dict)
+    job = Signal(str, dict)
+    error = Signal(str, dict)
 
-        self.outCommand = outCommand
-        self.outJobs = outJobs
-        self.outError = outError
+    def __init__(self, outCommandInsertText, outJobsInsertText, outErrorInsertText):
+        super(OutputWindows, self).__init__()
+
+        self.command.connect(outCommandInsertText)
+        self.job.connect(outJobsInsertText)
+        self.error.connect(outErrorInsertText)
