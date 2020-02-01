@@ -31,6 +31,7 @@ class RunJobs(QObject):
 
     finishedSignal = Signal()
     startSignal = Signal()
+    resultSignal = Signal(object)
 
     # Class logging state
     __log = False
@@ -122,7 +123,7 @@ class RunJobs(QObject):
             funcResult (str): messages from runJobs
         """
 
-        print(funcResult)
+        self.resultSignal.emit(funcResult)
 
 
 @staticVars(newJob=False)
@@ -141,7 +142,6 @@ def displayRunJobs(line, job, mainWindow, indexTotal, funcProgress=None):
     n = 0
 
     if line.find("Progress:") >= 0:
-        print("\r" + line[:-1], end="")
 
         if m := regEx.search(line):
             n = int(m.group(1))
@@ -152,7 +152,6 @@ def displayRunJobs(line, job, mainWindow, indexTotal, funcProgress=None):
 
     else:
 
-        print(line, end="")
         mainWindow.jobsOutputSignal.emit(line[:-1], {"appendLine": True})
 
     if (line.find("writing.") > 0) or (line.find("Multiplexing took") == 0):
@@ -196,12 +195,6 @@ def runJobs(jobQueue, mainWindow, funcProgress=None):
 
         jobQueue.statusUpdateSignal.emit(job, JobStatus.Running)
         currentJob += 1
-
-        print(
-            "At position ({}, {}) ID = {} Running.. ".format(
-                job.statusIndex.row(), job.statusIndex.column(), job.job[config.JOBID],
-            )
-        )
 
         # Test
 
@@ -278,12 +271,10 @@ def dummyRunCommand(command, job, funcProgress, indexTotal):
     """
     dummyRunCommand dummy run job function
     """
-    print("\nJob ID: {} \nCommand: {}\n".format(job.job[config.JOBID], command))
 
-    # j current file
     funcProgress.lblSetValue.emit(2, indexTotal[0] + 1)
     i = 0
     while i < 100:
-        i += 0.1
+        i += 0.05
         funcProgress.pbSetValues.emit(i, indexTotal[1] + i)
         time.sleep(0.0001)
