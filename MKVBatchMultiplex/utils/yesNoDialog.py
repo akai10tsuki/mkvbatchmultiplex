@@ -3,7 +3,7 @@ QMessageBox Yes/No dialog.
 """
 
 from PySide2.QtWidgets import QMessageBox
-from ..utils import Text
+from .text import Text
 
 
 def yesNoDialog(parent, msg, title):
