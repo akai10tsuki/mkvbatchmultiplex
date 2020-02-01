@@ -4,22 +4,27 @@ class CommandWidget
 import logging
 import threading
 
-from PySide2.QtCore import Signal, Slot, QTimer
+from PySide2.QtCore import Qt, Signal, Slot, QTimer
 from PySide2.QtWidgets import (
     QApplication,
     QWidget,
     QGridLayout,
     QGroupBox,
     QFormLayout,
+    QFrame,
     QLineEdit,
 )
 
-from vsutillib.pyqt import OutputTextWidget, QPushButtonWidget
+import vsutillib.mkv as mkv
+
+from vsutillib.pyqt import OutputTextWidget, QPushButtonWidget, RunInThread
 from vsutillib.process import isThreadRunning
 
 from .. import config
 from ..jobs import JobStatus
 from ..utils import Text, ValidateCommand, yesNoDialog
+
+from .CommandWidgetsHelpers import checkFiles, runAnalysis, showCommands
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -32,7 +37,7 @@ class CommandWidget(QWidget):
     __log = False
     insertTextSignal = Signal(str, dict)
     updateCommandSignal = Signal(str)
-    cmdValidationSignal = Signal(bool)
+    cliButtonsSateSignal = Signal(bool)
 
     @classmethod
     def classLog(cls, setLogging=None):
@@ -62,11 +67,16 @@ class CommandWidget(QWidget):
     def __init__(self, parent=None, proxyModel=None):
         super(CommandWidget, self).__init__(parent)
 
+        self.__output = None
         self.parent = parent
         self.proxyModel = proxyModel
         self.tableModel = proxyModel.sourceModel()
 
-        self.cmdValidationSignal.connect(self.cmdValidation)
+        self.cliButtonsSateSignal.connect(self.cliButtonsState)
+        self.parent.jobsQueue.addQueueItemSignal.connect(
+            lambda: self.jobStartQueueState(True)
+        )
+
         self.timer = QTimer()
         self.timer.setInterval(2000)
         self.timer.timeout.connect(self.watchJobs)
@@ -76,25 +86,47 @@ class CommandWidget(QWidget):
         self._initUI()
         self._initHelper()
 
+        self.parent.jobsQueue.runJobs.startSignal.connect(lambda: self.jobStatus(True))
+        self.parent.jobsQueue.runJobs.finishedSignal.connect(
+            lambda: self.jobStatus(False)
+        )
+
     def _initControls(self):
 
         self.outputWindow = OutputTextWidget(self)
 
+        #
+        # command line
+        #
         self.frmCmdLine = QFormLayout()
         btnAddCommand = QPushButtonWidget(
-            Text.txt0160, function=lambda: self.addCommand(JobStatus.Waiting), toolTip=Text.txt0161
+            Text.txt0160,
+            function=lambda: self.addCommand(JobStatus.Waiting),
+            toolTip=Text.txt0161,
         )
         self.cmdLine = QLineEdit()
-        #validator = ValidateCommand(self)
-        self.cmdLine.setValidator(ValidateCommand(self, self.cmdValidationSignal))
+        self.cmdLine.setValidator(ValidateCommand(self, self.cliButtonsSateSignal))
 
         self.frmCmdLine.addRow(btnAddCommand, self.cmdLine)
 
         self.command = QWidget()
         self.command.setLayout(self.frmCmdLine)
 
+        #
+        # Button group definition
+        #
         self.btnGroup = QGroupBox()
         self.btnGrid = QGridLayout()
+
+        line = QFrame()
+        line.setFrameShape(QFrame.HLine)
+        line.setFrameShadow(QFrame.Raised)
+        line.setLineWidth(1)
+
+        line1 = QFrame()
+        line1.setFrameShape(QFrame.HLine)
+        line1.setFrameShadow(QFrame.Raised)
+        line1.setLineWidth(1)
 
         btnPasteClipboard = QPushButtonWidget(
             "Paste",
@@ -108,13 +140,54 @@ class CommandWidget(QWidget):
             toolTip="Add command to jobs table and put on Queue",
         )
 
+        btnStartQueue = QPushButtonWidget(
+            "Start Queue",
+            function=self.parent.jobsQueue.run,
+            toolTip="Start processing jobs on Queue",
+        )
+
+        btnAnalysis = QPushButtonWidget(
+            "Analysis",
+            function=lambda: self.runFunctionInThread(
+                runAnalysis, output=self.output, command=self.cmdLine.text()
+            ),
+            toolTip="Print analysis of command line",
+        )
+
+        btnShowCommands = QPushButtonWidget(
+            "Commands",
+            function=lambda: self.runFunctionInThread(
+                showCommands, output=self.output, command=self.cmdLine.text()
+            ),
+            toolTip="Commands to be applied",
+        )
+
+        btnCheckFiles = QPushButtonWidget(
+            "Check Files", function=lambda: self.runFunctionInThread(
+                checkFiles, output=self.output, command=self.cmdLine.text()
+            ), toolTip="Check files for consistency"
+        )
+
         btnClear = QPushButtonWidget(
-            Text.txt0162, function=self.clearOutputWindow, toolTip=Text.txt0163
+            "Clear Output",
+            function=self.clearOutputWindow,
+            toolTip="Erase text in output window",
+        )
+
+        btnReset = QPushButtonWidget(
+            "Reset", toolTip="Reset state completely to work with another batch"
         )
 
         self.btnGrid.addWidget(btnPasteClipboard, 0, 0)
         self.btnGrid.addWidget(btnAddQueue, 1, 0)
-        self.btnGrid.addWidget(btnClear, 2, 0)
+        self.btnGrid.addWidget(btnStartQueue, 1, 1)
+        self.btnGrid.addWidget(line, 2, 0, 1, 2)
+        self.btnGrid.addWidget(btnAnalysis, 3, 0)
+        self.btnGrid.addWidget(btnShowCommands, 3, 1)
+        self.btnGrid.addWidget(btnCheckFiles, 4, 0)
+        self.btnGrid.addWidget(line1, 5, 0, 1, 2)
+        self.btnGrid.addWidget(btnClear, 6, 0)
+        self.btnGrid.addWidget(btnReset, 6, 1)
         self.btnGroup.setLayout(self.btnGrid)
 
     def _initUI(self):
@@ -132,17 +205,28 @@ class CommandWidget(QWidget):
         # map insertText signal to outputWidget one
         self.insertText = self.outputWindow.insertTextSignal
 
-
         # command
         self.cmdLine.setClearButtonEnabled(True)
         self.updateCommandSignal.connect(self.updateCommand)
-        self.cmdValidationSignal.connect(self.cmdValidation)
+        self.cliButtonsSateSignal.connect(self.cliButtonsState)
         self.frmCmdLine.itemAt(0, QFormLayout.LabelRole).widget().setEnabled(False)
 
-        # clear button
-        self.btnGrid.itemAt(config.BTNADDQUEUE).widget().setEnabled(False)
+        #
+        # button state
+        #
+
+        # Command related
+        self.cliButtonsState(False)
+
+        # Clear buttons related
         self.btnGrid.itemAt(config.BTNCLEAR).widget().setEnabled(False)
+        self.btnGrid.itemAt(config.BTNRESET).widget().setEnabled(False)
+
+        # connect text windows textChanged to clearButtonState function
         self.outputWindow.textChanged.connect(self.clearButtonsState)
+
+        # Job Queue related
+        self.btnGrid.itemAt(config.BTNSTARTQUEUE).widget().setEnabled(False)
 
     @property
     def log(self):
@@ -166,21 +250,28 @@ class CommandWidget(QWidget):
         if isinstance(value, bool) or value is None:
             self.__log = value
 
+    @property
+    def output(self):
+        return self.__output
+
+    @output.setter
+    def output(self, value):
+        self.__output = value
+
     def watchJobs(self):
 
         totalThreads = threading.activeCount()
-        print(f'Running threads = {totalThreads}')
+        print(f"Running threads = {totalThreads}")
 
-        bTest = isThreadRunning('jobsWorker')
+        bTest = isThreadRunning(config.WORKERTHREADNAME)
 
-        print(f'Jobs worker running {bTest}')
-
+        print(f"Jobs worker running {bTest}")
 
     def addCommand(self, status):
 
         totalJobs = self.tableModel.rowCount()
         command = self.cmdLine.text()
-        data = [['', ''], [status, "Status code"], [command, command]]
+        data = [["", ""], [status, "Status code"], [command, command]]
         self.tableModel.insertRows(totalJobs, 1, data=data)
 
         self.cmdLine.clear()
@@ -194,10 +285,29 @@ class CommandWidget(QWidget):
             self.updateCommand(clip)
 
     @Slot(bool)
-    def cmdValidation(self, validateOK):
+    def cliButtonsState(self, validateOK):
 
-        addCommand = self.frmCmdLine.itemAt(0, QFormLayout.LabelRole).widget()
+        addCommand = self.frmCmdLine.itemAt(
+            config.BTNADDCOMMAND, QFormLayout.LabelRole
+        ).widget()
         addCommand.setEnabled(validateOK)
+
+        for b in [
+            config.BTNADDQUEUE,
+            config.BTNANALYSIS,
+            config.BTNSHOWCOMMANDS,
+            config.BTNCHECKFILES,
+        ]:
+            button = self.btnGrid.itemAt(b).widget()
+            button.setEnabled(validateOK)
+
+    @Slot(bool)
+    def jobStartQueueState(self, state):
+
+        if state and not isThreadRunning(config.WORKERTHREADNAME):
+            self.btnGrid.itemAt(config.BTNSTARTQUEUE).widget().setEnabled(state)
+        else:
+            self.btnGrid.itemAt(config.BTNSTARTQUEUE).widget().setEnabled(state)
 
     @Slot(str)
     def updateCommand(self, command):
@@ -209,13 +319,6 @@ class CommandWidget(QWidget):
 
     def clearButtonsState(self):
         """Set clear button state"""
-        if self.outputWindow.toPlainText() != "":
-            self.btnGrid.itemAt(config.BTNCLEAR).widget().setEnabled(True)
-        else:
-            self.btnGrid.itemAt(config.BTNCLEAR).widget().setEnabled(False)
-
-    def buttonsState(self):
-        """Set button state according to valid input on command line"""
         if self.outputWindow.toPlainText() != "":
             self.btnGrid.itemAt(config.BTNCLEAR).widget().setEnabled(True)
         else:
@@ -238,6 +341,25 @@ class CommandWidget(QWidget):
 
         if bAnswer:
             self.outputWindow.clear()
+
+    @Slot(bool)
+    def jobStatus(self, running):
+        if running:
+            self.jobStartQueueState(False)
+            print("running signal jobStatus CommandWidget")
+        else:
+            print("ended signal jobStatus CommandWidget")
+
+    def runFunctionInThread(self, function, *args, **kwargs):
+        """
+        Pass the function to execute Other args,
+        kwargs are passed to the run function
+        """
+
+        worker = RunInThread(function, *args, **kwargs)
+
+        # Execute
+        worker.run()
 
     def setLanguage(self):
         """
