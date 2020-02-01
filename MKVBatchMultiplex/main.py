@@ -168,18 +168,18 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         menuBar = self.menuBar()
 
         # File SubMenu
-        fileMenu = QMenuWidget(Text.txt0026)
+        fileMenu = QMenuWidget(Text.txt0020)
 
         closeIcon = self.style().standardIcon(QStyle.SP_DialogCloseButton)
 
         # Exit application
         actExit = QActionWidget(
-            closeIcon, Text.txt0030, self, shortcut=Text.txt0015, tooltip=Text.txt0014,
+            closeIcon, Text.txt0021, self, shortcut=Text.txt0022, tooltip=Text.txt0023,
         )
         actExit.triggered.connect(self.close)
 
         # Abort
-        actAbort = QActionWidget(Text.txt0017, self, tooltip=Text.txt0018)
+        actAbort = QActionWidget(Text.txt0024, self, tooltip=Text.txt0025)
         actAbort.triggered.connect(abort)
 
         # Add actions to SubMenu
@@ -188,21 +188,21 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         menuBar.addMenu(fileMenu)
 
         # Settings SubMenu
-        settingsMenu = QMenuWidget(Text.txt0027)
+        settingsMenu = QMenuWidget(Text.txt0040)
 
         # Enable logging
-        self.actEnableLogging = QActionWidget(Text.txt0019, self, checkable=True)
-        self.actEnableLogging.setStatusTip(Text.txt0020)
+        self.actEnableLogging = QActionWidget(Text.txt0041, self, checkable=True)
+        self.actEnableLogging.setStatusTip(Text.txt0042)
         self.actEnableLogging.triggered.connect(self.enableLogging)
 
         # Font
-        actSelectFont = QActionWidget(Text.txt0021, self)
-        actSelectFont.setStatusTip(Text.txt0022)
+        actSelectFont = QActionWidget(Text.txt0043, self)
+        actSelectFont.setStatusTip(Text.txt0044)
         actSelectFont.triggered.connect(self.selectAppFont)
 
         # Restore Defaults
-        actRestoreDefaults = QActionWidget(Text.txt0023, self)
-        actRestoreDefaults.setStatusTip(Text.txt0045)
+        actRestoreDefaults = QActionWidget(Text.txt0046, self)
+        actRestoreDefaults.setStatusTip(Text.txt0047)
         actRestoreDefaults.triggered.connect(self.restoreDefaults)
 
         self.actEN = QActionWidget(
@@ -221,7 +221,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         )
         self.actES.triggered.connect(lambda: self.setLanguage("es", self.actES))
 
-        self.languageMenu = QMenuWidget(Text.txt0028)
+        self.languageMenu = QMenuWidget(Text.txt0045)
         self.languageMenu.addAction(self.actEN)
         self.languageMenu.addAction(self.actES)
 
@@ -235,19 +235,19 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         menuBar.addMenu(settingsMenu)
 
         # Help Menu
-        actHelpContents = QActionWidget(Text.txt0044 + "...", self)
+        actHelpContents = QActionWidget(Text.txt0061 + "...", self)
         actHelpContents.triggered.connect(lambda: _help(self.appDirectory, 0))
 
-        actHelpUsing = QActionWidget(Text.txt0024, self)
+        actHelpUsing = QActionWidget(Text.txt0062, self)
         actHelpUsing.triggered.connect(lambda: _help(self.appDirectory, 1))
 
-        actAbout = QActionWidget(Text.txt0040, self)
+        actAbout = QActionWidget(Text.txt0063, self)
         actAbout.triggered.connect(self.about)
 
-        actAboutQt = QActionWidget("About QT", self)
+        actAboutQt = QActionWidget(Text.txt0064, self)
         actAboutQt.triggered.connect(self.aboutQt)
 
-        helpMenu = QMenuWidget(Text.txt0025)
+        helpMenu = QMenuWidget(Text.txt0060)
         helpMenu.addAction(actHelpContents)
         helpMenu.addAction(actHelpUsing)
         helpMenu.addSeparator()

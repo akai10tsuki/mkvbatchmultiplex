@@ -338,9 +338,9 @@ class CommandWidget(QWidget):
         bAnswer = False
 
         # Clear output window?
-        title = _(Text.txt0083)
+        title = "Clear output"
         msg = "¿" if language == "es" else ""
-        msg += _("Text.txt0084") + "?"
+        msg += "Clear output window" + "?"
 
         bAnswer = yesNoDialog(self, msg, title)
 
