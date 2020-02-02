@@ -59,33 +59,25 @@ class JobsTableViewWidget(QWidget):
         self.grpBox = QGroupBox(title)
 
         btnPopulate = QPushButtonWidget(
-            "Populate",
+            Text.txt0120,
             function=lambda: populate(self.tableModel),
-            toolTip="Add test jobs to table",
+            toolTip=Text.txt0121,
         )
 
         btnAddWaitingJobsToQueue = QPushButtonWidget(
-            "Queue Waiting Jobs",
-            function=self.addWaitingJobsToQueue,
-            toolTip="Add all Waiting jobs to the queue",
+            Text.txt0122, function=self.addWaitingJobsToQueue, toolTip=Text.txt0123,
         )
 
         btnClearJobsQueue = QPushButtonWidget(
-            "Clear Queue",
-            function=self.clearJobsQueue,
-            toolTip="Remove Jobs from Queue",
+            Text.txt0124, function=self.clearJobsQueue, toolTip=Text.txt0125,
         )
 
         btnStartQueue = QPushButtonWidget(
-            "Start Queue",
-            function=self.parent.jobsQueue.run,
-            toolTip="Start processing jobs on Queue",
+            Text.txt0126, function=self.parent.jobsQueue.run, toolTip=Text.txt0127,
         )
 
         btnPrintDataset = QPushButtonWidget(
-            "Debug",
-            function=self.printDataset,
-            toolTip="Print current dataset to console",
+            Text.txt0128, function=self.printDataset, toolTip=Text.txt0129,
         )
 
         self.grpGrid.addWidget(self.tableView, 0, 0, 1, 5)
@@ -122,13 +114,25 @@ class JobsTableViewWidget(QWidget):
         self.parent.jobsQueue.addQueueItemSignal.connect(
             lambda: self.jobStartQueueState(True)
         )
+        self.parent.jobsQueue.addQueueItemSignal.connect(
+            lambda: self.jobClearQueueState(True)
+        )
+        self.parent.jobsQueue.queueEmptiedSignal.connect(
+            lambda: self.jobClearQueueState(False)
+        )
+        self.parent.jobsQueue.queueEmptiedSignal.connect(
+            lambda: self.jobStartQueueState(False)
+        )
 
+        # Job Queue Worker start/End
         self.parent.jobsQueue.runJobs.startSignal.connect(lambda: self.jobStatus(True))
         self.parent.jobsQueue.runJobs.finishedSignal.connect(
             lambda: self.jobStatus(False)
         )
 
-        self.grpGrid.itemAt(config.JTVBTNRUN).widget().setEnabled(False)
+        # Default button state
+        self.grpGrid.itemAt(config.JTVBTNSTARTQUEUE).widget().setEnabled(False)
+        self.grpGrid.itemAt(config.JTVBTNCLEARQUEUE).widget().setEnabled(False)
 
     @classmethod
     def classLog(cls, setLogging=None):
@@ -201,24 +205,24 @@ class JobsTableViewWidget(QWidget):
         clearJobsQueue delete any remaining jobs from Queue
         """
 
-        language = config.data.get(config.ConfigKey.Language)
-        bAnswer = False
+        if len(self.parent.jobsQueue) > 0:
+            language = config.data.get(config.ConfigKey.Language)
+            bAnswer = False
 
-        title = _('Clear Queue')
-        msg = "¿" if language == "es" else ""
-        msg += _('Erase any jobs remaining in the Queue') + "?"
+            title = _("Clear Queue")
+            msg = "¿" if language == "es" else ""
+            msg += _("Erase any jobs remaining in the Queue") + "?"
 
-        bAnswer = yesNoDialog(self, msg, title)
+            bAnswer = yesNoDialog(self, msg, title)
 
-        if bAnswer:
-            self.configuration(action=config.Action.Reset)
+            if bAnswer:
+                while job := self.parent.jobsQueue.pop():
 
-        if self.parent.jobsQueue:
-            print(
-                "Something to Clear Total Jobs = {}".format(len(self.parent.jobsQueue))
-            )
-        else:
-            print("Nothing here")
+                    self.tableModel.setData(job.statusIndex, JobStatus.Waiting)
+
+            else:
+
+                print("Nothing here")
 
     def setLanguage(self):
         """
@@ -253,13 +257,17 @@ class JobsTableViewWidget(QWidget):
         # self.parent.outputMainSignal.emit("The Color Red\n", {"color": Qt.red})
         # print()
 
+    def jobClearQueueState(self, state):
+
+        self.grpGrid.itemAt(config.JTVBTNCLEARQUEUE).widget().setEnabled(state)
+
     @Slot(bool)
     def jobStartQueueState(self, state):
 
         if state and not isThreadRunning(config.WORKERTHREADNAME):
-            self.grpGrid.itemAt(config.JTVBTNRUN).widget().setEnabled(state)
+            self.grpGrid.itemAt(config.JTVBTNSTARTQUEUE).widget().setEnabled(state)
         else:
-            self.grpGrid.itemAt(config.JTVBTNRUN).widget().setEnabled(state)
+            self.grpGrid.itemAt(config.JTVBTNSTARTQUEUE).widget().setEnabled(state)
 
     @Slot(bool)
     def jobStatus(self, running):
