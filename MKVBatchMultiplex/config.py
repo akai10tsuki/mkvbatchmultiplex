@@ -87,7 +87,8 @@ BTNRESET = 9
 
 WORKERTHREADNAME = "jobsWorker"
 
-JTVBTNRUN = 4
+JTVBTNCLEARQUEUE = 3
+JTVBTNSTARTQUEUE = 4
 
 #######################
 #######################
