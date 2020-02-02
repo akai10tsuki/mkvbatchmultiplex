@@ -106,6 +106,14 @@ class JobQueue(QObject):
         self.statusUpdateSignal.connect(self.statusUpdate)
         self.runSignal.connect(self.run)
 
+        jobID = config.data.get('JobID')
+        if jobID:
+            if jobID > 9999:
+                # Roll over
+                jobID = 1
+
+            self.__jobID = jobID
+
     def __bool__(self):
         if self._workQueue:
             return True
@@ -191,6 +199,7 @@ class JobQueue(QObject):
         if not jobID:
             self.tableModel.setData(jobIndex, self.__jobID)
             self.__jobID += 1
+            config.data.set('JobID', self.__jobID)
 
         self.tableModel.setData(statusIndex, JobStatus.Queue)
 
@@ -215,7 +224,11 @@ class JobQueue(QObject):
         """
 
         if self._workQueue:
-            return self._workQueue.popleft()
+
+            element = self._workQueue.popleft()
+            self._checkEmptied()
+
+            return  element
 
         return None
 
@@ -228,7 +241,11 @@ class JobQueue(QObject):
         """
 
         if self._workQueue:
-            return self._workQueue.pop()
+
+            element = self._workQueue.pop()
+            self._checkEmptied()
+
+            return  element
 
         return None
 
@@ -241,14 +258,23 @@ class JobQueue(QObject):
         """
 
         if self._workQueue:
-            return self._workQueue.pop()
+
+            element = self._workQueue.popleft()
+            self._checkEmptied()
+
+            return  element
 
         return None
+
+    def _checkEmptied(self):
+
+        if not self._workQueue:
+            self.queueEmptiedSignal.emit()
 
     @Slot()
     def run(self):
         """
         run test run worker thread
         """
-        self.runJobs.progress  = self.progress
+        self.runJobs.progress = self.progress
         self.runJobs.run()
