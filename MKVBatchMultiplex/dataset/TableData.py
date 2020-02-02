@@ -33,10 +33,12 @@ class HeaderAttributeKey:
     Type = "Type"
     Width = "Width"
 
+
 class DataKey:
 
     Data = 0
     ToolTip = 1
+
 
 class HeaderInfo:
     """
@@ -48,6 +50,7 @@ class HeaderInfo:
     headerList = None
     toolTip = None
 
+
 class DataItem:
     """
     Data item information
@@ -56,9 +59,10 @@ class DataItem:
     data = None
     toolTip = None
 
+
 class Index:
     """
-     Dummy QModelIndex
+    Dummy QModelIndex
 
     Returns:
         Index: Dummy QModelIndex
@@ -80,6 +84,7 @@ class Index:
     def isValid(self):
 
         return True
+
 
 class TableData:
     """
@@ -134,7 +139,7 @@ class TableData:
             if (index < 0) or (index > len(self.headers) - 1):
                 raise IndexError("list index [{}] out of range".format(index))
 
-            return self.headers[index].attribute['Label']
+            return self.headers[index].attribute["Label"]
 
         if isinstance(index, tuple):
 
@@ -163,7 +168,7 @@ class TableData:
     def __setitem__(self, index, value):
 
         if isinstance(index, int):
-            self.headers[index].attribute['Label'] = value
+            self.headers[index].attribute["Label"] = value
 
         elif isinstance(index, tuple):
             # Only update members of the data table no headers
@@ -176,7 +181,7 @@ class TableData:
             else:
                 raise IndexError("Bad index format: {}".format(index))
 
-            index = Index(row, col) # Simulate index
+            index = Index(row, col)  # Simulate index
 
             self.setData(index, value)
 
@@ -245,7 +250,7 @@ class TableData:
 
         return False
 
-    def insertRow(self, position, row):
+    def insertRow(self, position, row=None):
         """
         Insert a data row
 
@@ -253,20 +258,28 @@ class TableData:
             index {int} -- row number where to insert the data
             row {list} -- list with row data
         """
-        emptyRow = [DataItem(), DataItem(), DataItem()]
 
-        self.data.insert(position, emptyRow)
+        if row is not None:
 
-        for column, value in enumerate(row):
-            if isinstance(value, list):
-                newItem = DataItem()
-                newItem.data = value[DataKey.Data]
-                newItem.toolTip = value[DataKey.ToolTip]
-                index = Index(position, column)
-                self.setData(index, newItem)
-            else:
-                if value is not None:
-                    raise ValueError('Item at index {} is invalid'.format(column))
+            emptyRow = [DataItem(), DataItem(), DataItem()]
+
+            self.data.insert(position, emptyRow)
+
+            for column, value in enumerate(row):
+                if isinstance(value, list):
+                    newItem = DataItem()
+                    newItem.data = value[DataKey.Data]
+                    newItem.toolTip = value[DataKey.ToolTip]
+                    index = Index(position, column)
+                    self.setData(index, newItem)
+                else:
+                    if value is not None:
+                        raise ValueError("Item at index {} is invalid".format(column))
+        else:
+
+            emptyRow = ["", "", ""]
+
+            self.data.insert(position, emptyRow)
 
     def deleteRow(self, index):
         """
