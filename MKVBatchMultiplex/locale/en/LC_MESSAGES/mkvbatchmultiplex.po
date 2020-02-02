@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  \n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-02-01 09:41-0500\n"
+"POT-Creation-Date: 2020-02-01 16:40-0500\n"
 "PO-Revision-Date: 2020-01-24 23:59-0500\n"
 "Last-Translator: \n"
 "Language: en_US\n"
@@ -182,12 +182,12 @@ msgstr ""
 msgid "Remove jobs from Queue"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:73
-msgid "Simulate Run"
+#: MKVBatchMultiplex/utils/text.py:73 MKVBatchMultiplex/utils/text.py:98
+msgid "Start Queue"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:74
-msgid "Clear Queue simulating a run"
+#: MKVBatchMultiplex/utils/text.py:74 MKVBatchMultiplex/utils/text.py:99
+msgid "Start processing jobs on Queue"
 msgstr ""
 
 #: MKVBatchMultiplex/utils/text.py:75
@@ -258,14 +258,6 @@ msgstr ""
 msgid "Add command to jobs table and put on Queue"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:98
-msgid "Start Queue"
-msgstr ""
-
-#: MKVBatchMultiplex/utils/text.py:99
-msgid "Start processing jobs on Queue"
-msgstr ""
-
 #: MKVBatchMultiplex/utils/text.py:100
 msgid "Analysis"
 msgstr ""
@@ -316,5 +308,11 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "Add command to jobs table"
+#~ msgstr ""
+
+#~ msgid "Simulate Run"
+#~ msgstr ""
+
+#~ msgid "Clear Queue simulating a run"
 #~ msgstr ""
 

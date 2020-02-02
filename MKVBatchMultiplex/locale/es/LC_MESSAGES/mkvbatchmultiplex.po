@@ -6,9 +6,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: MKVBatchMultiplex\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-02-01 09:41-0500\n"
-"PO-Revision-Date: 2020-02-01 09:41-0500\n"
+"Report-Msgid-Bugs-To: akait10tsuki@gmail.com\n"
+"POT-Creation-Date: 2020-02-01 16:40-0500\n"
+"PO-Revision-Date: 2020-02-01 16:42-0500\n"
 "Last-Translator: \n"
 "Language: es_PR\n"
 "Language-Team: Efrain Vergara <akai10tsuki@gmail.com>\n"
@@ -175,7 +175,7 @@ msgstr "Agrejar tragajos es espera"
 
 #: MKVBatchMultiplex/utils/text.py:70
 msgid "Add all Waiting jobs to the Queue"
-msgstr "Agregar todos los trabajos en espera a la cola"
+msgstr "Añadir todos los trabajos es estado 'Waiting' a la Cola"
 
 #: MKVBatchMultiplex/utils/text.py:71
 msgid "Clear Queue"
@@ -183,15 +183,15 @@ msgstr "Borrar la cola"
 
 #: MKVBatchMultiplex/utils/text.py:72
 msgid "Remove jobs from Queue"
-msgstr "Eliminar trabajos de la cola"
+msgstr "Remover trabajos de la Cola"
 
-#: MKVBatchMultiplex/utils/text.py:73
-msgid "Simulate Run"
-msgstr "Ejecutar simulación"
+#: MKVBatchMultiplex/utils/text.py:73 MKVBatchMultiplex/utils/text.py:98
+msgid "Start Queue"
+msgstr "Comenzar"
 
-#: MKVBatchMultiplex/utils/text.py:74
-msgid "Clear Queue simulating a run"
-msgstr "Borrar la cola simulando una ejecución"
+#: MKVBatchMultiplex/utils/text.py:74 MKVBatchMultiplex/utils/text.py:99
+msgid "Start processing jobs on Queue"
+msgstr "Comenzar a procesar trabajos en la Cola"
 
 #: MKVBatchMultiplex/utils/text.py:75
 msgid "Debug"
@@ -261,14 +261,6 @@ msgstr "Añadir a Cola"
 msgid "Add command to jobs table and put on Queue"
 msgstr "Agregar comando a la tabla de trabajos con estado 'Waiting'"
 
-#: MKVBatchMultiplex/utils/text.py:98
-msgid "Start Queue"
-msgstr "Comenzar"
-
-#: MKVBatchMultiplex/utils/text.py:99
-msgid "Start processing jobs on Queue"
-msgstr "Comenzar a procesar trabajos en la Cola"
-
 #: MKVBatchMultiplex/utils/text.py:100
 msgid "Analysis"
 msgstr "Análisis"
@@ -307,6 +299,11 @@ msgid "Clear output"
 msgstr "Borrar texto"
 
 #: MKVBatchMultiplex/utils/text.py:111
-#, fuzzy
 msgid "Clear output window"
-msgstr "Borrar el texto de la ventana de salida"
+msgstr "Borrar el texto en la ventana de salida"
+
+#~ msgid "Simulate Run"
+#~ msgstr "Ejecutar simulación"
+
+#~ msgid "Clear Queue simulating a run"
+#~ msgstr "Borrar la cola simulando una ejecución"
