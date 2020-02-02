@@ -39,6 +39,7 @@ from vsutillib.pyqt import (
     OutputTextWidget,
     QActionWidget,
     QMenuWidget,
+    QProgressIndicator,
 )
 
 from . import config
@@ -74,6 +75,9 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.jobsQueue = JobQueue(self)
         self.defaultPalette = palette
         self.widgetSetLanguage = SetLanguage()
+        self.progressSpin = QProgressIndicator(self)
+        self.progressSpin.color = Qt.cyan
+        self.progressSpin.displayedWhenStopped = True
 
         #
         # Where am I running from
@@ -150,6 +154,13 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
         # connect to tabs widget tab change Signal
         self.tabs.currentChanged.connect(tabChange)
+
+        # connect to runJobs Start/Stop SigNal
+        self.jobsQueue.runJobs.startSignal.connect(self.progressSpin.startAnimation)
+        self.jobsQueue.runJobs.finishedSignal.connect(
+            self.progressSpin.stopAnimation
+        )
+
 
     def _initUI(self):
 
@@ -266,6 +277,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         statusBar = self.statusBar()  # pylint: disable=unused-variable
         statusBar.addPermanentWidget(self.jobsLabel)
         statusBar.addPermanentWidget(self.progressBar)
+        statusBar.addPermanentWidget(self.progressSpin)
 
         self.progress = Progress(self, self.progressBar, self.jobsLabel)
 
