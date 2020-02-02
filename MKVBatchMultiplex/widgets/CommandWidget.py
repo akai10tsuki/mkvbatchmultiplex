@@ -6,7 +6,8 @@ class CommandWidget
 
 import logging
 
-from PySide2.QtCore import Signal, Slot
+from PySide2.QtCore import Qt, Signal, Slot
+from PySide2.QtGui import QPalette
 from PySide2.QtWidgets import (
     QApplication,
     QWidget,
@@ -79,6 +80,9 @@ class CommandWidget(QWidget):
         self.cliButtonsSateSignal.connect(self.cliButtonsState)
         self.parent.jobsQueue.addQueueItemSignal.connect(
             lambda: self.jobStartQueueState(True)
+        )
+        self.parent.jobsQueue.queueEmptiedSignal.connect(
+            lambda: self.jobStartQueueState(False)
         )
 
         self._initControls()
@@ -349,8 +353,28 @@ class CommandWidget(QWidget):
 
     @Slot(bool)
     def jobStatus(self, running):
+        """
+        jobStatus receive Signals for job start/end
+
+        Args:
+            running (bool): True if job started. False if ended.
+        """
+
         if running:
+
             self.jobStartQueueState(False)
+
+            palette = QPalette()
+            palette.setColor(QPalette.WindowText, Qt.cyan)
+
+            self.parent.jobsLabel.setPalette(palette)
+
+        else:
+
+            palette = QPalette()
+            palette.setColor(QPalette.WindowText, Qt.white)
+
+            self.parent.jobsLabel.setPalette(palette)
 
     def setLanguage(self):
         """
