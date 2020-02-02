@@ -7,7 +7,7 @@ from PySide2.QtWidgets import (
     QStyle,
     QComboBox,
 )
-from PySide2.QtCore import QRect, QPoint, QEvent, Slot
+from PySide2.QtCore import Qt, QRect, QPoint, QEvent, Slot
 
 from ..jobs import JobStatus
 
@@ -142,6 +142,9 @@ class StatusComboBoxDelegate(QStyledItemDelegate):
             editor = QComboBox(parent)
             editor.addItems(self.comboItems)
             editor.currentIndexChanged.connect(self.currentIndexChanged)
+            editor.setEditable(True)
+            editor.lineEdit().setReadOnly(True)
+            editor.lineEdit().setAlignment(Qt.AlignCenter)
 
             return editor
 
@@ -158,8 +161,6 @@ class StatusComboBoxDelegate(QStyledItemDelegate):
         self.commitData.emit(self.sender())
 
 def _comboBoxItems(status):
-
-    print("Status = {}".format(status))
 
     if status in [JobStatus.AbortJobError, JobStatus.Error]:
         return None
