@@ -31,6 +31,8 @@ from PySide2.QtWidgets import (
     QStyle,
 )
 
+import vsutillib.media as media
+
 from vsutillib.pyqt import (
     centerWidgets,
     darkPalette,
@@ -42,13 +44,11 @@ from vsutillib.pyqt import (
     QProgressIndicator,
 )
 
-import vsutillib.media as media
-
 from . import config
 from .dataset import TableData, tableHeaders
 from .jobs import JobQueue
 from .models import TableProxyModel, JobsTableModel
-from .widgets import CommandWidget, JobsTableViewWidget, TabsWidget
+from .widgets import CommandWidget, JobsTableViewWidget, RenameWidget, TabsWidget
 from .utils import (
     Text,
     OutputWindows,
@@ -120,6 +120,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.commandWidget = CommandWidget(self, self.proxyModel)
         self.jobsOutput = OutputTextWidget(self)
         self.errorOutput = OutputTextWidget(self)
+        self.renameWidget = RenameWidget(self)
 
         self.tabs = TabsWidget(
             self,
@@ -127,7 +128,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
             self.tableViewWidget,
             self.jobsOutput,
             self.errorOutput,
-            QWidget(),
+            self.renameWidget,
         )
 
     def _initHelper(self):
@@ -145,15 +146,11 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.tableViewWidget.output = self.output
         self.jobsQueue.output = self.output
 
-        # map output widgets inserTextSignal to local ones
-        #self.outputMainSignal = self.commandWidget.insertTextSignal
-        #self.jobsOutputSignal = self.jobsOutput.insertTextSignal
-        #self.errorOutputSignal = self.errorOutput.insertTextSignal
-
         # setup widgets setLanguage to SetLanguage change signal
         self.widgetSetLanguage.addSlot(self.tableViewWidget.setLanguage)
         self.widgetSetLanguage.addSlot(self.commandWidget.setLanguage)
         self.widgetSetLanguage.addSlot(self.tabs.setLanguage)
+        self.widgetSetLanguage.addSlot(self.renameWidget.setLanguage)
 
         # connect to tabs widget tab change Signal
         self.tabs.currentChanged.connect(tabChange)
@@ -284,14 +281,14 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
     def enableLogging(self, state):
         """Activate logging"""
 
-        print('Loggin sate {}'.format(state))
+        print("Loggin sate {}".format(state))
         self.log = state
         self.commandWidget.log = state
         self.jobsOutput.log = state
         self.errorOutput.log = state
         self.tableViewWidget.log = state
         self.jobsQueue.log = state
-        msg = 'Start Logging.' if state else 'Stop Logging.'
+        msg = "Start Logging." if state else "Stop Logging."
         logging.info(msg)
 
     def configuration(self, action=None):

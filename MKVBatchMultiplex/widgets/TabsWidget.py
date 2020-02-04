@@ -40,40 +40,18 @@ class TabsWidget(QTabWidget):
 
         self.__log = False
 
-        self._initControls(tab1Widget, tab2Widget, tab3Widget, tab4Widget, tab5Widget)
-        #self._initUI()
+        self._initUI(tab1Widget, tab2Widget, tab3Widget, tab4Widget, tab5Widget)
         self.setCurrentIndexSignal.connect(super().setCurrentIndex)
         self.setCurrentWidgetSignal.connect(super().setCurrentWidget)
 
-    def _initControls(self, tab1Widget, tab2Widget, tab3Widget, tab4Widget, tab5Widget):
+    def _initUI(self, tab1Widget, tab2Widget, tab3Widget, tab4Widget, tab5Widget):
         """Setup Widget Layout"""
-
-        #self.tab1 = tab1Widget
-        #self.tab2 = tab2Widget
-        #self.tab3 = tab3Widget
-        #self.tab4 = tab4Widget
-        self.tab5 = tab5Widget
 
         self.addTab(tab1Widget, 'Command(s)')
         self.addTab(tab2Widget, 'Job(s)')
         self.addTab(tab3Widget, 'Job(s) Output')
         self.addTab(tab4Widget, 'Job(s) Error(s)')
-
-    def _initUI(self):
-        """Setup Widget Layout"""
-
-        # Add tabs
-        #self.addTab(self.tab1, "Command(s)")
-        #self.addTab(self.tab2, "Job(s)")
-        #self.addTab(self.tab3, "Job(s) Output")
-        #self.addTab(self.tab4, "Job(s) Error(s)")
-        #self.addTab(self.tab5, "Rename Files")
-
-        # Add tabs to widget
-        # self.layout.addWidget(self.tabs)
-        #tab1Layout = QHBoxLayout()
-        #tab1Layout.addWidget(self.tab1)
-        #self.tab1.setLayout(tab1Layout)
+        self.addTab(tab5Widget, 'Rename Files')
 
     @classmethod
     def classLog(cls, setLogging=None):
@@ -130,4 +108,4 @@ class TabsWidget(QTabWidget):
         self.setTabText(1, _(Text.txt0140) + "(s)")
         self.setTabText(2, _(Text.txt0141))
         self.setTabText(3, _(Text.txt0142))
-        #self.setTabText(4, _(Text.txt0143))
+        self.setTabText(4, _(Text.txt0143))
