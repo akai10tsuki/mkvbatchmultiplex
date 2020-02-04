@@ -69,9 +69,10 @@ class CommandWidget(QWidget):
 
         return cls.__log
 
-    def __init__(self, parent=None, proxyModel=None):
+    def __init__(self, parent=None, proxyModel=None, log=None):
         super(CommandWidget, self).__init__(parent)
 
+        self.__log = log
         self.__output = None
         self.parent = parent
         self.proxyModel = proxyModel
@@ -88,6 +89,8 @@ class CommandWidget(QWidget):
         self._initControls()
         self._initUI()
         self._initHelper()
+
+        self.log = log
 
         self.parent.jobsQueue.runJobs.startSignal.connect(lambda: self.jobStatus(True))
         self.parent.jobsQueue.runJobs.finishedSignal.connect(
@@ -108,7 +111,7 @@ class CommandWidget(QWidget):
             toolTip=Text.txt0161,
         )
         self.cmdLine = QLineEdit()
-        self.cmdLine.setValidator(ValidateCommand(self, self.cliButtonsSateSignal))
+        self.cmdLine.setValidator(ValidateCommand(self, self.cliButtonsSateSignal, log=self.log))
 
         self.frmCmdLine.addRow(btnAddCommand, self.cmdLine)
 
@@ -247,13 +250,15 @@ class CommandWidget(QWidget):
         if self.__log is not None:
             return self.__log
 
-        return OutputTextWidget.classLog()
+        return CommandWidget.classLog()
 
     @log.setter
     def log(self, value):
         """set instance log variable"""
         if isinstance(value, bool) or value is None:
             self.__log = value
+            ValidateCommand.classLog(value) # No variable used so for now use class log
+            self.outputWindow.log = value
 
     @property
     def output(self):

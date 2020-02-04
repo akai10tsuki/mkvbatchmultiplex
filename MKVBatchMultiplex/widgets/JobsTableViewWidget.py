@@ -35,10 +35,11 @@ class JobsTableViewWidget(QWidget):
     # Class logging state
     __log = False
 
-    def __init__(self, parent, proxyModel, title=None):
+    def __init__(self, parent, proxyModel, title=None, log=None):
         super(JobsTableViewWidget, self).__init__(parent)
 
         self.__output = None
+        self.__log = None
 
         self.parent = parent
         self.proxyModel = proxyModel
@@ -51,6 +52,8 @@ class JobsTableViewWidget(QWidget):
         self._initUI(title)
         self._setupDelegates()
         self._initHelper()
+
+        self.log = log
 
     def _initUI(self, title):
 
@@ -248,14 +251,11 @@ class JobsTableViewWidget(QWidget):
 
         dataset = self.tableModel.dataset
         for r in range(0, len(dataset)):
-            self.parent.outputMainSignal.emit(
+            self.output.command.emit(
                 "Row {} ID {} Status {}\n".format(r, dataset[r, 0], dataset[r, 1]), {}
             )
-            # print("Row {} ID {} Status {}".format(r, dataset[r, 0], dataset[r, 1]))
 
-        self.parent.outputMainSignal.emit("\n", {})
-        # self.parent.outputMainSignal.emit("The Color Red\n", {"color": Qt.red})
-        # print()
+        self.output.command.emit("\n", {})
 
     def jobClearQueueState(self, state):
 

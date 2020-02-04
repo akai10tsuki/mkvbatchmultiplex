@@ -36,7 +36,7 @@ class JobsTableView(QTableView):
     # Class logging state
     __log = False
 
-    def __init__(self, parent=None, model=None, title=None):
+    def __init__(self, parent=None, model=None, title=None, log=None):
         super(JobsTableView, self).__init__()
 
         self.parent = parent
@@ -47,6 +47,8 @@ class JobsTableView(QTableView):
         self._initHelper()
         self.setModel(model)
         self.setSortingEnabled(True)
+
+        self.log = log
 
     def _initHelper(self):
 

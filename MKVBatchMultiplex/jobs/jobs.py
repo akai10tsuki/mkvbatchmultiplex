@@ -34,14 +34,14 @@ class JobInfo:  # pylint: disable=R0903
         output (list, optional): job output. Defaults to None.
     """
 
-    def __init__(self, index=None, job=None, errors=None, output=None):
+    def __init__(self, index=None, job=None, errors=None, output=None, log=False):
 
         self.jobIndex = index[config.JOBID]
         self.statusIndex = index[config.JOBSTATUS]
         self.commandIndex = index[config.JOBCOMMAND]
         self.job = job
         self.command = job[config.JOBCOMMAND]
-        self.oCommand = MKVCommand(job[config.JOBCOMMAND])
+        self.oCommand = MKVCommand(job[config.JOBCOMMAND], log=log)
         self.errors = [] if errors is None else errors
         self.output = [] if output is None else output
 
@@ -88,10 +88,12 @@ class JobQueue(QObject):
 
         return cls.__log
 
-    def __init__(self, parent, model=None, funcProgress=None, jobWorkQueue=None):
+    def __init__(self, parent, model=None, funcProgress=None, jobWorkQueue=None, log=None):
         super(JobQueue, self).__init__(parent)
 
+        self.__log = None
         self.__progress = None
+
         self.parent = parent
         self.tableModel = model
         self.progress = funcProgress
@@ -101,7 +103,9 @@ class JobQueue(QObject):
         else:
             self._workQueue = jobWorkQueue
 
-        self.runJobs = RunJobs(self, self) # progress function is a late bind
+        self.log = log
+
+        self.runJobs = RunJobs(self, self, log=self.log) # progress function is a late bind
 
         self.statusUpdateSignal.connect(self.statusUpdate)
         self.runSignal.connect(self.run)
@@ -143,6 +147,7 @@ class JobQueue(QObject):
         """set instance log variable"""
         if isinstance(value, bool) or value is None:
             self.__log = value
+            #MKVCommand.classLog(self.log) # TODO: Don't use class log
 
     @property
     def model(self):
@@ -193,7 +198,7 @@ class JobQueue(QObject):
         statusIndex = self.tableModel.index(jobRow, JOBSTATUS)
         commandIndex = self.tableModel.index(jobRow, JOBCOMMAND)
 
-        newJob = JobInfo([jobIndex, statusIndex, commandIndex], job)
+        newJob = JobInfo([jobIndex, statusIndex, commandIndex], job, log=self.log)
         self._workQueue.append(newJob)
 
         if not jobID:
@@ -277,4 +282,6 @@ class JobQueue(QObject):
         run test run worker thread
         """
         self.runJobs.progress = self.progress
+        self.runJobs.output = self.output
+        self.runJobs.log = self.log
         self.runJobs.run()

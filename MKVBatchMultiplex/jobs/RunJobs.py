@@ -1,7 +1,7 @@
 """
 Class to process jobs queue
 """
-# RJB0001
+# RJB0011
 
 import logging
 import re
@@ -9,7 +9,7 @@ import re
 # import threading
 import time
 
-from PySide2.QtCore import QObject, Signal
+from PySide2.QtCore import QObject, Qt, Signal
 
 import vsutillib.mkv as mkv
 
@@ -36,10 +36,36 @@ class RunJobs(QObject):
     # Class logging state
     __log = False
 
-    def __init__(self, parent, jobsQueue=None, progressFunc=None):
+    @classmethod
+    def classLog(cls, setLogging=None):
+        """
+        get/set logging at class level
+        every class instance will log
+        unless overwritten
+
+        Args:
+            setLogging (bool):
+                - True class will log
+                - False turn off logging
+                - None returns current Value
+
+        Returns:
+            bool:
+
+            returns the current value set
+        """
+
+        if setLogging is not None:
+            if isinstance(setLogging, bool):
+                cls.__log = setLogging
+
+        return cls.__log
+
+    def __init__(self, parent, jobsQueue=None, progressFunc=None, log=None):
         super(RunJobs, self).__init__()
 
         self.__jobsQueue = None
+        self.__output = None
         self.__process = None
         self.__progress = None
 
@@ -50,11 +76,32 @@ class RunJobs(QObject):
         self.mainWindow = self.parent.parent
         self.jobsWorker = None
         self.__logging = False
-        self.__running = False
+        self.log = log
+
+    @property
+    def log(self):
+        """
+        class property can be used to override the class global
+        logging setting
+
+            bool:
+
+            True if logging is enable False otherwise
+        """
+        if self.__log is not None:
+            return self.__log
+
+        return RunJobs.classLog()
+
+    @log.setter
+    def log(self, value):
+        """set instance log variable"""
+        if isinstance(value, bool) or value is None:
+            self.__log = value
 
     @property
     def running(self):
-        return self.__running
+        return isThreadRunning(config.WORKERTHREADNAME)
 
     @property
     def jobsqueue(self):
@@ -63,6 +110,14 @@ class RunJobs(QObject):
     @jobsqueue.setter
     def jobsqueue(self, value):
         self.__jobsQueue = value
+
+    @property
+    def output(self):
+        return self.__output
+
+    @output.setter
+    def output(self, value):
+        self.__output = value
 
     @property
     def process(self):
@@ -85,12 +140,13 @@ class RunJobs(QObject):
         run summit jobs to worker
         """
 
-        if self.jobsqueue and not isThreadRunning(config.WORKERTHREADNAME):
+        if self.jobsqueue and not self.running:
 
             self.jobsWorker = ThreadWorker(
                 runJobs,
                 self.jobsqueue,
-                self.mainWindow,
+                self.output,
+                log=self.log,
                 funcStart=self.start,
                 funcResult=self.result,
                 funcProgress=self.progress,
@@ -99,21 +155,46 @@ class RunJobs(QObject):
 
             self.jobsWorker.name = config.WORKERTHREADNAME
             self.jobsWorker.start()
-            self.__running = True
+
+            return True
+
+        if not self.jobsqueue:
+
+            msg = "Jobs Queue empty"
+            self.output.error.emit(msg, {"color": Qt.yellow})
+
+            if self.log:
+                MODULELOG.error("RJB0001: Error: %s", msg)
+
+        if self.running:
+
+            msg = "Jobs running"
+            self.output.error.emit(msg, {"color": Qt.yellow})
+
+            if self.log:
+                MODULELOG.error("RJB0002: Error: %s", msg)
+
+        return False
 
     def start(self):
         """
         start generate signal for start of run
         """
-        self.__running = True
+
         self.startSignal.emit()
+
+        if self.log:
+            MODULELOG.debug("RJB0003: Jobs started.")
 
     def finished(self):
         """
         finished generate signal for finished run
         """
-        self.__running = False
+
         self.finishedSignal.emit()
+
+        if self.log:
+            MODULELOG.debug("RJB0004 Jobs finished.")
 
     def result(self, funcResult):
         """
@@ -127,7 +208,7 @@ class RunJobs(QObject):
 
 
 @staticVars(newJob=False)
-def displayRunJobs(line, job, mainWindow, indexTotal, funcProgress=None):
+def displayRunJobs(line, job, output, indexTotal, funcProgress=None):
     """
     Convenience function used by runJobs
     to display lines of the mkvmerge
@@ -147,19 +228,19 @@ def displayRunJobs(line, job, mainWindow, indexTotal, funcProgress=None):
             n = int(m.group(1))
 
         if n > 0:
-            mainWindow.jobsOutputSignal.emit(line[:-1], {"replaceLine": True})
+            output.job.emit(line[:-1], {"replaceLine": True})
             funcProgress.pbSetValues.emit(n, indexTotal[1] + n)
 
     else:
 
-        mainWindow.jobsOutputSignal.emit(line[:-1], {"appendLine": True})
+        output.job.emit(line[:-1], {"appendLine": True})
 
     if (line.find("writing.") > 0) or (line.find("Multiplexing took") == 0):
-        mainWindow.jobsOutputSignal.emit("\n", {})
+        output.job.emit("\n", {})
 
 
 @staticVars(running=False)
-def runJobs(jobQueue, mainWindow, funcProgress=None):
+def runJobs(jobQueue, output, funcProgress=None, log=False):
     """
     runJobs execute jobs on queue
 
@@ -182,7 +263,7 @@ def runJobs(jobQueue, mainWindow, funcProgress=None):
     currentJob = 0
     indexTotal = [0, 0]
 
-    verify = mkv.VerifyStructure()
+    verify = mkv.VerifyStructure(log=log)
 
     while job := jobQueue.popLeft():
 
@@ -196,16 +277,11 @@ def runJobs(jobQueue, mainWindow, funcProgress=None):
         jobQueue.statusUpdateSignal.emit(job, JobStatus.Running)
         currentJob += 1
 
-        # Test
-
         indexTotal[0] = 0  # file index
         indexTotal[1] = 0  # current max progress bar
 
-        # Job(s): {0:3d} Current: {1:3d} File: {2:3d} of {3:3d} Errors: {4:3d}
-
         totalFiles = 0
         if job.oCommand:
-            # print("Total files {}".format(len(job.oCommand)))
             totalFiles = len(job.oCommand)
 
         maxBar = totalFiles * 100
@@ -219,42 +295,88 @@ def runJobs(jobQueue, mainWindow, funcProgress=None):
 
         cli = RunCommand(
             processLine=displayRunJobs,
-            processArgs=[job, mainWindow, indexTotal],
+            processArgs=[job, output, indexTotal],
             processKWArgs={"funcProgress": funcProgress},
             commandShlex=True,
             universalNewLines=True,
+            log=log,
         )
 
-        for cmd, baseFiles, sourceFiles, destinationFiles, _ in job.oCommand:
+        if job.oCommand:
 
-            funcProgress.lblSetValue.emit(2, indexTotal[0] + 1)
+            if log:
+                MODULELOG.debug("RJB0005: Job ID: %s started.", job.job[config.JOBID])
 
-            verify.verifyStructure(baseFiles, sourceFiles)
+            for cmd, baseFiles, sourceFiles, destinationFiles, _ in job.oCommand:
 
-            if verify:
-                ###
-                # Execute cmd
-                ###
-                msg = "\nCommand: {}\nBase Files: {}\nSource Files: {}\nDestination Files: {}\n\n"
-                msg = msg.format(cmd, baseFiles, sourceFiles, destinationFiles)
-                mainWindow.jobsOutputSignal.emit(msg, {})
+                funcProgress.lblSetValue.emit(2, indexTotal[0] + 1)
 
-                cli.command = cmd
-                #cli.run()
+                verify.verifyStructure(baseFiles, sourceFiles)
 
-                dummyRunCommand(cmd, job, funcProgress, indexTotal)
+                if log:
 
-            else:
+                    msg = (
+                        "Command: {}  Base Files: {} "
+                        "Source Files: {} Destination Files: {}"
+                    )
+                    msg = msg.format(cmd, baseFiles, sourceFiles, destinationFiles)
 
-                msg = "\nDestination Files: {}\n".format(destinationFiles)
-                mainWindow.jobsOutputSignal.emit(msg, {})
-                for m in verify.analysis:
-                    mainWindow.jobsOutputSignal.emit(m, {})
+                    MODULELOG.debug('RJB0006: %s', msg)
 
-            indexTotal[1] += 100
-            indexTotal[0] += 1
 
-        jobQueue.statusUpdateSignal.emit(job, JobStatus.Done)
+                if verify:
+
+                    ###
+                    # Execute cmd
+                    ###
+                    msg = (
+                        "\nCommand: {}\nBase Files: {}\n"
+                        "Source Files: {}\nDestination Files: {}\n\n"
+                    )
+                    msg = msg.format(cmd, baseFiles, sourceFiles, destinationFiles)
+                    output.job.emit(msg, {})
+
+                    if log:
+                        MODULELOG.debug('RJB0007: Structure checks ok')
+
+
+                    if config.SIMULATERUN:
+                        dummyRunCommand(funcProgress, indexTotal)
+                    else:
+                        cli.command = cmd
+                        cli.run()
+
+                else:
+                    msg = "\nDestination Files: {}\n".format(destinationFiles)
+                    output.job.emit(msg, {})
+                    for m in verify.analysis:
+                        output.job.emit(m, {})
+
+                    if log:
+                        MODULELOG.error('RJB0008: Structure check failed')
+
+                indexTotal[1] += 100
+                indexTotal[0] += 1
+
+            jobQueue.statusUpdateSignal.emit(job, JobStatus.Done)
+
+            if log:
+                MODULELOG.debug("RJB0009: Job ID: %s finished.", job.job[config.JOBID])
+
+        else:
+
+            msg = "Job ID: {} cannot execute command.\n\n{}\n"
+            msg = msg.format(job.job[config.JOBID], job.oCommand.command)
+            output.error.emit(msg, {"color": Qt.red})
+
+            jobQueue.statusUpdateSignal.emit(job, JobStatus.Error)
+
+            if log:
+                MODULELOG.debug(
+                    "RJB0010: Job ID: %s cannot execute command: %s.",
+                    job.job[config.JOBID],
+                    job.oCommand.command,
+                )
 
     for index in range(4):
         funcProgress.lblSetValue.emit(index, 0)
@@ -267,7 +389,7 @@ def runJobs(jobQueue, mainWindow, funcProgress=None):
     return "Job queue empty."
 
 
-def dummyRunCommand(command, job, funcProgress, indexTotal):
+def dummyRunCommand(funcProgress, indexTotal):
     """
     dummyRunCommand dummy run job function
     """
@@ -275,6 +397,6 @@ def dummyRunCommand(command, job, funcProgress, indexTotal):
     funcProgress.lblSetValue.emit(2, indexTotal[0] + 1)
     i = 0
     while i < 100:
-        i += 0.05
+        i += 0.5
         funcProgress.pbSetValues.emit(i, indexTotal[1] + i)
         time.sleep(0.0001)
