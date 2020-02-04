@@ -42,6 +42,8 @@ from vsutillib.pyqt import (
     QProgressIndicator,
 )
 
+import vsutillib.media as media
+
 from . import config
 from .dataset import TableData, tableHeaders
 from .jobs import JobQueue
@@ -115,13 +117,13 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.tableViewWidget = JobsTableViewWidget(self, self.proxyModel, "Jobs Table")
         self.tableViewWidget.tableView.sortByColumn(0, Qt.AscendingOrder)
 
-        self.comandWidget = CommandWidget(self, self.proxyModel)
+        self.commandWidget = CommandWidget(self, self.proxyModel)
         self.jobsOutput = OutputTextWidget(self)
         self.errorOutput = OutputTextWidget(self)
 
         self.tabs = TabsWidget(
             self,
-            self.comandWidget,
+            self.commandWidget,
             self.tableViewWidget,
             self.jobsOutput,
             self.errorOutput,
@@ -135,21 +137,22 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
         # Set output to contain output windows insertText Signals
         self.output = OutputWindows(
-            self.comandWidget.insertText,
+            self.commandWidget.insertText,
             self.jobsOutput.insertText,
             self.errorOutput.insertText,
         )
-        self.comandWidget.output = self.output
+        self.commandWidget.output = self.output
         self.tableViewWidget.output = self.output
+        self.jobsQueue.output = self.output
 
         # map output widgets inserTextSignal to local ones
-        self.outputMainSignal = self.comandWidget.insertTextSignal
-        self.jobsOutputSignal = self.jobsOutput.insertTextSignal
-        self.errorOutputSignal = self.errorOutput.insertTextSignal
+        #self.outputMainSignal = self.commandWidget.insertTextSignal
+        #self.jobsOutputSignal = self.jobsOutput.insertTextSignal
+        #self.errorOutputSignal = self.errorOutput.insertTextSignal
 
         # setup widgets setLanguage to SetLanguage change signal
         self.widgetSetLanguage.addSlot(self.tableViewWidget.setLanguage)
-        self.widgetSetLanguage.addSlot(self.comandWidget.setLanguage)
+        self.widgetSetLanguage.addSlot(self.commandWidget.setLanguage)
         self.widgetSetLanguage.addSlot(self.tabs.setLanguage)
 
         # connect to tabs widget tab change Signal
@@ -157,10 +160,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
         # connect to runJobs Start/Stop SigNal
         self.jobsQueue.runJobs.startSignal.connect(self.progressSpin.startAnimation)
-        self.jobsQueue.runJobs.finishedSignal.connect(
-            self.progressSpin.stopAnimation
-        )
-
+        self.jobsQueue.runJobs.finishedSignal.connect(self.progressSpin.stopAnimation)
 
     def _initUI(self):
 
@@ -284,12 +284,15 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
     def enableLogging(self, state):
         """Activate logging"""
 
-        if state:
-            self.log = True
-            logging.info("Start logging.")
-        else:
-            self.log = False
-            logging.info("Stop logging.")
+        print('Loggin sate {}'.format(state))
+        self.log = state
+        self.commandWidget.log = state
+        self.jobsOutput.log = state
+        self.errorOutput.log = state
+        self.tableViewWidget.log = state
+        self.jobsQueue.log = state
+        msg = 'Start Logging.' if state else 'Stop Logging.'
+        logging.info(msg)
 
     def configuration(self, action=None):
         """
@@ -322,7 +325,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
             if bLogging := config.data.get(config.ConfigKey.Logging):
                 self.actEnableLogging.setChecked(bLogging)
-                self.enableLoggin(bLogging)
+                self.enableLogging(bLogging)
 
             if byteGeometry := config.data.get(config.ConfigKey.Geometry):
                 self.restoreGeometry(QByteArray.fromBase64(QByteArray(byteGeometry)))
@@ -486,6 +489,20 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
             event.accept()
         else:
             event.ignore()
+
+    def checkDependencies(self):
+        """check if MediaInfo library is present"""
+
+        if platform.system() == "Linux":
+
+            libFiles = media.isMediaInfoLib()
+
+            if not libFiles:
+                self.output.command.emit(
+                    "\nMediaInfo library not found can not process jobs.\n\n",
+                    {"color": Qt.red},
+                )
+                # self.jobs.jobsStatus(JobStatus.Blocked)
 
     def about(self):
         """About"""
