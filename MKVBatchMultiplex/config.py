@@ -61,10 +61,10 @@ if getattr(sys, "frozen", False):
     CWD = Path(os.path.dirname(__file__)).parent
 else:
     CWD = Path(os.path.realpath(__file__)).parent
-
 LOCALE = CWD.joinpath("locale")
 
 data = ConfigurationSettings()  # pylint: disable=invalid-name
+FORCELOG = True
 
 ######################
 # Application specific
@@ -89,6 +89,8 @@ WORKERTHREADNAME = "jobsWorker"
 
 JTVBTNCLEARQUEUE = 3
 JTVBTNSTARTQUEUE = 4
+
+SIMULATERUN = True
 
 #######################
 #######################
@@ -122,6 +124,9 @@ def init():
     configFile = Path(filesPath, CONFIGFILE)
     data.setConfigFile(configFile)
     data.readFromFile()
+
+    if FORCELOG:
+        data.set(ConfigKey.Logging, True)
 
     if data.get(ConfigKey.Language) is None:
         data.set(ConfigKey.Language, DEFAULTLANGUAGE)
