@@ -13,7 +13,14 @@ MODULELOG.addHandler(logging.NullHandler())
 
 
 class ValidateCommand(QValidator):
-    """Validate command line entered"""
+    """
+    ValidateCommand class validates command line entered
+
+    Args:
+        parent (QWidget): parent widget
+        resultSignal (Signal): Signal(bool) emitted when result found
+        log (bool, optional): True do logging other value don't log. Defaults to None.
+    """
 
     __log = False
 
@@ -68,7 +75,12 @@ class ValidateCommand(QValidator):
 
     @log.setter
     def log(self, value):
-        """set instance log variable"""
+        """
+        set instance log variable a value of None means class global
+        logging state prevails.
+
+        True or False overrides the class global state
+        """
         if isinstance(value, bool) or value is None:
             self.__log = value
 

@@ -3,6 +3,8 @@
 """
 # JOB0001
 
+# pylint: disable=bad-continuation
+
 import logging
 
 from collections import deque
@@ -22,7 +24,7 @@ MODULELOG.addHandler(logging.NullHandler())
 JOBID, JOBSTATUS, JOBCOMMAND = range(3)
 
 
-class JobInfo:  # pylint: disable=R0903
+class JobInfo:  # pylint: disable=too-many-instance-attributes
     """
     JobInfo Information for a job
 
@@ -34,14 +36,19 @@ class JobInfo:  # pylint: disable=R0903
         output (list, optional): job output. Defaults to None.
     """
 
-    def __init__(self, index=None, job=None, errors=None, output=None, log=False):
+    def __init__(
+        self, index=None, job=None, errors=None, output=None, log=False, oCommand=None
+    ):
 
         self.jobIndex = index[config.JOBID]
         self.statusIndex = index[config.JOBSTATUS]
         self.commandIndex = index[config.JOBCOMMAND]
         self.job = job
         self.command = job[config.JOBCOMMAND]
-        self.oCommand = MKVCommand(job[config.JOBCOMMAND], log=log)
+        if oCommand is not None:
+            self.oCommand = oCommand
+        else:
+            self.oCommand = MKVCommand(job[config.JOBCOMMAND], log=log)
         self.errors = [] if errors is None else errors
         self.output = [] if output is None else output
 
@@ -88,7 +95,9 @@ class JobQueue(QObject):
 
         return cls.__log
 
-    def __init__(self, parent, model=None, funcProgress=None, jobWorkQueue=None, log=None):
+    def __init__(
+        self, parent, model=None, funcProgress=None, jobWorkQueue=None, log=None
+    ):
         super(JobQueue, self).__init__(parent)
 
         self.__log = None
@@ -105,12 +114,14 @@ class JobQueue(QObject):
 
         self.log = log
 
-        self.runJobs = RunJobs(self, self, log=self.log) # progress function is a late bind
+        self.runJobs = RunJobs(
+            self, self, log=self.log
+        )  # progress function is a late bind
 
         self.statusUpdateSignal.connect(self.statusUpdate)
         self.runSignal.connect(self.run)
 
-        jobID = config.data.get('JobID')
+        jobID = config.data.get("JobID")
         if jobID:
             if jobID > 9999:
                 # Roll over
@@ -147,7 +158,6 @@ class JobQueue(QObject):
         """set instance log variable"""
         if isinstance(value, bool) or value is None:
             self.__log = value
-            #MKVCommand.classLog(self.log) # TODO: Don't use class log
 
     @property
     def model(self):
@@ -176,7 +186,7 @@ class JobQueue(QObject):
 
         self.tableModel.setData(job.statusIndex, status)
 
-    def append(self, jobRow):
+    def append(self, jobRow, oCommand=None):
         """
         append append job to queue
 
@@ -188,7 +198,9 @@ class JobQueue(QObject):
             bool: True if append successful False otherwise
         """
 
-        job = self.tableModel.dataset[jobRow, ]
+        job = self.tableModel.dataset[
+            jobRow,
+        ]
         status = job[config.JOBSTATUS]
         if status != JobStatus.AddToQueue:
             return False
@@ -198,13 +210,15 @@ class JobQueue(QObject):
         statusIndex = self.tableModel.index(jobRow, JOBSTATUS)
         commandIndex = self.tableModel.index(jobRow, JOBCOMMAND)
 
-        newJob = JobInfo([jobIndex, statusIndex, commandIndex], job, log=self.log)
+        newJob = JobInfo(
+            [jobIndex, statusIndex, commandIndex], job, log=self.log, oCommand=oCommand
+        )
         self._workQueue.append(newJob)
 
         if not jobID:
             self.tableModel.setData(jobIndex, self.__jobID)
             self.__jobID += 1
-            config.data.set('JobID', self.__jobID)
+            config.data.set("JobID", self.__jobID)
 
         self.tableModel.setData(statusIndex, JobStatus.Queue)
 
@@ -233,7 +247,7 @@ class JobQueue(QObject):
             element = self._workQueue.popleft()
             self._checkEmptied()
 
-            return  element
+            return element
 
         return None
 
@@ -250,7 +264,7 @@ class JobQueue(QObject):
             element = self._workQueue.pop()
             self._checkEmptied()
 
-            return  element
+            return element
 
         return None
 
@@ -267,7 +281,7 @@ class JobQueue(QObject):
             element = self._workQueue.popleft()
             self._checkEmptied()
 
-            return  element
+            return element
 
         return None
 

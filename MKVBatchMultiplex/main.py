@@ -145,6 +145,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.commandWidget.output = self.output
         self.tableViewWidget.output = self.output
         self.jobsQueue.output = self.output
+        self.commandWidget.rename = self.renameWidget
 
         # setup widgets setLanguage to SetLanguage change signal
         self.widgetSetLanguage.addSlot(self.tableViewWidget.setLanguage)
@@ -281,7 +282,6 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
     def enableLogging(self, state):
         """Activate logging"""
 
-        print("Loggin sate {}".format(state))
         self.log = state
         self.commandWidget.log = state
         self.jobsOutput.log = state

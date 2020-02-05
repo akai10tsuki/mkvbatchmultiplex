@@ -1,10 +1,13 @@
 """
-MKVFormWidget:
+RenameWidget:
 
-Command input widget
+This widget permit the rename of the output files in the MKVCommand
+
+Also if files are drop from directories in the OS it will rename them.
+
 """
 
-#LOG FW0013
+# LOG FW0013
 
 import logging
 import re
@@ -12,9 +15,16 @@ import re
 from pathlib import Path
 
 from PySide2.QtCore import Signal, Qt, Slot
-from PySide2.QtWidgets import (QGridLayout, QLabel, QWidget, QLineEdit,
-                               QHBoxLayout, QVBoxLayout, QSizePolicy,
-                               QPushButton, QGroupBox)
+from PySide2.QtWidgets import (
+    QGridLayout,
+    QLabel,
+    QWidget,
+    QLineEdit,
+    QHBoxLayout,
+    QVBoxLayout,
+    QSizePolicy,
+    QGroupBox,
+)
 
 import vsutillib.pyqt as pyqt
 
@@ -22,8 +32,16 @@ MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
 
+class ButtonIndex:
+
+    ApplyRename = 0
+    Undo = 1
+    Clear = 2
+
+
 class RenameWidget(QWidget):
     """Central widget"""
+
     # pylint: disable=too-many-instance-attributes
     # Defining elements of a GUI
 
@@ -31,8 +49,9 @@ class RenameWidget(QWidget):
     __log = False
 
     outputRenameResultsSignal = Signal(str, dict)
-    outputOriginalFileSignal = Signal(str, dict)
+    outputOriginalFilesSignal = Signal(str, dict)
     applyFileRenameSignal = Signal(list)
+    setFilesSignal = Signal(object)
 
     @classmethod
     def classLog(cls, setLogging=None):
@@ -69,7 +88,8 @@ class RenameWidget(QWidget):
         self.__output = None
 
         self._initControls()
-        self._initLayout()
+        self._initUI()
+        self._initHelper()
         self._bFilesDropped = False
         self._bDuplicateRename = False
 
@@ -78,62 +98,80 @@ class RenameWidget(QWidget):
     def _initControls(self):
 
         self.textFileName = RegExLineInputWidget(
-            'Base File Name: ', 'Name parsed from command line.')
+            "Base File Name: ", "Name parsed from command line."
+        )
         self.textFileName.lineEdit.setReadOnly(True)
-        self.textRegEx = RegExLineInputWidget("Regular Expression: ",
-                                              'Enter regular expression.')
+        self.textRegEx = RegExLineInputWidget(
+            "Regular Expression: ", "Enter regular expression."
+        )
         self.textSubString = RegExLineInputWidget(
-            "Substitution String: ", 'Enter substitution string.')
-        self.textRegEx.lineEdit.textChanged.connect(self._updateRegEx)
-        self.textSubString.lineEdit.textChanged.connect(self._updateRegEx)
+            "Substitution String: ", "Enter substitution string."
+        )
 
-        self.buttonApplyRename = QPushButton(' Apply Rename ')
-        self.buttonApplyRename.resize(self.buttonApplyRename.sizeHint())
-        self.buttonApplyRename.setSizePolicy(QSizePolicy.Fixed,
-                                             QSizePolicy.Fixed)
-        self.buttonApplyRename.clicked.connect(self._applyRename)
-        self.buttonApplyRename.setEnabled(False)
-
-        self.buttonUndoRename = QPushButton(' Undo ')
-        self.buttonUndoRename.resize(self.buttonUndoRename.sizeHint())
-        self.buttonUndoRename.setSizePolicy(QSizePolicy.Fixed,
-                                            QSizePolicy.Fixed)
-        self.buttonUndoRename.clicked.connect(self._undoRename)
-        self.buttonUndoRename.setEnabled(False)
+        # self.buttonApplyRename = QPushButton(' Apply Rename ')
+        # self.buttonApplyRename.resize(self.buttonApplyRename.sizeHint())
+        # self.buttonApplyRename.setSizePolicy(QSizePolicy.Fixed,
+        #                                     QSizePolicy.Fixed)
+        # self.buttonApplyRename.clicked.connect(self._applyRename)
+        # self.buttonApplyRename.setEnabled(False)
 
         self.textOriginalNames = RegExFilesWidget(
-            self, "Original names:", "Name generated base on parsed command.")
+            self, "Original names:", "Name generated base on parsed command."
+        )
         self.textOriginalNames.textBox.setReadOnly(True)
         self.textOriginalNames.textBox.connectToInsertText(
-            self.outputOriginalFileSignal)
+            self.outputOriginalFilesSignal
+        )
         self.textOriginalNames.textBox.filesDroppedUpdateSignal.connect(
-            self._setOutputFilesDropped)
+            self._setFilesDropped
+        )
 
         self.textRenameResults = RegExInputWidget(
-            self, "Rename:", "Names that will be used for commands.")
+            self, "Rename:", "Names that will be used for commands."
+        )
         self.textRenameResults.textBox.setReadOnly(True)
         self.textRenameResults.textBox.connectToInsertText(
-            self.outputRenameResultsSignal)
+            self.outputRenameResultsSignal
+        )
 
-    def _initLayout(self):
+        btnApplyRename = pyqt.QPushButtonWidget(
+            "Apply Rename",
+            function=self._applyRename,
+            toolTip="Replace the original names with the operation result",
+        )
+        btnApplyRename.setEnabled(False)
 
-        btnGrid = QHBoxLayout()
-        btnGrid.addWidget(self.buttonApplyRename)
-        btnGrid.addWidget(self.buttonUndoRename)
-        btnGrid.addStretch()
+        btnUndoRename = pyqt.QPushButtonWidget(
+            "Undo", function=self._undoRename, toolTip="Undo rename operation"
+        )
+        btnUndoRename.setEnabled(False)
 
-        btnGroup = QGroupBox()
-        btnGroup.setLayout(btnGrid)
+        btnClear = pyqt.QPushButtonWidget("Clear", toolTip="Clear names start over")
+        # btnClear.setEnabled(False)
+
+        self.btnGrid = QHBoxLayout()
+        self.btnGrid.addWidget(btnApplyRename)
+        self.btnGrid.addWidget(btnUndoRename)
+        self.btnGrid.addStretch()
+        self.btnGrid.addWidget(btnClear)
+
+        self.btnGroup = QGroupBox()
+        self.btnGroup.setLayout(self.btnGrid)
+
+    def _initUI(self):
 
         inputGrid = QGridLayout()
 
+        # Labels
         inputGrid.addWidget(self.textRegEx.lblText, 0, 0, Qt.AlignRight)
         inputGrid.addWidget(self.textSubString.lblText, 1, 0, Qt.AlignRight)
 
+        # Input lines
         inputGrid.addWidget(self.textRegEx.lineEdit, 0, 1)
         inputGrid.addWidget(self.textSubString.lineEdit, 1, 1)
 
-        inputGrid.addWidget(btnGroup, 2, 0, 1, 2)
+        # buttons
+        inputGrid.addWidget(self.btnGroup, 2, 0, 1, 2)
 
         gridWidget = QWidget()
         gridWidget.setLayout(inputGrid)
@@ -151,6 +189,17 @@ class RenameWidget(QWidget):
         grid.addWidget(boxWidget, 2, 0)
 
         self.setLayout(grid)
+
+    def _initHelper(self):
+
+        # local signals
+        self.setFilesSignal.connect(self.setFiles)
+
+        self.textRegEx.lineEdit.textChanged.connect(self._updateRegEx)
+        self.textSubString.lineEdit.textChanged.connect(self._updateRegEx)
+        self.textOriginalNames.textBox.textChanged.connect(self.clearButtonState)
+
+        self.btnGrid.itemAt(3).widget().setEnabled(False)
 
     def __bool__(self):
 
@@ -205,31 +254,43 @@ class RenameWidget(QWidget):
         self.textOriginalNames.textBox.clear()
         self.textRenameResults.textBox.clear()
 
-    def connectToSetOutputFile(self, objSignal):
+    def clearButtonState(self):
+        """Set clear button state"""
+        if self.textOriginalNames.textBox.toPlainText() != "":
+            self.btnGrid.itemAt(3).widget().setEnabled(True)
+        else:
+            self.btnGrid.itemAt(3).widget().setEnabled(False)
 
-        objSignal.connect(self.setOutputFile)
+    def connectToSetFiles(self, objSignal):
+
+        objSignal.connect(self.setFiles)
 
     def setLanguage(self):
         """
         setLanguage set labels according to locale
         """
 
-        a = 10
-        print(a)
+        print("RenameWidget.setLanguage")
 
     @Slot(object)
-    def setOutputFile(self, objCommand):
+    def setFiles(self, objCommand):
+        """
+        setFile setup file names to work with
+
+        Args:
+            objCommand (MKVCommand): MKVCommand object containing the files to rename
+        """
 
         self.textOriginalNames.textBox.clear()
         self.textRenameResults.textBox.clear()
 
         for f in objCommand.destinationFiles:
             # show files
-            self.outputOriginalFileSignal.emit(str(f.name) + '\n', {'color': Qt.white})
+            self.outputOriginalFilesSignal.emit(str(f.name) + "\n", {"color": Qt.white})
             # save files
             self._outputFileNames.append(f)
 
-    def _setOutputFilesDropped(self, filesDropped):
+    def _setFilesDropped(self, filesDropped):
 
         if filesDropped:
             self._outputFileNames = []
@@ -259,10 +320,14 @@ class RenameWidget(QWidget):
         for f in self._renameFileNames:
             of = Path(f)
             if (f in duplicateNames) or of.is_file():
-                self.outputRenameResultsSignal.emit(str(f.name) + '\n', {'color': Qt.red})
+                self.outputRenameResultsSignal.emit(
+                    str(f.name) + "\n", {"color": Qt.red}
+                )
             else:
                 # check theme
-                self.outputRenameResultsSignal.emit(str(f.name) + '\n', {'color': Qt.white})
+                self.outputRenameResultsSignal.emit(
+                    str(f.name) + "\n", {"color": Qt.white}
+                )
 
     def _updateRegEx(self):
 
@@ -286,34 +351,36 @@ class RenameWidget(QWidget):
 
                 self._renameFileNames.append(objName)
 
-            _resolveIncrements(self._outputFileNames, self._renameFileNames,
-                               subText)
+            _resolveIncrements(self._outputFileNames, self._renameFileNames, subText)
 
             self._displayRenames()
 
             if self:
-                self.buttonApplyRename.setEnabled(True)
+                self.btnGrid.itemAt(0).widget().setEnabled(True)
+                # self.buttonApplyRename.setEnabled(True)
             else:
-                self.buttonApplyRename.setEnabled(False)
+                self.btnGrid.itemAt(0).widget().setEnabled(False)
+                # self.buttonApplyRename.setEnabled(False)
 
         except re.error:
 
             self.textRenameResults.textBox.clear()
             statusBar.showMessage("Invalid regex.")
 
-        if _resolveIncrements(self._outputFileNames, self._renameFileNames,
-                              subText):
+        if _resolveIncrements(self._outputFileNames, self._renameFileNames, subText):
             self._displayRenames()
 
             if self:
-                self.buttonApplyRename.setEnabled(True)
+                self.btnGrid.itemAt(0).widget().setEnabled(True)
+                # self.buttonApplyRename.setEnabled(True)
             else:
-                self.buttonApplyRename.setEnabled(False)
+                self.btnGrid.itemAt(0).widget().setEnabled(False)
+                # self.buttonApplyRename.setEnabled(False)
 
     def _applyRename(self):
 
         if self._bFilesDropped:
-            #self.applyFileRenameSignal.emit(self._renameFileNames)
+            # self.applyFileRenameSignal.emit(self._renameFileNames)
             filesPair = zip(self._outputFileNames, self._renameFileNames)
             for oldName, newName in filesPair:
                 try:
@@ -324,8 +391,10 @@ class RenameWidget(QWidget):
         else:
             self.applyFileRenameSignal.emit(self._renameFileNames)
 
-        self.buttonApplyRename.setEnabled(False)
-        self.buttonUndoRename.setEnabled(True)
+        self.btnGrid.itemAt(0).widget().setEnabled(False)
+        # self.buttonApplyRename.setEnabled(False)
+        self.btnGrid.itemAt(1).widget().setEnabled(True)
+        # self.buttonUndoRename.setEnabled(True)
 
     def _undoRename(self):
 
@@ -339,11 +408,13 @@ class RenameWidget(QWidget):
         else:
             self.applyFileRenameSignal.emit(self._outputFileNames)
 
-        self.buttonApplyRename.setEnabled(True)
-        self.buttonUndoRename.setEnabled(False)
+        self.btnGrid.itemAt(0).widget().setEnabled(True)
+        # self.buttonApplyRename.setEnabled(True)
+        self.btnGrid.itemAt(1).widget().setEnabled(False)
+        # self.buttonUndoRename.setEnabled(False)
 
 
-class RegExLineInputWidget():
+class RegExLineInputWidget:
     """Input line with text labels"""
 
     def __init__(self, lblText="", strToolTip=""):
@@ -418,23 +489,23 @@ def _resolveIncrements(currentNames, newNames, subText):
         m, ii = item
 
         #    [int(m), "<i: NN>", "{:0" + str(len(m)) + "d}"]
-        
+
         i = int(m)  # start index
         sf = "{:0" + str(len(m)) + "d}"  # string format for index
 
         for index, newName in enumerate(fileNames):
-        
+
             # change increment index for string format in name n
             nName = re.sub(ii, sf, newName)
             nName = nName.format(i)  # change string format for index
-        
+
             # substitute newName with substitution in index fileNames
             fileNames[index] = nName
             i += 1
 
     for index, f in enumerate(currentNames):
         # Path('.') is not full path use original name to get path
-        if Path(fileNames[index]).parent == Path('.'):
+        if Path(fileNames[index]).parent == Path("."):
             nf = f.parent.joinpath(fileNames[index] + f.suffix)
         else:
             nf = Path(f)
@@ -458,7 +529,7 @@ def _matchGroups(strText, strMatch):
         if matchGroup:
             group = matchGroup.group()
             result.append(group)
-            tmp = re.sub(group, '', tmp)
+            tmp = re.sub(group, "", tmp)
         else:
             break
 

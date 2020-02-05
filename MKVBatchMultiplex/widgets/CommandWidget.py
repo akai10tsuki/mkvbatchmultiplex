@@ -24,6 +24,7 @@ from vsutillib.pyqt import (
     runFunctionInThread,
 )
 from vsutillib.process import isThreadRunning
+from vsutillib.mkv import MKVCommand
 
 from .. import config
 from ..jobs import JobStatus
@@ -43,6 +44,7 @@ class CommandWidget(QWidget):
     insertTextSignal = Signal(str, dict)
     updateCommandSignal = Signal(str)
     cliButtonsSateSignal = Signal(bool)
+    cliValidateSignal = Signal(bool)
 
     @classmethod
     def classLog(cls, setLogging=None):
@@ -74,28 +76,18 @@ class CommandWidget(QWidget):
 
         self.__log = log
         self.__output = None
+        self.__rename = None
+        self.oCommand = MKVCommand()
+
         self.parent = parent
         self.proxyModel = proxyModel
         self.tableModel = proxyModel.sourceModel()
-
-        self.cliButtonsSateSignal.connect(self.cliButtonsState)
-        self.parent.jobsQueue.addQueueItemSignal.connect(
-            lambda: self.jobStartQueueState(True)
-        )
-        self.parent.jobsQueue.queueEmptiedSignal.connect(
-            lambda: self.jobStartQueueState(False)
-        )
 
         self._initControls()
         self._initUI()
         self._initHelper()
 
         self.log = log
-
-        self.parent.jobsQueue.runJobs.startSignal.connect(lambda: self.jobStatus(True))
-        self.parent.jobsQueue.runJobs.finishedSignal.connect(
-            lambda: self.jobStatus(False)
-        )
 
     def _initControls(self):
 
@@ -111,7 +103,9 @@ class CommandWidget(QWidget):
             toolTip=Text.txt0161,
         )
         self.cmdLine = QLineEdit()
-        self.cmdLine.setValidator(ValidateCommand(self, self.cliButtonsSateSignal, log=self.log))
+        self.cmdLine.setValidator(
+            ValidateCommand(self, self.cliValidateSignal, log=self.log)
+        )
 
         self.frmCmdLine.addRow(btnAddCommand, self.cmdLine)
 
@@ -155,7 +149,7 @@ class CommandWidget(QWidget):
         btnAnalysis = QPushButtonWidget(
             "Analysis",
             function=lambda: runFunctionInThread(
-                runAnalysis, output=self.output, command=self.cmdLine.text()
+                runAnalysis, command=self.cmdLine.text(), output=self.output,
             ),
             toolTip="Print analysis of command line",
         )
@@ -163,7 +157,10 @@ class CommandWidget(QWidget):
         btnShowCommands = QPushButtonWidget(
             "Commands",
             function=lambda: runFunctionInThread(
-                showCommands, output=self.output, command=self.cmdLine.text()
+                showCommands,
+                output=self.output,
+                command=self.cmdLine.text(),
+                oCommand=self.oCommand,
             ),
             toolTip="Commands to be applied",
         )
@@ -171,7 +168,10 @@ class CommandWidget(QWidget):
         btnCheckFiles = QPushButtonWidget(
             "Check Files",
             function=lambda: runFunctionInThread(
-                checkFiles, output=self.output, command=self.cmdLine.text()
+                checkFiles,
+                output=self.output,
+                command=self.cmdLine.text(),
+                oCommand=self.oCommand,
             ),
             toolTip="Check files for consistency",
         )
@@ -210,20 +210,37 @@ class CommandWidget(QWidget):
 
     def _initHelper(self):
 
+        #
+        # Signal interconnections
+        #
+
+        # local button state connect to related state
+        self.parent.jobsQueue.addQueueItemSignal.connect(
+            lambda: self.jobStartQueueState(True)
+        )
+        self.parent.jobsQueue.queueEmptiedSignal.connect(
+            lambda: self.jobStartQueueState(False)
+        )
+
+        # job related
+        self.parent.jobsQueue.runJobs.startSignal.connect(lambda: self.jobStatus(True))
+        self.parent.jobsQueue.runJobs.finishedSignal.connect(
+            lambda: self.jobStatus(False)
+        )
+
         # map insertText signal to outputWidget one
         self.insertText = self.outputWindow.insertTextSignal
 
         # command
-        self.cmdLine.setClearButtonEnabled(True)
         self.updateCommandSignal.connect(self.updateCommand)
         self.cliButtonsSateSignal.connect(self.cliButtonsState)
-        self.frmCmdLine.itemAt(0, QFormLayout.LabelRole).widget().setEnabled(False)
-
+        self.cliValidateSignal.connect(self.cliValidate)
         #
         # button state
         #
 
         # Command related
+        self.frmCmdLine.itemAt(0, QFormLayout.LabelRole).widget().setEnabled(False)
         self.cliButtonsState(False)
 
         # Clear buttons related
@@ -231,10 +248,16 @@ class CommandWidget(QWidget):
         self.btnGrid.itemAt(config.BTNRESET).widget().setEnabled(False)
 
         # connect text windows textChanged to clearButtonState function
-        self.outputWindow.textChanged.connect(self.clearButtonsState)
+        self.outputWindow.textChanged.connect(self.clearButtonState)
 
         # Job Queue related
         self.btnGrid.itemAt(config.BTNSTARTQUEUE).widget().setEnabled(False)
+
+        #
+        # Misc
+        #
+
+        self.cmdLine.setClearButtonEnabled(True)  # button at end of line to clear it
 
     @property
     def log(self):
@@ -257,7 +280,7 @@ class CommandWidget(QWidget):
         """set instance log variable"""
         if isinstance(value, bool) or value is None:
             self.__log = value
-            ValidateCommand.classLog(value) # No variable used so for now use class log
+            ValidateCommand.classLog(value)  # No variable used so for now use class log
             self.outputWindow.log = value
 
     @property
@@ -268,29 +291,20 @@ class CommandWidget(QWidget):
     def output(self, value):
         self.__output = value
 
-    def addCommand(self, status):
-        """
-        addCommand add command row in jobs table
+    @property
+    def rename(self):
+        return self.__rename
 
-        Args:
-            status (JobStatus): Status for job to be added should be either
-                                JobStatus.Waiting or JobStatus.AddToQueue
-        """
+    @rename.setter
+    def rename(self, value):
+        if isinstance(value, object):
+            self.__rename = value
 
-        totalJobs = self.tableModel.rowCount()
-        command = self.cmdLine.text()
-        data = [["", ""], [status, "Status code"], [command, command]]
-        self.tableModel.insertRows(totalJobs, 1, data=data)
+    @Slot(list)
+    def applyRename(self, renameFiles):
 
-        self.cmdLine.clear()
-
-    def pasteClipboard(self):
-        """Paste clipboard to command QLineEdit"""
-
-        clip = QApplication.clipboard().text()
-
-        if clip:
-            self.updateCommand(clip)
+        if self.oCommand:
+            self.oCommand.renameOutputFiles(renameFiles)
 
     @Slot(bool)
     def cliButtonsState(self, validateOK):
@@ -316,12 +330,32 @@ class CommandWidget(QWidget):
             button.setEnabled(validateOK)
 
     @Slot(bool)
+    def cliValidate(self, validateOK):
+
+        self.cliButtonsState(validateOK)
+        self.updateObjCommnad(validateOK)
+        if self.rename is not None:
+            if validateOK:
+                self.rename.setFilesSignal.emit(self.oCommand)
+                self.rename.applyFileRenameSignal.connect(self.applyRename)
+            else:
+                self.rename.clear()
+
+    @Slot(bool)
     def jobStartQueueState(self, state):
 
         if state and not isThreadRunning(config.WORKERTHREADNAME):
             self.btnGrid.itemAt(config.BTNSTARTQUEUE).widget().setEnabled(state)
         else:
             self.btnGrid.itemAt(config.BTNSTARTQUEUE).widget().setEnabled(state)
+
+    @Slot(bool)
+    def updateObjCommnad(self, valid):
+
+        if valid:
+            self.oCommand.command = self.cmdLine.text()
+        else:
+            self.oCommand.command = ""
 
     @Slot(str)
     def updateCommand(self, command):
@@ -330,31 +364,6 @@ class CommandWidget(QWidget):
         self.cmdLine.clear()
         self.cmdLine.setText(command)
         self.cmdLine.setCursorPosition(0)
-
-    def clearButtonsState(self):
-        """Set clear button state"""
-        if self.outputWindow.toPlainText() != "":
-            self.btnGrid.itemAt(config.BTNCLEAR).widget().setEnabled(True)
-        else:
-            self.btnGrid.itemAt(config.BTNCLEAR).widget().setEnabled(False)
-
-    def clearOutputWindow(self):
-        """
-        clearOutputWindow clear the command output window
-        """
-
-        language = config.data.get(config.ConfigKey.Language)
-        bAnswer = False
-
-        # Clear output window?
-        title = "Clear output"
-        msg = "¿" if language == "es" else ""
-        msg += "Clear output window" + "?"
-
-        bAnswer = yesNoDialog(self, msg, title)
-
-        if bAnswer:
-            self.outputWindow.clear()
 
     @Slot(bool)
     def jobStatus(self, running):
@@ -380,6 +389,55 @@ class CommandWidget(QWidget):
             palette.setColor(QPalette.WindowText, Qt.white)
 
             self.parent.jobsLabel.setPalette(palette)
+
+    def addCommand(self, status):
+        """
+        addCommand add command row in jobs table
+
+        Args:
+            status (JobStatus): Status for job to be added should be either
+                                JobStatus.Waiting or JobStatus.AddToQueue
+        """
+
+        totalJobs = self.tableModel.rowCount()
+        command = self.cmdLine.text()
+        data = [["", ""], [status, "Status code"], [command, command]]
+        self.tableModel.insertRows(totalJobs, 1, data=data)
+
+        self.cmdLine.clear()
+
+    def pasteClipboard(self):
+        """Paste clipboard to command QLineEdit"""
+
+        clip = QApplication.clipboard().text()
+
+        if clip:
+            self.updateCommand(clip)
+
+    def clearButtonState(self):
+        """Set clear button state"""
+        if self.outputWindow.toPlainText() != "":
+            self.btnGrid.itemAt(config.BTNCLEAR).widget().setEnabled(True)
+        else:
+            self.btnGrid.itemAt(config.BTNCLEAR).widget().setEnabled(False)
+
+    def clearOutputWindow(self):
+        """
+        clearOutputWindow clear the command output window
+        """
+
+        language = config.data.get(config.ConfigKey.Language)
+        bAnswer = False
+
+        # Clear output window?
+        title = "Clear output"
+        msg = "¿" if language == "es" else ""
+        msg += "Clear output window" + "?"
+
+        bAnswer = yesNoDialog(self, msg, title)
+
+        if bAnswer:
+            self.outputWindow.clear()
 
     def setLanguage(self):
         """

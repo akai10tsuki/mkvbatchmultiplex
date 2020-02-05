@@ -29,7 +29,10 @@ def showCommands(**kwargs):
 
     output = kwargs.pop("output", None)
     command = kwargs.pop("command", None)
-    oCommand = mkv.MKVCommand(command)
+    oCommand = kwargs.pop('oCommand', None)
+
+    if oCommand is None:
+        oCommand = mkv.MKVCommand(command)
 
     if output is None:
         return "No output callback function"
@@ -58,7 +61,10 @@ def checkFiles(**kwargs):
 
     output = kwargs.pop("output", None)
     command = kwargs.pop("command", None)
-    oCommand = mkv.MKVCommand(command)
+    oCommand = kwargs.pop('oCommand', None)
+
+    if oCommand is None:
+        oCommand = mkv.MKVCommand(command)
 
     if output is None:
         return "No output callback function"
