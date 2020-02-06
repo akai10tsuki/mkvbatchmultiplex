@@ -8,6 +8,8 @@ import logging
 import io
 import csv
 
+from PySide2.QtCore import Qt
+
 from PySide2.QtWidgets import (
     QTableView,
     QAbstractItemView,
@@ -17,6 +19,9 @@ from PySide2.QtWidgets import (
     QHeaderView,
 )
 
+from vsutillib.mkv import MKVCommand
+
+from ..jobs import JobStatus
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -58,6 +63,8 @@ class JobsTableView(QTableView):
         # self.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.setAlternatingRowColors(True)
         self.setWordWrap(False)
+
+        self.setAcceptDrops(True)
 
     @classmethod
     def classLog(cls, setLogging=None):
@@ -218,3 +225,23 @@ class JobsTableView(QTableView):
             stream = io.StringIO()
             csv.writer(stream, delimiter="\t").writerows(table)
             QApplication.clipboard().setText(stream.getvalue())
+
+    def supportedDropActions(self): # pylint: disable=no-self-use
+
+        return Qt.CopyAction | Qt.MoveAction
+
+    def dropEvent(self, event):
+
+        data = event.mimeData()
+        command = data.text()
+
+        self._addCommand(command)
+
+    def _addCommand(self, command):
+
+        oCommand = MKVCommand(command)
+        if oCommand:
+            tableModel = self.model.sourceModel()
+            totalJobs = tableModel.rowCount()
+            data = [["", ""], [JobStatus.Waiting, "Status code"], [command, command]]
+            tableModel.insertRows(totalJobs, 1, data=data)
