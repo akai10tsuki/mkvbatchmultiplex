@@ -133,12 +133,12 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
     def _initHelper(self):
         """
-        _initHelper setup signals
+        _initHelper setup signals, do any late binds and misc configuration
         """
 
         # Set output to contain output windows insertText Signals
         self.output = OutputWindows(
-            self.commandWidget.insertText,
+            self.commandWidget.outputWindow.insertText,
             self.jobsOutput.insertText,
             self.errorOutput.insertText,
         )
@@ -146,6 +146,10 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.tableViewWidget.output = self.output
         self.jobsQueue.output = self.output
         self.commandWidget.rename = self.renameWidget
+
+        self.commandWidget.outputWindow.setReadOnly(True)
+        self.jobsOutput.setReadOnly(True)
+        self.errorOutput.setReadOnly(True)
 
         # setup widgets setLanguage to SetLanguage change signal
         self.widgetSetLanguage.addSlot(self.tableViewWidget.setLanguage)
