@@ -211,7 +211,6 @@ class GenCommandApp(QMainWindow):
     def pasteClipboard(self, index):
         """Paste clipboard to command QLineEdit"""
 
-        print(index)
         cmd = self.cmd0
         if index == 1:
             cmd = self.cmd1
