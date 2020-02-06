@@ -14,10 +14,11 @@ from PySide2.QtCore import QObject, Qt, Signal
 import vsutillib.mkv as mkv
 
 from vsutillib.process import ThreadWorker, RunCommand, isThreadRunning
+from vsutillib.pyqt import SvgColor
 from vsutillib.misc import staticVars
 
 from .. import config
-from .jobKeys import JobStatus
+from .jobKeys import JobStatus, JobKey
 
 
 MODULELOG = logging.getLogger(__name__)
@@ -61,17 +62,19 @@ class RunJobs(QObject):
 
         return cls.__log
 
-    def __init__(self, parent, jobsQueue=None, progressFunc=None, log=None):
+    def __init__(self, parent, jobsQueue=None, progressFunc=None, model=None, log=None):
         super(RunJobs, self).__init__()
 
         self.__jobsQueue = None
         self.__output = None
         self.__process = None
         self.__progress = None
+        self.__model = None
 
         self.parent = parent
         self.jobsqueue = jobsQueue
         self.progress = progressFunc
+        self.model = model
 
         self.mainWindow = self.parent.parent
         self.jobsWorker = None
@@ -112,6 +115,14 @@ class RunJobs(QObject):
         self.__jobsQueue = value
 
     @property
+    def model(self):
+        return self.__model
+
+    @model.setter
+    def model(self, value):
+        self.__model = value
+
+    @property
     def output(self):
         return self.__output
 
@@ -146,6 +157,7 @@ class RunJobs(QObject):
                 runJobs,
                 self.jobsqueue,
                 self.output,
+                self.model,
                 log=self.log,
                 funcStart=self.start,
                 funcResult=self.result,
@@ -240,7 +252,7 @@ def displayRunJobs(line, job, output, indexTotal, funcProgress=None):
 
 
 @staticVars(running=False)
-def runJobs(jobQueue, output, funcProgress=None, log=False):
+def runJobs(jobQueue, output, model, funcProgress=None, log=False):
     """
     runJobs execute jobs on queue
 
@@ -304,10 +316,14 @@ def runJobs(jobQueue, output, funcProgress=None, log=False):
 
         if job.oCommand:
 
+            msg = "*******************\n"
+            msg += "Job ID: {} started.\n\n".format(job.job[JobKey.ID])
+            output.job.emit(msg, {'color': Qt.cyan})
+
             if log:
                 MODULELOG.debug("RJB0005: Job ID: %s started.", job.job[config.JOBID])
 
-            for cmd, baseFiles, sourceFiles, destinationFiles, _ in job.oCommand:
+            for cmd, baseFiles, sourceFiles, destinationFile, _ in job.oCommand:
 
                 funcProgress.lblSetValue.emit(2, indexTotal[0] + 1)
 
@@ -317,9 +333,9 @@ def runJobs(jobQueue, output, funcProgress=None, log=False):
 
                     msg = (
                         "Command: {}  Base Files: {} "
-                        "Source Files: {} Destination Files: {}"
+                        "Source Files: {} Destination File: {}"
                     )
-                    msg = msg.format(cmd, baseFiles, sourceFiles, destinationFiles)
+                    msg = msg.format(cmd, baseFiles, sourceFiles, destinationFile)
 
                     MODULELOG.debug('RJB0006: %s', msg)
 
@@ -330,11 +346,11 @@ def runJobs(jobQueue, output, funcProgress=None, log=False):
                     # Execute cmd
                     ###
                     msg = (
-                        "\nCommand: {}\nBase Files: {}\n"
-                        "Source Files: {}\nDestination Files: {}\n\n"
+                        "Command: {}\nBase Files: {}\n"
+                        "Source Files: {}\nDestination Files: {}\n"
                     )
-                    msg = msg.format(cmd, baseFiles, sourceFiles, destinationFiles)
-                    output.job.emit(msg, {})
+                    msg = msg.format(cmd, baseFiles, sourceFiles, destinationFile)
+                    output.job.emit(msg, {'appendEnd': True})
 
                     if log:
                         MODULELOG.debug('RJB0007: Structure checks ok')
@@ -347,16 +363,41 @@ def runJobs(jobQueue, output, funcProgress=None, log=False):
                         cli.run()
 
                 else:
-                    msg = "\nDestination Files: {}\n".format(destinationFiles)
-                    output.job.emit(msg, {})
-                    for m in verify.analysis:
-                        output.job.emit(m, {})
+
+                    msg = "Error Job ID: {} ---------------------".format(job.job[JobKey.ID])
+                    output.error.emit(msg, {'color': SvgColor.red, 'appendEnd': True})
+
+                    msg = "\nDestination File: {}\n\n".format(destinationFile)
+                    output.job.emit(msg, {'color': SvgColor.red, 'appendEnd': True})
+                    output.error.emit(msg, {'color': SvgColor.red, 'appendEnd': True})
+                    #errorMsg(output, msg, {'color': SvgColor.red, 'appendEnd': True})
+
+                    for i, m in enumerate(verify.analysis):
+                        if i == 0:
+                            #errorMsg(output, m, {'color': SvgColor.orange, 'appendEnd': True})
+                            output.job.emit(m, {'color': SvgColor.orange})
+                            output.error.emit(m, {'color': SvgColor.orange})
+                        else:
+                            #errorMsg(output, m, {'color': SvgColor.red, 'appendEnd': True})
+                            output.job.emit(m, {'color': Qt.red})
+                            output.error.emit(m, {'color': Qt.red})
+
+                    #errorMsg(output, '', {'color': SvgColor.orange, 'appendEnd': True})
+                    output.job.emit('', {'appendEnd': True})
+                    #output.error.emit('', {'appendEnd': True})
+
+                    msg = "Error Job ID: {} ---------------------\n\n".format(job.job[JobKey.ID])
+                    output.error.emit(msg, {'color': Qt.red, 'appendEnd': True})
 
                     if log:
                         MODULELOG.error('RJB0008: Structure check failed')
 
                 indexTotal[1] += 100
                 indexTotal[0] += 1
+
+            msg = "\nJob ID: {} ended.\n".format(job.job[JobKey.ID])
+            msg += "*******************\n\n\n"
+            output.job.emit(msg, {'color': Qt.cyan, 'appendEnd': True})
 
             jobQueue.statusUpdateSignal.emit(job, JobStatus.Done)
 
@@ -365,7 +406,7 @@ def runJobs(jobQueue, output, funcProgress=None, log=False):
 
         else:
 
-            msg = "Job ID: {} cannot execute command.\n\n{}\n"
+            msg = "Job ID: {} cannot execute command.\n\nCommand: {}\n"
             msg = msg.format(job.job[config.JOBID], job.oCommand.command)
             output.error.emit(msg, {"color": Qt.red})
 
@@ -400,3 +441,9 @@ def dummyRunCommand(funcProgress, indexTotal):
         i += 0.5
         funcProgress.pbSetValues.emit(i, indexTotal[1] + i)
         time.sleep(0.0001)
+
+def errorMsg(output, msg, kwargs):
+
+    print('{}'.format(str(kwargs)))
+    output.error.emit(msg, kwargs)
+    output.job.emit(msg, kwargs)
