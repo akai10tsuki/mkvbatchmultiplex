@@ -286,7 +286,7 @@ class RenameWidget(QWidget):
 
         for f in objCommand.destinationFiles:
             # show files
-            self.outputOriginalFilesSignal.emit(str(f.name) + "\n", {"color": Qt.white})
+            self.outputOriginalFilesSignal.emit(str(f.name) + "\n", {})
             # save files
             self._outputFileNames.append(f)
 
@@ -326,7 +326,7 @@ class RenameWidget(QWidget):
             else:
                 # check theme
                 self.outputRenameResultsSignal.emit(
-                    str(f.name) + "\n", {"color": Qt.white}
+                    str(f.name) + "\n", {}
                 )
 
     def _updateRegEx(self):
@@ -448,6 +448,7 @@ class RegExFilesWidget(QWidget):
     def __init__(self, parent=None, lblText="", strToolTip=""):
         super(RegExFilesWidget, self).__init__(parent)
 
+        print('Init in Rename')
         self.lblText = QLabel(lblText)
         self.textBox = pyqt.FileListWidget(self)
         self.textBox.setToolTip(strToolTip)
