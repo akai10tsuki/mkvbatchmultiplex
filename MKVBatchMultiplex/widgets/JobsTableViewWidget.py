@@ -5,8 +5,7 @@ JobsTableWidget
 import logging
 
 from PySide2.QtCore import QThreadPool, Qt, Slot
-
-from PySide2.QtWidgets import QWidget, QGroupBox, QGridLayout, QApplication
+from PySide2.QtWidgets import QWidget, QGroupBox, QGridLayout, QApplication, QAbstractItemView
 
 from vsutillib.pyqt import QPushButtonWidget, darkPalette
 from vsutillib.process import isThreadRunning
