@@ -29,7 +29,7 @@ class JobsTableModel(TableModel):
 
     def insertRows(self, position, rows, index=QModelIndex(), data=None):
 
-        rc = super(JobsTableModel, self).insertRows(position, rows, index, data)
+        rc = super(JobsTableModel, self).insertRows(position, rows, index, data=data)
 
         if rc:
             for r in range(0, rows):

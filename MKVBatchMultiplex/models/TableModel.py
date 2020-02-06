@@ -101,9 +101,11 @@ Class for a table model with horizontal headers
 
 # pylint: disable=unused-argument
 
+
 from PySide2.QtCore import QAbstractTableModel, Qt, QSortFilterProxyModel, QModelIndex
 
 JOBID, JOBSTATUS, JOBCOMMAND = range(3)
+
 
 class TableModel(QAbstractTableModel):
     """Model for table view
@@ -306,7 +308,7 @@ class TableModel(QAbstractTableModel):
         #
 
         if not index.isValid():
-            return None
+            return Qt.ItemIsDropEnabled
 
         if index.column() == 1:
             # if status column
@@ -342,6 +344,20 @@ class TableModel(QAbstractTableModel):
             return True
 
         return False
+
+    #
+    # Enable Drag and Drop
+    #
+    def supportedDropActions(self):
+
+        return Qt.CopyAction | Qt.MoveAction
+
+    def canDropMimeData(self, data, action, row, col, parent):
+
+        if not data.hasFormat("text/plain"):
+            return False
+
+        return True
 
 
 class TableProxyModel(QSortFilterProxyModel):

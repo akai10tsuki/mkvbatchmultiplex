@@ -15,7 +15,7 @@ from vsutillib.mkv import MKVCommand
 
 from .. import config
 from ..models import TableProxyModel
-from .jobKeys import JobStatus
+from .jobKeys import JobStatus, JobKey
 from .RunJobs import RunJobs
 
 
@@ -198,27 +198,29 @@ class JobQueue(QObject):
             bool: True if append successful False otherwise
         """
 
-        job = self.tableModel.dataset[
-            jobRow,
-        ]
-        status = job[config.JOBSTATUS]
+        job = self.tableModel.dataset[jobRow,]
+
+        status = self.tableModel.dataset[jobRow,][JobKey.Status]
         if status != JobStatus.AddToQueue:
             return False
 
-        jobID = job[config.JOBID]
-        jobIndex = self.tableModel.index(jobRow, JOBID)
-        statusIndex = self.tableModel.index(jobRow, JOBSTATUS)
-        commandIndex = self.tableModel.index(jobRow, JOBCOMMAND)
-
-        newJob = JobInfo(
-            [jobIndex, statusIndex, commandIndex], job, log=self.log, oCommand=oCommand
-        )
-        self._workQueue.append(newJob)
+        jobID = self.tableModel.dataset[jobRow,][JobKey.ID]
+        jobIndex = self.tableModel.index(jobRow, JobKey.ID)
+        statusIndex = self.tableModel.index(jobRow, JobKey.Status)
+        commandIndex = self.tableModel.index(jobRow, JobKey.Command)
 
         if not jobID:
             self.tableModel.setData(jobIndex, self.__jobID)
             self.__jobID += 1
             config.data.set("JobID", self.__jobID)
+
+        newJob = JobInfo(
+            [jobIndex, statusIndex, commandIndex],
+            self.tableModel.dataset[jobRow,],
+            log=self.log,
+            oCommand=oCommand,
+        )
+        self._workQueue.append(newJob)
 
         self.tableModel.setData(statusIndex, JobStatus.Queue)
 
@@ -295,6 +297,8 @@ class JobQueue(QObject):
         """
         run test run worker thread
         """
+
+        self.runJobs.model = self.tableModel
         self.runJobs.progress = self.progress
         self.runJobs.output = self.output
         self.runJobs.log = self.log
