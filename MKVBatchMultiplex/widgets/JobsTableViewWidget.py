@@ -235,7 +235,7 @@ class JobsTableViewWidget(QWidget):
             widget = self.grpGrid.itemAt(index).widget()
             if isinstance(widget, QPushButtonWidget):
                 widget.setText(_(widget.originalText))
-                widget.setStatusTip(_(widget.toolTip))
+                widget.setToolTip(_(widget.toolTip))
 
         self.grpBox.setTitle(_(Text.txt0130))
         self.tableModel.setHeaderData(JOBSTATUS, Qt.Horizontal, _(Text.txt0131))

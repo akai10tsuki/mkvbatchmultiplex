@@ -7,7 +7,7 @@ CommandWidget helper functions attach to buttons
 from PySide2.QtCore import Qt
 
 import vsutillib.mkv as mkv
-from vsutillib.pyqt import SvgColor
+from vsutillib.pyqt import SvgColor, LineOutput
 
 
 def runAnalysis(**kwargs):
@@ -15,22 +15,25 @@ def runAnalysis(**kwargs):
 
     output = kwargs.pop("output", None)
     command = kwargs.pop("command", None)
+    log = kwargs.pop("log", False)
 
-    verify = mkv.VerifyMKVCommand(command)
+    verify = mkv.VerifyMKVCommand(command, log=log)
 
-    output.command.emit("Analysis of command line:\n", {"appendEnd": True})
+    output.command.emit("Analysis of command line:\n", {LineOutput.AppendEnd: True})
 
     for e in verify.analysis:
         if e.find(r"chk:") >= 0:
             output.command.emit(
-                "{}".format(e), {"color": SvgColor.darkgreen, "appendEnd": True}
+                "{}".format(e),
+                {LineOutput.Color: SvgColor.darkgreen, LineOutput.AppendEnd: True},
             )
         else:
             output.command.emit(
-                "{}".format(e), {"color": SvgColor.red, "appendEnd": True}
+                "{}".format(e),
+                {LineOutput.Color: SvgColor.red, LineOutput.AppendEnd: True},
             )
 
-    output.command.emit("\n", {"appendEnd": True})
+    output.command.emit("\n", {LineOutput.AppendEnd: True})
 
 
 def showCommands(**kwargs):
@@ -39,29 +42,32 @@ def showCommands(**kwargs):
     output = kwargs.pop("output", None)
     command = kwargs.pop("command", None)
     oCommand = kwargs.pop("oCommand", None)
+    log = kwargs.pop("log", False)
 
     if oCommand is None:
-        oCommand = mkv.MKVCommand(command)
+        oCommand = mkv.MKVCommand(command, log=log)
 
     if output is None:
         return "No output callback function"
 
-    output.command.emit("Shell:\n\n{}\n".format(oCommand.command), {"appendEnd": True})
+    output.command.emit(
+        "Shell:\n\n{}\n".format(oCommand.command), {LineOutput.AppendEnd: True}
+    )
     output.command.emit(
         "Command Template:\n\n{}\n\nCommands:\n".format(str(oCommand.template)),
-        {"appendEnd": True},
+        {LineOutput.AppendEnd: True},
     )
 
     if oCommand:
         for command, _, _, _, _ in oCommand:
-            output.command.emit(str(command) + "\n", {"appendEnd": True})
+            output.command.emit(str(command) + "\n", {LineOutput.AppendEnd: True})
     else:
         output.command.emit(
             "MCW0008: Error in command construction {}\n".format(oCommand.error),
-            {"color": Qt.red, "appendEnd": True},
+            {LineOutput.Color: Qt.red, LineOutput.AppendEnd: True},
         )
 
-    output.command.emit("", {"appendEnd": True})
+    output.command.emit("", {LineOutput.AppendEnd: True})
 
     return None
 
@@ -72,18 +78,19 @@ def checkFiles(**kwargs):
     output = kwargs.pop("output", None)
     command = kwargs.pop("command", None)
     oCommand = kwargs.pop("oCommand", None)
+    log = kwargs.pop("log", False)
 
     if oCommand is None:
-        oCommand = mkv.MKVCommand(command)
+        oCommand = mkv.MKVCommand(command, log=log)
 
     if output is None:
         return "No output callback function"
 
-    output.command.emit("Checking files...\n", {"appendEnd": True})
+    output.command.emit("Checking files...\n", {LineOutput.AppendEnd: True})
 
     if oCommand:
 
-        verify = mkv.VerifyStructure()
+        verify = mkv.VerifyStructure(log=log)
 
         for index, (_, baseFiles, sourceFiles, destinationFile, _) in enumerate(
             oCommand
@@ -100,7 +107,9 @@ def checkFiles(**kwargs):
                 msg = "{}. Source: {}\nDestination: {}\nStructure looks Ok.\n"
                 msg = msg.format(index + 1, str(lstFile), destinationFile)
 
-                output.command.emit(msg, {"color": Qt.darkGreen, "appendEnd": True})
+                output.command.emit(
+                    msg, {LineOutput.Color: Qt.darkGreen, LineOutput.AppendEnd: True}
+                )
 
             else:
 
@@ -108,21 +117,33 @@ def checkFiles(**kwargs):
                 msg = msg.format(index + 1, str(lstFile), destinationFile)
 
                 output.command.emit(
-                    msg, {"color": SvgColor.yellowgreen, "appendEnd": True}
+                    msg,
+                    {
+                        LineOutput.Color: SvgColor.yellowgreen,
+                        LineOutput.AppendEnd: True,
+                    },
                 )
 
                 for i, m in enumerate(verify.analysis):
                     if i == 0:
                         output.command.emit(
                             m.strip() + "\n",
-                            {"color": SvgColor.orange, "appendEnd": True},
+                            {
+                                LineOutput.Color: SvgColor.orange,
+                                LineOutput.AppendEnd: True,
+                            },
                         )
                     else:
                         output.command.emit(
                             str(i) + ". " + m.strip(),
-                            {"color": SvgColor.red, "appendEnd": True},
+                            {
+                                LineOutput.Color: SvgColor.red,
+                                LineOutput.AppendEnd: True,
+                            },
                         )
 
-    output.command.emit("", {"appendEnd": True})
+                output.command.emit("", {LineOutput.AppendEnd: True})
+
+        output.command.emit("", {LineOutput.AppendEnd: True})
 
     return None

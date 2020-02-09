@@ -10,6 +10,7 @@ Central widget holds:
 
 """
 # MTW0001
+# pylint: disable=bad-continuation
 
 import logging
 
