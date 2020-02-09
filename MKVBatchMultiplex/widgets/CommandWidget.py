@@ -149,7 +149,7 @@ class CommandWidget(QWidget):
         btnAnalysis = QPushButtonWidget(
             "Analysis",
             function=lambda: runFunctionInThread(
-                runAnalysis, command=self.cmdLine.text(), output=self.output,
+                runAnalysis, command=self.cmdLine.text(), output=self.output, log=self.log
             ),
             toolTip="Print analysis of command line",
         )
@@ -161,6 +161,7 @@ class CommandWidget(QWidget):
                 output=self.output,
                 command=self.cmdLine.text(),
                 oCommand=self.oCommand,
+                log=self.log,
             ),
             toolTip="Commands to be applied",
         )
@@ -172,6 +173,7 @@ class CommandWidget(QWidget):
                 output=self.output,
                 command=self.cmdLine.text(),
                 oCommand=self.oCommand,
+                log=self.log,
             ),
             toolTip="Check files for consistency",
         )
@@ -448,10 +450,10 @@ class CommandWidget(QWidget):
             widget = self.frmCmdLine.itemAt(index, QFormLayout.LabelRole).widget()
             if isinstance(widget, QPushButtonWidget):
                 widget.setText("  " + _(widget.originalText) + "  ")
-                widget.setStatusTip(_(widget.toolTip))
+                widget.setToolTip(_(widget.toolTip))
 
         for index in range(self.btnGrid.count()):
             widget = self.btnGrid.itemAt(index).widget()
             if isinstance(widget, QPushButtonWidget):
                 widget.setText("  " + _(widget.originalText) + "  ")
-                widget.setStatusTip(_(widget.toolTip))
+                widget.setToolTip(_(widget.toolTip))
