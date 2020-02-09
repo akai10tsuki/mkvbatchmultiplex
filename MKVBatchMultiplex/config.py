@@ -48,7 +48,7 @@ REQUIRED = [
 __version__ = VERSION
 
 # label
-#TOTALJOBS, CURRENTJOB, CURRENTFILE, TOTALFILES, TOTALERRORS = range(5)
+# TOTALJOBS, CURRENTJOB, CURRENTFILE, TOTALFILES, TOTALERRORS = range(5)
 
 CONFIGFILE = "config.xml"
 FILESROOT = "." + APPNAME
@@ -95,7 +95,8 @@ SIMULATERUN = True
 #######################
 #######################
 
-class Action: # pylint: disable=too-few-public-methods
+
+class Action:  # pylint: disable=too-few-public-methods
 
     Save = "Save"
     Reset = "Reset"
@@ -114,6 +115,18 @@ class ConfigKey:  # pylint: disable=too-few-public-methods
     Logging = "Logging"
     Geometry = "Geometry"
 
+    #
+    # App Specific
+    #
+
+    Tab = 'Tab'
+    TabText = 'TabText'
+
+class Key:
+
+    RegEx = "RegEx"
+    SubString = "SubString"
+    MaxCount = "MaxCount"
 
 def init():
     """Configure logging and configuration file"""
@@ -148,6 +161,26 @@ def init():
     logging.info("CF0002: Python: %s", sys.version)
     app = "CF0003: " + app
     logging.info(app, VERSION)
+
+    #
+    # App Specific
+    #
+    if data.get(Key.RegEx) is None:
+        data.set(
+            Key.RegEx,
+            [
+                "\\[.*\\]\\W*(.*?) -\\W*(\\d+)(.*?).*",
+                "[.*\\] (.*) (\\d+) .*",
+                "\\[.*\\] (.*?) (\\d+) \\[.*",
+                "(.*?) (\\d+).*",
+            ],
+        )
+
+    if data.get(Key.SubString) is None:
+        data.set(Key.SubString, ["\\1 - S01E\\2", "\\1 - S01E\\2 - \\3"])
+
+    if data.get(Key.MaxCount) is None:
+        data.set(Key.MaxCount, 10)
 
 
 def close():
