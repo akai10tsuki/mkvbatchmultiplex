@@ -77,6 +77,7 @@ class CommandWidget(QWidget):
         self.__log = log
         self.__output = None
         self.__rename = None
+        self.__tab = None
         self.oCommand = MKVCommand()
 
         self.parent = parent
@@ -149,7 +150,10 @@ class CommandWidget(QWidget):
         btnAnalysis = QPushButtonWidget(
             "Analysis",
             function=lambda: runFunctionInThread(
-                runAnalysis, command=self.cmdLine.text(), output=self.output, log=self.log
+                runAnalysis,
+                command=self.cmdLine.text(),
+                output=self.output,
+                log=self.log,
             ),
             toolTip="Print analysis of command line",
         )
@@ -284,6 +288,14 @@ class CommandWidget(QWidget):
             self.__log = value
             ValidateCommand.classLog(value)  # No variable used so for now use class log
             self.outputWindow.log = value
+
+    @property
+    def tab(self):
+        return self.__tab
+
+    @tab.setter
+    def tab(self, value):
+        self.__tab = value
 
     @property
     def output(self):

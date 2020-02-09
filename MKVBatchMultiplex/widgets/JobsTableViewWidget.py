@@ -5,7 +5,12 @@ JobsTableWidget
 import logging
 
 from PySide2.QtCore import QThreadPool, Qt, Slot
-from PySide2.QtWidgets import QWidget, QGroupBox, QGridLayout, QApplication, QAbstractItemView
+from PySide2.QtWidgets import (
+    QWidget,
+    QGroupBox,
+    QGridLayout,
+    QApplication,
+)
 
 from vsutillib.pyqt import QPushButtonWidget, darkPalette
 from vsutillib.process import isThreadRunning
@@ -39,6 +44,7 @@ class JobsTableViewWidget(QWidget):
 
         self.__output = None
         self.__log = None
+        self.__tab = None
 
         self.parent = parent
         self.proxyModel = proxyModel
@@ -189,6 +195,14 @@ class JobsTableViewWidget(QWidget):
     @output.setter
     def output(self, value):
         self.__output = value
+
+    @property
+    def tab(self):
+        return self.__tab
+
+    @tab.setter
+    def tab(self, value):
+        self.__tab = value
 
     def addWaitingJobsToQueue(self):
         """

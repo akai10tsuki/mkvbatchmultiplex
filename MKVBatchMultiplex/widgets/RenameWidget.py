@@ -47,6 +47,7 @@ class Key:
     SubString = "SubString"
     MaxCount = "MaxCount"
 
+
 class RenameWidget(QWidget):
     """Central widget"""
 
@@ -94,6 +95,7 @@ class RenameWidget(QWidget):
 
         self.__log = None
         self.__output = None
+        self.__tab = None
 
         self._initControls()
         self._initUI()
@@ -109,14 +111,14 @@ class RenameWidget(QWidget):
         # Input Lines
         #
         self.textRegEx = RegExLineInputWidget(
-            "  Regular Expression" + ": ", "Enter regular expression."
+            "Regular Expression", "Enter regular expression."
         )
         self.textSubString = RegExLineInputWidget(
-            "   Substitution String" + ": ", "Enter substitution string."
+            "Substitution String", "Enter substitution string."
         )
 
         self.textOriginalNames = RegExFilesWidget(
-            self, "Original names:", "Name generated base on parsed command."
+            "Original names", "Name generated base on parsed command."
         )
         self.textOriginalNames.textBox.setReadOnly(True)
         self.textOriginalNames.textBox.connectToInsertText(
@@ -127,7 +129,7 @@ class RenameWidget(QWidget):
         )
 
         self.textRenameResults = RegExInputWidget(
-            self, "Rename:", "Names that will be used for commands."
+            "Rename to", "Names that will be used for commands."
         )
         self.textRenameResults.textBox.setReadOnly(True)
         self.textRenameResults.textBox.connectToInsertText(
@@ -164,12 +166,9 @@ class RenameWidget(QWidget):
 
         inputGrid = QGridLayout()
 
-        # Labels
-        # inputGrid.addWidget(self.textRegEx.lblText, 0, 0, Qt.AlignRight)
-        # inputGrid.addWidget(self.textSubString.lblText, 1, 0, Qt.AlignRight)
-
+        #
         # Input lines
-        # self.textRegEx.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        #
         inputGrid.addWidget(self.textRegEx, 0, 0, 1, 2)
         inputGrid.addWidget(self.textSubString, 1, 0, 1, 2)
 
@@ -219,7 +218,6 @@ class RenameWidget(QWidget):
             self.textSubString.cmdLine.addItems(items)
             self.textSubString.cmdLine.clearEditText()
 
-
         self.btnGrid.itemAt(ButtonIndex.Clear).widget().setEnabled(False)
 
     def __bool__(self):
@@ -250,6 +248,14 @@ class RenameWidget(QWidget):
         """set instance log variable"""
         if isinstance(value, bool) or value is None:
             self.__log = value
+
+    @property
+    def tab(self):
+        return self.__tab
+
+    @tab.setter
+    def tab(self, value):
+        self.__tab = value
 
     @property
     def output(self):
@@ -290,7 +296,20 @@ class RenameWidget(QWidget):
         setLanguage set labels according to locale
         """
 
-        print("RenameWidget.setLanguage")
+        for index in range(self.btnGrid.count()):
+            widget = self.btnGrid.itemAt(index).widget()
+            if isinstance(widget, pyqt.QPushButtonWidget):
+                widget.setText(_(widget.originalText))
+                widget.setToolTip(_(widget.toolTip))
+
+        for w in [self.textRegEx, self.textSubString]:
+            w.lblText.setText(_(w.label) + ": ")
+            w.cmdLine.setToolTip(_(w.toolTip))
+
+        for w in [self.textOriginalNames, self.textRenameResults]:
+            w.lblText.setText(_(w.label) + ":")
+            w.textBox.setToolTip(_(w.toolTip))
+            w.repaint()
 
     @Slot()
     def saveItems(self, comboType):
@@ -461,6 +480,9 @@ class RegExLineInputWidget(QWidget):
     def __init__(self, lblText="", strToolTip=""):
         super().__init__()
 
+        self.label = lblText
+        self.toolTip = strToolTip
+
         self.lblText = QLabel(lblText)
         self.cmdLine = pyqt.ComboLineEdit(self)
         self.cmdLine.setToolTip(strToolTip)
@@ -472,8 +494,11 @@ class RegExLineInputWidget(QWidget):
 class RegExInputWidget(QWidget):
     """Input box with text Labels"""
 
-    def __init__(self, parent=None, lblText="", strToolTip=""):
-        super(RegExInputWidget, self).__init__(parent)
+    def __init__(self, lblText="", strToolTip=""):
+        super().__init__()
+
+        self.label = lblText
+        self.toolTip = strToolTip
 
         self.lblText = QLabel(lblText)
         self.textBox = pyqt.OutputTextWidget(self)
@@ -488,8 +513,11 @@ class RegExInputWidget(QWidget):
 class RegExFilesWidget(QWidget):
     """Input for with text Labels"""
 
-    def __init__(self, parent=None, lblText="", strToolTip=""):
-        super(RegExFilesWidget, self).__init__(parent)
+    def __init__(self, lblText="", strToolTip=""):
+        super().__init__()
+
+        self.label = lblText
+        self.toolTip = strToolTip
 
         self.lblText = QLabel(lblText)
         self.textBox = pyqt.FileListWidget(self)
