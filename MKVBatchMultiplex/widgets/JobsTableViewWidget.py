@@ -16,7 +16,7 @@ from vsutillib.pyqt import QPushButtonWidget, darkPalette
 from vsutillib.process import isThreadRunning
 
 from .. import config
-from ..jobs import JobStatus
+from ..jobs import JobStatus, JobKey
 from ..delegates import StatusComboBoxDelegate
 from ..utils import populate, Text, yesNoDialog
 
@@ -24,7 +24,6 @@ from .JobsTableView import JobsTableView
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
-JOBID, JOBSTATUS, JOBCOMMAND = range(3)
 
 
 class JobsTableViewWidget(QWidget):
@@ -252,8 +251,9 @@ class JobsTableViewWidget(QWidget):
                 widget.setToolTip(_(widget.toolTip))
 
         self.grpBox.setTitle(_(Text.txt0130))
-        self.tableModel.setHeaderData(JOBSTATUS, Qt.Horizontal, _(Text.txt0131))
-        self.tableModel.setHeaderData(JOBCOMMAND, Qt.Horizontal, _(Text.txt0132))
+        self.tableModel.setHeaderData(JobKey.ID, Qt.Horizontal, _(Text.txt0131))
+        self.tableModel.setHeaderData(JobKey.Status, Qt.Horizontal, _(Text.txt0132))
+        self.tableModel.setHeaderData(JobKey.Command, Qt.Horizontal, _(Text.txt0133))
 
     def printDataset(self):
         """
