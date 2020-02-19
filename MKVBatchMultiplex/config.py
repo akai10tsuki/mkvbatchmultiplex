@@ -90,7 +90,7 @@ WORKERTHREADNAME = "jobsWorker"
 JTVBTNCLEARQUEUE = 3
 JTVBTNSTARTQUEUE = 4
 
-SIMULATERUN = False
+SIMULATERUN = True
 
 #######################
 #######################
