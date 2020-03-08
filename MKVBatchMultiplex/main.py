@@ -161,15 +161,6 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         )
         self.tabs = TabWidget(self, tabsList)
 
-        # self.tabs = TabsWidget(
-        #    self,
-        #    self.commandWidget,
-        #    self.tableViewWidget,
-        #    self.jobsOutput,
-        #    self.errorOutput,
-        #    self.renameWidget,
-        # )
-
     def _initHelper(self):
         """
         _initHelper setup signals, do any late binds and misc configuration
