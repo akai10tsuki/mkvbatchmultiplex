@@ -23,6 +23,7 @@ from vsutillib.pyqt import (
     QPushButtonWidget,
     runFunctionInThread,
 )
+from vsutillib.misc import staticVars
 from vsutillib.process import isThreadRunning
 from vsutillib.mkv import MKVCommand
 
@@ -345,6 +346,12 @@ class CommandWidget(QWidget):
 
     @Slot(bool)
     def cliValidate(self, validateOK):
+        """
+        cliValidate Slot used by ValidateCommnad
+
+        Args:
+            validateOK (bool): True if command line is Ok.  False otherwise.
+        """
 
         self.cliButtonsState(validateOK)
         self.updateObjCommnad(validateOK)
@@ -415,7 +422,7 @@ class CommandWidget(QWidget):
 
         totalJobs = self.tableModel.rowCount()
         command = self.cmdLine.text()
-        data = [["", ""], [status, "Status code"], [command, command]]
+        data = [["", "", None], [status, "Status code", None], [command, command, self.oCommand]]
         self.tableModel.insertRows(totalJobs, 1, data=data)
 
         self.cmdLine.clear()
