@@ -222,7 +222,7 @@ msgstr "Trabajos"
 
 #: MKVBatchMultiplex/utils/text.py:85
 msgid "Jobs Output"
-msgstr "Borrar texto"
+msgstr "Registro de Trabajos"
 
 #: MKVBatchMultiplex/utils/text.py:86
 msgid "Jobs Errors"
