@@ -206,7 +206,7 @@ class RunJobs(QObject):
         self.finishedSignal.emit()
 
         if self.log:
-            MODULELOG.debug("RJB0004 Jobs finished.")
+            MODULELOG.debug("RJB0004: Jobs finished.")
 
     def result(self, funcResult):
         """
@@ -318,10 +318,10 @@ def runJobs(jobQueue, output, model, funcProgress=None, log=False):
 
             msg = "*******************\n"
             msg += "Job ID: {} started.\n\n".format(job.job[JobKey.ID])
-            output.job.emit(msg, {'color': Qt.cyan})
+            output.job.emit(msg, {"color": Qt.cyan})
 
             if log:
-                MODULELOG.debug("RJB0005: Job ID: %s started.", job.job[config.JOBID])
+                MODULELOG.debug("RJB0005: Job ID: %s started.", job.job[JobKey.ID])
 
             for cmd, baseFiles, sourceFiles, destinationFile, _ in job.oCommand:
 
@@ -337,8 +337,7 @@ def runJobs(jobQueue, output, model, funcProgress=None, log=False):
                     )
                     msg = msg.format(cmd, baseFiles, sourceFiles, destinationFile)
 
-                    MODULELOG.debug('RJB0006: %s', msg)
-
+                    MODULELOG.debug("RJB0006: %s", msg)
 
                 if verify:
 
@@ -350,11 +349,10 @@ def runJobs(jobQueue, output, model, funcProgress=None, log=False):
                         "Source Files: {}\nDestination Files: {}\n"
                     )
                     msg = msg.format(cmd, baseFiles, sourceFiles, destinationFile)
-                    output.job.emit(msg, {'appendEnd': True})
+                    output.job.emit(msg, {"appendEnd": True})
 
                     if log:
-                        MODULELOG.debug('RJB0007: Structure checks ok')
-
+                        MODULELOG.debug("RJB0007: Structure checks ok")
 
                     if config.SIMULATERUN:
                         dummyRunCommand(funcProgress, indexTotal)
@@ -364,50 +362,54 @@ def runJobs(jobQueue, output, model, funcProgress=None, log=False):
 
                 else:
 
-                    msg = "Error Job ID: {} ---------------------".format(job.job[JobKey.ID])
-                    output.error.emit(msg, {'color': SvgColor.red, 'appendEnd': True})
+                    msg = "Error Job ID: {} ---------------------".format(
+                        job.job[JobKey.ID]
+                    )
+                    output.error.emit(msg, {"color": SvgColor.red, "appendEnd": True})
 
                     msg = "\nDestination File: {}\n\n".format(destinationFile)
-                    output.job.emit(msg, {'color': SvgColor.red, 'appendEnd': True})
-                    output.error.emit(msg, {'color': SvgColor.red, 'appendEnd': True})
-                    #errorMsg(output, msg, {'color': SvgColor.red, 'appendEnd': True})
+                    output.job.emit(msg, {"color": SvgColor.red, "appendEnd": True})
+                    output.error.emit(msg, {"color": SvgColor.red, "appendEnd": True})
+                    # errorMsg(output, msg, {'color': SvgColor.red, 'appendEnd': True})
 
                     for i, m in enumerate(verify.analysis):
                         if i == 0:
-                            #errorMsg(output, m, {'color': SvgColor.orange, 'appendEnd': True})
-                            output.job.emit(m, {'color': SvgColor.orange})
-                            output.error.emit(m, {'color': SvgColor.orange})
+                            # errorMsg(output, m, {'color': SvgColor.orange, 'appendEnd': True})
+                            output.job.emit(m, {"color": SvgColor.orange})
+                            output.error.emit(m, {"color": SvgColor.orange})
                         else:
-                            #errorMsg(output, m, {'color': SvgColor.red, 'appendEnd': True})
-                            output.job.emit(m, {'color': Qt.red})
-                            output.error.emit(m, {'color': Qt.red})
+                            # errorMsg(output, m, {'color': SvgColor.red, 'appendEnd': True})
+                            output.job.emit(m, {"color": Qt.red})
+                            output.error.emit(m, {"color": Qt.red})
 
-                    #errorMsg(output, '', {'color': SvgColor.orange, 'appendEnd': True})
-                    output.job.emit('', {'appendEnd': True})
-                    #output.error.emit('', {'appendEnd': True})
+                    # errorMsg(output, '', {'color': SvgColor.orange, 'appendEnd': True})
+                    output.job.emit("", {"appendEnd": True})
+                    # output.error.emit('', {'appendEnd': True})
 
-                    msg = "Error Job ID: {} ---------------------\n\n".format(job.job[JobKey.ID])
-                    output.error.emit(msg, {'color': Qt.red, 'appendEnd': True})
+                    msg = "Error Job ID: {} ---------------------\n\n".format(
+                        job.job[JobKey.ID]
+                    )
+                    output.error.emit(msg, {"color": Qt.red, "appendEnd": True})
 
                     if log:
-                        MODULELOG.error('RJB0008: Structure check failed')
+                        MODULELOG.error("RJB0008: Structure check failed")
 
                 indexTotal[1] += 100
                 indexTotal[0] += 1
 
             msg = "\nJob ID: {} ended.\n".format(job.job[JobKey.ID])
             msg += "*******************\n\n\n"
-            output.job.emit(msg, {'color': Qt.cyan, 'appendEnd': True})
+            output.job.emit(msg, {"color": Qt.cyan, "appendEnd": True})
 
             jobQueue.statusUpdateSignal.emit(job, JobStatus.Done)
 
             if log:
-                MODULELOG.debug("RJB0009: Job ID: %s finished.", job.job[config.JOBID])
+                MODULELOG.debug("RJB0009: Job ID: %s finished.", job.job[JobKey.ID])
 
         else:
 
             msg = "Job ID: {} cannot execute command.\n\nCommand: {}\n"
-            msg = msg.format(job.job[config.JOBID], job.oCommand.command)
+            msg = msg.format(job.job[JobKey.ID], job.oCommand.command)
             output.error.emit(msg, {"color": Qt.red})
 
             jobQueue.statusUpdateSignal.emit(job, JobStatus.Error)
@@ -415,7 +417,7 @@ def runJobs(jobQueue, output, model, funcProgress=None, log=False):
             if log:
                 MODULELOG.debug(
                     "RJB0010: Job ID: %s cannot execute command: %s.",
-                    job.job[config.JOBID],
+                    job.job[JobKey.ID],
                     job.oCommand.command,
                 )
 
@@ -442,8 +444,9 @@ def dummyRunCommand(funcProgress, indexTotal):
         funcProgress.pbSetValues.emit(i, indexTotal[1] + i)
         time.sleep(0.0001)
 
+
 def errorMsg(output, msg, kwargs):
 
-    print('{}'.format(str(kwargs)))
+    # print('{}'.format(str(kwargs)))
     output.error.emit(msg, kwargs)
     output.job.emit(msg, kwargs)

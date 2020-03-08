@@ -65,11 +65,12 @@ class JobsTableViewWidget(QWidget):
         self.grpGrid = QGridLayout()
         self.grpBox = QGroupBox(title)
 
-        btnPopulate = QPushButtonWidget(
-            Text.txt0120,
-            function=lambda: populate(self.tableModel),
-            toolTip=Text.txt0121,
-        )
+        if config.SIMULATERUN:
+            btnPopulate = QPushButtonWidget(
+                Text.txt0120,
+                function=lambda: populate(self.tableModel),
+                toolTip=Text.txt0121,
+            )
 
         btnAddWaitingJobsToQueue = QPushButtonWidget(
             Text.txt0122, function=self.addWaitingJobsToQueue, toolTip=Text.txt0123,
@@ -88,11 +89,12 @@ class JobsTableViewWidget(QWidget):
         )
 
         self.grpGrid.addWidget(self.tableView, 0, 0, 1, 5)
-        self.grpGrid.addWidget(btnPopulate, 1, 0)
-        self.grpGrid.addWidget(btnAddWaitingJobsToQueue, 1, 1)
-        self.grpGrid.addWidget(btnClearJobsQueue, 1, 2)
-        self.grpGrid.addWidget(btnStartQueue, 1, 3)
-        self.grpGrid.addWidget(btnPrintDataset, 1, 4)
+        self.grpGrid.addWidget(btnAddWaitingJobsToQueue, 1, 0)
+        self.grpGrid.addWidget(btnClearJobsQueue, 1, 1)
+        self.grpGrid.addWidget(btnStartQueue, 1, 2)
+        if config.SIMULATERUN:
+            self.grpGrid.addWidget(btnPopulate, 1, 3)
+            self.grpGrid.addWidget(btnPrintDataset, 1, 4)
 
         self.grpBox.setLayout(self.grpGrid)
 
@@ -118,6 +120,9 @@ class JobsTableViewWidget(QWidget):
     def _initHelper(self):
 
         # Job Queue related
+        self.parent.jobsQueue.addWaitingItemSignal.connect(
+            lambda: self.jobAddWaitingState(True)
+        )
         self.parent.jobsQueue.addQueueItemSignal.connect(
             lambda: self.jobStartQueueState(True)
         )
@@ -138,6 +143,7 @@ class JobsTableViewWidget(QWidget):
         )
 
         # Default button state
+        self.grpGrid.itemAt(config.JTVBTNADDWAITING).widget().setEnabled(False)
         self.grpGrid.itemAt(config.JTVBTNSTARTQUEUE).widget().setEnabled(False)
         self.grpGrid.itemAt(config.JTVBTNCLEARQUEUE).widget().setEnabled(False)
 
@@ -215,6 +221,8 @@ class JobsTableViewWidget(QWidget):
                 index = self.tableModel.index(row, 1)
                 self.tableModel.setData(index, JobStatus.AddToQueue)
 
+        self.jobAddWaitingState(False)
+
     def clearJobsQueue(self):
         """
         clearJobsQueue delete any remaining jobs from Queue
@@ -270,6 +278,12 @@ class JobsTableViewWidget(QWidget):
 
         self.output.command.emit("\n", {})
 
+    @Slot(bool)
+    def jobAddWaitingState(self, state):
+
+        self.grpGrid.itemAt(config.JTVBTNADDWAITING).widget().setEnabled(state)
+
+    @Slot(bool)
     def jobClearQueueState(self, state):
 
         self.grpGrid.itemAt(config.JTVBTNCLEARQUEUE).widget().setEnabled(state)

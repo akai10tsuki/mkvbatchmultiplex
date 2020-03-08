@@ -5,11 +5,14 @@
 
 # pylint: disable=bad-continuation
 
+import copy
 import logging
 
 from collections import deque
 
+
 from PySide2.QtCore import QObject, Slot, Signal
+
 
 from vsutillib.mkv import MKVCommand
 
@@ -37,18 +40,22 @@ class JobInfo:  # pylint: disable=too-many-instance-attributes
     """
 
     def __init__(
-        self, index=None, job=None, errors=None, output=None, log=False, oCommand=None
+        self, index, job, tableModel, errors=None, output=None, log=False,
     ):
 
-        self.jobIndex = index[config.JOBID]
-        self.statusIndex = index[config.JOBSTATUS]
-        self.commandIndex = index[config.JOBCOMMAND]
+        self.jobIndex = index[JobKey.ID]
+        self.statusIndex = index[JobKey.Status]
+        self.commandIndex = index[JobKey.Command]
         self.job = job
-        self.command = job[config.JOBCOMMAND]
-        if oCommand is not None:
-            self.oCommand = oCommand
-        else:
-            self.oCommand = MKVCommand(job[config.JOBCOMMAND], log=log)
+        self.command = job[JobKey.Command]
+        self.oCommand = copy.deepcopy(
+            tableModel.dataset.data[self.commandIndex.row()][
+                self.commandIndex.column()
+            ].oCommand
+        )
+        if not self.oCommand:
+            self.oCommand = MKVCommand(job[JobKey.Command], log=log)
+
         self.errors = [] if errors is None else errors
         self.output = [] if output is None else output
 
@@ -64,12 +71,14 @@ class JobQueue(QObject):
     # Class logging state
     __log = False
 
+    __firstRun = True
     __jobID = 10
 
     statusUpdateSignal = Signal(object, str)
     runSignal = Signal()
     addQueueItemSignal = Signal()
     queueEmptiedSignal = Signal()
+    addWaitingItemSignal = Signal()
 
     @classmethod
     def classLog(cls, setLogging=None):
@@ -186,22 +195,26 @@ class JobQueue(QObject):
 
         self.tableModel.setData(job.statusIndex, status)
 
-    def append(self, jobRow, oCommand=None):
+    def append(self, jobRow):
         """
         append append job to queue
 
         Args:
-            index (QModelIndex): index for job status on dataset
-            job (list): job row on dataset
+            jobRow (QModelIndex): index for job status on dataset
+            oCommand (list): job row on dataset
 
         Returns:
             bool: True if append successful False otherwise
         """
 
-        job = self.tableModel.dataset[jobRow,]
+        #job = self.tableModel.dataset[
+        #    jobRow,
+        #]
 
         status = self.tableModel.dataset[jobRow,][JobKey.Status]
         if status != JobStatus.AddToQueue:
+            if status == JobStatus.Waiting:
+                self.addWaitingItemSignal.emit()
             return False
 
         jobID = self.tableModel.dataset[jobRow,][JobKey.ID]
@@ -217,8 +230,8 @@ class JobQueue(QObject):
         newJob = JobInfo(
             [jobIndex, statusIndex, commandIndex],
             self.tableModel.dataset[jobRow,],
+            self.tableModel,
             log=self.log,
-            oCommand=oCommand,
         )
         self._workQueue.append(newJob)
 
@@ -302,4 +315,9 @@ class JobQueue(QObject):
         self.runJobs.progress = self.progress
         self.runJobs.output = self.output
         self.runJobs.log = self.log
+
+        if JobQueue.__firstRun:
+            self.parent.jobsOutput.setCurrentIndexSignal.emit()
+            JobQueue.__firstRun = False
+
         self.runJobs.run()

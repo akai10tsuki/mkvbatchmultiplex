@@ -38,6 +38,7 @@ class DataKey:
 
     Data = 0
     ToolTip = 1
+    OCommand = 2
 
 
 class HeaderInfo:
@@ -58,6 +59,7 @@ class DataItem:
 
     data = None
     toolTip = None
+    oCommand = None
 
 
 class Index:
@@ -173,8 +175,6 @@ class TableData:
         elif isinstance(index, tuple):
             # Only update members of the data table no headers
 
-            print("Bad Bad")
-
             if len(index) == 2:
 
                 row, col = index
@@ -226,6 +226,7 @@ class TableData:
             if isinstance(value, DataItem):
                 self.data[row][column].data = value.data
                 self.data[row][column].toolTip = value.toolTip
+                self.data[row][column].oCommand = value.oCommand
             else:
                 self.data[row][column].data = value
             return True
@@ -270,6 +271,7 @@ class TableData:
                     newItem = DataItem()
                     newItem.data = value[DataKey.Data]
                     newItem.toolTip = value[DataKey.ToolTip]
+                    newItem.oCommand = value[DataKey.OCommand]
                     index = Index(position, column)
                     self.setData(index, newItem)
                 else:
