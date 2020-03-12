@@ -359,6 +359,8 @@ def runJobs(jobQueue, output, model, funcProgress=None, log=False):
             if log:
                 MODULELOG.debug("RJB0005: Job ID: %s started.", job.job[JobKey.ID])
 
+            updateStatus = True
+
             for cmd, baseFiles, sourceFiles, destinationFile, _ in job.oCommand:
 
                 funcProgress.lblSetValue.emit(2, indexTotal[0] + 1)
@@ -375,6 +377,7 @@ def runJobs(jobQueue, output, model, funcProgress=None, log=False):
 
                 if status == JobStatus.Abort:
                     jobQueue.statusUpdateSignal.emit(job, JobStatus.Aborted)
+                    updateStatus = False
                     break
 
                 #
@@ -455,7 +458,8 @@ def runJobs(jobQueue, output, model, funcProgress=None, log=False):
             msg += "*******************\n\n\n"
             output.job.emit(msg, {"color": Qt.cyan, "appendEnd": True})
 
-            jobQueue.statusUpdateSignal.emit(job, JobStatus.Done)
+            if updateStatus:
+                jobQueue.statusUpdateSignal.emit(job, JobStatus.Done)
 
             if log:
                 MODULELOG.debug("RJB0009: Job ID: %s finished.", job.job[JobKey.ID])
