@@ -86,10 +86,11 @@ class RenameWidget(QWidget):
 
         return cls.__log
 
-    def __init__(self, parent, log=None):
+    def __init__(self, parent, controlQueue=None, log=None):
         super(RenameWidget, self).__init__(parent)
 
         self.parent = parent
+        self.controlQueue = controlQueue
         self._outputFileNames = []
         self._renameFileNames = []
 
