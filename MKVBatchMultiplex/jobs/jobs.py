@@ -105,7 +105,7 @@ class JobQueue(QObject):
         return cls.__log
 
     def __init__(
-        self, parent, model=None, funcProgress=None, jobWorkQueue=None, log=None
+        self, parent, model=None, funcProgress=None, jobWorkQueue=None, controlQueue=None, log=None
     ):
         super(JobQueue, self).__init__(parent)
 
@@ -115,6 +115,7 @@ class JobQueue(QObject):
         self.parent = parent
         self.tableModel = model
         self.progress = funcProgress
+        self.controlQueue = controlQueue
 
         if jobWorkQueue is None:
             self._workQueue = deque()
@@ -193,6 +194,8 @@ class JobQueue(QObject):
     @Slot(object, str)
     def statusUpdate(self, job, status):
 
+        print("Jobs statusUpdate job {} = {}".format(job.job[JobKey.ID], status))
+
         self.tableModel.setData(job.statusIndex, status)
 
     def append(self, jobRow):
@@ -247,7 +250,7 @@ class JobQueue(QObject):
         """Clear the job queue"""
 
         while job := self.pop():
-            print("Clearing the way {}".format(job.job[config.JOBID]))
+            print("Clearing the way {}".format(job.job[JobKey.ID]))
 
     def popLeft(self):
         """

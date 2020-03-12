@@ -1,4 +1,8 @@
-# pylint: disable=unused-argument
+"""
+ deleage classes
+"""
+
+# pylint: disable=unused-argument, bad-continuation
 
 from PySide2.QtWidgets import (
     QStyledItemDelegate,
@@ -10,6 +14,7 @@ from PySide2.QtWidgets import (
 from PySide2.QtCore import Qt, QRect, QPoint, QEvent, Slot
 
 from ..jobs import JobStatus
+
 
 class FillColorDelegate(QStyledItemDelegate):
     """FillColorDelegate
@@ -160,13 +165,19 @@ class StatusComboBoxDelegate(QStyledItemDelegate):
     def currentIndexChanged(self):
         self.commitData.emit(self.sender())
 
+
 def _comboBoxItems(status):
 
     if status in [JobStatus.AbortJobError, JobStatus.Error]:
         return None
 
-    elif status in [JobStatus.Skip, JobStatus.Aborted,
-                        JobStatus.Abort, JobStatus.Done]:
+    elif status in [
+        JobStatus.Skip,
+        JobStatus.Skipped,
+        JobStatus.Abort,
+        JobStatus.Aborted,
+        JobStatus.Done,
+    ]:
         comboItems = [status, JobStatus.Waiting]
 
     elif status in [JobStatus.Queue, JobStatus.Waiting]:

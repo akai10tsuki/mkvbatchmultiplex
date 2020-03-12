@@ -25,5 +25,7 @@ class JobStatus:
     Queue = "Queue"
     Running = "Running"
     Skip = "Skip"
+    Skipped = "Skipped"
     Stop = "Stop"
+    Stopped = "Stopped"
     Waiting = "Waiting"

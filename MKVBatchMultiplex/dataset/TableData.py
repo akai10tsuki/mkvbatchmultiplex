@@ -229,6 +229,9 @@ class TableData:
                 self.data[row][column].oCommand = value.oCommand
             else:
                 self.data[row][column].data = value
+
+            print("Setting Data ({}, {}) = {}".format(row, column, self.data[row][column].data))
+
             return True
 
         return False

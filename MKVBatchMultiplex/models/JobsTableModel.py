@@ -62,6 +62,8 @@ class JobsTableModel(TableModel):
             if value == JobStatus.AddToQueue:
                 self.jobQueue.append(row)
 
+            print("JobsTableModel Setting Data ({}, {}) = {}".format(index.row(), index.column(), value))
+
             return True
 
         return False

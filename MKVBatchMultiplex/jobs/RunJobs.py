@@ -62,7 +62,7 @@ class RunJobs(QObject):
 
         return cls.__log
 
-    def __init__(self, parent, jobsQueue=None, progressFunc=None, model=None, log=None):
+    def __init__(self, parent, jobsQueue=None, progressFunc=None, model=None, controlQueue=None, log=None):
         super(RunJobs, self).__init__()
 
         self.__jobsQueue = None
@@ -75,7 +75,7 @@ class RunJobs(QObject):
         self.jobsqueue = jobsQueue
         self.progress = progressFunc
         self.model = model
-
+        self.controlQueue = controlQueue
         self.mainWindow = self.parent.parent
         self.jobsWorker = None
         self.__logging = False
@@ -219,7 +219,7 @@ class RunJobs(QObject):
         self.resultSignal.emit(funcResult)
 
 
-@staticVars(newJob=False)
+@staticVars(printPercent=False)
 def displayRunJobs(line, job, output, indexTotal, funcProgress=None):
     """
     Convenience function used by runJobs
@@ -229,25 +229,44 @@ def displayRunJobs(line, job, output, indexTotal, funcProgress=None):
     Args:
         line (str): line to display
     """
-    regEx = re.compile(r"(\d+)")
+    regEx = re.compile(r":\W*(\d+)%")
 
     funcProgress.lblSetValue.emit(2, indexTotal[0] + 1)
-    n = 0
+    n = -1
 
-    if line.find("Progress:") >= 0:
+    #if line.find("Progress:") >= 0:
+    #
+    #    if m := regEx.search(line):
+    #        n = int(m.group(1))
+    #
+    #    if n > 0:
+    #        output.job.emit(line[:-1], {"replaceLine": True})
+    #        funcProgress.pbSetValues.emit(n, indexTotal[1] + n)
+    #
+    #else:
 
-        if m := regEx.search(line):
-            n = int(m.group(1))
+    #    output.job.emit(line[:-1], {"appendLine": True})
 
-        if n > 0:
-            output.job.emit(line[:-1], {"replaceLine": True})
-            funcProgress.pbSetValues.emit(n, indexTotal[1] + n)
+    if m := regEx.search(line):
+        n = int(m.group(1))
+
+    if n >= 0:
+        if not displayRunJobs.printPercent:
+            output.job.emit("\n", {})
+            displayRunJobs.printPercent = True
+
+        output.job.emit(line[:-1], {"replaceLine": True})
+        funcProgress.pbSetValues.emit(n, indexTotal[1] + n)
 
     else:
 
+        if displayRunJobs.printPercent:
+            #output.job.emit("\n", {})
+            displayRunJobs.printPercent = False
+
         output.job.emit(line[:-1], {"appendLine": True})
 
-    if (line.find("writing.") > 0) or (line.find("Multiplexing took") == 0):
+    if (line.find("El multiplexado") == 0) or (line.find("Multiplexing took") == 0):
         output.job.emit("\n", {})
 
 
@@ -286,7 +305,6 @@ def runJobs(jobQueue, output, model, funcProgress=None, log=False):
             totalJobs = totalJobs + actualRemaining - remainingJobs
             remainingJobs = actualRemaining - 1
 
-        jobQueue.statusUpdateSignal.emit(job, JobStatus.Running)
         currentJob += 1
 
         indexTotal[0] = 0  # file index
@@ -304,6 +322,24 @@ def runJobs(jobQueue, output, model, funcProgress=None, log=False):
         funcProgress.lblSetValue.emit(3, totalFiles)
 
         indexTotal[0] = 0
+
+        # Check Job Status for Skip
+        #
+
+        print("Model type = {}".format(model))
+
+        #sourceIndex = model.mapToSource(job.statusIndex)
+
+        #status = model.sourceModel().dataset[sourceIndex.row(), sourceIndex.column()]
+
+        #if status == JobStatus.Skip:
+        #    jobQueue.statusUpdateSignal.emit(job, JobStatus.Skipped)
+        #    break
+
+        #
+        # Check Job Status for Skip
+
+        jobQueue.statusUpdateSignal.emit(job, JobStatus.Running)
 
         cli = RunCommand(
             processLine=displayRunJobs,
@@ -326,6 +362,23 @@ def runJobs(jobQueue, output, model, funcProgress=None, log=False):
             for cmd, baseFiles, sourceFiles, destinationFile, _ in job.oCommand:
 
                 funcProgress.lblSetValue.emit(2, indexTotal[0] + 1)
+
+                print("Model type 2 = {}".format(model))
+
+                # Check Job Status for Abort
+                #
+                sourceIndex = job.statusIndex
+
+                status = model.dataset[sourceIndex.row(), sourceIndex.column()]
+
+                print("Run Job {}, Status = {}".format(job.job[JobKey.ID], status))
+
+                if status == JobStatus.Abort:
+                    jobQueue.statusUpdateSignal.emit(job, JobStatus.Aborted)
+                    break
+
+                #
+                # Check Job Status for Abort
 
                 verify.verifyStructure(baseFiles, sourceFiles)
 
@@ -357,6 +410,7 @@ def runJobs(jobQueue, output, model, funcProgress=None, log=False):
                     if config.SIMULATERUN:
                         dummyRunCommand(funcProgress, indexTotal)
                     else:
+                        # TODO: queue to control execution of running job inside the RunCommand
                         cli.command = cmd
                         cli.run()
 
@@ -379,8 +433,8 @@ def runJobs(jobQueue, output, model, funcProgress=None, log=False):
                             output.error.emit(m, {"color": SvgColor.orange})
                         else:
                             # errorMsg(output, m, {'color': SvgColor.red, 'appendEnd': True})
-                            output.job.emit(m, {"color": Qt.red})
-                            output.error.emit(m, {"color": Qt.red})
+                            output.job.emit(m, {"color": SvgColor.red})
+                            output.error.emit(m, {"color": SvgColor.red})
 
                     # errorMsg(output, '', {'color': SvgColor.orange, 'appendEnd': True})
                     output.job.emit("", {"appendEnd": True})
@@ -389,7 +443,7 @@ def runJobs(jobQueue, output, model, funcProgress=None, log=False):
                     msg = "Error Job ID: {} ---------------------\n\n".format(
                         job.job[JobKey.ID]
                     )
-                    output.error.emit(msg, {"color": Qt.red, "appendEnd": True})
+                    output.error.emit(msg, {"color": SvgColor.red, "appendEnd": True})
 
                     if log:
                         MODULELOG.error("RJB0008: Structure check failed")

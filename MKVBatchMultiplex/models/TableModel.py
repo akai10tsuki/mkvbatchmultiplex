@@ -275,6 +275,8 @@ class TableModel(QAbstractTableModel):
             self.dataset.setData(index, value)
             self.dataChanged.emit(index, index)
 
+            print("TableModel Setting Data ({}, {}) = {}".format(index.row(), index.column(), value))
+
             return True
 
         return False

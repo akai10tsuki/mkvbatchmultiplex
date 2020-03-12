@@ -23,7 +23,6 @@ from vsutillib.pyqt import (
     QPushButtonWidget,
     runFunctionInThread,
 )
-from vsutillib.misc import staticVars
 from vsutillib.process import isThreadRunning
 from vsutillib.mkv import MKVCommand
 
@@ -72,7 +71,7 @@ class CommandWidget(QWidget):
 
         return cls.__log
 
-    def __init__(self, parent=None, proxyModel=None, log=None):
+    def __init__(self, parent=None, proxyModel=None, controlQueue=None, log=None):
         super(CommandWidget, self).__init__(parent)
 
         self.__log = log
@@ -80,6 +79,7 @@ class CommandWidget(QWidget):
         self.__rename = None
         self.__tab = None
         self.oCommand = MKVCommand()
+        self.controlQueue = controlQueue
 
         self.parent = parent
         self.proxyModel = proxyModel
