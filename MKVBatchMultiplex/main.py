@@ -14,6 +14,7 @@ import sys
 import threading
 import webbrowser
 
+from collections import deque
 from pathlib import Path
 
 from PySide2.QtCore import QByteArray, Slot
@@ -75,7 +76,8 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.actES = None
         self.languageMenu = None
         self.progress = None
-        self.jobsQueue = JobQueue(self)
+        self.controlQueue = deque()
+        self.jobsQueue = JobQueue(self, controlQueue=self.controlQueue)
         self.defaultPalette = palette
         self.widgetSetLanguage = SetLanguage()
         self.progressSpin = QProgressIndicator(self)
