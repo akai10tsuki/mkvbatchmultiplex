@@ -66,7 +66,7 @@ LOCALE = CWD.joinpath("locale")
 
 data = ConfigurationSettings()  # pylint: disable=invalid-name
 FORCELOG = True
-SIMULATERUN = False
+SIMULATERUN = True
 
 ######################
 # Application specific
