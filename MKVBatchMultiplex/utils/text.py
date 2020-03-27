@@ -25,7 +25,6 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0024 = S_("Abort")
     txt0025 = S_("Force exit")
 
-
     # 40
     txt0040 = S_("&Settings")
     txt0041 = S_("Enable logging")
@@ -129,7 +128,6 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0207 = S_("Names that will be used for commands")
     txt0208 = S_("Apply Rename")
     txt0209 = S_("Replace the original names with the operation result")
-
 
     txt0210 = S_("Undo")
     txt0211 = S_("Undo rename operation")
