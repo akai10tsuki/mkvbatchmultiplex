@@ -13,6 +13,7 @@ from PySide2.QtWidgets import (
 )
 from PySide2.QtCore import Qt, QRect, QPoint, QEvent, Slot
 
+
 from ..jobs import JobStatus
 
 
@@ -22,8 +23,8 @@ class FillColorDelegate(QStyledItemDelegate):
 
     def __init__(self, model, color):
         """
-        This delegate replaces a cell's display with a solid fill color surrounded by a
-        thin white border
+        This delegate replaces a cell's display with a solid fill color
+        surrounded by a thin white border
 
         :param model: underlying ProxyModel object
         :param color: QColor object
@@ -37,11 +38,11 @@ class FillColorDelegate(QStyledItemDelegate):
         return None
 
     def paint(self, painter, option, index):
+
         source_index = self.model.mapToSource(index)
         row = source_index.row()
         column = source_index.column()
         value = self.model.sourceModel().dataset[row][column]
-
         rect = QRect(
             option.rect.x() + 1,
             option.rect.y() + 1,
@@ -56,14 +57,13 @@ class FillColorDelegate(QStyledItemDelegate):
 
 
 class CheckBoxDelegate(QStyledItemDelegate):
-    """CheckBoxDelegate
-    """
+    """ CheckBoxDelegate """
 
     def __init__(self, proxy_model):
         """
-        This delegate replaces a cell's display with a check box. Underlying data are updated when
-        the box is checked or unchecked. Persistant editor needs to be set on the table's cells in
-        order to update the box.
+        This delegate replaces a cell's display with a check box. Underlying
+        data are updated when the box is checked or unchecked. Persistant editor
+        needs to be set on the table's cells in order to update the box.
 
         :param model: underlying ProxyModel object
         """
@@ -75,6 +75,7 @@ class CheckBoxDelegate(QStyledItemDelegate):
         return None
 
     def paint(self, painter, option, index):
+
         # Check data
         source_index = self.proxy_model.mapToSource(index)
         row = source_index.row()
@@ -100,6 +101,7 @@ class CheckBoxDelegate(QStyledItemDelegate):
         QApplication.style().drawControl(QStyle.CE_CheckBox, opts, painter)
 
     def editorEvent(self, event, model, option, index):
+
         source_index = model.mapToSource(index)
         column = source_index.column()
         if column and event.type() == QEvent.MouseButtonRelease:
@@ -108,6 +110,7 @@ class CheckBoxDelegate(QStyledItemDelegate):
         return False
 
     def setModelData(self, editor, model, index):
+
         row = index.row()
         column = index.column()
         model.dataset[row][column] = not model.dataset[row][column]
@@ -134,16 +137,12 @@ class StatusComboBoxDelegate(QStyledItemDelegate):
     def createEditor(self, parent, option, index):
 
         sourceIndex = self.model.mapToSource(index)
-
         row = sourceIndex.row()
         column = sourceIndex.column()
-
         status = self.model.sourceModel().dataset[row, column]
-
         self.comboItems = _comboBoxItems(status)
 
         if self.comboItems:
-
             editor = QComboBox(parent)
             editor.addItems(self.comboItems)
             editor.currentIndexChanged.connect(self.currentIndexChanged)
@@ -155,11 +154,29 @@ class StatusComboBoxDelegate(QStyledItemDelegate):
 
         return None
 
+    def editorEvent(self, event, model, option, index):
+
+        sourceIndex = model.mapToSource(index)
+        column = sourceIndex.column()
+
+        if column and event.type() == QEvent.MouseButtonRelease:
+            self.setModelData(None, model.sourceModel(), sourceIndex)
+
+            return False
+
+        # if column and (event.type() == QEvent.KeyPress):
+        #    if event.key() in [Qt.Key_Enter, Qt.Key_Return]:
+        #        self.setModelData(None, model.sourceModel(), sourceIndex)
+        #        return True
+
+        return False
+
     def setModelData(self, editor, model, index):
 
-        comboIndex = editor.currentIndex()
-        text = self.comboItems[comboIndex]
-        model.setData(index, text)
+        if editor:
+            comboIndex = editor.currentIndex()
+            text = self.comboItems[comboIndex]
+            model.setData(index, text)
 
     @Slot()
     def currentIndexChanged(self):
