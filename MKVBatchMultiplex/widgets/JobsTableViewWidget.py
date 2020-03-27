@@ -47,10 +47,8 @@ class JobsTableViewWidget(QWidget):
 
         self.parent = parent
         self.proxyModel = proxyModel
-        self.tableModel = proxyModel.sourceModel()
-
+        self.model = proxyModel.sourceModel()
         self.tableView = JobsTableView(self, proxyModel, title)
-        self.threadpool = QThreadPool()
         self.delegates = {}
 
         self._initUI(title)
@@ -68,22 +66,19 @@ class JobsTableViewWidget(QWidget):
         if config.SIMULATERUN:
             btnPopulate = QPushButtonWidget(
                 Text.txt0120,
-                function=lambda: populate(self.tableModel),
+                function=lambda: populate(self.model),
                 toolTip=Text.txt0121,
             )
 
         btnAddWaitingJobsToQueue = QPushButtonWidget(
             Text.txt0122, function=self.addWaitingJobsToQueue, toolTip=Text.txt0123,
         )
-
         btnClearJobsQueue = QPushButtonWidget(
             Text.txt0124, function=self.clearJobsQueue, toolTip=Text.txt0125,
         )
-
         btnStartQueue = QPushButtonWidget(
             Text.txt0126, function=self.parent.jobsQueue.run, toolTip=Text.txt0127,
         )
-
         btnPrintDataset = QPushButtonWidget(
             Text.txt0128, function=self.printDataset, toolTip=Text.txt0129,
         )
@@ -92,37 +87,32 @@ class JobsTableViewWidget(QWidget):
         self.grpGrid.addWidget(btnAddWaitingJobsToQueue, 1, 0)
         self.grpGrid.addWidget(btnClearJobsQueue, 1, 1)
         self.grpGrid.addWidget(btnStartQueue, 1, 2)
+
         if config.SIMULATERUN:
             self.grpGrid.addWidget(btnPopulate, 1, 3)
             self.grpGrid.addWidget(btnPrintDataset, 1, 4)
 
         self.grpBox.setLayout(self.grpGrid)
-
         grid.addWidget(self.grpBox)
-
         self.setLayout(grid)
 
     def _setupDelegates(self):
         """
-        Store delegates in self.delegates dictionary by column name and apply delegates to table
-        view
+        Store delegates in self.delegates dictionary by column name and apply
+        delegates to table view
         """
 
         self.delegates["status"] = StatusComboBoxDelegate(self.proxyModel)
 
         for columnName, delegate in self.delegates.items():
-
-            for i, column in enumerate(self.tableModel.dataset.headerName):
-
+            for i, column in enumerate(self.model.dataset.headerName):
                 if column == columnName:
                     self.tableView.setItemDelegateForColumn(i, delegate)
 
     def _initHelper(self):
 
         # Job Queue related
-        self.parent.jobsQueue.addWaitingItemSignal.connect(
-            lambda: self.jobAddWaitingState(True)
-        )
+        self.parent.jobsQueue.statusChangeSignal.connect(self.jobAddWaitingState)
         self.parent.jobsQueue.addQueueItemSignal.connect(
             lambda: self.jobStartQueueState(True)
         )
@@ -214,14 +204,14 @@ class JobsTableViewWidget(QWidget):
         addWaitingJobsToQueue adds any Waiting job to job queue
         """
 
-        for row in range(self.tableModel.rowCount()):
-            rowStatus = self.tableModel.dataset[row, 1]
+        for row in range(self.model.rowCount()):
+            rowStatus = self.model.dataset[row, 1]
 
             if rowStatus == JobStatus.Waiting:
-                index = self.tableModel.index(row, 1)
-                self.tableModel.setData(index, JobStatus.AddToQueue)
+                index = self.model.index(row, 1)
+                self.model.setData(index, JobStatus.AddToQueue)
 
-        self.jobAddWaitingState(False)
+        # self.jobAddWaitingState()
 
     def clearJobsQueue(self):
         """
@@ -231,20 +221,16 @@ class JobsTableViewWidget(QWidget):
         if len(self.parent.jobsQueue) > 0:
             language = config.data.get(config.ConfigKey.Language)
             bAnswer = False
-
             title = _("Clear Queue")
             msg = "¿" if language == "es" else ""
             msg += _("Erase any jobs remaining in the Queue") + "?"
-
             bAnswer = yesNoDialog(self, msg, title)
 
             if bAnswer:
                 while job := self.parent.jobsQueue.pop():
 
-                    self.tableModel.setData(job.statusIndex, JobStatus.Waiting)
-
+                    self.model.setData(job.statusIndex, JobStatus.Waiting)
             else:
-
                 print("Nothing here")
 
     def setLanguage(self):
@@ -259,9 +245,9 @@ class JobsTableViewWidget(QWidget):
                 widget.setToolTip(_(widget.toolTip))
 
         self.grpBox.setTitle(_(Text.txt0130))
-        self.tableModel.setHeaderData(JobKey.ID, Qt.Horizontal, _(Text.txt0131))
-        self.tableModel.setHeaderData(JobKey.Status, Qt.Horizontal, _(Text.txt0132))
-        self.tableModel.setHeaderData(JobKey.Command, Qt.Horizontal, _(Text.txt0133))
+        self.model.setHeaderData(JobKey.ID, Qt.Horizontal, _(Text.txt0131))
+        self.model.setHeaderData(JobKey.Status, Qt.Horizontal, _(Text.txt0132))
+        self.model.setHeaderData(JobKey.Command, Qt.Horizontal, _(Text.txt0133))
 
     def printDataset(self):
         """
@@ -269,19 +255,22 @@ class JobsTableViewWidget(QWidget):
         """
 
         QApplication.setPalette(darkPalette())
+        dataset = self.model.dataset
 
-        dataset = self.tableModel.dataset
         for r in range(0, len(dataset)):
             self.output.command.emit(
-                "Row {} ID {} Status {}\n".format(r, dataset[r, 0], dataset[r, 1]), {}
+                "Row {} ID {} Status {}\n".format(
+                    r, dataset[r, JobKey.ID], dataset[r, JobKey.Status]
+                ),
+                {},
             )
 
         self.output.command.emit("\n", {})
 
     @Slot(bool)
-    def jobAddWaitingState(self, state):
+    def jobAddWaitingState(self):
 
-        self.grpGrid.itemAt(config.JTVBTNADDWAITING).widget().setEnabled(state)
+        self.grpGrid.itemAt(config.JTVBTNADDWAITING).widget().setEnabled(hasWaiting(self.model))
 
     @Slot(bool)
     def jobClearQueueState(self, state):
@@ -298,5 +287,24 @@ class JobsTableViewWidget(QWidget):
 
     @Slot(bool)
     def jobStatus(self, running):
+
         if running:
             self.jobStartQueueState(False)
+
+
+def hasWaiting(model):
+    """
+    hasWaiting looks for a Waiting status
+
+    Args:
+        model (TableModel): a table model
+
+    Returns:
+        bool: True if Waiting status found. False otherwise.
+    """
+
+    for r in range(0, len(model.dataset)):
+        if model.dataset[r, JobKey.Status] == JobStatus.Waiting:
+            return True
+
+    return False
