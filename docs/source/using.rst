@@ -46,7 +46,7 @@ Structure for directories:
           video - S01E01.srt
           video - S01E02.avi  video - S01E02.mkv
           video - S01E02.srt
-          ...                 ...
+          .                   .
           video - S01E13.avi  video - S01E13.mkv
           video - S01E13.srt
           ==================  ==================
@@ -189,11 +189,11 @@ Tabs
   .. code-block:: bash
 
     mkvmerge v30.0.0 ('Interstellar') 64-bit
-    'C:\tests\VideoFiles\video'S01E05.avi': Using the demultiplexer for the format 'AVI'.
-    'C:\tests\VideoFiles\Video'S01E05.ass': Using the demultiplexer for the format 'SSA/ASS subtitles'.
-    'C:\tests\VideoFiles\video'S01E05.avi' track 0: Using the output module for the format 'MPEG-4'.
-    'C:\tests\VideoFiles\video'S01E05.avi' track 1: Using the output module for the format 'MP3'.
-    'C:\tests\VideoFiles\Video'S01E05.ass' track 0: Using the output module for the format 'text subtitles'.
+    '\video'S01E05.avi': Using the demultiplexer for the format 'AVI'.
+    '\Video'S01E05.ass': Using the demultiplexer for the format 'SSA/ASS subtitles'.
+    '\video'S01E05.avi' track 0: Using the output module for the format 'MPEG-4'.
+    '\video'S01E05.avi' track 1: Using the output module for the format 'MP3'.
+    '\Video'S01E05.ass' track 0: Using the output module for the format 'text subtitles'.
     The file 'C:\tests\NewFiles\new-video'S01E05 (15).mkv' has been opened for writing.
     Progress: 100%
 
