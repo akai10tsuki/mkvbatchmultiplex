@@ -44,16 +44,18 @@ class JobsTableView(QTableView):
     def __init__(self, parent=None, model=None, title=None, log=None):
         super(JobsTableView, self).__init__()
 
+        self.__log = None  # Instance logging state None = Class state prevails
+
         self.parent = parent
         self.model = model
         self.viewTitle = title
-        self.__log = None  # Instance logging state None = Class state prevails
+        self.log = log
 
-        self._initHelper()
         self.setModel(model)
         self.setSortingEnabled(True)
 
-        self.log = log
+        self._initHelper()
+
 
     def _initHelper(self):
 
@@ -63,7 +65,6 @@ class JobsTableView(QTableView):
         # self.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.setAlternatingRowColors(True)
         self.setWordWrap(False)
-
         self.setAcceptDrops(True)
 
     @classmethod
@@ -101,6 +102,7 @@ class JobsTableView(QTableView):
 
             True if logging is enable False otherwise
         """
+
         if self.__log is not None:
             return self.__log
 
@@ -109,15 +111,17 @@ class JobsTableView(QTableView):
     @log.setter
     def log(self, value):
         """set instance log variable"""
+
         if isinstance(value, bool) or value is None:
             self.__log = value
 
     def setVisibleColumns(self, columnsToInclude=None):
         """
-        Hides columns so that only those specified in the columnsToInclude list are shown
+        Hides columns so that only those specified in the columnsToInclude list
+        are shown
 
-        :param columnsToInclude: list of str, items must be column names as defined in the
-            underlying TableModel
+        :param columnsToInclude: list of str, items must be column names as
+            defined in the underlying TableModel
         """
 
         if columnsToInclude is None:
@@ -136,17 +140,14 @@ class JobsTableView(QTableView):
         if 0 <= row < totalRows:
 
             menu = QMenu()
-
             menu.addAction("Copy")
             menu.addAction("Remove")
 
             if action := menu.exec_(event.globalPos()):
-
                 result = action.text()
 
                 if result == "Copy":
                     self.copySelection()
-
                 elif result == "Remove":
                     self.model.filterConditions["Remove"].append(row)
                     self.model.setFilterFixedString("")
@@ -175,7 +176,6 @@ class JobsTableView(QTableView):
 
         if selection == menuItems["Copy"]:  # Specify what happens for each item
             self.copySelection()
-
         elif selection == menuItems["Remove"]:
             self.model.filterConditions["Remove"].append(row)
             self.model.setFilterFixedString("")
@@ -193,16 +193,16 @@ class JobsTableView(QTableView):
         # width = header.sectionSize(2)
         # header.setSectionResizeMode(2, QHeaderView.Interactive)
         # header.resizeSection(2, width)
-
         header.setFont(self.parent.font())
 
         super(JobsTableView, self).resizeEvent(event)
 
     def copySelection(self):
         """
-        This function copies the selected cells in a table view, accounting for filters and rows as
-        well as non-continuous selection ranges. The format of copied values can be pasted into
-        Excel retaining the original organization.
+        This function copies the selected cells in a table view, accounting for
+        filters and rows as well as non-continuous selection ranges. The format
+        of copied values can be pasted into Excel retaining the original
+        organization.
 
         Adapted from code provided by ekhumoro on StackOverflow
         """
@@ -210,7 +210,6 @@ class JobsTableView(QTableView):
         selection = self.selectedIndexes()
 
         if selection:
-
             rows = [index.row() for index in selection]
             columns = [index.column() for index in selection]
             rowCount = max(rows) - min(rows) + 1
@@ -226,7 +225,7 @@ class JobsTableView(QTableView):
             csv.writer(stream, delimiter="\t").writerows(table)
             QApplication.clipboard().setText(stream.getvalue())
 
-    def supportedDropActions(self): # pylint: disable=no-self-use
+    def supportedDropActions(self):  # pylint: disable=no-self-use
 
         return Qt.CopyAction | Qt.MoveAction
 
@@ -234,12 +233,12 @@ class JobsTableView(QTableView):
 
         data = event.mimeData()
         command = data.text()
-
         self._addCommand(command)
 
     def _addCommand(self, command):
 
         oCommand = MKVCommand(command)
+
         if oCommand:
             tableModel = self.model.sourceModel()
             totalJobs = tableModel.rowCount()
