@@ -10,7 +10,7 @@ from PySide2.QtCore import Qt, QModelIndex
 from .TableModel import TableModel
 from ..jobs import JobStatus, JobKey
 
-#JOBID, JOBSTATUS, JOBCOMMAND = range(3)
+# JOBID, JOBSTATUS, JOBCOMMAND = range(3)
 
 
 class JobsTableModel(TableModel):
@@ -54,15 +54,15 @@ class JobsTableModel(TableModel):
         """
 
         if role == Qt.EditRole:
-
             row = index.row()
-
+            column = index.column()
             super(JobsTableModel, self).setData(index, value, role)
 
             if value == JobStatus.AddToQueue:
                 self.jobQueue.append(row)
 
-            print("JobsTableModel Setting Data ({}, {}) = {}".format(index.row(), index.column(), value))
+            if column == JobKey.Status:
+                self.jobQueue.statusChangeSignal.emit()
 
             return True
 
