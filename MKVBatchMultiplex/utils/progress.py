@@ -13,7 +13,8 @@ class Progress(QObject):
     Args:
         parent (QWidget): parent widget
         progressBar (DualProgressBar): progress bar widget
-        formatLabel (FormatLabel, optional): label with text defined as a format string.
+        formatLabel (FormatLabel, optional): label with text defined as
+                                             a format string.
             Defaults to None.
     """
 
