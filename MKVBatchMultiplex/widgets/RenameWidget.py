@@ -4,7 +4,6 @@ RenameWidget:
 This widget permit the rename of the output files in the MKVCommand
 
 Also if files are drop from directories in the OS it will rename them.
-
 """
 
 # LOG FW0013
@@ -89,21 +88,19 @@ class RenameWidget(QWidget):
     def __init__(self, parent, controlQueue=None, log=None):
         super(RenameWidget, self).__init__(parent)
 
-        self.parent = parent
-        self.controlQueue = controlQueue
-        self._outputFileNames = []
-        self._renameFileNames = []
-
         self.__log = None
         self.__output = None
         self.__tab = None
 
+        self.parent = parent
+        self.controlQueue = controlQueue
+        self._outputFileNames = []
+        self._renameFileNames = []
         self._initControls()
         self._initUI()
         self._initHelper()
         self._bFilesDropped = False
         self._bDuplicateRename = False
-
         self.log = log
 
     def _initControls(self):
@@ -117,7 +114,6 @@ class RenameWidget(QWidget):
         self.textSubString = RegExLineInputWidget(
             "Substitution String", "Enter substitution string."
         )
-
         self.textOriginalNames = RegExFilesWidget(
             "Original names", "Name generated base on parsed command."
         )
@@ -128,7 +124,6 @@ class RenameWidget(QWidget):
         self.textOriginalNames.textBox.filesDroppedUpdateSignal.connect(
             self._setFilesDropped
         )
-
         self.textRenameResults = RegExInputWidget(
             "Rename to", "Names that will be used for commands."
         )
@@ -136,22 +131,20 @@ class RenameWidget(QWidget):
         self.textRenameResults.textBox.connectToInsertText(
             self.outputRenameResultsSignal
         )
-
         btnApplyRename = pyqt.QPushButtonWidget(
             "Apply Rename",
             function=self._applyRename,
             toolTip="Replace the original names with the operation result",
         )
         btnApplyRename.setEnabled(False)
-
         btnUndoRename = pyqt.QPushButtonWidget(
             "Undo", function=self._undoRename, toolTip="Undo rename operation"
         )
         btnUndoRename.setEnabled(False)
-
         btnClear = pyqt.QPushButtonWidget(
             "Clear", function=self.clear, toolTip="Clear names start over"
         )
+
         # btnClear.setEnabled(False)
 
         self.btnGrid = QHBoxLayout()
@@ -166,7 +159,6 @@ class RenameWidget(QWidget):
     def _initUI(self):
 
         inputGrid = QGridLayout()
-
         #
         # Input lines
         #
@@ -199,7 +191,6 @@ class RenameWidget(QWidget):
 
         # local signals
         self.setFilesSignal.connect(self.setFiles)
-
         self.textRegEx.cmdLine.currentTextChanged.connect(self._updateRegEx)
         self.textSubString.cmdLine.currentTextChanged.connect(self._updateRegEx)
         self.textOriginalNames.textBox.textChanged.connect(self.clearButtonState)
@@ -209,6 +200,7 @@ class RenameWidget(QWidget):
         self.textSubString.cmdLine.itemsChangeSignal.connect(
             lambda: self.saveItems(Key.SubString)
         )
+
         if maxCount is not None:
             self.textRegEx.cmdLine.setMaxCount(maxCount)
             self.textSubString.cmdLine.setMaxCount(maxCount)
@@ -226,6 +218,7 @@ class RenameWidget(QWidget):
         for n, r in zip(self._outputFileNames, self._renameFileNames):
             if n != r:
                 return True
+
         return False
 
     @property
@@ -274,15 +267,14 @@ class RenameWidget(QWidget):
         self._outputFileNames = []
         self._renameFileNames = []
         self._bFilesDropped = False
-
         self.textRegEx.cmdLine.lineEdit().clear()
         self.textSubString.cmdLine.lineEdit().clear()
-
         self.textOriginalNames.textBox.clear()
         self.textRenameResults.textBox.clear()
 
     def clearButtonState(self):
         """Set clear button state"""
+
         if self.textOriginalNames.textBox.toPlainText() != "":
             self.btnGrid.itemAt(ButtonIndex.Clear).widget().setEnabled(True)
         else:
@@ -299,6 +291,7 @@ class RenameWidget(QWidget):
 
         for index in range(self.btnGrid.count()):
             widget = self.btnGrid.itemAt(index).widget()
+
             if isinstance(widget, pyqt.QPushButtonWidget):
                 widget.setText(_(widget.originalText))
                 widget.setToolTip(_(widget.toolTip))
@@ -318,21 +311,26 @@ class RenameWidget(QWidget):
         saveItems of ComboLineEdit use in widget
 
         Args:
-            comboType (str): key indicating witch ComboListEdit to save to config
+            comboType (str): key indicating witch ComboListEdit
+                             to save to config
         """
 
         if comboType == Key.RegEx:
             if self.textRegEx.cmdLine.count() > 0:
                 items = []
+
                 for i in range(0, self.textRegEx.cmdLine.count()):
                     items.append(self.textRegEx.cmdLine.itemText(i))
+
                 config.data.set(Key.RegEx, items)
 
         if comboType == Key.SubString:
             if self.textRegEx.cmdLine.count():
                 items = []
+
                 for i in range(0, self.textSubString.cmdLine.count()):
                     items.append(self.textSubString.cmdLine.itemText(i))
+
                 config.data.set(Key.SubString, items)
 
     @Slot(object)
@@ -341,7 +339,8 @@ class RenameWidget(QWidget):
         setFile setup file names to work with
 
         Args:
-            objCommand (MKVCommand): MKVCommand object containing the files to rename
+            objCommand (MKVCommand): MKVCommand object containing the files
+                                     to rename
         """
 
         self.textOriginalNames.textBox.clear()
@@ -358,7 +357,6 @@ class RenameWidget(QWidget):
         if filesDropped:
             self._outputFileNames = []
             self._outputFileNames.extend(filesDropped)
-
             self.textRenameResults.textBox.clear()
 
             if not self._bFilesDropped:
@@ -375,6 +373,7 @@ class RenameWidget(QWidget):
     def _displayRenames(self):
 
         duplicateNames = _findDuplicates(self._renameFileNames)
+
         if duplicateNames:
             self._bDuplicateRename = True
         else:
@@ -382,12 +381,16 @@ class RenameWidget(QWidget):
 
         for f in self._renameFileNames:
             of = Path(f)
-            if (f in duplicateNames) or of.is_file():
-                self.outputRenameResultsSignal.emit(
-                    str(f.name) + "\n", {"color": Qt.red}
-                )
-            else:
-                # check theme
+
+            try:
+                if (f in duplicateNames) or of.is_file():
+                    self.outputRenameResultsSignal.emit(
+                        str(f.name) + "\n", {"color": Qt.red}
+                    )
+                else:
+                    # check theme
+                    self.outputRenameResultsSignal.emit(str(f.name) + "\n", {})
+            except OSError:
                 self.outputRenameResultsSignal.emit(str(f.name) + "\n", {})
 
     def _updateRegEx(self):
@@ -401,6 +404,7 @@ class RenameWidget(QWidget):
 
         try:
             regEx = re.compile(rg)
+
             for f in self._outputFileNames:
                 strFile = f.stem
                 matchRegEx = regEx.sub(subText, strFile)
@@ -413,7 +417,6 @@ class RenameWidget(QWidget):
                 self._renameFileNames.append(objName)
 
             _resolveIncrements(self._outputFileNames, self._renameFileNames, subText)
-
             self._displayRenames()
 
             if self:
@@ -424,7 +427,6 @@ class RenameWidget(QWidget):
                 # self.buttonApplyRename.setEnabled(False)
 
         except re.error:
-
             self.textRenameResults.textBox.clear()
             statusBar.showMessage("Invalid regex.")
 
@@ -483,7 +485,6 @@ class RegExLineInputWidget(QWidget):
 
         self.label = lblText
         self.toolTip = strToolTip
-
         self.lblText = QLabel(lblText)
         self.cmdLine = pyqt.ComboLineEdit(self)
         self.cmdLine.setToolTip(strToolTip)
@@ -500,10 +501,10 @@ class RegExInputWidget(QWidget):
 
         self.label = lblText
         self.toolTip = strToolTip
-
         self.lblText = QLabel(lblText)
         self.textBox = pyqt.OutputTextWidget(self)
         self.textBox.setToolTip(strToolTip)
+
         vboxLayout = QVBoxLayout()
         vboxLayout.addWidget(self.lblText)
         vboxLayout.addWidget(self.textBox)
@@ -519,10 +520,10 @@ class RegExFilesWidget(QWidget):
 
         self.label = lblText
         self.toolTip = strToolTip
-
         self.lblText = QLabel(lblText)
         self.textBox = pyqt.FileListWidget(self)
         self.textBox.setToolTip(strToolTip)
+
         vboxLayout = QVBoxLayout()
         vboxLayout.addWidget(self.lblText)
         vboxLayout.addWidget(self.textBox)
@@ -598,6 +599,7 @@ def _matchGroups(strText, strMatch):
 
     while True:
         matchGroup = reSearchEx.search(tmp)
+
         if matchGroup:
             group = matchGroup.group()
             result.append(group)
@@ -620,6 +622,7 @@ def _findDuplicates(fileNames):
             else:
                 if seen[x] == 1:
                     duplicates.append(x)
+
                 seen[x] += 1
 
     return duplicates
