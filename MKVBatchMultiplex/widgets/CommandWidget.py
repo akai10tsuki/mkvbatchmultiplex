@@ -78,23 +78,20 @@ class CommandWidget(QWidget):
         self.__output = None
         self.__rename = None
         self.__tab = None
+
         self.oCommand = MKVCommand()
         self.controlQueue = controlQueue
-
         self.parent = parent
         self.proxyModel = proxyModel
-        self.tableModel = proxyModel.sourceModel()
+        self.model = proxyModel.sourceModel()
+        self.outputWindow = OutputTextWidget(self)
+        self.log = log
 
         self._initControls()
         self._initUI()
         self._initHelper()
 
-        self.log = log
-
     def _initControls(self):
-
-        self.outputWindow = OutputTextWidget(self)
-
         #
         # command line
         #
@@ -108,9 +105,7 @@ class CommandWidget(QWidget):
         self.cmdLine.setValidator(
             ValidateCommand(self, self.cliValidateSignal, log=self.log)
         )
-
         self.frmCmdLine.addRow(btnAddCommand, self.cmdLine)
-
         self.command = QWidget()
         self.command.setLayout(self.frmCmdLine)
 
@@ -135,19 +130,16 @@ class CommandWidget(QWidget):
             function=self.pasteClipboard,
             toolTip="Paste Clipboard contents in command line",
         )
-
         btnAddQueue = QPushButtonWidget(
             "Add Queue",
             function=lambda: self.addCommand(JobStatus.AddToQueue),
             toolTip="Add command to jobs table and put on Queue",
         )
-
         btnStartQueue = QPushButtonWidget(
             "Start Queue",
             function=self.parent.jobsQueue.run,
             toolTip="Start processing jobs on Queue",
         )
-
         btnAnalysis = QPushButtonWidget(
             "Analysis",
             function=lambda: runFunctionInThread(
@@ -158,7 +150,6 @@ class CommandWidget(QWidget):
             ),
             toolTip="Print analysis of command line",
         )
-
         btnShowCommands = QPushButtonWidget(
             "Commands",
             function=lambda: runFunctionInThread(
@@ -170,7 +161,6 @@ class CommandWidget(QWidget):
             ),
             toolTip="Commands to be applied",
         )
-
         btnCheckFiles = QPushButtonWidget(
             "Check Files",
             function=lambda: runFunctionInThread(
@@ -182,13 +172,11 @@ class CommandWidget(QWidget):
             ),
             toolTip="Check files for consistency",
         )
-
         btnClear = QPushButtonWidget(
             "Clear Output",
             function=self.clearOutputWindow,
             toolTip="Erase text in output window",
         )
-
         btnReset = QPushButtonWidget(
             "Reset", toolTip="Reset state completely to work with another batch"
         )
@@ -208,7 +196,6 @@ class CommandWidget(QWidget):
     def _initUI(self):
 
         grid = QGridLayout()
-
         grid.addWidget(self.command, 0, 0, 1, 2)
         grid.addWidget(self.btnGroup, 1, 0)
         grid.addWidget(self.outputWindow, 1, 1, 10, 1)
@@ -216,7 +203,6 @@ class CommandWidget(QWidget):
         self.setLayout(grid)
 
     def _initHelper(self):
-
         #
         # Signal interconnections
         #
@@ -242,6 +228,7 @@ class CommandWidget(QWidget):
         self.updateCommandSignal.connect(self.updateCommand)
         self.cliButtonsSateSignal.connect(self.cliButtonsState)
         self.cliValidateSignal.connect(self.cliValidate)
+
         #
         # button state
         #
@@ -285,9 +272,11 @@ class CommandWidget(QWidget):
     @log.setter
     def log(self, value):
         """set instance log variable"""
+
         if isinstance(value, bool) or value is None:
             self.__log = value
-            ValidateCommand.classLog(value)  # No variable used so for now use class log
+            # No variable used so for now use class log
+            ValidateCommand.classLog(value)
             self.outputWindow.log = value
 
     @property
@@ -366,9 +355,9 @@ class CommandWidget(QWidget):
     def jobStartQueueState(self, state):
 
         if state and not isThreadRunning(config.WORKERTHREADNAME):
-            self.btnGrid.itemAt(config.BTNSTARTQUEUE).widget().setEnabled(state)
+            self.btnGrid.itemAt(config.BTNSTARTQUEUE).widget().setEnabled(True)
         else:
-            self.btnGrid.itemAt(config.BTNSTARTQUEUE).widget().setEnabled(state)
+            self.btnGrid.itemAt(config.BTNSTARTQUEUE).widget().setEnabled(False)
 
     @Slot(bool)
     def updateObjCommnad(self, valid):
@@ -396,19 +385,13 @@ class CommandWidget(QWidget):
         """
 
         if running:
-
             self.jobStartQueueState(False)
-
             palette = QPalette()
             palette.setColor(QPalette.WindowText, Qt.cyan)
-
             self.parent.jobsLabel.setPalette(palette)
-
         else:
-
             palette = QPalette()
             palette.setColor(QPalette.WindowText, Qt.white)
-
             self.parent.jobsLabel.setPalette(palette)
 
     def addCommand(self, status):
@@ -420,11 +403,14 @@ class CommandWidget(QWidget):
                                 JobStatus.Waiting or JobStatus.AddToQueue
         """
 
-        totalJobs = self.tableModel.rowCount()
+        totalJobs = self.model.rowCount()
         command = self.cmdLine.text()
-        data = [["", "", None], [status, "Status code", None], [command, command, self.oCommand]]
-        self.tableModel.insertRows(totalJobs, 1, data=data)
-
+        data = [
+            ["", "", None],
+            [status, "Status code", None],
+            [command, command, self.oCommand],
+        ]
+        self.model.insertRows(totalJobs, 1, data=data)
         self.cmdLine.clear()
 
     def pasteClipboard(self):
@@ -454,7 +440,6 @@ class CommandWidget(QWidget):
         title = "Clear output"
         msg = "¿" if language == "es" else ""
         msg += "Clear output window" + "?"
-
         bAnswer = yesNoDialog(self, msg, title)
 
         if bAnswer:

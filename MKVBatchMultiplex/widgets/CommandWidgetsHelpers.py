@@ -16,9 +16,7 @@ def runAnalysis(**kwargs):
     output = kwargs.pop("output", None)
     command = kwargs.pop("command", None)
     log = kwargs.pop("log", False)
-
     verify = mkv.VerifyMKVCommand(command, log=log)
-
     output.command.emit("Analysis of command line:\n", {LineOutput.AppendEnd: True})
 
     for e in verify.analysis:
@@ -89,33 +87,26 @@ def checkFiles(**kwargs):
     output.command.emit("Checking files...\n", {LineOutput.AppendEnd: True})
 
     if oCommand:
-
         verify = mkv.VerifyStructure(log=log)
 
         for index, (_, baseFiles, sourceFiles, destinationFile, _) in enumerate(
             oCommand
         ):
-
             verify.verifyStructure(baseFiles, sourceFiles)
-
             lstFile = []
+
             for f in sourceFiles:
                 lstFile.append(str(f))
 
             if verify:
-
                 msg = "{}. Source: {}\nDestination: {}\nStructure looks Ok.\n"
                 msg = msg.format(index + 1, str(lstFile), destinationFile)
-
                 output.command.emit(
                     msg, {LineOutput.Color: Qt.darkGreen, LineOutput.AppendEnd: True}
                 )
-
             else:
-
                 msg = "{}. Source: {}\nDestination: {}\nStructure Error.\n"
                 msg = msg.format(index + 1, str(lstFile), destinationFile)
-
                 output.command.emit(
                     msg,
                     {
