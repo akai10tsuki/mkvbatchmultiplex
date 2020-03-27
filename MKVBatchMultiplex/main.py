@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 r"""
 JobsTable
-
-
 """
 
 import gettext
@@ -110,16 +108,14 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
         headers = tableHeaders()
         self.tableData = TableData(headerList=headers, dataList=[])
-        self.tableModel = JobsTableModel(self.tableData, self.jobsQueue)
-        self.proxyModel = TableProxyModel(self.tableModel)
-
-        self.jobsQueue.model = self.proxyModel
+        self.model = JobsTableModel(self.tableData, self.jobsQueue)
+        self.proxyModel = TableProxyModel(self.model)
+        self.jobsQueue.proxyModel = self.proxyModel
         self.jobsQueue.progress = self.progress
 
         # Widgets for tabs
         self.tableViewWidget = JobsTableViewWidget(self, self.proxyModel, "Jobs Table")
         self.tableViewWidget.tableView.sortByColumn(0, Qt.AscendingOrder)
-
         self.commandWidget = CommandWidget(self, self.proxyModel)
         self.jobsOutput = OutputTextWidget(self)
         self.errorOutput = OutputTextWidget(self)
@@ -178,7 +174,6 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.tableViewWidget.output = self.output
         self.jobsQueue.output = self.output
         self.commandWidget.rename = self.renameWidget
-
         self.commandWidget.outputWindow.setReadOnly(True)
         self.jobsOutput.setReadOnly(True)
         self.errorOutput.setReadOnly(True)
@@ -200,12 +195,9 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
         # Create Widgets
         widget = QWidget()
-
         layout = QVBoxLayout(widget)
         layout.addWidget(self.tabs)
-
         widget.setLayout(layout)
-
         self.setCentralWidget(widget)
 
     def _initMenu(self):  # pylint: disable=too-many-statements
@@ -214,7 +206,6 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
         # File SubMenu
         fileMenu = QMenuWidget(Text.txt0020)
-
         closeIcon = self.style().standardIcon(QStyle.SP_DialogCloseButton)
 
         # Exit application
@@ -257,7 +248,6 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
             tooltip="Select english language for the interface",
         )
         self.actEN.triggered.connect(lambda: self.setLanguage("en", self.actEN))
-
         self.actES = QActionWidget(
             "Español (Spanish)",
             self,
@@ -282,16 +272,12 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         # Help Menu
         actHelpContents = QActionWidget(Text.txt0061 + "...", self)
         actHelpContents.triggered.connect(lambda: _help(self.appDirectory, 0))
-
         actHelpUsing = QActionWidget(Text.txt0062, self)
         actHelpUsing.triggered.connect(lambda: _help(self.appDirectory, 1))
-
         actAbout = QActionWidget(Text.txt0063, self)
         actAbout.triggered.connect(self.about)
-
         actAboutQt = QActionWidget(Text.txt0064, self)
         actAboutQt.triggered.connect(self.aboutQt)
-
         helpMenu = QMenuWidget(Text.txt0060)
         helpMenu.addAction(actHelpContents)
         helpMenu.addAction(actHelpUsing)
@@ -301,18 +287,15 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         menuBar.addMenu(helpMenu)
 
         # Init status var
-
         self.progressBar = DualProgressBar(align=Qt.Horizontal)
         self.jobsLabel = FormatLabel(
             "Job(s): {0:3d} Current: {1:3d} File: {2:3d} of {3:3d} Errors: {4:3d}",
             init=[0, 0, 0, 0, 0],
         )
-
         statusBar = self.statusBar()  # pylint: disable=unused-variable
         statusBar.addPermanentWidget(self.jobsLabel)
         statusBar.addPermanentWidget(self.progressBar)
         statusBar.addPermanentWidget(self.progressSpin)
-
         self.progress = Progress(self, self.progressBar, self.jobsLabel)
 
     def enableLogging(self, state):
@@ -336,17 +319,13 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         bLogging = False
 
         if action == config.Action.Reset:
-
             self.setFont(defaultFont)
             self.setAppFont(defaultFont)
-
             self.actEnableLogging.setChecked(bLogging)
             self.enableLoggin(bLogging)
             self.setGeometry(0, 0, 1280, 720)
             centerWidgets(self)
-
         elif action == config.Action.Restore:
-
             if strFont := config.data.get(config.ConfigKey.Font):
                 restoreFont = QFont()
                 restoreFont.fromString(strFont)
@@ -371,7 +350,6 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
                 self.tabs.setCurrentIndexSignal.emit(tabIndex)
 
         elif action in (config.Action.Save, config.Action.Update):
-
             # Update Logging
             config.data.set(config.ConfigKey.Logging, self.actEnableLogging.isChecked())
 
@@ -385,7 +363,6 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
             config.data.set(config.ConfigKey.Geometry, b)
 
             if action == config.Action.Save:
-
                 config.data.saveToFile()
 
     def restoreDefaults(self):
@@ -397,11 +374,9 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
         language = config.data.get(config.ConfigKey.Language)
         bAnswer = False
-
         title = _(Text.txt0083)
         msg = "¿" if language == "es" else ""
         msg += _(Text.txt0084) + "?"
-
         bAnswer = yesNoDialog(self, msg, title)
 
         if bAnswer:
@@ -418,7 +393,6 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         for a in self.menuBar().actions():
             # menus on menubar are QAction classes
             # get the menu
-
             m = a.menu()
             m.setFont(font)
 
@@ -441,10 +415,8 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         """Select Font"""
 
         font = self.font()
-
         fontDialog = QFontDialog()
         centerWidgets(fontDialog, self)
-
         valid, font = fontDialog.getFont(font)
 
         if valid:
@@ -457,7 +429,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         Set application language the scheme permits runtime changes
 
         Keyword Arguments:
-            language {str} -- language selected (default: {'es'})
+            language {str} -- language selected (default: {"en"})
             menuItem {QMenuWidget} -- menu object making the call for
                 checkmark update
         """
@@ -468,11 +440,8 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         lang = gettext.translation(
             config.NAME, localedir=str(config.LOCALE), languages=[language]
         )
-
         lang.install(names=("ngettext",))
-
         config.data.set(config.ConfigKey.Language, language)
-
         self.setWindowTitle(Text.txt0001)
         self.jobsLabel.template = _(Text.txt0085)
         self.progressBar.label = _(Text.txt0091) + ":"
@@ -505,9 +474,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
         language = config.data.get(config.ConfigKey.Language)
         bAnswer = False
-
         title = _(Text.txt0080)
-
         leadQuestionMark = "¿" if language == "es" else ""
 
         if threading.activeCount() > 1:
@@ -527,7 +494,6 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         """check if MediaInfo library is present"""
 
         if platform.system() == "Linux":
-
             libFiles = media.isMediaInfoLib()
 
             if not libFiles:
@@ -595,7 +561,6 @@ def mainApp():
     # Palette will change on macOS according to current theme
     # will create a poor mans dark theme for windows
     if platform.system() == "Windows":
-
         # Force the style to be the same on all OSs:
         app.setStyle("Fusion")
         app.setPalette(darkPalette())
@@ -603,7 +568,6 @@ def mainApp():
     win = MainWindow()
     win.show()
     app.exec_()
-
     config.close()
 
 
