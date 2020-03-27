@@ -76,15 +76,12 @@ class Index:
         self._column = column
 
     def row(self):
-
         return self._row
 
     def column(self):
-
         return self._column
 
     def isValid(self):
-
         return True
 
 
@@ -144,7 +141,6 @@ class TableData:
             return self.headers[index].attribute["Label"]
 
         if isinstance(index, tuple):
-
             col = None
 
             if len(index) == 1:
@@ -155,9 +151,9 @@ class TableData:
                 raise IndexError("Bad index format: {}".format(index))
 
             if col is None:
-
                 returnRow = []
                 currentRow = self.data[row]
+
                 for r in currentRow:
                     returnRow.append(r.data)
 
@@ -174,17 +170,13 @@ class TableData:
 
         elif isinstance(index, tuple):
             # Only update members of the data table no headers
-
             if len(index) == 2:
-
                 row, col = index
             else:
                 raise IndexError("Bad index format: {}".format(index))
 
             index = Index(row, col)  # Simulate index
-
             self.setData(index, value)
-
         else:
             raise TypeError("Invalid index type")
 
@@ -200,14 +192,11 @@ class TableData:
         """
 
         if header is not None:
-
-            self.headerName.append(header[0])
-
             oHeader = HeaderInfo()
             oHeader.header = header[0]
             oHeader.attribute = header[1]
             oHeader.headerList = header
-
+            self.headerName.append(header[0])
             self.headers.append(oHeader)
 
     def setData(self, index, value):
@@ -223,14 +212,13 @@ class TableData:
             # better for logging purposes
             row = index.row()
             column = index.column()
+
             if isinstance(value, DataItem):
                 self.data[row][column].data = value.data
                 self.data[row][column].toolTip = value.toolTip
                 self.data[row][column].oCommand = value.oCommand
             else:
                 self.data[row][column].data = value
-
-            print("Setting Data ({}, {}) = {}".format(row, column, self.data[row][column].data))
 
             return True
 
@@ -250,6 +238,7 @@ class TableData:
             row = index.row()
             column = index.column()
             self.data[row][column].toolTip = value
+
             return True
 
         return False
@@ -264,9 +253,7 @@ class TableData:
         """
 
         if row is not None:
-
             emptyRow = [DataItem(), DataItem(), DataItem()]
-
             self.data.insert(position, emptyRow)
 
             for column, value in enumerate(row):
@@ -281,9 +268,7 @@ class TableData:
                     if value is not None:
                         raise ValueError("Item at index {} is invalid".format(column))
         else:
-
             emptyRow = ["", "", ""]
-
             self.data.insert(position, emptyRow)
 
     def deleteRow(self, index):
@@ -312,26 +297,18 @@ class TableData:
         if columnHeader is None:
             self.headers.insert(position, HeaderInfo())
             self.headerName.insert(position, "")
-
         else:
-
             if isinstance(columnHeader, list):
-
                 oHeader = HeaderInfo()
                 oHeader.header = columnHeader[0]
                 oHeader.attribute = columnHeader[1]
                 oHeader.headerList = columnHeader
-
                 self.headers.insert(position, oHeader)
                 self.headerName.insert(position, oHeader.header)
-
             elif isinstance(columnHeader, HeaderInfo):
-
                 self.headers.insert(position, columnHeader)
                 self.headers.insert(position, columnHeader.header)
-
             else:
-
                 raise TypeError("Invalid column header type.")
 
         if columnData is None:
