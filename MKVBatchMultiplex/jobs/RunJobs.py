@@ -18,6 +18,7 @@ from vsutillib.pyqt import SvgColor
 from vsutillib.misc import staticVars
 
 from .. import config
+from ..models import TableProxyModel
 from .jobKeys import JobStatus, JobKey
 
 
@@ -62,23 +63,32 @@ class RunJobs(QObject):
 
         return cls.__log
 
-    def __init__(self, parent, jobsQueue=None, progressFunc=None, model=None, controlQueue=None, log=None):
+    def __init__(
+        self,
+        parent,
+        jobsQueue=None,
+        progressFunc=None,
+        proxyModel=None,
+        controlQueue=None,
+        log=None,
+    ):
         super(RunJobs, self).__init__()
 
         self.__jobsQueue = None
+        self.__logging = False
         self.__output = None
         self.__process = None
         self.__progress = None
+        self.__proxyModel = None
         self.__model = None
 
         self.parent = parent
         self.jobsqueue = jobsQueue
         self.progress = progressFunc
-        self.model = model
+        self.proxyModel = proxyModel
         self.controlQueue = controlQueue
         self.mainWindow = self.parent.parent
         self.jobsWorker = None
-        self.__logging = False
         self.log = log
 
     @property
@@ -118,9 +128,15 @@ class RunJobs(QObject):
     def model(self):
         return self.__model
 
-    @model.setter
-    def model(self, value):
-        self.__model = value
+    @property
+    def proxyModel(self):
+        return self.__proxyModel
+
+    @proxyModel.setter
+    def proxyModel(self, value):
+        if isinstance(value, TableProxyModel):
+            self.__proxyModel = value
+            self.__model = value.sourceModel()
 
     @property
     def output(self):
@@ -152,7 +168,6 @@ class RunJobs(QObject):
         """
 
         if self.jobsqueue and not self.running:
-
             self.jobsWorker = ThreadWorker(
                 runJobs,
                 self.jobsqueue,
@@ -164,14 +179,12 @@ class RunJobs(QObject):
                 funcProgress=self.progress,
                 funcFinished=self.finished,
             )
-
             self.jobsWorker.name = config.WORKERTHREADNAME
             self.jobsWorker.start()
 
             return True
 
         if not self.jobsqueue:
-
             msg = "Jobs Queue empty"
             self.output.error.emit(msg, {"color": Qt.yellow})
 
@@ -179,7 +192,6 @@ class RunJobs(QObject):
                 MODULELOG.error("RJB0001: Error: %s", msg)
 
         if self.running:
-
             msg = "Jobs running"
             self.output.error.emit(msg, {"color": Qt.yellow})
 
@@ -229,12 +241,11 @@ def displayRunJobs(line, job, output, indexTotal, funcProgress=None):
     Args:
         line (str): line to display
     """
-    regEx = re.compile(r":\W*(\d+)%")
 
+    regEx = re.compile(r":\W*(\d+)%$")
     funcProgress.lblSetValue.emit(2, indexTotal[0] + 1)
     n = -1
-
-    #if line.find("Progress:") >= 0:
+    # if line.find("Progress:") >= 0:
     #
     #    if m := regEx.search(line):
     #        n = int(m.group(1))
@@ -243,7 +254,7 @@ def displayRunJobs(line, job, output, indexTotal, funcProgress=None):
     #        output.job.emit(line[:-1], {"replaceLine": True})
     #        funcProgress.pbSetValues.emit(n, indexTotal[1] + n)
     #
-    #else:
+    # else:
 
     #    output.job.emit(line[:-1], {"appendLine": True})
 
@@ -259,9 +270,8 @@ def displayRunJobs(line, job, output, indexTotal, funcProgress=None):
         funcProgress.pbSetValues.emit(n, indexTotal[1] + n)
 
     else:
-
         if displayRunJobs.printPercent:
-            #output.job.emit("\n", {})
+            # output.job.emit("\n", {})
             displayRunJobs.printPercent = False
 
         output.job.emit(line[:-1], {"appendLine": True})
@@ -288,17 +298,15 @@ def runJobs(jobQueue, output, model, funcProgress=None, log=False):
         return "Working..."
 
     runJobs.running = True
-
     totalJobs = len(jobQueue)
     remainingJobs = totalJobs - 1
     currentJob = 0
     indexTotal = [0, 0]
-
     verify = mkv.VerifyStructure(log=log)
 
     while job := jobQueue.popLeft():
-
         actualRemaining = len(jobQueue)
+
         if actualRemaining == remainingJobs:
             remainingJobs -= 1
         else:
@@ -306,41 +314,32 @@ def runJobs(jobQueue, output, model, funcProgress=None, log=False):
             remainingJobs = actualRemaining - 1
 
         currentJob += 1
-
         indexTotal[0] = 0  # file index
         indexTotal[1] = 0  # current max progress bar
-
         totalFiles = 0
+
         if job.oCommand:
             totalFiles = len(job.oCommand)
 
         maxBar = totalFiles * 100
         funcProgress.pbSetMaximum.emit(100, maxBar)
-
         funcProgress.lblSetValue.emit(0, totalJobs)
         funcProgress.lblSetValue.emit(1, currentJob)
         funcProgress.lblSetValue.emit(3, totalFiles)
-
         indexTotal[0] = 0
 
         # Check Job Status for Skip
         #
+        sourceIndex = job.statusIndex
+        status = model.dataset[sourceIndex.row(), sourceIndex.column()]
 
-        print("Model type = {}".format(model))
-
-        #sourceIndex = model.mapToSource(job.statusIndex)
-
-        #status = model.sourceModel().dataset[sourceIndex.row(), sourceIndex.column()]
-
-        #if status == JobStatus.Skip:
-        #    jobQueue.statusUpdateSignal.emit(job, JobStatus.Skipped)
-        #    break
-
+        if status == JobStatus.Skip:
+            jobQueue.statusUpdateSignal.emit(job, JobStatus.Skipped)
+            break
         #
         # Check Job Status for Skip
 
         jobQueue.statusUpdateSignal.emit(job, JobStatus.Running)
-
         cli = RunCommand(
             processLine=displayRunJobs,
             processArgs=[job, output, indexTotal],
@@ -351,7 +350,6 @@ def runJobs(jobQueue, output, model, funcProgress=None, log=False):
         )
 
         if job.oCommand:
-
             msg = "*******************\n"
             msg += "Job ID: {} started.\n\n".format(job.job[JobKey.ID])
             output.job.emit(msg, {"color": Qt.cyan})
@@ -362,41 +360,31 @@ def runJobs(jobQueue, output, model, funcProgress=None, log=False):
             updateStatus = True
 
             for cmd, baseFiles, sourceFiles, destinationFile, _ in job.oCommand:
-
                 funcProgress.lblSetValue.emit(2, indexTotal[0] + 1)
-
-                print("Model type 2 = {}".format(model))
 
                 # Check Job Status for Abort
                 #
                 sourceIndex = job.statusIndex
-
                 status = model.dataset[sourceIndex.row(), sourceIndex.column()]
-
-                print("Run Job {}, Status = {}".format(job.job[JobKey.ID], status))
 
                 if status == JobStatus.Abort:
                     jobQueue.statusUpdateSignal.emit(job, JobStatus.Aborted)
                     updateStatus = False
                     break
-
                 #
                 # Check Job Status for Abort
 
                 verify.verifyStructure(baseFiles, sourceFiles)
 
                 if log:
-
                     msg = (
                         "Command: {}  Base Files: {} "
                         "Source Files: {} Destination File: {}"
                     )
                     msg = msg.format(cmd, baseFiles, sourceFiles, destinationFile)
-
                     MODULELOG.debug("RJB0006: %s", msg)
 
                 if verify:
-
                     ###
                     # Execute cmd
                     ###
@@ -413,36 +401,29 @@ def runJobs(jobQueue, output, model, funcProgress=None, log=False):
                     if config.SIMULATERUN:
                         dummyRunCommand(funcProgress, indexTotal)
                     else:
-                        # TODO: queue to control execution of running job inside the RunCommand
+                        # TODO: queue to control execution of running job inside
+                        # the RunCommand
                         cli.command = cmd
                         cli.run()
 
                 else:
-
                     msg = "Error Job ID: {} ---------------------".format(
                         job.job[JobKey.ID]
                     )
                     output.error.emit(msg, {"color": SvgColor.red, "appendEnd": True})
-
                     msg = "\nDestination File: {}\n\n".format(destinationFile)
                     output.job.emit(msg, {"color": SvgColor.red, "appendEnd": True})
                     output.error.emit(msg, {"color": SvgColor.red, "appendEnd": True})
-                    # errorMsg(output, msg, {'color': SvgColor.red, 'appendEnd': True})
 
                     for i, m in enumerate(verify.analysis):
                         if i == 0:
-                            # errorMsg(output, m, {'color': SvgColor.orange, 'appendEnd': True})
                             output.job.emit(m, {"color": SvgColor.orange})
                             output.error.emit(m, {"color": SvgColor.orange})
                         else:
-                            # errorMsg(output, m, {'color': SvgColor.red, 'appendEnd': True})
                             output.job.emit(m, {"color": SvgColor.red})
                             output.error.emit(m, {"color": SvgColor.red})
 
-                    # errorMsg(output, '', {'color': SvgColor.orange, 'appendEnd': True})
                     output.job.emit("", {"appendEnd": True})
-                    # output.error.emit('', {'appendEnd': True})
-
                     msg = "Error Job ID: {} ---------------------\n\n".format(
                         job.job[JobKey.ID]
                     )
@@ -465,11 +446,9 @@ def runJobs(jobQueue, output, model, funcProgress=None, log=False):
                 MODULELOG.debug("RJB0009: Job ID: %s finished.", job.job[JobKey.ID])
 
         else:
-
             msg = "Job ID: {} cannot execute command.\n\nCommand: {}\n"
             msg = msg.format(job.job[JobKey.ID], job.oCommand.command)
             output.error.emit(msg, {"color": Qt.red})
-
             jobQueue.statusUpdateSignal.emit(job, JobStatus.Error)
 
             if log:
@@ -484,7 +463,6 @@ def runJobs(jobQueue, output, model, funcProgress=None, log=False):
 
     funcProgress.pbSetMaximum.emit(100, 100)
     funcProgress.pbSetValues.emit(0, 100)
-
     runJobs.running = False
 
     return "Job queue empty."
@@ -497,6 +475,7 @@ def dummyRunCommand(funcProgress, indexTotal):
 
     funcProgress.lblSetValue.emit(2, indexTotal[0] + 1)
     i = 0
+
     while i < 100:
         i += 0.5
         funcProgress.pbSetValues.emit(i, indexTotal[1] + i)
@@ -505,6 +484,5 @@ def dummyRunCommand(funcProgress, indexTotal):
 
 def errorMsg(output, msg, kwargs):
 
-    # print('{}'.format(str(kwargs)))
     output.error.emit(msg, kwargs)
     output.job.emit(msg, kwargs)
