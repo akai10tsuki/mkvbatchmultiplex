@@ -19,7 +19,8 @@ class ValidateCommand(QValidator):
     Args:
         parent (QWidget): parent widget
         resultSignal (Signal): Signal(bool) emitted when result found
-        log (bool, optional): True do logging other value don't log. Defaults to None.
+        log (bool, optional): True do logging other value don't log.
+                              Defaults to None.
     """
 
     __log = False
