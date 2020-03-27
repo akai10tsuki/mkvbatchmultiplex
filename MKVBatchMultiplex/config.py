@@ -66,13 +66,11 @@ LOCALE = CWD.joinpath("locale")
 
 data = ConfigurationSettings()  # pylint: disable=invalid-name
 FORCELOG = True
-SIMULATERUN = True
+SIMULATERUN = False
 
 ######################
 # Application specific
 ######################
-
-#JOBID, JOBSTATUS, JOBCOMMAND = range(3)
 
 BTNADDCOMMAND = 0
 
@@ -131,11 +129,7 @@ class Key:
     MaxCount = "MaxCount"
 
 
-def init(filesRoot=None,
-         cfgFile=None,
-         logFile=None,
-         name=None,
-         version=None):
+def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None):
     """
     configures the system to save application configuration to xml file
 
@@ -176,7 +170,6 @@ def init(filesRoot=None,
     loghandler = LogRotateFileHandler(loggingFile, backupCount=10, encoding="utf-8")
     formatter = logging.Formatter("%(asctime)s %(levelname)-8s %(name)s %(message)s")
     loghandler.setFormatter(formatter)
-
     logging.getLogger("").setLevel(logging.DEBUG)
     logging.getLogger("").addHandler(loghandler)
 
@@ -202,16 +195,17 @@ def init(filesRoot=None,
         data.set(
             Key.RegEx,
             [
-                r"\[.*\]\W*(.*?)\W*-\W*(\d+)(.*?).*",
-                r"\[.*\]\W*(.*?)\W*-\W*(\d+)\W*-\W*(.*)",
-                r"\[.*\]\W*(.*)\W*(\d+)\W*.*",
-                r"\[.*\]\W*(.*?)\W*(\d+)\W*\[.*",
-                r"(.*?)\W*(\d+).*",
+                r"(\[.*\]\W*|)(?P<name>.*?)(\W*-|)\W*(?P<episode>\d+).*",
+                r"(\[.*\]\W*|)(?P<name>.*?)(\W*-|)\W*(?P<episode>\d+)(\W*-\W*)(?P<title>.*)",
+                r"(\[.*\]\W*|)(?P<name>.*?)(\W*-|)\W*(?P<episode>\d+)(\W*-\W*)(?P<title>.*?)((\W*\[.*|\W*\(.*))",
             ],
         )
 
     if data.get(Key.SubString) is None:
-        data.set(Key.SubString, [r"\1 - S01E\2", r"\1 - S01E\2 - \3"])
+        data.set(
+            Key.SubString,
+            [r"\g<name> - S01E\g<episode>", r"\g<name> - S01E\g<episode> - \g<title>",],
+        )
 
     if data.get(Key.MaxCount) is None:
         data.set(Key.MaxCount, 10)
