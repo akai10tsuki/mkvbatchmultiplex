@@ -24,7 +24,6 @@ from .RunJobs import RunJobs
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
-JOBID, JOBSTATUS, JOBCOMMAND = range(3)
 
 
 class JobInfo:  # pylint: disable=too-many-instance-attributes
@@ -53,6 +52,7 @@ class JobInfo:  # pylint: disable=too-many-instance-attributes
                 self.commandIndex.column()
             ].oCommand
         )
+
         if not self.oCommand:
             self.oCommand = MKVCommand(job[JobKey.Command], log=log)
 
@@ -70,7 +70,6 @@ class JobQueue(QObject):
 
     # Class logging state
     __log = False
-
     __firstRun = True
     __jobID = 10
 
@@ -78,7 +77,7 @@ class JobQueue(QObject):
     runSignal = Signal()
     addQueueItemSignal = Signal()
     queueEmptiedSignal = Signal()
-    addWaitingItemSignal = Signal()
+    statusChangeSignal = Signal()
 
     @classmethod
     def classLog(cls, setLogging=None):
@@ -105,15 +104,23 @@ class JobQueue(QObject):
         return cls.__log
 
     def __init__(
-        self, parent, model=None, funcProgress=None, jobWorkQueue=None, controlQueue=None, log=None
+        self,
+        parent,
+        proxyModel=None,
+        funcProgress=None,
+        jobWorkQueue=None,
+        controlQueue=None,
+        log=None,
     ):
         super(JobQueue, self).__init__(parent)
 
         self.__log = None
         self.__progress = None
+        self.__model = None
+        self.__proxyModel = None
 
         self.parent = parent
-        self.tableModel = model
+        self.proxyModel = proxyModel
         self.progress = funcProgress
         self.controlQueue = controlQueue
 
@@ -123,15 +130,13 @@ class JobQueue(QObject):
             self._workQueue = jobWorkQueue
 
         self.log = log
-
         self.runJobs = RunJobs(
             self, self, log=self.log
         )  # progress function is a late bind
-
         self.statusUpdateSignal.connect(self.statusUpdate)
         self.runSignal.connect(self.run)
-
         jobID = config.data.get("JobID")
+
         if jobID:
             if jobID > 9999:
                 # Roll over
@@ -171,12 +176,17 @@ class JobQueue(QObject):
 
     @property
     def model(self):
-        return self.tableModel
+        return self.__model
 
-    @model.setter
-    def model(self, value):
+    @property
+    def proxyModel(self):
+        return self.__proxyModel
+
+    @proxyModel.setter
+    def proxyModel(self, value):
         if isinstance(value, TableProxyModel):
-            self.tableModel = value.sourceModel()
+            self.__proxyModel = value
+            self.__model = value.sourceModel()
 
     @property
     def progress(self):
@@ -186,17 +196,10 @@ class JobQueue(QObject):
     def progress(self, value):
         self.__progress = value
 
-    @model.setter
-    def model(self, value):
-        if isinstance(value, TableProxyModel):
-            self.tableModel = value.sourceModel()
-
     @Slot(object, str)
     def statusUpdate(self, job, status):
 
-        print("Jobs statusUpdate job {} = {}".format(job.job[JobKey.ID], status))
-
-        self.tableModel.setData(job.statusIndex, status)
+        self.model.setData(job.statusIndex, status)
 
     def append(self, jobRow):
         """
@@ -210,35 +213,34 @@ class JobQueue(QObject):
             bool: True if append successful False otherwise
         """
 
-        #job = self.tableModel.dataset[
+        # job = self.model.dataset[
         #    jobRow,
-        #]
+        # ]
 
-        status = self.tableModel.dataset[jobRow,][JobKey.Status]
+        status = self.model.dataset[jobRow,][JobKey.Status]
         if status != JobStatus.AddToQueue:
             if status == JobStatus.Waiting:
                 self.addWaitingItemSignal.emit()
             return False
 
-        jobID = self.tableModel.dataset[jobRow,][JobKey.ID]
-        jobIndex = self.tableModel.index(jobRow, JobKey.ID)
-        statusIndex = self.tableModel.index(jobRow, JobKey.Status)
-        commandIndex = self.tableModel.index(jobRow, JobKey.Command)
+        jobID = self.model.dataset[jobRow,][JobKey.ID]
+        jobIndex = self.model.index(jobRow, JobKey.ID)
+        statusIndex = self.model.index(jobRow, JobKey.Status)
+        commandIndex = self.model.index(jobRow, JobKey.Command)
 
         if not jobID:
-            self.tableModel.setData(jobIndex, self.__jobID)
+            self.model.setData(jobIndex, self.__jobID)
             self.__jobID += 1
             config.data.set("JobID", self.__jobID)
 
         newJob = JobInfo(
             [jobIndex, statusIndex, commandIndex],
-            self.tableModel.dataset[jobRow,],
-            self.tableModel,
+            self.model.dataset[jobRow,],
+            self.model,
             log=self.log,
         )
         self._workQueue.append(newJob)
-
-        self.tableModel.setData(statusIndex, JobStatus.Queue)
+        self.model.setData(statusIndex, JobStatus.Queue)
 
         if self._workQueue:
             self.addQueueItemSignal.emit()
@@ -261,7 +263,6 @@ class JobQueue(QObject):
         """
 
         if self._workQueue:
-
             element = self._workQueue.popleft()
             self._checkEmptied()
 
@@ -278,7 +279,6 @@ class JobQueue(QObject):
         """
 
         if self._workQueue:
-
             element = self._workQueue.pop()
             self._checkEmptied()
 
@@ -295,7 +295,6 @@ class JobQueue(QObject):
         """
 
         if self._workQueue:
-
             element = self._workQueue.popleft()
             self._checkEmptied()
 
@@ -314,7 +313,7 @@ class JobQueue(QObject):
         run test run worker thread
         """
 
-        self.runJobs.model = self.tableModel
+        self.runJobs.proxyModel = self.proxyModel
         self.runJobs.progress = self.progress
         self.runJobs.output = self.output
         self.runJobs.log = self.log
