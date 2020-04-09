@@ -20,7 +20,6 @@ from PySide2.QtGui import QIcon, QFont, Qt
 from PySide2.QtWidgets import (
     QAction,
     QApplication,
-    qApp,
     QMainWindow,
     QMessageBox,
     QVBoxLayout,
@@ -164,11 +163,11 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         _initHelper setup signals, do any late binds and misc configuration
         """
 
-        # Set output to contain output windows insertText Signals
+        # Set output to contain output windows objects
         self.output = OutputWindows(
-            self.commandWidget.outputWindow.insertText,
-            self.jobsOutput.insertText,
-            self.errorOutput.insertText,
+            self.commandWidget.outputWindow,
+            self.jobsOutput,
+            self.errorOutput,
         )
         self.commandWidget.output = self.output
         self.tableViewWidget.output = self.output
@@ -177,6 +176,8 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.commandWidget.outputWindow.setReadOnly(True)
         self.jobsOutput.setReadOnly(True)
         self.errorOutput.setReadOnly(True)
+
+        self.jobsOutput.textChanged.connect(self.commandWidget.resetButtonState)
 
         # setup widgets setLanguage to SetLanguage change signal
         self.widgetSetLanguage.addSlot(self.tableViewWidget.setLanguage)
@@ -547,7 +548,7 @@ def _help(pth, index=0):
 def abort():
     """Force Quit"""
 
-    qApp.quit()  # pylint: disable=E1101
+    QApplication.quit()  # pylint: disable=E1101
 
 
 def mainApp():
