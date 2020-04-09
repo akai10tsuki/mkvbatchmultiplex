@@ -16,9 +16,13 @@ class OutputWindows(QObject):
     job = Signal(str, dict)
     error = Signal(str, dict)
 
-    def __init__(self, outCommandInsertText, outJobsInsertText, outErrorInsertText):
+    def __init__(self, outCommand, outJobs, outError):
         super(OutputWindows, self).__init__()
 
-        self.command.connect(outCommandInsertText)
-        self.job.connect(outJobsInsertText)
-        self.error.connect(outErrorInsertText)
+        self.commandOutput = outCommand
+        self.jobOutput = outJobs
+        self.errorOutput = outError
+
+        self.command.connect(outCommand.insertText)
+        self.job.connect(outJobs.insertText)
+        self.error.connect(outError.insertText)
