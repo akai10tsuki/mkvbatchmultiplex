@@ -16,6 +16,7 @@ from PySide2.QtWidgets import (
     QFormLayout,
     QFrame,
     QLineEdit,
+    QMessageBox,
 )
 
 from vsutillib.pyqt import (
@@ -24,6 +25,7 @@ from vsutillib.pyqt import (
     runFunctionInThread,
 )
 from vsutillib.process import isThreadRunning
+from vsutillib.pyqt import messageBox
 from vsutillib.mkv import MKVCommand
 
 from .. import config
@@ -45,6 +47,7 @@ class CommandWidget(QWidget):
     updateCommandSignal = Signal(str)
     cliButtonsSateSignal = Signal(bool)
     cliValidateSignal = Signal(bool)
+    resetSignal = Signal()
 
     @classmethod
     def classLog(cls, setLogging=None):
@@ -178,7 +181,9 @@ class CommandWidget(QWidget):
             toolTip="Erase text in output window",
         )
         btnReset = QPushButtonWidget(
-            "Reset", toolTip="Reset state completely to work with another batch"
+            "Reset",
+            function=self.reset,
+            toolTip="Reset state completely to work with another batch",
         )
 
         self.btnGrid.addWidget(btnPasteClipboard, 0, 0)
@@ -423,6 +428,7 @@ class CommandWidget(QWidget):
 
     def clearButtonState(self):
         """Set clear button state"""
+
         if self.outputWindow.toPlainText() != "":
             self.btnGrid.itemAt(config.BTNCLEAR).widget().setEnabled(True)
         else:
@@ -444,6 +450,41 @@ class CommandWidget(QWidget):
 
         if bAnswer:
             self.outputWindow.clear()
+
+    def resetButtonState(self):
+        """Set clear button state"""
+
+        if self.output.jobOutput.toPlainText() != "":
+            self.btnGrid.itemAt(config.BTNRESET).widget().setEnabled(True)
+        else:
+            self.btnGrid.itemAt(config.BTNRESET).widget().setEnabled(False)
+
+    def reset(self):
+        """
+        reset program status
+        """
+
+        language = config.data.get(config.ConfigKey.Language)
+
+        if not isThreadRunning(config.WORKERTHREADNAME):
+
+            language = config.data.get(config.ConfigKey.Language)
+            bAnswer = False
+
+            # Clear output window?
+            title = "Reset"
+            msg = "¿" if language == "es" else ""
+            msg += "Reset Application" + "?"
+            bAnswer = yesNoDialog(self, msg, title)
+
+            if bAnswer:
+                self.cmdLine.clear()
+                self.outputWindow.clear()
+                self.output.jobOutput.clear()
+                self.output.errorOutput.clear()
+
+        else:
+            messageBox(self, "Reset", "Jobs are running..")
 
     def setLanguage(self):
         """
