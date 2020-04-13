@@ -133,6 +133,11 @@ class CommandWidget(QWidget):
             function=self.pasteClipboard,
             toolTip="Paste Clipboard contents in command line",
         )
+        #btnRename = QPushButtonWidget(
+        #    "Rename",
+        #    function=self.,
+        #    toolTip="Rename output files",
+        #)
         btnAddQueue = QPushButtonWidget(
             "Add Queue",
             function=lambda: self.addCommand(JobStatus.AddToQueue),
