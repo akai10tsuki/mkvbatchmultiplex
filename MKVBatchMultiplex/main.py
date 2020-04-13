@@ -320,13 +320,18 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         bLogging = False
 
         if action == config.Action.Reset:
+            # Font
             self.setFont(defaultFont)
             self.setAppFont(defaultFont)
+            # Logging
             self.actEnableLogging.setChecked(bLogging)
             self.enableLoggin(bLogging)
+            # Geometry
             self.setGeometry(0, 0, 1280, 720)
             centerWidgets(self)
+
         elif action == config.Action.Restore:
+            # Font
             if strFont := config.data.get(config.ConfigKey.Font):
                 restoreFont = QFont()
                 restoreFont.fromString(strFont)
@@ -336,16 +341,19 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
                 self.setFont(defaultFont)
                 self.setAppFont(defaultFont)
 
+            # Logging
             if bLogging := config.data.get(config.ConfigKey.Logging):
                 self.actEnableLogging.setChecked(bLogging)
                 self.enableLogging(bLogging)
 
+            # Geometry
             if byteGeometry := config.data.get(config.ConfigKey.Geometry):
                 self.restoreGeometry(QByteArray.fromBase64(QByteArray(byteGeometry)))
             else:
                 self.setGeometry(0, 0, 1280, 720)
                 centerWidgets(self)
 
+            # Current tab
             if tabIndex := config.data.get("Tab"):
                 # setting tab to jobs
                 self.tabs.setCurrentIndexSignal.emit(tabIndex)
@@ -382,6 +390,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
         if bAnswer:
             self.configuration(action=config.Action.Reset)
+            self.configuration(action=config.Action.Update)
 
     def setAppFont(self, font):
         """
