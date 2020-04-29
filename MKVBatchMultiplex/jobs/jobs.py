@@ -14,7 +14,7 @@ from collections import deque
 from PySide2.QtCore import QObject, Slot, Signal
 
 
-from vsutillib.mkv import MKVCommand
+from vsutillib.mkv import MKVCommand, MKVCommandParser
 
 from .. import config
 from ..models import TableProxyModel
@@ -54,7 +54,8 @@ class JobInfo:  # pylint: disable=too-many-instance-attributes
         )
 
         if not self.oCommand:
-            self.oCommand = MKVCommand(job[JobKey.Command], log=log)
+            # self.oCommand = MKVCommand(job[JobKey.Command], log=log)
+            self.oCommand = MKVCommandParser(job[JobKey.Command], log=log)
 
         self.errors = [] if errors is None else errors
         self.output = [] if output is None else output
@@ -70,6 +71,7 @@ class JobQueue(QObject):
 
     # Class logging state
     __log = False
+
     __firstRun = True
     __jobID = 10
 
