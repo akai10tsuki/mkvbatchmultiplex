@@ -5,6 +5,7 @@ class CommandWidget
 # pylint: disable=bad-continuation
 
 import logging
+import time
 
 from PySide2.QtCore import Qt, Signal, Slot
 from PySide2.QtGui import QPalette
@@ -25,8 +26,8 @@ from vsutillib.pyqt import (
     runFunctionInThread,
 )
 from vsutillib.process import isThreadRunning
-from vsutillib.pyqt import messageBox
-from vsutillib.mkv import MKVCommand
+from vsutillib.pyqt import messageBox, LineOutput
+from vsutillib.mkv import MKVCommand, MKVCommandParser
 
 from .. import config
 from ..jobs import JobStatus
@@ -82,7 +83,8 @@ class CommandWidget(QWidget):
         self.__rename = None
         self.__tab = None
 
-        self.oCommand = MKVCommand()
+        # self.oCommand = MKVCommand()
+        self.oCommand = MKVCommandParser()
         self.controlQueue = controlQueue
         self.parent = parent
         self.proxyModel = proxyModel
@@ -99,16 +101,16 @@ class CommandWidget(QWidget):
         # command line
         #
         self.frmCmdLine = QFormLayout()
-        btnAddCommand = QPushButtonWidget(
-            Text.txt0160,
-            function=lambda: self.addCommand(JobStatus.Waiting),
-            toolTip=Text.txt0161,
+        btnPasteClipboard = QPushButtonWidget(
+            "Paste",
+            function=self.pasteClipboard,
+            toolTip="Paste Clipboard contents in command line",
         )
         self.cmdLine = QLineEdit()
         self.cmdLine.setValidator(
             ValidateCommand(self, self.cliValidateSignal, log=self.log)
         )
-        self.frmCmdLine.addRow(btnAddCommand, self.cmdLine)
+        self.frmCmdLine.addRow(btnPasteClipboard, self.cmdLine)
         self.command = QWidget()
         self.command.setLayout(self.frmCmdLine)
 
@@ -128,16 +130,16 @@ class CommandWidget(QWidget):
         line1.setFrameShadow(QFrame.Raised)
         line1.setLineWidth(1)
 
-        btnPasteClipboard = QPushButtonWidget(
-            "Paste",
-            function=self.pasteClipboard,
-            toolTip="Paste Clipboard contents in command line",
+        btnAddCommand = QPushButtonWidget(
+            Text.txt0160,
+            function=lambda: self.addCommand(JobStatus.Waiting),
+            toolTip=Text.txt0161,
         )
-        #btnRename = QPushButtonWidget(
-        #    "Rename",
-        #    function=self.,
-        #    toolTip="Rename output files",
-        #)
+        btnRename = QPushButtonWidget(
+            "Rename",
+            function=self.parent.renameWidget.setCurrentIndexSignal.emit,
+            toolTip="Rename output files",
+        )
         btnAddQueue = QPushButtonWidget(
             "Add Queue",
             function=lambda: self.addCommand(JobStatus.AddToQueue),
@@ -191,7 +193,8 @@ class CommandWidget(QWidget):
             toolTip="Reset state completely to work with another batch",
         )
 
-        self.btnGrid.addWidget(btnPasteClipboard, 0, 0)
+        self.btnGrid.addWidget(btnAddCommand, 0, 0)
+        self.btnGrid.addWidget(btnRename, 0, 1)
         self.btnGrid.addWidget(btnAddQueue, 1, 0)
         self.btnGrid.addWidget(btnStartQueue, 1, 1)
         self.btnGrid.addWidget(line, 2, 0, 1, 2)
@@ -244,23 +247,22 @@ class CommandWidget(QWidget):
         #
 
         # Command related
-        self.frmCmdLine.itemAt(0, QFormLayout.LabelRole).widget().setEnabled(False)
+        #self.frmCmdLine.itemAt(0, QFormLayout.LabelRole).widget().setEnabled(False)
         self.cliButtonsState(False)
 
         # Clear buttons related
-        self.btnGrid.itemAt(config.BTNCLEAR).widget().setEnabled(False)
-        self.btnGrid.itemAt(config.BTNRESET).widget().setEnabled(False)
+        self.btnGrid.itemAt(_Button.CLEAR).widget().setEnabled(False)
+        self.btnGrid.itemAt(_Button.RESET).widget().setEnabled(False)
 
         # connect text windows textChanged to clearButtonState function
         self.outputWindow.textChanged.connect(self.clearButtonState)
 
         # Job Queue related
-        self.btnGrid.itemAt(config.BTNSTARTQUEUE).widget().setEnabled(False)
+        self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(False)
 
         #
         # Misc
         #
-
         self.cmdLine.setClearButtonEnabled(True)  # button at end of line to clear it
 
     @property
@@ -329,16 +331,13 @@ class CommandWidget(QWidget):
             validateOK (bool): True to enable, False to disable
         """
 
-        addCommand = self.frmCmdLine.itemAt(
-            config.BTNADDCOMMAND, QFormLayout.LabelRole
-        ).widget()
-        addCommand.setEnabled(validateOK)
-
         for b in [
-            config.BTNADDQUEUE,
-            config.BTNANALYSIS,
-            config.BTNSHOWCOMMANDS,
-            config.BTNCHECKFILES,
+            _Button.ADDCOMMAND,
+            _Button.RENAME,
+            _Button.ADDQUEUE,
+            _Button.ANALYSIS,
+            _Button.SHOWCOMMANDS,
+            _Button.CHECKFILES,
         ]:
             button = self.btnGrid.itemAt(b).widget()
             button.setEnabled(validateOK)
@@ -352,30 +351,40 @@ class CommandWidget(QWidget):
             validateOK (bool): True if command line is Ok.  False otherwise.
         """
 
+        if validateOK:
+            self.output.command.emit(
+                "Command looks ok.\n", {LineOutput.AppendEnd: True}
+            )
+        else:
+            if self.cmdLine.text() != "":
+                self.output.command.emit("Bad command.\n", {LineOutput.AppendEnd: True})
+
         self.cliButtonsState(validateOK)
         self.updateObjCommnad(validateOK)
-        if self.rename is not None:
-            if validateOK:
-                self.rename.setFilesSignal.emit(self.oCommand)
-                self.rename.applyFileRenameSignal.connect(self.applyRename)
-            else:
-                self.rename.clear()
 
     @Slot(bool)
     def jobStartQueueState(self, state):
 
         if state and not isThreadRunning(config.WORKERTHREADNAME):
-            self.btnGrid.itemAt(config.BTNSTARTQUEUE).widget().setEnabled(True)
+            self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(True)
         else:
-            self.btnGrid.itemAt(config.BTNSTARTQUEUE).widget().setEnabled(False)
+            self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(False)
 
     @Slot(bool)
     def updateObjCommnad(self, valid):
 
         if valid:
             self.oCommand.command = self.cmdLine.text()
+            if self.rename is not None:
+                # Have to wait for MKVCommandParser finish reading files
+                # while isThreadRunning("MKVPARSING"):
+                #    time.sleep(0.5)
+                self.rename.setFilesSignal.emit(self.oCommand)
+                self.rename.applyFileRenameSignal.connect(self.applyRename)
         else:
             self.oCommand.command = ""
+            if self.rename is not None:
+                self.rename.clear()
 
     @Slot(str)
     def updateCommand(self, command):
@@ -429,15 +438,19 @@ class CommandWidget(QWidget):
         clip = QApplication.clipboard().text()
 
         if clip:
-            self.updateCommand(clip)
+            self.output.command.emit(
+                "Checking command...\n", {LineOutput.AppendEnd: True}
+            )
+            self.update()
+            self.updateCommandSignal.emit(clip)
 
     def clearButtonState(self):
         """Set clear button state"""
 
         if self.outputWindow.toPlainText() != "":
-            self.btnGrid.itemAt(config.BTNCLEAR).widget().setEnabled(True)
+            self.btnGrid.itemAt(_Button.CLEAR).widget().setEnabled(True)
         else:
-            self.btnGrid.itemAt(config.BTNCLEAR).widget().setEnabled(False)
+            self.btnGrid.itemAt(_Button.CLEAR).widget().setEnabled(False)
 
     def clearOutputWindow(self):
         """
@@ -460,9 +473,9 @@ class CommandWidget(QWidget):
         """Set clear button state"""
 
         if self.output.jobOutput.toPlainText() != "":
-            self.btnGrid.itemAt(config.BTNRESET).widget().setEnabled(True)
+            self.btnGrid.itemAt(_Button.RESET).widget().setEnabled(True)
         else:
-            self.btnGrid.itemAt(config.BTNRESET).widget().setEnabled(False)
+            self.btnGrid.itemAt(_Button.RESET).widget().setEnabled(False)
 
     def reset(self):
         """
@@ -487,6 +500,7 @@ class CommandWidget(QWidget):
                 self.outputWindow.clear()
                 self.output.jobOutput.clear()
                 self.output.errorOutput.clear()
+                self.resetSignal.emit()
 
         else:
             messageBox(self, "Reset", "Jobs are running..")
@@ -507,3 +521,20 @@ class CommandWidget(QWidget):
             if isinstance(widget, QPushButtonWidget):
                 widget.setText("  " + _(widget.originalText) + "  ")
                 widget.setToolTip(_(widget.toolTip))
+
+
+class _Button:
+
+    PASTE = 0
+
+    ADDCOMMAND = 0
+    RENAME = 1
+    ADDQUEUE = 2
+    STARTQUEUE = 3
+
+    ANALYSIS = 5
+    SHOWCOMMANDS = 6
+    CHECKFILES = 7
+
+    CLEAR = 9
+    RESET = 10
