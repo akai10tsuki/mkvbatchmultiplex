@@ -19,7 +19,7 @@ from PySide2.QtWidgets import (
     QHeaderView,
 )
 
-from vsutillib.mkv import MKVCommand
+from vsutillib.mkv import MKVCommand, MKVCommandParser
 
 from ..jobs import JobStatus
 
@@ -41,17 +41,17 @@ class JobsTableView(QTableView):
     # Class logging state
     __log = False
 
-    def __init__(self, parent=None, model=None, title=None, log=None):
+    def __init__(self, parent=None, proxyModel=None, title=None, log=None):
         super(JobsTableView, self).__init__()
 
         self.__log = None  # Instance logging state None = Class state prevails
 
         self.parent = parent
-        self.model = model
+        self.proxyModel = proxyModel
         self.viewTitle = title
         self.log = log
 
-        self.setModel(model)
+        self.setModel(proxyModel)
         self.setSortingEnabled(True)
 
         self._initHelper()
@@ -127,7 +127,7 @@ class JobsTableView(QTableView):
         if columnsToInclude is None:
             columnsToInclude = []
 
-        for i, column in enumerate(self.model.sourceModel().columns):
+        for i, column in enumerate(self.proxyModel.sourceModel().columns):
             hide = column not in columnsToInclude
             self.setColumnHidden(i, hide)
 
@@ -135,7 +135,7 @@ class JobsTableView(QTableView):
         """Context Menu"""
 
         row = self.rowAt(event.pos().y())
-        totalRows = self.model.rowCount()
+        totalRows = self.proxyModel.rowCount()
 
         if 0 <= row < totalRows:
 
@@ -149,8 +149,8 @@ class JobsTableView(QTableView):
                 if result == "Copy":
                     self.copySelection()
                 elif result == "Remove":
-                    self.model.filterConditions["Remove"].append(row)
-                    self.model.setFilterFixedString("")
+                    self.proxyModel.filterConditions["Remove"].append(row)
+                    self.proxyModel.setFilterFixedString("")
 
     def contextMenuEventOriginal(self, event):
         """
@@ -165,7 +165,7 @@ class JobsTableView(QTableView):
         """
 
         index = self.indexAt(event.pos())
-        row = self.model.mapToSource(index).row()
+        row = self.proxyModel.mapToSource(index).row()
         contextMenu = QMenu(self)
         menuItems = {}
 
@@ -177,8 +177,8 @@ class JobsTableView(QTableView):
         if selection == menuItems["Copy"]:  # Specify what happens for each item
             self.copySelection()
         elif selection == menuItems["Remove"]:
-            self.model.filterConditions["Remove"].append(row)
-            self.model.setFilterFixedString("")
+            self.proxyModel.filterConditions["Remove"].append(row)
+            self.proxyModel.setFilterFixedString("")
 
     def resizeEvent(self, event):
 
@@ -237,10 +237,10 @@ class JobsTableView(QTableView):
 
     def _addCommand(self, command):
 
-        oCommand = MKVCommand(command)
+        oCommand = MKVCommandParser(command)
 
         if oCommand:
-            tableModel = self.model.sourceModel()
+            tableModel = self.proxyModel.sourceModel()
             totalJobs = tableModel.rowCount()
             data = [["", ""], [JobStatus.Waiting, "Status code"], [command, command]]
             tableModel.insertRows(totalJobs, 1, data=data)
