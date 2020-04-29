@@ -10,6 +10,7 @@ Also if files are drop from directories in the OS it will rename them.
 
 import logging
 import re
+import time
 
 from pathlib import Path
 
@@ -26,6 +27,7 @@ from PySide2.QtWidgets import (
 )
 
 import vsutillib.pyqt as pyqt
+from vsutillib.process import isThreadRunning
 
 from .. import config
 
@@ -60,6 +62,7 @@ class RenameWidget(QWidget):
     outputOriginalFilesSignal = Signal(str, dict)
     applyFileRenameSignal = Signal(list)
     setFilesSignal = Signal(object)
+    setCurrentIndexSignal = Signal()
 
     @classmethod
     def classLog(cls, setLogging=None):
@@ -190,6 +193,7 @@ class RenameWidget(QWidget):
         maxCount = config.data.get(Key.MaxCount)
 
         # local signals
+        self.setCurrentIndexSignal.connect(self._setCurrentIndex)
         self.setFilesSignal.connect(self.setFiles)
         self.textRegEx.cmdLine.currentTextChanged.connect(self._updateRegEx)
         self.textSubString.cmdLine.currentTextChanged.connect(self._updateRegEx)
@@ -250,6 +254,20 @@ class RenameWidget(QWidget):
     @tab.setter
     def tab(self, value):
         self.__tab = value
+
+    @property
+    def tabWidget(self):
+        return self.__tabWidget
+
+    @tabWidget.setter
+    def tabWidget(self, value):
+        self.__tabWidget = value
+
+    @Slot()
+    def _setCurrentIndex(self):
+
+        if self.tabWidget:
+            self.tabWidget.setCurrentIndex(self.tab)
 
     @property
     def output(self):
@@ -345,6 +363,10 @@ class RenameWidget(QWidget):
 
         self.textOriginalNames.textBox.clear()
         self.textRenameResults.textBox.clear()
+
+        # Have to wait for MKVCommandParser finish reading files
+        while isThreadRunning("MKVPARSING"):
+            time.sleep(0.5)
 
         for f in objCommand.destinationFiles:
             # show files
