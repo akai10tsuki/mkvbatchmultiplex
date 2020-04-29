@@ -281,7 +281,7 @@ def displayRunJobs(line, job, output, indexTotal, funcProgress=None):
 
 
 @staticVars(running=False)
-def runJobs(jobQueue, output, model, funcProgress=None, log=False):
+def runJobs(jobQueue, output, model, funcProgress, log=False):
     """
     runJobs execute jobs on queue
 
@@ -303,6 +303,7 @@ def runJobs(jobQueue, output, model, funcProgress=None, log=False):
     currentJob = 0
     indexTotal = [0, 0]
     verify = mkv.VerifyStructure(log=log)
+    totalErrors = 0
 
     while job := jobQueue.popLeft():
         actualRemaining = len(jobQueue)
@@ -359,7 +360,11 @@ def runJobs(jobQueue, output, model, funcProgress=None, log=False):
 
             updateStatus = True
 
-            for cmd, baseFiles, sourceFiles, destinationFile, _ in job.oCommand:
+            if not job.oCommand.commandsGenerated:
+                output.job.emit("Generating commands...", {"appendEnd": True})
+                job.oCommand.generateCommands()
+
+            for cmd, baseFiles, sourceFiles, destinationFile, _, _, _ in job.oCommand:
                 funcProgress.lblSetValue.emit(2, indexTotal[0] + 1)
 
                 # Check Job Status for Abort
@@ -407,6 +412,9 @@ def runJobs(jobQueue, output, model, funcProgress=None, log=False):
                         cli.run()
 
                 else:
+                    totalErrors += 1
+                    funcProgress.lblSetValue.emit(4, totalErrors)
+
                     msg = "Error Job ID: {} ---------------------".format(
                         job.job[JobKey.ID]
                     )
@@ -446,6 +454,8 @@ def runJobs(jobQueue, output, model, funcProgress=None, log=False):
                 MODULELOG.debug("RJB0009: Job ID: %s finished.", job.job[JobKey.ID])
 
         else:
+            totalErrors += 1
+            funcProgress.lblSetValue.emit(4, totalErrors)
             msg = "Job ID: {} cannot execute command.\n\nCommand: {}\n"
             msg = msg.format(job.job[JobKey.ID], job.oCommand.command)
             output.error.emit(msg, {"color": Qt.red})
