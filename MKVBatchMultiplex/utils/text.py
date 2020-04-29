@@ -115,6 +115,8 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0179 = S_("Reset state completely to work with another batch")
     txt0180 = S_("Clear output")
     txt0181 = S_("Clear output window")
+    txt0182 = S_("Rename")
+    txt0183 = S_("Rename output files")
 
     # RenameWidget
     # 200
