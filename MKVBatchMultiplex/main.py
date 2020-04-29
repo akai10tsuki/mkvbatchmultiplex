@@ -15,7 +15,7 @@ import webbrowser
 from collections import deque
 from pathlib import Path
 
-from PySide2.QtCore import QByteArray, Slot
+from PySide2.QtCore import QByteArray, QSize, Slot
 from PySide2.QtGui import QIcon, QFont, Qt
 from PySide2.QtWidgets import (
     QAction,
@@ -79,6 +79,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.widgetSetLanguage = SetLanguage()
         self.progressSpin = QProgressIndicator(self)
         self.progressSpin.color = Qt.cyan
+        self.progressSpin.delay = 50
         self.progressSpin.displayedWhenStopped = True
 
         #
@@ -91,7 +92,6 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
             self.appDirectory = Path(os.path.realpath(__file__))
 
         self.setWindowTitle(config.APPNAME + ": " + config.DESCRIPTION)
-        self.setWindowIcon(QIcon(str(self.appDirectory.parent) + "/images/Itsue.png"))
 
         # Setup User Interface
         self._initMenu()
@@ -115,10 +115,10 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         # Widgets for tabs
         self.tableViewWidget = JobsTableViewWidget(self, self.proxyModel, "Jobs Table")
         self.tableViewWidget.tableView.sortByColumn(0, Qt.AscendingOrder)
+        self.renameWidget = RenameWidget(self)
         self.commandWidget = CommandWidget(self, self.proxyModel)
         self.jobsOutput = OutputTextWidget(self)
         self.errorOutput = OutputTextWidget(self)
-        self.renameWidget = RenameWidget(self)
 
         tabsList = []
         tabsList.append(
@@ -565,8 +565,26 @@ def mainApp():
 
     config.init()
 
+    #
+    # Where am I running from
+    #
+    if getattr(sys, "frozen", False):
+        # Running in a pyinstaller bundle
+        directory = Path(os.path.dirname(__file__))
+    else:
+        directory = Path(os.path.realpath(__file__))
+
+
     # PySide2 app
     app = QApplication(sys.argv)
+
+    icon = QIcon()
+    #icon.addFile(str(directory.parent) + '/images/Itsue16x16.png', QSize(16,16))
+    #icon.addFile(str(directory.parent) + '/images/Itsue24x24.png', QSize(24,24))
+    #icon.addFile(str(directory.parent) + '/images/Itsue32x32.png', QSize(32,32))
+    #icon.addFile(str(directory.parent) + '/images/Itsue48x48.png', QSize(48,48))
+    icon.addFile(str(directory.parent) + '/images/Itsue256x256.png', QSize(256,256))
+    #app.setWindowIcon(icon)
 
     # Palette will change on macOS according to current theme
     # will create a poor mans dark theme for windows
@@ -576,6 +594,7 @@ def mainApp():
         app.setPalette(darkPalette())
 
     win = MainWindow()
+    win.setWindowIcon(icon)
     win.show()
     app.exec_()
     config.close()
