@@ -79,7 +79,7 @@ class JobQueue(QObject):
     runSignal = Signal()
     addQueueItemSignal = Signal()
     queueEmptiedSignal = Signal()
-    statusChangeSignal = Signal()
+    statusChangeSignal = Signal(object)
 
     @classmethod
     def classLog(cls, setLogging=None):
@@ -133,7 +133,7 @@ class JobQueue(QObject):
 
         self.log = log
         self.runJobs = RunJobs(
-            self, self, log=self.log
+            self, self, controlQueue=self.controlQueue, log=self.log
         )  # progress function is a late bind
         self.statusUpdateSignal.connect(self.statusUpdate)
         self.runSignal.connect(self.run)
