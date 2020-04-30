@@ -173,10 +173,11 @@ class RunJobs(QObject):
                 self.jobsqueue,
                 self.output,
                 self.model,
+                self.progress,
+                self.controlQueue,
                 log=self.log,
                 funcStart=self.start,
                 funcResult=self.result,
-                funcProgress=self.progress,
                 funcFinished=self.finished,
             )
             self.jobsWorker.name = config.WORKERTHREADNAME
@@ -281,13 +282,13 @@ def displayRunJobs(line, job, output, indexTotal, funcProgress=None):
 
 
 @staticVars(running=False)
-def runJobs(jobQueue, output, model, funcProgress, log=False):
+def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
     """
     runJobs execute jobs on queue
 
     Args:
         jobQueue (JobQueue): Job queue has all related information for the job
-        funcProgress (func, optional): function to call to report job progress. Defaults to None.
+        funcProgress (func): function to call to report job progress. Defaults to None.
 
     Returns:
         str: Dummy  return value
@@ -304,8 +305,14 @@ def runJobs(jobQueue, output, model, funcProgress, log=False):
     indexTotal = [0, 0]
     verify = mkv.VerifyStructure(log=log)
     totalErrors = 0
+    abortAll = False
 
     while job := jobQueue.popLeft():
+
+        if abortAll:
+            jobQueue.statusUpdateSignal.emit(job, JobStatus.Aborted)
+            continue
+
         actualRemaining = len(jobQueue)
 
         if actualRemaining == remainingJobs:
@@ -345,6 +352,7 @@ def runJobs(jobQueue, output, model, funcProgress, log=False):
             processLine=displayRunJobs,
             processArgs=[job, output, indexTotal],
             processKWArgs={"funcProgress": funcProgress},
+            controlQueue=controlQueue,
             commandShlex=True,
             universalNewLines=True,
             log=log,
@@ -354,6 +362,7 @@ def runJobs(jobQueue, output, model, funcProgress, log=False):
             msg = "*******************\n"
             msg += "Job ID: {} started.\n\n".format(job.job[JobKey.ID])
             output.job.emit(msg, {"color": Qt.cyan})
+            exitStatus = "ended"
 
             if log:
                 MODULELOG.debug("RJB0005: Job ID: %s started.", job.job[JobKey.ID])
@@ -361,10 +370,13 @@ def runJobs(jobQueue, output, model, funcProgress, log=False):
             updateStatus = True
 
             if not job.oCommand.commandsGenerated:
-                output.job.emit("Generating commands...", {"appendEnd": True})
+                output.job.emit("Generating commands...\n", {"appendEnd": True})
                 job.oCommand.generateCommands()
 
-            for cmd, baseFiles, sourceFiles, destinationFile, _, _, _ in job.oCommand:
+            for (
+                index,
+                (cmd, baseFiles, sourceFiles, destinationFile, _, _, _),
+            ) in enumerate(job.oCommand):
                 funcProgress.lblSetValue.emit(2, indexTotal[0] + 1)
 
                 # Check Job Status for Abort
@@ -372,9 +384,26 @@ def runJobs(jobQueue, output, model, funcProgress, log=False):
                 sourceIndex = job.statusIndex
                 status = model.dataset[sourceIndex.row(), sourceIndex.column()]
 
+                ###
+                # Check controlQueue
+                ###
+                if controlQueue:
+                    queueStatus = controlQueue.popleft()
+                    if queueStatus in [JobStatus.Abort, JobStatus.AbortJob, JobStatus.AbortJobError]:
+                        jobQueue.statusUpdateSignal.emit(job, JobStatus.Abort)
+                        status = JobStatus.Abort
+                        exitStatus = queueStatus
+                        if queueStatus == JobStatus.Abort:
+                            abortAll = True
+                        if f := job.oCommand[index - 1][3]:
+                            if f.is_file():
+                                f.unlink()
+
                 if status == JobStatus.Abort:
                     jobQueue.statusUpdateSignal.emit(job, JobStatus.Aborted)
                     updateStatus = False
+                    if exitStatus == "ended":
+                        exitStatus = "aborted"
                     break
                 #
                 # Check Job Status for Abort
@@ -443,7 +472,7 @@ def runJobs(jobQueue, output, model, funcProgress, log=False):
                 indexTotal[1] += 100
                 indexTotal[0] += 1
 
-            msg = "\nJob ID: {} ended.\n".format(job.job[JobKey.ID])
+            msg = "\nJob ID: {} {}.\n".format(job.job[JobKey.ID], exitStatus)
             msg += "*******************\n\n\n"
             output.job.emit(msg, {"color": Qt.cyan, "appendEnd": True})
 
