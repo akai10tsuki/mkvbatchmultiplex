@@ -7,6 +7,7 @@ import logging
 from PySide2.QtCore import QThreadPool, Qt, Slot
 from PySide2.QtWidgets import (
     QWidget,
+    QHBoxLayout,
     QGroupBox,
     QGridLayout,
     QApplication,
@@ -38,7 +39,7 @@ class JobsTableViewWidget(QWidget):
     # Class logging state
     __log = False
 
-    def __init__(self, parent, proxyModel, title=None, log=None):
+    def __init__(self, parent, proxyModel, controlQueue, title=None, log=None):
         super(JobsTableViewWidget, self).__init__(parent)
 
         self.__output = None
@@ -48,6 +49,7 @@ class JobsTableViewWidget(QWidget):
         self.parent = parent
         self.proxyModel = proxyModel
         self.model = proxyModel.sourceModel()
+        self.controlQueue = controlQueue
         self.tableView = JobsTableView(self, proxyModel, title)
         self.delegates = {}
 
@@ -82,17 +84,34 @@ class JobsTableViewWidget(QWidget):
         btnPrintDataset = QPushButtonWidget(
             Text.txt0128, function=self.printDataset, toolTip=Text.txt0129,
         )
+        btnAbortCurrentJob = QPushButtonWidget(
+            "Abort Current Job",
+            function=self.abortCurrentJob,
+            toolTip="Abort running job",
+        )
+        btnAbortJobs = QPushButtonWidget(
+            "Abort Jobs", function=self.abortCurrentJob, toolTip="Abort jobs",
+        )
+
+        self.btnGrid = QHBoxLayout()
+        self.btnGrid.addWidget(btnAddWaitingJobsToQueue)
+        self.btnGrid.addWidget(btnClearJobsQueue)
+        self.btnGrid.addWidget(btnStartQueue)
+        self.btnGrid.addWidget(btnAbortCurrentJob)
+        self.btnGrid.addWidget(btnAbortJobs)
+        self.btnGrid.addStretch()
+        if config.SIMULATERUN:
+            self.btnGrid.addWidget(btnPopulate)
+            self.btnGrid.addWidget(btnPrintDataset)
+
+        self.btnGroup = QGroupBox("")
+        self.btnGroup.setLayout(self.btnGrid)
 
         self.grpGrid.addWidget(self.tableView, 0, 0, 1, 5)
-        self.grpGrid.addWidget(btnAddWaitingJobsToQueue, 1, 0)
-        self.grpGrid.addWidget(btnClearJobsQueue, 1, 1)
-        self.grpGrid.addWidget(btnStartQueue, 1, 2)
-
-        if config.SIMULATERUN:
-            self.grpGrid.addWidget(btnPopulate, 1, 3)
-            self.grpGrid.addWidget(btnPrintDataset, 1, 4)
+        self.grpGrid.addWidget(self.btnGroup, 1, 0, 1, 5)
 
         self.grpBox.setLayout(self.grpGrid)
+
         grid.addWidget(self.grpBox)
         self.setLayout(grid)
 
@@ -113,6 +132,7 @@ class JobsTableViewWidget(QWidget):
 
         # Job Queue related
         self.parent.jobsQueue.statusChangeSignal.connect(self.jobAddWaitingState)
+        self.parent.jobsQueue.statusChangeSignal.connect(self.jobStatusChangeCheck)
         self.parent.jobsQueue.addQueueItemSignal.connect(
             lambda: self.jobStartQueueState(True)
         )
@@ -133,9 +153,11 @@ class JobsTableViewWidget(QWidget):
         )
 
         # Default button state
-        self.grpGrid.itemAt(config.JTVBTNADDWAITING).widget().setEnabled(False)
-        self.grpGrid.itemAt(config.JTVBTNSTARTQUEUE).widget().setEnabled(False)
-        self.grpGrid.itemAt(config.JTVBTNCLEARQUEUE).widget().setEnabled(False)
+        self.btnGrid.itemAt(_Button.ADDWAITING).widget().setEnabled(False)
+        self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(False)
+        self.btnGrid.itemAt(_Button.CLEARQUEUE).widget().setEnabled(False)
+        self.btnGrid.itemAt(_Button.ABORTCURRENTJOB).widget().setEnabled(False)
+        self.btnGrid.itemAt(_Button.ABORTJOBS).widget().setEnabled(False)
 
     @classmethod
     def classLog(cls, setLogging=None):
@@ -199,6 +221,12 @@ class JobsTableViewWidget(QWidget):
     def tab(self, value):
         self.__tab = value
 
+    def abortCurrentJob(self):
+        self.controlQueue.append(JobStatus.AbortJob)
+
+    def abortJobs(self):
+        self.controlQueue.append(JobStatus.Abort)
+
     def addWaitingJobsToQueue(self):
         """
         addWaitingJobsToQueue adds any Waiting job to job queue
@@ -238,10 +266,10 @@ class JobsTableViewWidget(QWidget):
         setLanguage set labels according to locale
         """
 
-        for index in range(self.grpGrid.count()):
-            widget = self.grpGrid.itemAt(index).widget()
+        for index in range(self.btnGrid.count()):
+            widget = self.btnGrid.itemAt(index).widget()
             if isinstance(widget, QPushButtonWidget):
-                widget.setText(_(widget.originalText))
+                widget.setText("  " + _(widget.originalText) + "  ")
                 widget.setToolTip(_(widget.toolTip))
 
         self.grpBox.setTitle(_(Text.txt0130))
@@ -267,29 +295,45 @@ class JobsTableViewWidget(QWidget):
 
         self.output.command.emit("\n", {})
 
-    @Slot(bool)
+    @Slot(object)
     def jobAddWaitingState(self):
 
-        self.grpGrid.itemAt(config.JTVBTNADDWAITING).widget().setEnabled(hasWaiting(self.model))
+        self.btnGrid.itemAt(_Button.ADDWAITING).widget().setEnabled(
+            hasWaiting(self.model)
+        )
 
     @Slot(bool)
     def jobClearQueueState(self, state):
 
-        self.grpGrid.itemAt(config.JTVBTNCLEARQUEUE).widget().setEnabled(state)
+        self.btnGrid.itemAt(_Button.CLEARQUEUE).widget().setEnabled(state)
 
     @Slot(bool)
     def jobStartQueueState(self, state):
 
         if state and not isThreadRunning(config.WORKERTHREADNAME):
-            self.grpGrid.itemAt(config.JTVBTNSTARTQUEUE).widget().setEnabled(state)
+            self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(state)
         else:
-            self.grpGrid.itemAt(config.JTVBTNSTARTQUEUE).widget().setEnabled(state)
+            self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(state)
 
     @Slot(bool)
     def jobStatus(self, running):
 
         if running:
             self.jobStartQueueState(False)
+
+        self.btnGrid.itemAt(_Button.ABORTCURRENTJOB).widget().setEnabled(running)
+        self.btnGrid.itemAt(_Button.ABORTJOBS).widget().setEnabled(running)
+
+    @Slot(object)
+    def jobStatusChangeCheck(self, index):
+
+        row = index.row()
+        column = index.column()
+
+        rowStatus = self.model.dataset[row, column]
+
+        if rowStatus == JobStatus.Abort:
+            self.controlQueue.append(JobStatus.AbortJob)
 
 
 def hasWaiting(model):
@@ -308,3 +352,12 @@ def hasWaiting(model):
             return True
 
     return False
+
+
+class _Button:
+
+    ADDWAITING = 0
+    CLEARQUEUE = 1
+    STARTQUEUE = 2
+    ABORTCURRENTJOB = 3
+    ABORTJOBS = 4
