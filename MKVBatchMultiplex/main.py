@@ -113,7 +113,9 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.jobsQueue.progress = self.progress
 
         # Widgets for tabs
-        self.tableViewWidget = JobsTableViewWidget(self, self.proxyModel, "Jobs Table")
+        self.tableViewWidget = JobsTableViewWidget(
+            self, self.proxyModel, self.controlQueue, "Jobs Table"
+        )
         self.tableViewWidget.tableView.sortByColumn(0, Qt.AscendingOrder)
         self.renameWidget = RenameWidget(self)
         self.commandWidget = CommandWidget(self, self.proxyModel)
@@ -165,9 +167,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
         # Set output to contain output windows objects
         self.output = OutputWindows(
-            self.commandWidget.outputWindow,
-            self.jobsOutput,
-            self.errorOutput,
+            self.commandWidget.outputWindow, self.jobsOutput, self.errorOutput,
         )
         self.commandWidget.output = self.output
         self.tableViewWidget.output = self.output
@@ -574,17 +574,16 @@ def mainApp():
     else:
         directory = Path(os.path.realpath(__file__))
 
-
     # PySide2 app
     app = QApplication(sys.argv)
 
     icon = QIcon()
-    #icon.addFile(str(directory.parent) + '/images/Itsue16x16.png', QSize(16,16))
-    #icon.addFile(str(directory.parent) + '/images/Itsue24x24.png', QSize(24,24))
-    #icon.addFile(str(directory.parent) + '/images/Itsue32x32.png', QSize(32,32))
-    #icon.addFile(str(directory.parent) + '/images/Itsue48x48.png', QSize(48,48))
-    icon.addFile(str(directory.parent) + '/images/Itsue256x256.png', QSize(256,256))
-    #app.setWindowIcon(icon)
+    # icon.addFile(str(directory.parent) + '/images/Itsue16x16.png', QSize(16,16))
+    # icon.addFile(str(directory.parent) + '/images/Itsue24x24.png', QSize(24,24))
+    # icon.addFile(str(directory.parent) + '/images/Itsue32x32.png', QSize(32,32))
+    # icon.addFile(str(directory.parent) + '/images/Itsue48x48.png', QSize(48,48))
+    icon.addFile(str(directory.parent) + "/images/Itsue256x256.png", QSize(256, 256))
+    # app.setWindowIcon(icon)
 
     # Palette will change on macOS according to current theme
     # will create a poor mans dark theme for windows
