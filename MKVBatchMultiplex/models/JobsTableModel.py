@@ -62,7 +62,7 @@ class JobsTableModel(TableModel):
                 self.jobQueue.append(row)
 
             if column == JobKey.Status:
-                self.jobQueue.statusChangeSignal.emit()
+                self.jobQueue.statusChangeSignal.emit(index)
 
             return True
 
