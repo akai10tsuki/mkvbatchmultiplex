@@ -27,34 +27,18 @@ from PySide2.QtWidgets import (
 
 import vsutillib.pyqt as pyqt
 
-# from vsutillib.process import isThreadRunning
+from .. import config
 
-# from .. import config
-
-# from .RenameWidgetHelpers import (
-#    findDuplicates,
-#    RegExFilesWidget,
-#    RegExLineInputWidget,
-#    RegExInputWidget,
-#    resolveIncrements,
-# )
+from .RenameWidgetHelpers import (
+    findDuplicates,
+    RegExFilesWidget,
+    RegExLineInputWidget,
+    RegExInputWidget,
+    resolveIncrements,
+)
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
-
-
-class ButtonIndex:
-
-    ApplyRename = 0
-    Undo = 1
-    Clear = 3
-
-
-class Key:
-
-    RegEx = "RegEx"
-    SubString = "SubString"
-    MaxCount = "MaxCount"
 
 
 class RenameWidget(QWidget):
@@ -452,3 +436,17 @@ class RenameWidget(QWidget):
             self.applyFileRenameSignal.emit(self._outputFileNames)
         self.btnGrid.itemAt(ButtonIndex.ApplyRename).widget().setEnabled(True)
         self.btnGrid.itemAt(ButtonIndex.Undo).widget().setEnabled(False)
+
+
+class ButtonIndex:
+
+    ApplyRename = 0
+    Undo = 1
+    Clear = 3
+
+
+class Key:
+
+    RegEx = "RegEx"
+    SubString = "SubString"
+    MaxCount = "MaxCount"
