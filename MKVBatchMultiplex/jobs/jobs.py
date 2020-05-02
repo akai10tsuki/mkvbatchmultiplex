@@ -78,6 +78,7 @@ class JobQueue(QObject):
     statusUpdateSignal = Signal(object, str)
     runSignal = Signal()
     addQueueItemSignal = Signal()
+    addWaitingItemSignal = Signal()
     queueEmptiedSignal = Signal()
     statusChangeSignal = Signal(object)
 

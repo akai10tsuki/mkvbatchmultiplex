@@ -35,6 +35,7 @@ class JobsTableModel(TableModel):
             for r in range(0, rows):
                 jobRow = position + r
                 self.jobQueue.append(jobRow)
+            self.jobQueue.statusChangeSignal.emit(index)
 
         return rc
 

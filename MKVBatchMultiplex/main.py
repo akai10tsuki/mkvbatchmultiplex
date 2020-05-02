@@ -591,9 +591,10 @@ def mainApp():
         # Force the style to be the same on all OSs:
         app.setStyle("Fusion")
         app.setPalette(darkPalette())
+        app.setWindowIcon(icon)
 
     win = MainWindow()
-    win.setWindowIcon(icon)
+    #win.setWindowIcon(icon)
     win.show()
     app.exec_()
     config.close()
