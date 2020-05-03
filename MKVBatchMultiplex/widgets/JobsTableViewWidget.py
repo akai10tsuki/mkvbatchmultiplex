@@ -85,12 +85,14 @@ class JobsTableViewWidget(QWidget):
             Text.txt0128, function=self.printDataset, toolTip=Text.txt0129,
         )
         btnAbortCurrentJob = QPushButtonWidget(
-            "Abort Current Job",
+            Text.txt0134,
             function=self.abortCurrentJob,
-            toolTip="Abort running job",
+            toolTip=Text.txt0135,
         )
         btnAbortJobs = QPushButtonWidget(
-            "Abort Jobs", function=self.abortCurrentJob, toolTip="Abort jobs",
+            Text.txt0136,
+            function=self.abortCurrentJob,
+            toolTip=Text.txt0137,
         )
 
         self.btnGrid = QHBoxLayout()
@@ -249,9 +251,9 @@ class JobsTableViewWidget(QWidget):
         if len(self.parent.jobsQueue) > 0:
             language = config.data.get(config.ConfigKey.Language)
             bAnswer = False
-            title = _("Clear Queue")
+            title = _(Text.txt0124)
             msg = "¿" if language == "es" else ""
-            msg += _("Erase any jobs remaining in the Queue") + "?"
+            msg += _(Text.txt0125) + "?"
             bAnswer = yesNoDialog(self, msg, title)
 
             if bAnswer:

@@ -146,7 +146,7 @@ class CommandWidget(QWidget):
             toolTip=Text.txt0167,
         )
         btnStartQueue = QPushButtonWidget(
-            Text.txt0168,
+            Text.txt0126,
             function=self.parent.jobsQueue.run,
             toolTip=Text.txt0169,
         )

@@ -28,6 +28,7 @@ from PySide2.QtWidgets import (
 import vsutillib.pyqt as pyqt
 
 from .. import config
+from ..utils import Text
 
 from .RenameWidgetHelpers import (
     findDuplicates,
@@ -102,15 +103,9 @@ class RenameWidget(QWidget):
         #
         # Input Lines
         #
-        self.textRegEx = RegExLineInputWidget(
-            "Regular Expression", "Enter regular expression."
-        )
-        self.textSubString = RegExLineInputWidget(
-            "Substitution String", "Enter substitution string."
-        )
-        self.textOriginalNames = RegExFilesWidget(
-            "Original names", "Name generated base on parsed command."
-        )
+        self.textRegEx = RegExLineInputWidget(Text.txt0200, Text.txt0201)
+        self.textSubString = RegExLineInputWidget(Text.txt0202, Text.txt0203)
+        self.textOriginalNames = RegExFilesWidget(Text.txt0204, Text.txt0205)
         self.textOriginalNames.textBox.setReadOnly(True)
         self.textOriginalNames.textBox.connectToInsertText(
             self.outputOriginalFilesSignal
@@ -118,25 +113,23 @@ class RenameWidget(QWidget):
         self.textOriginalNames.textBox.filesDroppedUpdateSignal.connect(
             self._setFilesDropped
         )
-        self.textRenameResults = RegExInputWidget(
-            "Rename to", "Names that will be used for commands."
-        )
+        self.textRenameResults = RegExInputWidget(Text.txt0206, Text.txt0207)
         self.textRenameResults.textBox.setReadOnly(True)
         self.textRenameResults.textBox.connectToInsertText(
             self.outputRenameResultsSignal
         )
         btnApplyRename = pyqt.QPushButtonWidget(
-            "Apply Rename",
+            Text.txt0208,
             function=self._applyRename,
-            toolTip="Replace the original names with the operation result",
+            toolTip=Text.txt0209,
         )
         btnApplyRename.setEnabled(False)
         btnUndoRename = pyqt.QPushButtonWidget(
-            "Undo", function=self._undoRename, toolTip="Undo rename operation"
+            Text.txt0210, function=self._undoRename, toolTip=Text.txt0211
         )
         btnUndoRename.setEnabled(False)
         btnClear = pyqt.QPushButtonWidget(
-            "Clear", function=self.clear, toolTip="Clear names start over"
+            Text.txt0212, function=self.clear, toolTip=Text.txt0213
         )
         self.btnGrid = QHBoxLayout()
         self.btnGrid.addWidget(btnApplyRename)
@@ -399,7 +392,7 @@ class RenameWidget(QWidget):
                 self.btnGrid.itemAt(ButtonIndex.ApplyRename).widget().setEnabled(False)
         except re.error:
             self.textRenameResults.textBox.clear()
-            statusBar.showMessage("Invalid regex.")
+            statusBar.showMessage(Text.txt0214)
 
         if resolveIncrements(self._outputFileNames, self._renameFileNames, subText):
             self._displayRenames()
