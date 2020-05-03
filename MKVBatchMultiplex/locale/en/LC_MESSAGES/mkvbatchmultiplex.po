@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  \n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-04-29 12:12-0400\n"
+"POT-Creation-Date: 2020-05-02 16:41-0400\n"
 "PO-Revision-Date: 2020-01-24 23:59-0500\n"
 "Last-Translator: \n"
 "Language: en_US\n"
@@ -182,7 +182,7 @@ msgstr ""
 msgid "Remove jobs from Queue"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:72 MKVBatchMultiplex/utils/text.py:104
+#: MKVBatchMultiplex/utils/text.py:72
 msgid "Start Queue"
 msgstr ""
 
@@ -280,6 +280,10 @@ msgstr ""
 
 #: MKVBatchMultiplex/utils/text.py:103
 msgid "Add command to jobs table and put on Queue"
+msgstr ""
+
+#: MKVBatchMultiplex/utils/text.py:104
+msgid "Start Worker"
 msgstr ""
 
 #: MKVBatchMultiplex/utils/text.py:106

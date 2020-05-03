@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  MKVBatchMultiplex\n"
 "Report-Msgid-Bugs-To: akait10tsuki@gmail.com\n"
-"POT-Creation-Date: 2020-04-29 12:12-0400\n"
+"POT-Creation-Date: 2020-05-02 16:41-0400\n"
 "PO-Revision-Date: 2020-02-01 16:42-0500\n"
 "Last-Translator: \n"
 "Language: es_PR\n"
@@ -184,7 +184,7 @@ msgstr "Borrar la cola"
 msgid "Remove jobs from Queue"
 msgstr "Remover tareas de la Cola"
 
-#: MKVBatchMultiplex/utils/text.py:72 MKVBatchMultiplex/utils/text.py:104
+#: MKVBatchMultiplex/utils/text.py:72
 msgid "Start Queue"
 msgstr "Comenzar"
 
@@ -283,6 +283,10 @@ msgstr "Añadir a Cola"
 #: MKVBatchMultiplex/utils/text.py:103
 msgid "Add command to jobs table and put on Queue"
 msgstr "Agregar comando a la tabla de tareas con estado 'Waiting'"
+
+#: MKVBatchMultiplex/utils/text.py:104
+msgid "Start Worker"
+msgstr "Comenzar Tareas"
 
 #: MKVBatchMultiplex/utils/text.py:106
 msgid "Analysis"
