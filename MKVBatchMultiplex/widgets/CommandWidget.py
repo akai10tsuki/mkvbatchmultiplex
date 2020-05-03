@@ -102,9 +102,9 @@ class CommandWidget(QWidget):
         #
         self.frmCmdLine = QFormLayout()
         btnPasteClipboard = QPushButtonWidget(
-            "Paste",
+            Text.txt0164,
             function=self.pasteClipboard,
-            toolTip="Paste Clipboard contents in command line",
+            toolTip=Text.txt0165,
         )
         self.cmdLine = QLineEdit()
         self.cmdLine.setValidator(
@@ -136,32 +136,32 @@ class CommandWidget(QWidget):
             toolTip=Text.txt0161,
         )
         btnRename = QPushButtonWidget(
-            "Rename",
+            Text.txt0182,
             function=self.parent.renameWidget.setCurrentIndexSignal.emit,
-            toolTip="Rename output files",
+            toolTip=Text.txt0183,
         )
         btnAddQueue = QPushButtonWidget(
-            "Add Queue",
+            Text.txt0166,
             function=lambda: self.addCommand(JobStatus.AddToQueue),
-            toolTip="Add command to jobs table and put on Queue",
+            toolTip=Text.txt0167,
         )
         btnStartQueue = QPushButtonWidget(
-            "Start Queue",
+            Text.txt0168,
             function=self.parent.jobsQueue.run,
-            toolTip="Start processing jobs on Queue",
+            toolTip=Text.txt0169,
         )
         btnAnalysis = QPushButtonWidget(
-            "Analysis",
+            Text.txt0170,
             function=lambda: runFunctionInThread(
                 runAnalysis,
                 command=self.cmdLine.text(),
                 output=self.output,
                 log=self.log,
             ),
-            toolTip="Print analysis of command line",
+            toolTip=Text.txt0171,
         )
         btnShowCommands = QPushButtonWidget(
-            "Commands",
+            Text.txt0172,
             function=lambda: runFunctionInThread(
                 showCommands,
                 output=self.output,
@@ -169,10 +169,10 @@ class CommandWidget(QWidget):
                 oCommand=self.oCommand,
                 log=self.log,
             ),
-            toolTip="Commands to be applied",
+            toolTip=Text.txt0173,
         )
         btnCheckFiles = QPushButtonWidget(
-            "Check Files",
+            Text.txt0174,
             function=lambda: runFunctionInThread(
                 checkFiles,
                 output=self.output,
@@ -180,17 +180,17 @@ class CommandWidget(QWidget):
                 oCommand=self.oCommand,
                 log=self.log,
             ),
-            toolTip="Check files for consistency",
+            toolTip=Text.txt0175,
         )
         btnClear = QPushButtonWidget(
-            "Clear Output",
+            Text.txt0176,
             function=self.clearOutputWindow,
-            toolTip="Erase text in output window",
+            toolTip=Text.txt0177,
         )
         btnReset = QPushButtonWidget(
-            "Reset",
+            Text.txt0178,
             function=self.reset,
-            toolTip="Reset state completely to work with another batch",
+            toolTip=Text.txt0179,
         )
 
         self.btnGrid.addWidget(btnAddCommand, 0, 0)

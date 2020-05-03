@@ -25,7 +25,7 @@ button:
 Now there are two options **<Add Command>** button will add the job to the Jobs
 Table with a 'Waiting' status. The **<Add Queue>** button will add the command
 to the job Queue.  When finished adding jobs to the Queue push
-**<Start Queue>** to start the Queue worker and run the jobs.  Any job added
+**<Start Worker>** to start the Queue worker and run the jobs.  Any job added
 with the 'Waiting' status have to be added to the Queue in the Jobs tab in
 order to run the job.  If the Queue worker is running jobs added to the Queue
 will be processed in the order entered.

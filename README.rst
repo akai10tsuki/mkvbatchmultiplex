@@ -11,12 +11,8 @@ mkvbatchmultiplex: MKVMERGE batch multiplexing
   :target: https://pypi.org/project/mkvbatchmultiplex
 
 
-**Working on full re-write for version 2.0.0**
-
-This project started out of the need to multiplex a library of many video
-series using AVI_ container and SRT_ for subtitles to be maintained in a Media
-Server. And as the saying goes search for something to use did not find
-anything that met my requirements so program it myself.
+This project went into a rewrite for version 2.  Rename module was added to
+help maintain output file names Plex_ friendly.
 
 Description
 ===========
@@ -49,7 +45,6 @@ Dependencies
 ************
 
     * Python_ 3.8
-
         - PySide2_ 5.12 or greater
         - pymediainfo_ 4.0 or greater
     * MediaInfo_ tested with versions 17.10->18.12
@@ -81,10 +76,9 @@ Roadmap
 
 This is just the base for the project.  The roadmap is:
 
-    * Work on a stable release.
-    * Easier installation for different operating systems
-    * Documentation
-    * Work on job queue management
+    * Work on rename module to fetch some metadata from internet
+    * Work on Spanish interface translation
+    * Easier installation for linux
 
 The application works for me as is. If the the program generates any interest
 any further changes and additions will **also** depend on user base needs.
@@ -93,6 +87,7 @@ See https://mkvbatchmultiplex.readthedocs.io for more information.
 
 .. Hyperlinks.
 
+.. _Plex: https://www.plex.tv/
 .. _pymediainfo: https://pypi.org/project/pymediainfo/
 .. _PySide2: https://wiki.qt.io/Qt_for_Python
 .. _Python: https://www.python.org/downloads/
