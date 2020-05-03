@@ -69,7 +69,7 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0123 = S_("Add all Waiting jobs to the Queue")
     txt0124 = S_("Clear Queue")
     txt0125 = S_("Remove jobs from Queue")
-    txt0126 = S_("Start Queue")
+    txt0126 = S_("Start Worker")
     txt0127 = S_("Start processing jobs on Queue")
     txt0128 = S_("Debug")
     txt0129 = S_("Print current dataset to console")
@@ -77,6 +77,10 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0131 = S_("ID")
     txt0132 = S_("Status")
     txt0133 = S_("Command")
+    txt0134 = S_("Abort Running Job")
+    txt0135 = S_("Abort running job and continue with next in Queue")
+    txt0136 = S_("Abort Jobs")
+    txt0137 = S_("Abort running job and put jobs in Queue in Waiting status")
 
     # TabsWidget
     # 140
@@ -101,7 +105,7 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0165 = S_("Paste Clipboard contents in command line")
     txt0166 = S_("Add Queue")
     txt0167 = S_("Add command to jobs table and put on Queue")
-    txt0168 = S_("Start Worker")
+    # txt0168 = S_()
     txt0169 = S_("Start processing jobs on Queue")
     txt0170 = S_("Analysis")
     txt0171 = S_("Print analysis of command line")
@@ -135,6 +139,7 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0211 = S_("Undo rename operation")
     txt0212 = S_("Clear")
     txt0213 = S_("Clear names start over")
+    txt0214 = S_("Invalid regex")
 
     """
     txt0169 = S_()
