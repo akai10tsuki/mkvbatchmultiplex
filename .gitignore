@@ -65,6 +65,7 @@ target/
 tests/NewFiles/
 tests/generatecommand.1.py
 .vscode/
+locale
 tmp/
 docs2/
 _build/
