@@ -4,6 +4,7 @@ r"""
 JobsTable
 """
 
+import ctypes
 import gettext
 import logging
 import os
@@ -92,6 +93,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
             self.appDirectory = Path(os.path.realpath(__file__))
 
         self.setWindowTitle(config.APPNAME + ": " + config.DESCRIPTION)
+        self.setWindowIcon(QIcon(str(self.appDirectory.parent) + "/images/Itsue256x256.png"))
 
         # Setup User Interface
         self._initMenu()
@@ -565,36 +567,19 @@ def mainApp():
 
     config.init()
 
-    #
-    # Where am I running from
-    #
-    if getattr(sys, "frozen", False):
-        # Running in a pyinstaller bundle
-        directory = Path(os.path.dirname(__file__))
-    else:
-        directory = Path(os.path.realpath(__file__))
-
     # PySide2 app
     app = QApplication(sys.argv)
-
-    icon = QIcon()
-    # icon.addFile(str(directory.parent) + '/images/Itsue16x16.png', QSize(16,16))
-    # icon.addFile(str(directory.parent) + '/images/Itsue24x24.png', QSize(24,24))
-    # icon.addFile(str(directory.parent) + '/images/Itsue32x32.png', QSize(32,32))
-    # icon.addFile(str(directory.parent) + '/images/Itsue48x48.png', QSize(48,48))
-    icon.addFile(str(directory.parent) + "/images/Itsue256x256.png", QSize(256, 256))
-    # app.setWindowIcon(icon)
 
     # Palette will change on macOS according to current theme
     # will create a poor mans dark theme for windows
     if platform.system() == "Windows":
         # Force the style to be the same on all OSs:
+        myAppID = u'VergaraSoft.MKVBatchMultiplex.mkv.2.0.0' # arbitrary string
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myAppID)
         app.setStyle("Fusion")
         app.setPalette(darkPalette())
-        app.setWindowIcon(icon)
 
     win = MainWindow()
-    #win.setWindowIcon(icon)
     win.show()
     app.exec_()
     config.close()
