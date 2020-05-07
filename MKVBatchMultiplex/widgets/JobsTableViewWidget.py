@@ -223,6 +223,14 @@ class JobsTableViewWidget(QWidget):
     def tab(self, value):
         self.__tab = value
 
+    @property
+    def tabWidget(self):
+        return self.__tabWidget
+
+    @tabWidget.setter
+    def tabWidget(self, value):
+        self.__tabWidget = value
+
     def abortCurrentJob(self):
         self.controlQueue.append(JobStatus.AbortJob)
 
@@ -260,8 +268,8 @@ class JobsTableViewWidget(QWidget):
                 while job := self.parent.jobsQueue.pop():
 
                     self.model.setData(job.statusIndex, JobStatus.Waiting)
-            else:
-                print("Nothing here")
+            #else:
+            #    print("Nothing here")
 
     def setLanguage(self):
         """
