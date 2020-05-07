@@ -7,8 +7,8 @@ Class for a table model with horizontal headers
 
 from PySide2.QtCore import Qt, QModelIndex
 
-from .TableModel import TableModel
 from ..jobs import JobStatus, JobKey
+from .TableModel import TableModel
 
 # JOBID, JOBSTATUS, JOBCOMMAND = range(3)
 
