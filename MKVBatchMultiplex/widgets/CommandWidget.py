@@ -249,6 +249,7 @@ class CommandWidget(QWidget):
         # Command related
         #self.frmCmdLine.itemAt(0, QFormLayout.LabelRole).widget().setEnabled(False)
         self.cliButtonsState(False)
+        self.btnGrid.itemAt(_Button.ANALYSIS).widget().setEnabled(False)
 
         # Clear buttons related
         self.btnGrid.itemAt(_Button.CLEAR).widget().setEnabled(False)
@@ -256,6 +257,9 @@ class CommandWidget(QWidget):
 
         # connect text windows textChanged to clearButtonState function
         self.outputWindow.textChanged.connect(self.clearButtonState)
+
+        # connect command line textChanged to analysisButtonState function
+        self.cmdLine.textChanged.connect(self.analysisButtonState)
 
         # Job Queue related
         self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(False)
@@ -300,6 +304,14 @@ class CommandWidget(QWidget):
         self.__tab = value
 
     @property
+    def tabWidget(self):
+        return self.__tabWidget
+
+    @tabWidget.setter
+    def tabWidget(self, value):
+        self.__tabWidget = value
+
+    @property
     def output(self):
         return self.__output
 
@@ -335,7 +347,6 @@ class CommandWidget(QWidget):
             _Button.ADDCOMMAND,
             _Button.RENAME,
             _Button.ADDQUEUE,
-            _Button.ANALYSIS,
             _Button.SHOWCOMMANDS,
             _Button.CHECKFILES,
         ]:
@@ -451,6 +462,14 @@ class CommandWidget(QWidget):
             self.btnGrid.itemAt(_Button.CLEAR).widget().setEnabled(True)
         else:
             self.btnGrid.itemAt(_Button.CLEAR).widget().setEnabled(False)
+
+    def analysisButtonState(self):
+        """Set clear button state"""
+
+        if self.cmdLine.text() != "":
+            self.btnGrid.itemAt(_Button.ANALYSIS).widget().setEnabled(True)
+        else:
+            self.btnGrid.itemAt(_Button.ANALYSIS).widget().setEnabled(False)
 
     def clearOutputWindow(self):
         """
