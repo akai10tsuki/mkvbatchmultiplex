@@ -3,6 +3,7 @@ Define different signals for progress updates
 """
 
 from PySide2.QtCore import QObject, Signal
+
 from vsutillib.pyqt import DualProgressBar, FormatLabel
 
 
