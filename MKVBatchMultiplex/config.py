@@ -37,13 +37,15 @@ PROJECTURLS = {
 PYTHONVERSIONS = ">=3.8, <3.9"
 QT_VERSION = "PYSIDE2"
 REQUIRED = [
-    "PySide2>=5.12",
-    "vsutillib.mkv>=1.0.2",
-    "vsutillib.media>=1.0.2",
-    "vsutillib.macos>=1.0.2",
-    "vsutillib.files>=1.0.2",
-    "vsutillib.log>=1.0.1",
-    "vsutillib.pyqt>=1.0.2",
+    "PySide2>=5.14",
+    "vsutillib.files>=1.5.0",
+    "vsutillib.log>=1.5.0",
+    "vsutillib.macos>=1.5.0",
+    "vsutillib.media>=1.5.0",
+    "vsutillib.misc>=1.5.0",
+    "vsutillib.mkv>=1.5.0",
+    "vsutillib.process>=1.5.0",
+    "vsutillib.pyqt>=1.5.0",
 ]
 
 # for app
@@ -66,7 +68,6 @@ LOCALE = CWD.joinpath("locale")
 
 data = ConfigurationSettings()  # pylint: disable=invalid-name
 FORCELOG = True
-SIMULATERUN = False
 
 ######################
 # Application specific
