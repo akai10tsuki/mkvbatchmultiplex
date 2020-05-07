@@ -306,6 +306,7 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
     verify = mkv.VerifyStructure(log=log)
     totalErrors = 0
     abortAll = False
+    bSimulateRun = config.data.get("SimulateRun")
 
     while job := jobQueue.popLeft():
 
@@ -432,7 +433,7 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
                     if log:
                         MODULELOG.debug("RJB0007: Structure checks ok")
 
-                    if config.SIMULATERUN:
+                    if bSimulateRun:
                         dummyRunCommand(funcProgress, indexTotal)
                     else:
                         # TODO: queue to control execution of running job inside
@@ -507,7 +508,7 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
     return "Job queue empty."
 
 
-def dummyRunCommand(funcProgress, indexTotal):
+def dummyRunCommand(funcProgress, indexTotal, controlQueue):
     """
     dummyRunCommand dummy run job function
     """
@@ -519,6 +520,11 @@ def dummyRunCommand(funcProgress, indexTotal):
         i += 0.5
         funcProgress.pbSetValues.emit(i, indexTotal[1] + i)
         time.sleep(0.0001)
+        if controlQueue:
+            queueStatus = controlQueue.popleft()
+            controlQueue.appendleft(queueStatus)
+            if queueStatus in [JobStatus.Abort, JobStatus.AbortJob, JobStatus.AbortJobError]:
+                break
 
 
 def errorMsg(output, msg, kwargs):
