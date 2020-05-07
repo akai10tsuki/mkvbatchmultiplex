@@ -358,7 +358,8 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
             # Current tab
             if tabIndex := config.data.get("Tab"):
                 # setting tab to jobs
-                self.tabs.setCurrentIndexSignal.emit(tabIndex)
+                # self.tabs.setCurrentIndexSignal.emit(tabIndex)
+                self.tabs.setCurrentIndexSignal.emit(0)
 
         elif action in (config.Action.Save, config.Action.Update):
             # Update Logging
