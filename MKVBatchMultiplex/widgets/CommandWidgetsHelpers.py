@@ -7,8 +7,9 @@ CommandWidget helper functions attach to buttons
 from PySide2.QtCore import Qt
 
 import vsutillib.mkv as mkv
-from vsutillib.pyqt import SvgColor, LineOutput
+from vsutillib.pyqt import SvgColor, LineOutput, checkColor
 
+from .. import config
 
 def runAnalysis(**kwargs):
     """List the source files found"""
@@ -24,7 +25,7 @@ def runAnalysis(**kwargs):
             if e.find(r"chk:") >= 0:
                 output.command.emit(
                     "{}".format(e),
-                    {LineOutput.Color: SvgColor.darkgreen, LineOutput.AppendEnd: True},
+                    {LineOutput.Color: SvgColor.green, LineOutput.AppendEnd: True},
                 )
             else:
                 output.command.emit(

@@ -24,9 +24,10 @@ from vsutillib.pyqt import (
     OutputTextWidget,
     QPushButtonWidget,
     runFunctionInThread,
+    SvgColor,
 )
 from vsutillib.process import isThreadRunning
-from vsutillib.pyqt import messageBox, LineOutput
+from vsutillib.pyqt import messageBox, LineOutput, checkColor
 from vsutillib.mkv import MKVCommand, MKVCommandParser
 
 from .. import config
@@ -417,11 +418,13 @@ class CommandWidget(QWidget):
         if running:
             self.jobStartQueueState(False)
             palette = QPalette()
-            palette.setColor(QPalette.WindowText, Qt.cyan)
+            color = checkColor(SvgColor.cyan, config.data.get(config.ConfigKey.DarkMode))
+            palette.setColor(QPalette.WindowText, color)
             self.parent.jobsLabel.setPalette(palette)
         else:
             palette = QPalette()
-            palette.setColor(QPalette.WindowText, Qt.white)
+            color = checkColor(None, config.data.get(config.ConfigKey.DarkMode))
+            palette.setColor(QPalette.WindowText, color)
             self.parent.jobsLabel.setPalette(palette)
 
     def addCommand(self, status):
