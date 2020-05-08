@@ -114,6 +114,7 @@ class ConfigKey:  # pylint: disable=too-few-public-methods
     Font = "Font"
     Logging = "Logging"
     Geometry = "Geometry"
+    DarkMode = "DarkMode"
 
     #
     # App Specific
