@@ -187,14 +187,14 @@ class RunJobs(QObject):
 
         if not self.jobsqueue:
             msg = "Jobs Queue empty"
-            self.output.error.emit(msg, {"color": Qt.yellow})
+            self.output.error.emit(msg, {"color": SvgColor.yellow})
 
             if self.log:
                 MODULELOG.error("RJB0001: Error: %s", msg)
 
         if self.running:
             msg = "Jobs running"
-            self.output.error.emit(msg, {"color": Qt.yellow})
+            self.output.error.emit(msg, {"color": SvgColor.yellow})
 
             if self.log:
                 MODULELOG.error("RJB0002: Error: %s", msg)
@@ -362,7 +362,7 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
         if job.oCommand:
             msg = "*******************\n"
             msg += "Job ID: {} started.\n\n".format(job.job[JobKey.ID])
-            output.job.emit(msg, {"color": Qt.cyan})
+            output.job.emit(msg, {"color": SvgColor.cyan})
             exitStatus = "ended"
 
             if log:
@@ -390,7 +390,11 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
                 ###
                 if controlQueue:
                     queueStatus = controlQueue.popleft()
-                    if queueStatus in [JobStatus.Abort, JobStatus.AbortJob, JobStatus.AbortJobError]:
+                    if queueStatus in [
+                        JobStatus.Abort,
+                        JobStatus.AbortJob,
+                        JobStatus.AbortJobError,
+                    ]:
                         jobQueue.statusUpdateSignal.emit(job, JobStatus.Abort)
                         status = JobStatus.Abort
                         exitStatus = queueStatus
@@ -434,7 +438,7 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
                         MODULELOG.debug("RJB0007: Structure checks ok")
 
                     if bSimulateRun:
-                        dummyRunCommand(funcProgress, indexTotal)
+                        dummyRunCommand(funcProgress, indexTotal, controlQueue)
                     else:
                         # TODO: queue to control execution of running job inside
                         # the RunCommand
@@ -455,10 +459,20 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
 
                     for i, m in enumerate(verify.analysis):
                         if i == 0:
-                            output.job.emit(m, {"color": SvgColor.orange})
-                            output.error.emit(m, {"color": SvgColor.orange})
+                            lines = m.split("\n")
+                            findSource = True
+                            for index, line in enumerate(lines):
+                                color = SvgColor.orange
+                                if findSource and ((
+                                    searchIndex := line.find("File Name")
+                                ) >= 0):
+                                    if searchIndex >= 0:
+                                        color = SvgColor.tomato
+                                        findSource = False
+                                output.job.emit(line + "\n", {"color": color})
+                                output.error.emit(line + "\n", {"color": color})
                         else:
-                            output.job.emit(m, {"color": SvgColor.red})
+                            output.job.emit(m + "\n", {"color": SvgColor.red})
                             output.error.emit(m, {"color": SvgColor.red})
 
                     output.job.emit("", {"appendEnd": True})
@@ -475,7 +489,7 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
 
             msg = "\nJob ID: {} {}.\n".format(job.job[JobKey.ID], exitStatus)
             msg += "*******************\n\n\n"
-            output.job.emit(msg, {"color": Qt.cyan, "appendEnd": True})
+            output.job.emit(msg, {"color": SvgColor.cyan, "appendEnd": True})
 
             if updateStatus:
                 jobQueue.statusUpdateSignal.emit(job, JobStatus.Done)
@@ -488,7 +502,7 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
             funcProgress.lblSetValue.emit(4, totalErrors)
             msg = "Job ID: {} cannot execute command.\n\nCommand: {}\n"
             msg = msg.format(job.job[JobKey.ID], job.oCommand.command)
-            output.error.emit(msg, {"color": Qt.red})
+            output.error.emit(msg, {"color": SvgColor.red})
             jobQueue.statusUpdateSignal.emit(job, JobStatus.Error)
 
             if log:
@@ -523,7 +537,11 @@ def dummyRunCommand(funcProgress, indexTotal, controlQueue):
         if controlQueue:
             queueStatus = controlQueue.popleft()
             controlQueue.appendleft(queueStatus)
-            if queueStatus in [JobStatus.Abort, JobStatus.AbortJob, JobStatus.AbortJobError]:
+            if queueStatus in [
+                JobStatus.Abort,
+                JobStatus.AbortJob,
+                JobStatus.AbortJobError,
+            ]:
                 break
 
 
