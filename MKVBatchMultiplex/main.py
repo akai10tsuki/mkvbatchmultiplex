@@ -34,6 +34,7 @@ import vsutillib.media as media
 
 from vsutillib.pyqt import (
     centerWidgets,
+    checkColor,
     darkPalette,
     DualProgressBar,
     FormatLabel,
@@ -41,6 +42,7 @@ from vsutillib.pyqt import (
     QActionWidget,
     QMenuWidget,
     QProgressIndicator,
+    SvgColor,
     TabWidget,
 )
 
@@ -79,7 +81,9 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.defaultPalette = palette
         self.widgetSetLanguage = SetLanguage()
         self.progressSpin = QProgressIndicator(self)
-        self.progressSpin.color = Qt.cyan
+        self.progressSpin.color = checkColor(
+            SvgColor.cyan, config.data.get(config.ConfigKey.DarkMode)
+        )
         self.progressSpin.delay = 50
         self.progressSpin.displayedWhenStopped = True
 
@@ -93,7 +97,9 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
             self.appDirectory = Path(os.path.realpath(__file__))
 
         self.setWindowTitle(config.APPNAME + ": " + config.DESCRIPTION)
-        self.setWindowIcon(QIcon(str(self.appDirectory.parent) + "/images/Itsue256x256.png"))
+        self.setWindowIcon(
+            QIcon(str(self.appDirectory.parent) + "/images/Itsue256x256.png")
+        )
 
         # Setup User Interface
         self._initMenu()
@@ -575,10 +581,12 @@ def mainApp():
     # will create a poor mans dark theme for windows
     if platform.system() == "Windows":
         # Force the style to be the same on all OSs:
-        myAppID = u'VergaraSoft.MKVBatchMultiplex.mkv.2.0.0' # arbitrary string
+        myAppID = "VergaraSoft.MKVBatchMultiplex.mkv.2.0.0"  # arbitrary string
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myAppID)
         app.setStyle("Fusion")
         app.setPalette(darkPalette())
+        config.data.set(config.ConfigKey.DarkMode, True)
+        OutputTextWidget.isDarkMode = True
 
     win = MainWindow()
     win.show()
