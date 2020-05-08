@@ -34,7 +34,7 @@ PROJECTURLS = {
     "Bug Reports": "https://github.com/akai10tsuki/mkvbatchmultiplex/issues",
     "Source": "https://github.com/akai10tsuki/mkvbatchmultiplex/",
 }
-PYTHONVERSIONS = ">=3.8, <3.9"
+PYTHONVERSIONS = ">=3.8.1, <3.9"
 QT_VERSION = "PYSIDE2"
 REQUIRED = [
     "PySide2>=5.14",
@@ -115,6 +115,7 @@ class ConfigKey:  # pylint: disable=too-few-public-methods
     Logging = "Logging"
     Geometry = "Geometry"
     DarkMode = "DarkMode"
+    SimulateRun = "SimulateRun"
 
     #
     # App Specific
