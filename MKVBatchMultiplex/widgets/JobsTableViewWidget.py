@@ -65,7 +65,7 @@ class JobsTableViewWidget(QWidget):
         self.grpGrid = QGridLayout()
         self.grpBox = QGroupBox(title)
 
-        if config.SIMULATERUN:
+        if config.data.get("SimulateRun"):
             btnPopulate = QPushButtonWidget(
                 Text.txt0120,
                 function=lambda: populate(self.model),
@@ -102,7 +102,7 @@ class JobsTableViewWidget(QWidget):
         self.btnGrid.addWidget(btnAbortCurrentJob)
         self.btnGrid.addWidget(btnAbortJobs)
         self.btnGrid.addStretch()
-        if config.SIMULATERUN:
+        if config.data.get("SimulateRun"):
             self.btnGrid.addWidget(btnPopulate)
             self.btnGrid.addWidget(btnPrintDataset)
 
