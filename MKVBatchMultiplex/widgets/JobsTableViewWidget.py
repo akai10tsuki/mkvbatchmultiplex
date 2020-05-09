@@ -283,8 +283,8 @@ class JobsTableViewWidget(QWidget):
                 widget.setToolTip(_(widget.toolTip))
 
         self.grpBox.setTitle(_(Text.txt0130))
-        self.model.setHeaderData(JobKey.ID, Qt.Horizontal, _(Text.txt0131))
-        self.model.setHeaderData(JobKey.Status, Qt.Horizontal, _(Text.txt0132))
+        self.model.setHeaderData(JobKey.ID, Qt.Horizontal, "  " + _(Text.txt0131) + "  ")
+        self.model.setHeaderData(JobKey.Status, Qt.Horizontal, "  " + _(Text.txt0132) + "  ")
         self.model.setHeaderData(JobKey.Command, Qt.Horizontal, _(Text.txt0133))
 
     def printDataset(self):
