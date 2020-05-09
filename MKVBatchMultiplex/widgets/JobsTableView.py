@@ -56,7 +56,6 @@ class JobsTableView(QTableView):
 
         self._initHelper()
 
-
     def _initHelper(self):
 
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -140,6 +139,7 @@ class JobsTableView(QTableView):
         if 0 <= row < totalRows:
 
             menu = QMenu()
+            menu.setFont(self.parent.font())
             menu.addAction("Copy")
             menu.addAction("Remove")
 
@@ -183,16 +183,23 @@ class JobsTableView(QTableView):
     def resizeEvent(self, event):
 
         # Adjust the size of rows when font changes
+
         self.resizeRowsToContents()
         self.resizeColumnsToContents()
 
         # Adjust the width of Job Status column is specific to
         # current app
+
+
         header = self.horizontalHeader()
-        header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
-        # width = header.sectionSize(2)
-        # header.setSectionResizeMode(2, QHeaderView.Interactive)
-        # header.resizeSection(2, width)
+        #header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
+
+
+        width = header.sectionSize(2)
+        header.setSectionResizeMode(2, QHeaderView.Interactive)
+        header.resizeSection(2, width)
+
+
         header.setFont(self.parent.font())
 
         super(JobsTableView, self).resizeEvent(event)
