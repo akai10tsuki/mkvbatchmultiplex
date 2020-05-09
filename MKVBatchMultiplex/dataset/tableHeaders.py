@@ -27,9 +27,9 @@ def tableHeaders():
             {
                 "Type": "str",
                 "CastFunction": str,
-                "Label": "       " + "Status" + "       ",
+                "Label": "  " + "Status" + "  ",
                 "Alignment": "center",
-                "Width": 220,
+                "Width": 80,
                 "ToolTip": "Application code for the job status",
             },
         ],
