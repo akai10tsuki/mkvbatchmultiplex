@@ -49,6 +49,7 @@ class RegExLineInputWidget(QWidget):
         self.cmdLine.setToolTip(strToolTip)
         self.frmCmdLine = QFormLayout()
         self.frmCmdLine.addRow(self.lblText, self.cmdLine)
+        self.frmCmdLine.setFieldGrowthPolicy(QFormLayout.AllNonFixedFieldsGrow)
         self.setLayout(self.frmCmdLine)
 
 
