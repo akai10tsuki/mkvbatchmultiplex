@@ -112,6 +112,7 @@ class CommandWidget(QWidget):
             ValidateCommand(self, self.cliValidateSignal, log=self.log)
         )
         self.frmCmdLine.addRow(btnPasteClipboard, self.cmdLine)
+        self.frmCmdLine.setFieldGrowthPolicy(QFormLayout.AllNonFixedFieldsGrow)
         self.command = QWidget()
         self.command.setLayout(self.frmCmdLine)
 
