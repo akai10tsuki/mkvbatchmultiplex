@@ -5,8 +5,11 @@ mkvbatchmultiplex config file
 
 import logging
 import os
+import platform
 import sys
 from pathlib import Path
+
+from PySide2.QtGui import QFont
 
 from vsutillib.files import ConfigurationSettings
 from vsutillib.log import LogRotateFileHandler
@@ -69,28 +72,16 @@ LOCALE = CWD.joinpath("locale")
 data = ConfigurationSettings()  # pylint: disable=invalid-name
 FORCELOG = True
 
+if platform.system() == "Windows":
+    DEFAULTFONT = QFont("Segoe UI", 14)
+elif platform.system() == "Darwin":
+    DEFAULTFONT = QFont(".AppleSystemUIFont", 14)
+
 ######################
 # Application specific
 ######################
 
-#BTNADDCOMMAND = 0
-
-#BTNPASTE = 0
-#BTNADDQUEUE = 1
-#BTNSTARTQUEUE = 2
-
-#BTNANALYSIS = 4
-#BTNSHOWCOMMANDS = 5
-#BTNCHECKFILES = 6
-
-#BTNCLEAR = 8
-#BTNRESET = 9
-
 WORKERTHREADNAME = "jobsWorker"
-
-#JTVBTNADDWAITING = 1
-#JTVBTNCLEARQUEUE = 2
-#JTVBTNSTARTQUEUE = 3
 
 #######################
 #######################
