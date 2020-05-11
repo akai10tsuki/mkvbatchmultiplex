@@ -583,8 +583,7 @@ def mainApp():
         # Force the style to be the same on all OSs:
         myAppID = "VergaraSoft.MKVBatchMultiplex.mkv.2.0.0"  # arbitrary string
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myAppID)
-        app.setStyle("Fusion")
-        app.setPalette(darkPalette())
+        darkPalette(app)
         config.data.set(config.ConfigKey.DarkMode, True)
         OutputTextWidget.isDarkMode = True
 
