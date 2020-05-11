@@ -8,7 +8,7 @@ import logging
 import time
 
 from PySide2.QtCore import Qt, Signal, Slot
-from PySide2.QtGui import QPalette
+from PySide2.QtGui import QColor, QPalette
 from PySide2.QtWidgets import (
     QApplication,
     QWidget,
@@ -27,7 +27,7 @@ from vsutillib.pyqt import (
     SvgColor,
 )
 from vsutillib.process import isThreadRunning
-from vsutillib.pyqt import messageBox, LineOutput, checkColor
+from vsutillib.pyqt import checkColor, HorizontalLine, LineOutput, messageBox
 from vsutillib.mkv import MKVCommand, MKVCommandParser
 
 from .. import config
@@ -122,16 +122,6 @@ class CommandWidget(QWidget):
         self.btnGroup = QGroupBox()
         self.btnGrid = QGridLayout()
 
-        line = QFrame()
-        line.setFrameShape(QFrame.HLine)
-        line.setFrameShadow(QFrame.Raised)
-        line.setLineWidth(1)
-
-        line1 = QFrame()
-        line1.setFrameShape(QFrame.HLine)
-        line1.setFrameShadow(QFrame.Raised)
-        line1.setLineWidth(1)
-
         btnAddCommand = QPushButtonWidget(
             Text.txt0160,
             function=lambda: self.addCommand(JobStatus.Waiting),
@@ -199,11 +189,11 @@ class CommandWidget(QWidget):
         self.btnGrid.addWidget(btnRename, 0, 1)
         self.btnGrid.addWidget(btnAddQueue, 1, 0)
         self.btnGrid.addWidget(btnStartQueue, 1, 1)
-        self.btnGrid.addWidget(line, 2, 0, 1, 2)
+        self.btnGrid.addWidget(HorizontalLine(), 2, 0, 1, 2)
         self.btnGrid.addWidget(btnAnalysis, 3, 0)
         self.btnGrid.addWidget(btnShowCommands, 3, 1)
         self.btnGrid.addWidget(btnCheckFiles, 4, 0)
-        self.btnGrid.addWidget(line1, 5, 0, 1, 2)
+        self.btnGrid.addWidget(HorizontalLine(), 5, 0, 1, 2)
         self.btnGrid.addWidget(btnClear, 6, 0)
         self.btnGrid.addWidget(btnReset, 6, 1)
         self.btnGroup.setLayout(self.btnGrid)
@@ -419,7 +409,7 @@ class CommandWidget(QWidget):
         if running:
             self.jobStartQueueState(False)
             palette = QPalette()
-            color = checkColor(SvgColor.cyan, config.data.get(config.ConfigKey.DarkMode))
+            color = checkColor(QColor(42, 130, 218), config.data.get(config.ConfigKey.DarkMode))
             palette.setColor(QPalette.WindowText, color)
             self.parent.jobsLabel.setPalette(palette)
         else:

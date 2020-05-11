@@ -17,7 +17,7 @@ from collections import deque
 from pathlib import Path
 
 from PySide2.QtCore import QByteArray, QSize, Slot
-from PySide2.QtGui import QIcon, QFont, Qt
+from PySide2.QtGui import QColor, QFont, QIcon, Qt
 from PySide2.QtWidgets import (
     QAction,
     QApplication,
@@ -80,7 +80,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.widgetSetLanguage = SetLanguage()
         self.progressSpin = QProgressIndicator(self)
         self.progressSpin.color = checkColor(
-            SvgColor.cyan, config.data.get(config.ConfigKey.DarkMode)
+            QColor(42, 130, 218), config.data.get(config.ConfigKey.DarkMode)
         )
         self.progressSpin.delay = 50
         self.progressSpin.displayedWhenStopped = True
