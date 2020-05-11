@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  MKVBatchMultiplex\n"
 "Report-Msgid-Bugs-To: akait10tsuki@gmail.com\n"
-"POT-Creation-Date: 2020-05-03 02:22-0400\n"
+"POT-Creation-Date: 2020-05-11 14:12-0400\n"
 "PO-Revision-Date: 2020-02-01 16:42-0500\n"
 "Last-Translator: \n"
 "Language: es_PR\n"
@@ -131,9 +131,10 @@ msgid "Restore default settings"
 msgstr "Restaurar la configuración predeterminada"
 
 #: MKVBatchMultiplex/utils/text.py:56
-msgid "Job(s): {0:3d} Current: {1:3d} File: {2:3d} of {3:3d} Errors: {4:3d}"
+#, fuzzy
+msgid "Jobs: {0:3d} Current: {1:3d} File: {2:3d} of {3:3d} Errors: {4:3d}"
 msgstr ""
-"Tarea(s): {0: 3d} Procesando: {1: 3d} Archivo: {2: 3d} de {3: 3d} "
+"Tareas: {0: 3d} Procesando: {1: 3d} Archivo: {2: 3d} de {3: 3d} "
 "Errores: {4: 3d}"
 
 #: MKVBatchMultiplex/utils/text.py:57
