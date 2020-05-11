@@ -60,8 +60,6 @@ from .utils import (
     SetLanguage,
 )
 
-DEFAULTFONT = QFont("Segoe UI", 14)
-
 
 class MainWindow(QMainWindow):  # pylint: disable=R0902
     """Main window of application"""
@@ -324,7 +322,9 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         Read and write configuration
         """
 
-        defaultFont = DEFAULTFONT
+        defaultFont = QFont()
+        defaultFont.fromString(config.data.get(config.ConfigKey.SystemFont))
+        defaultFont.setPointSize(14)
         bLogging = False
 
         if action == config.Action.Reset:
@@ -572,10 +572,10 @@ def abort():
 def mainApp():
     """Main"""
 
-    config.init()
-
     # PySide2 app
     app = QApplication(sys.argv)
+
+    config.init(app=app)
 
     # Palette will change on macOS according to current theme
     # will create a poor mans dark theme for windows
