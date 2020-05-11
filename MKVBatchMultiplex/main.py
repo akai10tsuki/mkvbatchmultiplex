@@ -17,16 +17,19 @@ from collections import deque
 from pathlib import Path
 
 from PySide2.QtCore import QByteArray, QSize, Slot
-from PySide2.QtGui import QColor, QFont, QIcon, Qt
+from PySide2.QtGui import QColor, QFont, QFontMetrics, QIcon, Qt
 from PySide2.QtWidgets import (
     QAction,
     QApplication,
     QMainWindow,
     QMessageBox,
+    QMenuBar,
     QVBoxLayout,
     QWidget,
     QFontDialog,
     QToolTip,
+    QSizePolicy,
+    QStatusBar,
     QStyle,
 )
 
@@ -44,6 +47,7 @@ from vsutillib.pyqt import (
     QProgressIndicator,
     SvgColor,
     TabWidget,
+    VerticalLine,
 )
 
 from . import config
@@ -209,7 +213,8 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
     def _initMenu(self):  # pylint: disable=too-many-statements
 
-        menuBar = self.menuBar()
+        #menuBar = self.menuBar()
+        menuBar = QMenuBar()
 
         # File SubMenu
         fileMenu = QMenuWidget(Text.txt0020)
@@ -296,14 +301,22 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         # Init status var
         self.progressBar = DualProgressBar(align=Qt.Horizontal)
         self.jobsLabel = FormatLabel(
-            "Job(s): {0:3d} Current: {1:3d} File: {2:3d} of {3:3d} Errors: {4:3d}",
+            " " + Text.txt0085 + " ",
             init=[0, 0, 0, 0, 0],
         )
-        statusBar = self.statusBar()  # pylint: disable=unused-variable
+        #fm = QFontMetrics(self.font())
+        #statusBar = self.statusBar()  # pylint: disable=unused-variable
+        statusBar = QStatusBar()  # pylint: disable=unused-variable
+        #statusBar.setMaximumHeight(fm.capHeight() + 2)
+        statusBar.addPermanentWidget(VerticalLine())
         statusBar.addPermanentWidget(self.jobsLabel)
+        statusBar.addPermanentWidget(VerticalLine())
         statusBar.addPermanentWidget(self.progressBar)
         statusBar.addPermanentWidget(self.progressSpin)
         self.progress = Progress(self, self.progressBar, self.jobsLabel)
+
+        self.setMenuBar(menuBar)
+        self.setStatusBar(statusBar)
 
     def enableLogging(self, state):
         """Activate logging"""
@@ -430,6 +443,11 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
         QToolTip.setFont(font)
 
+        #fm = QFontMetrics(font)
+        #statusBar = self.statusBar()
+        #statusBar.setMaximumHeight(fm.capHeight() * 4)
+
+
     def selectAppFont(self):
         """Select Font"""
 
@@ -462,7 +480,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         lang.install(names=("ngettext",))
         config.data.set(config.ConfigKey.Language, language)
         self.setWindowTitle(Text.txt0001)
-        self.jobsLabel.template = _(Text.txt0085)
+        self.jobsLabel.template = " " + _(Text.txt0085) + " "
         self.progressBar.label = _(Text.txt0091) + ":"
 
         # Set langque main windows
