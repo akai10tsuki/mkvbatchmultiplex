@@ -344,7 +344,7 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
 
         if status == JobStatus.Skip:
             jobQueue.statusUpdateSignal.emit(job, JobStatus.Skipped)
-            break
+            continue
         #
         # Check Job Status for Skip
 

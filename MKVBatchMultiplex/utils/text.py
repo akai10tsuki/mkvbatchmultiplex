@@ -53,7 +53,7 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0083 = S_("Confirm restore ...")
     txt0084 = S_("Restore default settings")
 
-    txt0085 = S_("Job(s): {0:3d} Current: {1:3d} File: {2:3d} of {3:3d} Errors: {4:3d}")
+    txt0085 = S_("Jobs: {0:3d} Current: {1:3d} File: {2:3d} of {3:3d} Errors: {4:3d}")
     txt0086 = S_("Job identification number")
     txt0087 = S_("Application code for the job status")
     txt0088 = S_("Command generated for MKVMERGE by MKVToolNix")

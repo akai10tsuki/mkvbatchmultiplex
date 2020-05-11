@@ -5,8 +5,11 @@ mkvbatchmultiplex config file
 
 import logging
 import os
+import platform
 import sys
 from pathlib import Path
+
+from PySide2.QtGui import QFont
 
 from vsutillib.files import ConfigurationSettings
 from vsutillib.log import LogRotateFileHandler
@@ -73,24 +76,7 @@ FORCELOG = True
 # Application specific
 ######################
 
-#BTNADDCOMMAND = 0
-
-#BTNPASTE = 0
-#BTNADDQUEUE = 1
-#BTNSTARTQUEUE = 2
-
-#BTNANALYSIS = 4
-#BTNSHOWCOMMANDS = 5
-#BTNCHECKFILES = 6
-
-#BTNCLEAR = 8
-#BTNRESET = 9
-
 WORKERTHREADNAME = "jobsWorker"
-
-#JTVBTNADDWAITING = 1
-#JTVBTNCLEARQUEUE = 2
-#JTVBTNSTARTQUEUE = 3
 
 #######################
 #######################
@@ -110,12 +96,13 @@ class ConfigKey:  # pylint: disable=too-few-public-methods
     will have
     """
 
-    Language = "Language"
-    Font = "Font"
-    Logging = "Logging"
-    Geometry = "Geometry"
     DarkMode = "DarkMode"
+    Font = "Font"
+    Geometry = "Geometry"
+    Language = "Language"
+    Logging = "Logging"
     SimulateRun = "SimulateRun"
+    SystemFont = "SystemFont"
 
     #
     # App Specific
@@ -132,7 +119,7 @@ class Key:
     MaxCount = "MaxCount"
 
 
-def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None):
+def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None, app=None):
     """
     configures the system to save application configuration to xml file
 
@@ -158,6 +145,8 @@ def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None):
 
     data.setConfigFile(configFile)
     data.readFromFile()
+
+    setDefaultFont(app)
 
     if FORCELOG:
         data.set(ConfigKey.Logging, True)
@@ -213,6 +202,21 @@ def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None):
     if data.get(Key.MaxCount) is None:
         data.set(Key.MaxCount, 10)
 
+def setDefaultFont(app):
+    """save and set default font point size"""
+
+    strSystemFont = data.get(ConfigKey.SystemFont)
+    if strSystemFont is None:
+        systemFont = app.font()
+        data.set(ConfigKey.SystemFont, systemFont.toString())
+    else:
+        systemFont = QFont()
+        systemFont.fromString(strSystemFont)
+    strFont = data.get(ConfigKey.Font)
+    if strFont is None:
+        font = systemFont
+        font.setPointSize(14)
+        data.set(ConfigKey.Font, font.toString())
 
 def close():
     """exit accounting"""
