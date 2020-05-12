@@ -5,6 +5,8 @@ CommandWidget helper functions attach to buttons
 # pylint: disable=bad-continuation
 
 from PySide2.QtCore import Qt
+from PySide2.QtGui import QKeySequence
+from PySide2.QtWidgets import QLineEdit
 
 import vsutillib.mkv as mkv
 from vsutillib.pyqt import SvgColor, LineOutput, checkColor
@@ -177,3 +179,23 @@ def checkFiles(**kwargs):
         output.command.emit("", {LineOutput.AppendEnd: True})
 
     return None
+
+
+class QLineEditWidget(QLineEdit):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def keyPressEvent(self, event):
+        if event.matches(QKeySequence.Paste):
+            print("Ctrl-V Paste Filter")
+
+        super().keyPressEvent(event)
+
+    def contextMenuEvent(self, event):
+
+        print(str(event))
+
+        print(self.text())
+
+        super().contextMenuEvent(event)
