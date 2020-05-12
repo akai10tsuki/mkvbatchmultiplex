@@ -3,7 +3,6 @@ Changelog
 
 
 Changes to project.
-(Unreleased)
 
 This is a re-write of the application.  The major internal change is that the
 previous code was base on the episode as the unit of work.  Now the unit is the
@@ -15,8 +14,13 @@ friendly.
 The usage now is to add series to a queue and start a worker.  If the worker is
 running any added series to the queue will be processed.
 
-2.0.0a1 - YYYY-MM-DD
---------------------
+(Unreleased)
+------------
+
+
+2.0.0a1 - 2010-12-5
+-------------------
+
 
 - First release version 2.0
 - Re-write of MKVBatchMultiplex

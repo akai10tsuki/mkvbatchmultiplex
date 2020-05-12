@@ -41,14 +41,21 @@ Made light testing on ubuntu and macOS 10.14 Mojave and ubuntu 18.04.
 On macOS MKVToolNix must be version 30.0.0 or higher if working with
 Dark Theme.
 
+If working with the source to execute the application first create the
+locale files.  On the source directory execute:
+
+.. code:: bash
+
+    python setup.py generate_catalog
+
 Dependencies
 ************
 
-    * Python_ 3.8
-        - PySide2_ 5.12 or greater
-        - pymediainfo_ 4.0 or greater
+    * Python_ 3.8.1
+        - PySide2_ 5.14 or greater
+        - pymediainfo_ 4.2.1 or greater
     * MediaInfo_ tested with versions 17.10->18.12
-    * MKVToolNix_ tested with versions 17.00->42.0.0
+    * MKVToolNix_ tested with versions 17.00->46.0.0
 
 For now is a python package it can be installed:
 
@@ -77,11 +84,11 @@ Roadmap
 This is just the base for the project.  The roadmap is:
 
     * Work on rename module to fetch some metadata from internet
-    * Work on Spanish interface translation
+    * Work on the Spanish interface translation
     * Easier installation for linux
 
-The application works for me as is. If the the program generates any interest
-any further changes and additions will **also** depend on user base needs.
+If the the program generates any interest any further changes and additions
+will **also** depend on user base needs.
 
 See https://mkvbatchmultiplex.readthedocs.io for more information.
 
