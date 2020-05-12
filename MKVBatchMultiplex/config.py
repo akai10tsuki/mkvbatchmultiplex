@@ -45,8 +45,7 @@ REQUIRED = [
     "vsutillib.log>=1.5.0",
     "vsutillib.macos>=1.5.0",
     "vsutillib.media>=1.5.0",
-    "vsutillib.misc>=1.5.0",
-    "vsutillib.mkv>=1.5.0",
+    "vsutillib.mkv>=1.5.1",
     "vsutillib.process>=1.5.0",
     "vsutillib.pyqt>=1.5.0",
 ]
