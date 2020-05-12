@@ -84,11 +84,11 @@ Roadmap
 This is just the base for the project.  The roadmap is:
 
     * Work on rename module to fetch some metadata from internet
-    * Work on Spanish interface translation
+    * Work on the Spanish interface translation
     * Easier installation for linux
 
-The application works for me as is. If the the program generates any interest
-any further changes and additions will **also** depend on user base needs.
+If the the program generates any interest any further changes and additions
+will **also** depend on user base needs.
 
 See https://mkvbatchmultiplex.readthedocs.io for more information.
 
