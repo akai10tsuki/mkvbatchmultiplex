@@ -246,18 +246,6 @@ def displayRunJobs(line, job, output, indexTotal, funcProgress=None):
     regEx = re.compile(r":\W*(\d+)%$")
     funcProgress.lblSetValue.emit(2, indexTotal[0] + 1)
     n = -1
-    # if line.find("Progress:") >= 0:
-    #
-    #    if m := regEx.search(line):
-    #        n = int(m.group(1))
-    #
-    #    if n > 0:
-    #        output.job.emit(line[:-1], {"replaceLine": True})
-    #        funcProgress.pbSetValues.emit(n, indexTotal[1] + n)
-    #
-    # else:
-
-    #    output.job.emit(line[:-1], {"appendLine": True})
 
     if m := regEx.search(line):
         n = int(m.group(1))
