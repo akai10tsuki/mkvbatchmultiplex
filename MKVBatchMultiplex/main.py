@@ -113,6 +113,10 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.configuration(action=config.Action.Restore)
         self.setLanguage()
 
+        self.show()
+
+        self.progressBar.initTaskbarButton()
+
     def _initControls(self):
 
         headers = tableHeaders()
@@ -213,7 +217,6 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
     def _initMenu(self):  # pylint: disable=too-many-statements
 
-        #menuBar = self.menuBar()
         menuBar = QMenuBar()
 
         # File SubMenu
@@ -299,15 +302,9 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         menuBar.addMenu(helpMenu)
 
         # Init status var
-        self.progressBar = DualProgressBar(align=Qt.Horizontal)
-        self.jobsLabel = FormatLabel(
-            " " + Text.txt0085 + " ",
-            init=[0, 0, 0, 0, 0],
-        )
-        #fm = QFontMetrics(self.font())
-        #statusBar = self.statusBar()  # pylint: disable=unused-variable
+        self.progressBar = DualProgressBar(self, align=Qt.Horizontal)
+        self.jobsLabel = FormatLabel(" " + Text.txt0085 + " ", init=[0, 0, 0, 0, 0],)
         statusBar = QStatusBar()  # pylint: disable=unused-variable
-        #statusBar.setMaximumHeight(fm.capHeight() + 2)
         statusBar.addPermanentWidget(VerticalLine())
         statusBar.addPermanentWidget(self.jobsLabel)
         statusBar.addPermanentWidget(VerticalLine())
@@ -442,11 +439,6 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
                         continue
 
         QToolTip.setFont(font)
-
-        #fm = QFontMetrics(font)
-        #statusBar = self.statusBar()
-        #statusBar.setMaximumHeight(fm.capHeight() * 4)
-
 
     def selectAppFont(self):
         """Select Font"""
@@ -598,7 +590,7 @@ def mainApp():
     # Palette will change on macOS according to current theme
     # will create a poor mans dark theme for windows
     if platform.system() == "Windows":
-        # Force the style to be the same on all OSs:
+        # use a dark palette on Windows 10
         myAppID = "VergaraSoft.MKVBatchMultiplex.mkv.2.0.0"  # arbitrary string
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myAppID)
         darkPalette(app)
@@ -606,7 +598,6 @@ def mainApp():
         OutputTextWidget.isDarkMode = True
 
     win = MainWindow()
-    win.show()
     app.exec_()
     config.close()
 
