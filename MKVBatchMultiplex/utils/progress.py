@@ -19,6 +19,7 @@ class Progress(QObject):
             Defaults to None.
     """
 
+    pbReset = Signal()
     pbSetAlignment = Signal(int)
     pbSetValues = Signal(int, int)
     pbSetMaximum = Signal(int, int)
@@ -43,6 +44,7 @@ class Progress(QObject):
 
         if initProgressBar:
 
+            self.pbReset.connect(self.pb.reset)
             self.pbSetAlignment.connect(self.pb.setAlignment)
             self.pbSetValues.connect(self.pb.setValues)
             self.pbSetMaximum.connect(self.pb.setMaximum)
