@@ -319,6 +319,7 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
             totalFiles = len(job.oCommand)
 
         maxBar = totalFiles * 100
+        funcProgress.pbSetValues.emit(0, 0)
         funcProgress.pbSetMaximum.emit(100, maxBar)
         funcProgress.lblSetValue.emit(0, totalJobs)
         funcProgress.lblSetValue.emit(1, currentJob)
@@ -434,6 +435,8 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
                         cli.run()
 
                 else:
+                    job.errors.append(verify.analysis)
+
                     totalErrors += 1
                     funcProgress.lblSetValue.emit(4, totalErrors)
 
@@ -505,6 +508,7 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
 
     funcProgress.pbSetMaximum.emit(100, 100)
     funcProgress.pbSetValues.emit(0, 100)
+    funcProgress.pbReset.emit()
     runJobs.running = False
 
     return "Job queue empty."
