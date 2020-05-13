@@ -5,7 +5,6 @@ mkvbatchmultiplex config file
 
 import logging
 import os
-import platform
 import sys
 from pathlib import Path
 
@@ -14,7 +13,7 @@ from PySide2.QtGui import QFont
 from vsutillib.files import ConfigurationSettings
 from vsutillib.log import LogRotateFileHandler
 
-__VERSION = (2, 0, "0a1")
+__VERSION = (2, 0, "0a2")
 
 APPNAME = "MKVBatchMultiplex"
 VERSION = ".".join(map(str, __VERSION))
@@ -182,24 +181,10 @@ def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None, ap
     #
     # App Specific
     #
-    if data.get(Key.RegEx) is None:
-        data.set(
-            Key.RegEx,
-            [
-                r"(\[.*\]\W*|)(?P<name>.*?)(\W*-|)\W*(?P<episode>\d+).*",
-                r"(\[.*\]\W*|)(?P<name>.*?)(\W*-|)\W*(?P<episode>\d+)(\W*-\W*)(?P<title>.*)",
-                r"(\[.*\]\W*|)(?P<name>.*?)(\W*-|)\W*(?P<episode>\d+)(\W*-\W*)(?P<title>.*?)((\W*\[.*|\W*\(.*))",
-            ],
-        )
-
-    if data.get(Key.SubString) is None:
-        data.set(
-            Key.SubString,
-            [r"\g<name> - S01E\g<episode>", r"\g<name> - S01E\g<episode> - \g<title>",],
-        )
+    setRegEx()
 
     if data.get(Key.MaxCount) is None:
-        data.set(Key.MaxCount, 10)
+        data.set(Key.MaxCount, 20)
 
 def setDefaultFont(app):
     """save and set default font point size"""
@@ -216,6 +201,61 @@ def setDefaultFont(app):
         font = systemFont
         font.setPointSize(14)
         data.set(ConfigKey.Font, font.toString())
+
+
+def setRegEx():
+    """Update regex to 2.0.0a2"""
+
+    oldRegEx = [
+        r"(\[.*\]\W*|)(?P<name>.*?)(\W*-|)\W*(?P<episode>\d+).*",
+        r"(\[.*\]\W*|)(?P<name>.*?)(\W*-|)\W*(?P<episode>\d+)(\W*-\W*)(?P<title>.*)",
+        r"(\[.*\]\W*|)(?P<name>.*?)(\W*-|)\W*(?P<episode>\d+)(\W*-\W*)(?P<title>.*?)((\W*\[.*|\W*\(.*))",
+        r"(\[.*\]\W*|)(?P<name>.*?)(\W*-|)\W*(?P<episode>\d+)(\w*|)(\W*-\W*)(?P<title>.*?)((\W*\[.*|\W*\(.*))",
+        r"(\[.*\]\W*|)(?P<name>.*?)(\W*-|)\W*(?P<episode>\d+)(\w*|)(\W*-|)(?P<title>.*).*"
+    ]
+
+    newRegEx = [
+        r"([[(].*?[])]\W*|)(.*?)(\W*-\W*)(\d+).*",
+        r"([[(].*?[])]\W*|)(.*?)(\W*-\W*|\W*-|\W*|)(\d+).*",
+        r"([[(].*?[])]\W*|)(.*?)(\W*-\W*|\W*-|\W*|)(\d+)(\W*-\W*|\W*-|\W*|)(.*)",
+        r"([[(].*?[])]\W*|)(.*?)(\W*-\W*|\W*-|\W*|)(\d+)(\W*-\W*|\W*-|\W*|)(.*?)(\W*[([].*)",
+        r"([[(].*?[])]\W*|)(?P<name>.*?)(\W*-\W*)(?P<episode>\d+).*",
+        r"([[(].*?[])]\W*|)(?P<name>.*?)(\W*-\W*|\W*-|\W*|)(?P<episode>\d+).*",
+        r"([[(].*?[])]\W*|)(?P<name>.*?)(\W*-\W*|\W*-|\W*|)(?P<episode>\d+)(\W*-\W*|\W*-|\W*|)(?P<title>.*)",
+        r"([[(].*?[])]\W*|)(?P<name>.*?)(\W*-\W*|\W*-|\W*|)(?P<episode>\d+)(\W*-\W*|\W*-|\W*|)(?P<title>.*?)(\W*[([].*)",
+    ]
+
+    newSubString = [
+        r"\2 - S01E\4",
+        r"\2 - S01E\4 - \6",
+        r"\g<name> - S01E\g<episode>",
+        r"\g<name> - S01E\g<episode> - \g<title>",
+    ]
+
+    if data.get(Key.RegEx) is None:
+        data.set(Key.RegEx, newRegEx)
+    else:
+        currentRegEx = data.get(Key.RegEx)
+        for e in oldRegEx:
+            try:
+                currentRegEx.remove(e)
+            except: # pylint: disable=bare-except
+                pass
+        for e in newRegEx:
+            if e not in currentRegEx:
+                currentRegEx.append(e)
+        data.set(Key.RegEx, currentRegEx)
+
+    if data.get(Key.SubString) is None:
+        data.set(Key.SubString, newSubString)
+    else:
+        currentSubString = data.get(Key.SubString)
+        for e in currentSubString:
+            if e not in currentSubString:
+                currentSubString.append(e)
+        data.set(Key.SubString, currentSubString)
+
+    data.set(Key.MaxCount, 20)
 
 def close():
     """exit accounting"""
