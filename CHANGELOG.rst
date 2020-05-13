@@ -18,6 +18,20 @@ running any added series to the queue will be processed.
 ------------
 
 
+Added
+~~~~~
+
+- show progress bar on Windows taskbar icon
+
+Changed
+~~~~~~~
+
+
+Fixed
+~~~~~
+
+
+
 2.0.0a1 - 2010-12-5
 -------------------
 
