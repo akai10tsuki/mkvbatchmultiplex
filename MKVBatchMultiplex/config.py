@@ -95,10 +95,12 @@ class ConfigKey:  # pylint: disable=too-few-public-methods
     """
 
     DarkMode = "DarkMode"
+    DefaultGeometry = "DefaultGeometry"
     Font = "Font"
     Geometry = "Geometry"
+    InterfaceLanguages = "InterfaceLanguages"
     Language = "Language"
-    Logging = "Logging"
+    Loging = "Loging"
     SimulateRun = "SimulateRun"
     SystemFont = "SystemFont"
 
@@ -114,7 +116,7 @@ class Key:
 
     RegEx = "RegEx"
     SubString = "SubString"
-    MaxCount = "MaxCount"
+    MaxRegExCount = "MaxRegExCount"
 
 
 def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None, app=None):
@@ -147,7 +149,7 @@ def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None, ap
     setDefaultFont(app)
 
     if FORCELOG:
-        data.set(ConfigKey.Logging, True)
+        data.set(ConfigKey.Loging, True)
 
     if data.get(ConfigKey.Language) is None:
         data.set(ConfigKey.Language, DEFAULTLANGUAGE)
@@ -178,13 +180,17 @@ def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None, ap
     appName = "CF0003: " + appName
     logging.info("%s-%s", appName, appVersion)
 
+    setInterfaceLanguage()
+    setDefaultGeometry()
+
     #
     # App Specific
     #
     setRegEx()
 
-    if data.get(Key.MaxCount) is None:
-        data.set(Key.MaxCount, 20)
+    if data.get(Key.MaxRegExCount) is None:
+        data.set(Key.MaxRegExCount, 20)
+
 
 def setDefaultFont(app):
     """save and set default font point size"""
@@ -192,6 +198,7 @@ def setDefaultFont(app):
     strSystemFont = data.get(ConfigKey.SystemFont)
     if strSystemFont is None:
         systemFont = app.font()
+        systemFont.setPointSize(14)
         data.set(ConfigKey.SystemFont, systemFont.toString())
     else:
         systemFont = QFont()
@@ -203,6 +210,21 @@ def setDefaultFont(app):
         data.set(ConfigKey.Font, font.toString())
 
 
+def setDefaultGeometry():
+
+    if data.get(ConfigKey.DefaultGeometry) is None:
+        data.set(ConfigKey.DefaultGeometry, (0, 0, 1280, 720))
+
+
+def setInterfaceLanguage():
+
+    if data.get(ConfigKey.InterfaceLanguages) is None:
+        data.set(
+            ConfigKey.InterfaceLanguages,
+            {"en": "English (Inglés)", "es": "Español (Spanish)"},
+        )
+
+
 def setRegEx():
     """Update regex to 2.0.0a2"""
 
@@ -211,7 +233,7 @@ def setRegEx():
         r"(\[.*\]\W*|)(?P<name>.*?)(\W*-|)\W*(?P<episode>\d+)(\W*-\W*)(?P<title>.*)",
         r"(\[.*\]\W*|)(?P<name>.*?)(\W*-|)\W*(?P<episode>\d+)(\W*-\W*)(?P<title>.*?)((\W*\[.*|\W*\(.*))",
         r"(\[.*\]\W*|)(?P<name>.*?)(\W*-|)\W*(?P<episode>\d+)(\w*|)(\W*-\W*)(?P<title>.*?)((\W*\[.*|\W*\(.*))",
-        r"(\[.*\]\W*|)(?P<name>.*?)(\W*-|)\W*(?P<episode>\d+)(\w*|)(\W*-|)(?P<title>.*).*"
+        r"(\[.*\]\W*|)(?P<name>.*?)(\W*-|)\W*(?P<episode>\d+)(\w*|)(\W*-|)(?P<title>.*).*",
     ]
 
     newRegEx = [
@@ -239,7 +261,7 @@ def setRegEx():
         for e in oldRegEx:
             try:
                 currentRegEx.remove(e)
-            except: # pylint: disable=bare-except
+            except:  # pylint: disable=bare-except
                 pass
         for e in newRegEx:
             if e not in currentRegEx:
@@ -255,7 +277,9 @@ def setRegEx():
                 currentSubString.append(e)
         data.set(Key.SubString, currentSubString)
 
-    data.set(Key.MaxCount, 20)
+    # Todo: remove MaxCount
+    data.set(Key.MaxRegExCount, 20)
+
 
 def close():
     """exit accounting"""
