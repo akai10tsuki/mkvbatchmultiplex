@@ -16,15 +16,30 @@ class Preferences(QObject):
     def __init__(self, parent, prefDialog):
         super().__init__(parent)
 
+        self.__parent = None
         self.parent = parent
         self.prefDialog = prefDialog
 
+        self._initVars()
+
+    def _initVars(self):
         self.enableLoging = None
         self.font = None
         self.fontSize = None
         self.language = None
         self.restoreWindowSize = None
         self.__changedData = False
+
+    def __bool__(self):
+        return self.__changedData
+
+    @property
+    def parent(self):
+        return self.__parent
+
+    @parent.setter
+    def parent(self, value):
+        self.__parent = value
 
     @Slot(int)
     def interfaceLanguageChanged(self, index):
@@ -80,6 +95,8 @@ class Preferences(QObject):
                 self.prefDialog.fcmbBoxFontFamily.setCurrentFont(defaultFont.family())
                 self.prefDialog.spinBoxFontSize.setValue(defaultFont.pointSize())
 
+    def reset(self):
+        self._initVars()
 
 class SetPreferences(QObject):
     def __init__(self, parent):
@@ -156,13 +173,24 @@ class SetPreferences(QObject):
         if bLoging := config.data.get(config.ConfigKey.Loging):
             self.__prefDialog.chkBoxEnableLoging.setChecked(bLoging)
 
-    def readPreferences(self):
+    def getPreferences(self, applyChanges=False):
 
         self._initUI()
+        self.__pref.reset()
 
-        if self.__prefDialog.exec_():
-            if self.f__pref:
-                print("YEEEEEAH!!!, YEEEEEAH!!")
+        rc = self.__prefDialog.exec_()
+        if not rc:
+            self.__pref.reset()
+
+        if applyChanges:
+            self.applyChanges()
+
+        return rc
+
+    def applyChanges(self):
+
+        if self.f__pref:
+            print("YEEEEEAH!!!, YEEEEEAH!!")
         else:
             print("Bummer!!")
 
