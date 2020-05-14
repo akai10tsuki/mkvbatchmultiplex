@@ -189,7 +189,7 @@ class SetPreferences(QObject):
 
     def applyChanges(self):
 
-        if self.f__pref:
+        if self.__pref:
             print("YEEEEEAH!!!, YEEEEEAH!!")
         else:
             print("Bummer!!")
