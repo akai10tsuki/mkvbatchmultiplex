@@ -24,7 +24,7 @@ class JobsTableModel(TableModel):
     """
 
     def __init__(self, model, jobQueue):
-        super(JobsTableModel, self).__init__(model)
+        super().__init__(model)
 
         self.jobQueue = jobQueue
         self.model = model
@@ -117,7 +117,7 @@ class JobsTableModel(TableModel):
         if role == Qt.EditRole:
             row = index.row()
             column = index.column()
-            super(JobsTableModel, self).setData(index, value, role)
+            super().setData(index, value, role)
 
             if value == JobStatus.AddToQueue:
                 self.jobQueue.append(row)

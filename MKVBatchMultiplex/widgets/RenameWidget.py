@@ -165,7 +165,7 @@ class RenameWidget(QWidget):
 
     def _initHelper(self):
 
-        maxCount = config.data.get(Key.MaxCount)
+        maxCount = config.data.get(Key.MaxRegECount)
         # local signals
         self.setCurrentIndexSignal.connect(self._setCurrentIndex)
         self.setFilesSignal.connect(self.setFiles)
@@ -442,4 +442,4 @@ class Key:
 
     RegEx = "RegEx"
     SubString = "SubString"
-    MaxCount = "MaxCount"
+    MaxRegECount = "MaxRegECount"

@@ -21,71 +21,6 @@ from PySide2.QtWidgets import (
 import vsutillib.mkv as mkv
 
 
-
-#def findFile(element, dirPath=None):
-#    """find file in the path"""
-
-#    if dirPath is None:
-#        dirPath = os.getenv('PATH')
-
-#    dirs = dirPath.split(os.pathsep)
-
-#    for dirname in dirs:
-#        candidate = Path(PurePath(dirname).joinpath(element))
-#        if candidate.is_file():
-#            return candidate
-
-#    return None
-
-
-#def getMKVMerge():
-#    """Looks for mkvmerge executable in the system"""
-
-    # /Applications/MKVToolNix-29.0.0.app/Contents/MacOS/mkvmerge
-#    currentOS = platform.system()
-
-#    if currentOS == "Darwin":
-#        lstTest = glob.glob("/Applications/MKVToolNix*")
-#        if lstTest:
-#            f = lstTest[0] + "/Contents/MacOS/mkvmerge"
-#            mkvmerge = Path(f)
-#            if mkvmerge.is_file():
-#                return mkvmerge
-
-#    elif currentOS == "Windows":
-        #ProgramFiles=C:\Program Files
-        #ProgramFiles(x86)=C:\Program Files (x86)
-
-#        defPrograms64 = os.environ.get('ProgramFiles')
-#        defPrograms32 = os.environ.get('ProgramFiles(x86)')
-
-#        dirs = []
-#        if defPrograms64 is not None:
-#            dirs.append(defPrograms64)
-
-#        if defPrograms32 is not None:
-#            dirs.append(defPrograms32)
-
-        # search 64 bits
-#        for d in dirs:
-#            search = sorted(Path(d).rglob("mkvmerge.exe"))
-#            if search:
-#                mkvmerge = Path(search[0])
-#                if mkvmerge.is_file():
-#                    return mkvmerge
-
-#    elif currentOS == "Linux":
-
-#        search = findFile("mkvmerge")
-
-#        if search is not None:
-#            mkvmerge = Path(search)
-#            if mkvmerge.is_file():
-#                return mkvmerge
-
-#    return None
-
-
 def checkForQuote(file):
     """add quotes if find spaces in file name"""
 
@@ -116,7 +51,6 @@ class GenCommandApp(QMainWindow):
             l = "--ui-language en"
         else:
             l = "--ui-language en_US"
-
 
         p = os.path.dirname(os.path.realpath(__file__))
         p = os.path.realpath(p)
