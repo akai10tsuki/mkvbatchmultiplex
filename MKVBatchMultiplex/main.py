@@ -54,7 +54,12 @@ from . import config
 from .dataset import TableData, tableHeaders
 from .jobs import JobQueue
 from .models import TableProxyModel, JobsTableModel
-from .widgets import CommandWidget, JobsTableViewWidget, RenameWidget
+from .widgets import (
+    CommandWidget,
+    JobsTableViewWidget,
+    PreferencesDialogWidget,
+    RenameWidget,
+)
 from .utils import (
     Text,
     OutputWindows,
@@ -63,6 +68,7 @@ from .utils import (
     yesNoDialog,
     setLanguageMenus,
     SetLanguage,
+    SetPreferences,
 )
 
 
@@ -89,6 +95,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         )
         self.progressSpin.delay = 50
         self.progressSpin.displayedWhenStopped = True
+        self.setPreferences = PreferencesDialogWidget(self)
 
         #
         # Where am I running from
@@ -228,7 +235,9 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         actPreferences = QActionWidget(
             "&Preferences", self, shortcut="Ctrl+P", tooltip="Setup program options"
         )
-        actPreferences.triggered.connect(lambda: preferences(self))
+        actPreferences.triggered.connect(
+            lambda: self.setPreferences.getPreferences(True)
+        )
 
         # Exit application
         actExit = QActionWidget(
@@ -503,7 +512,6 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
         # Update language on other window widgets
         self.widgetSetLanguage.emitSignal()
-
 
     def closeEvent(self, event):
         """
