@@ -5,24 +5,24 @@
 import sys
 from PySide2.QtWidgets import QApplication, QDialog, QMainWindow
 from PySide2.QtCore import QFile
-from Ui_DlgPreferences import Ui_DlgPreferences
+from Ui_PreferencesDialog import Ui_PreferencesDialog
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
-        self.ui = Ui_DlgPreferences()
+        self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-class Dialog(QDialog):
+class PreferencesDialog(QDialog):
     def __init__(self):
         super().__init__()
-        self.ui = Ui_DlgPreferences()
+        self.ui = Ui_PreferencesDialog()
         self.ui.setupUi(self)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
-    window = Dialog()
+    window = PreferencesDialog()
     window.show()
 
     sys.exit(app.exec_())
