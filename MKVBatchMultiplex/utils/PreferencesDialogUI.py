@@ -8,7 +8,7 @@ Returns:
 import sys
 
 from PySide2.QtWidgets import QApplication, QDialogButtonBox, QMainWindow, QPushButton
-from PySide2.QtCore import QFile, QIODevice
+from PySide2.QtCore import QFile, QIODevice, Qt
 from PySide2.QtUiTools import QUiLoader
 
 from vsutillib.pyqt import darkPalette
@@ -36,6 +36,8 @@ def PreferencesDialogUI(uiDir):
     DPreferences.btnBox.addButton(btnRestoreDefaults, QDialogButtonBox.ResetRole)
     DPreferences.btnBox.addButton(btnApply, QDialogButtonBox.AcceptRole)
     DPreferences.btnBox.addButton(btnCancel, QDialogButtonBox.RejectRole)
+
+    DPreferences.setWindowFlags(DPreferences.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
     return DPreferences
 
