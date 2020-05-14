@@ -7,6 +7,8 @@ utils package imports
 from .mainSetLanguage import setLanguageMenus
 from .OutputWindows import OutputWindows
 from .populate import populate
+from .preferences import preferences
+from .PreferencesDialogUI import PreferencesDialogUI
 from .progress import Progress
 from .SetLanguage import SetLanguage
 from .text import Text
