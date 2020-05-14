@@ -36,7 +36,7 @@ from PySide2.QtWidgets import (
 import vsutillib.media as media
 
 from vsutillib.pyqt import (
-    centerWidgets,
+    centerWidget,
     checkColor,
     darkPalette,
     DualProgressBar,
@@ -80,15 +80,11 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
     def __init__(self, parent=None, palette=None):
         super(MainWindow, self).__init__(parent)
 
-        self.actEnableLoging = None
-        self.actEN = None
-        self.actES = None
-        self.languageMenu = None
         self.progress = None
         self.controlQueue = deque()
         self.jobsQueue = JobQueue(self, controlQueue=self.controlQueue)
         self.defaultPalette = palette
-        self.widgetSetLanguage = SetLanguage()
+        self.setLanguageWidget = SetLanguage()
         self.progressSpin = QProgressIndicator(self)
         self.progressSpin.color = checkColor(
             QColor(42, 130, 218), config.data.get(config.ConfigKey.DarkMode)
@@ -202,10 +198,10 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.jobsOutput.textChanged.connect(self.commandWidget.resetButtonState)
 
         # setup widgets setLanguage to SetLanguage change signal
-        self.widgetSetLanguage.addSlot(self.tableViewWidget.setLanguage)
-        self.widgetSetLanguage.addSlot(self.commandWidget.setLanguage)
-        self.widgetSetLanguage.addSlot(self.tabs.setLanguage)
-        self.widgetSetLanguage.addSlot(self.renameWidget.setLanguage)
+        self.setLanguageWidget.addSlot(self.tableViewWidget.setLanguage)
+        self.setLanguageWidget.addSlot(self.commandWidget.setLanguage)
+        self.setLanguageWidget.addSlot(self.tabs.setLanguage)
+        self.setLanguageWidget.addSlot(self.renameWidget.setLanguage)
 
         # connect to tabs widget tab change Signal
         self.tabs.currentChanged.connect(tabChange)
@@ -257,52 +253,6 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         fileMenu.addAction(actAbort)
         menuBar.addMenu(fileMenu)
 
-        # Settings SubMenu
-        settingsMenu = QMenuWidget(Text.txt0040)
-
-        # Enable logging
-        self.actEnableLoging = QActionWidget(Text.txt0041, self, checkable=True)
-        self.actEnableLoging.setStatusTip(Text.txt0042)
-        self.actEnableLoging.triggered.connect(self.enableLoging)
-
-        # Font
-        actSelectFont = QActionWidget(Text.txt0043, self)
-        actSelectFont.setStatusTip(Text.txt0044)
-        actSelectFont.triggered.connect(self.selectAppFont)
-
-        # Restore Defaults
-        actRestoreDefaults = QActionWidget(Text.txt0046, self)
-        actRestoreDefaults.setStatusTip(Text.txt0047)
-        actRestoreDefaults.triggered.connect(self.restoreDefaults)
-
-        self.actEN = QActionWidget(
-            "English (Inglés)",
-            self,
-            checkable=True,
-            tooltip="Select english language for the interface",
-        )
-        self.actEN.triggered.connect(lambda: self.setLanguage("en", self.actEN))
-        self.actES = QActionWidget(
-            "Español (Spanish)",
-            self,
-            checkable=True,
-            tooltip="Seleccione el idioma Español para la interfaz",
-        )
-        self.actES.triggered.connect(lambda: self.setLanguage("es", self.actES))
-
-        self.languageMenu = QMenuWidget(Text.txt0045)
-        self.languageMenu.addAction(self.actEN)
-        self.languageMenu.addAction(self.actES)
-
-        # Add items to Settings SubMenu
-        settingsMenu.addAction(self.actEnableLoging)
-        settingsMenu.addAction(actSelectFont)
-        settingsMenu.addSeparator()
-        settingsMenu.addMenu(self.languageMenu)
-        settingsMenu.addSeparator()
-        settingsMenu.addAction(actRestoreDefaults)
-        menuBar.addMenu(settingsMenu)
-
         # Help Menu
         actHelpContents = QActionWidget(Text.txt0061 + "...", self)
         actHelpContents.triggered.connect(lambda: _help(self.appDirectory, 0))
@@ -345,6 +295,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.jobsQueue.log = state
         msg = "Start Loging." if state else "Stop Loging."
         logging.info(msg)
+        config.data.set(config.ConfigKey.Loging, state)
 
     def configuration(self, action=None):
         """
@@ -361,11 +312,10 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
             self.setFont(defaultFont)
             self.setAppFont(defaultFont)
             # Loging
-            self.actEnableLoging.setChecked(bLoging)
-            self.enableLoggin(bLoging)
+            self.enableLoging(bLoging)
             # Geometry
             self.setGeometry(0, 0, 1280, 720)
-            centerWidgets(self)
+            centerWidget(self)
 
         elif action == config.Action.Restore:
             # Font
@@ -380,7 +330,6 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
             # Loging
             if bLoging := config.data.get(config.ConfigKey.Loging):
-                self.actEnableLoging.setChecked(bLoging)
                 self.enableLoging(bLoging)
 
             # Geometry
@@ -388,47 +337,18 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
                 self.restoreGeometry(QByteArray.fromBase64(QByteArray(byteGeometry)))
             else:
                 self.setGeometry(0, 0, 1280, 720)
-                centerWidgets(self)
+                centerWidget(self)
 
             # Current tab
             if tabIndex := config.data.get("Tab"):
                 # setting tab to jobs
-                # self.tabs.setCurrentIndexSignal.emit(tabIndex)
                 self.tabs.setCurrentIndexSignal.emit(0)
 
-        elif action in (config.Action.Save, config.Action.Update):
-            # Update Loging
-            config.data.set(config.ConfigKey.Loging, self.actEnableLoging.isChecked())
-
-            # Update current font
-            font = self.font()
-            config.data.set(config.ConfigKey.Font, font.toString())
-
-            # Update geometry includes position
-            base64Geometry = self.saveGeometry().toBase64()
-            b = base64Geometry.data()  # b is a bytes string
-            config.data.set(config.ConfigKey.Geometry, b)
+        elif action == config.Action.Save:
 
             if action == config.Action.Save:
                 config.data.saveToFile()
 
-    def restoreDefaults(self):
-        """
-        Override QMainWindow.closeEvent
-
-        Save configuration state before exit
-        """
-
-        language = config.data.get(config.ConfigKey.Language)
-        bAnswer = False
-        title = _(Text.txt0083)
-        msg = "¿" if language == "es" else ""
-        msg += _(Text.txt0084) + "?"
-        bAnswer = yesNoDialog(self, msg, title)
-
-        if bAnswer:
-            self.configuration(action=config.Action.Reset)
-            self.configuration(action=config.Action.Update)
 
     def setAppFont(self, font):
         """
@@ -458,19 +378,8 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
                         continue
 
         QToolTip.setFont(font)
+        config.data.set(config.ConfigKey.Font, font.toString())
 
-    def selectAppFont(self):
-        """Select Font"""
-
-        font = self.font()
-        fontDialog = QFontDialog()
-        centerWidgets(fontDialog, self)
-        valid, font = fontDialog.getFont(font)
-
-        if valid:
-            self.setFont(font)
-            self.setAppFont(font)
-            config.data.set(config.ConfigKey.Font, font.toString())
 
     def setLanguage(self, language=None, menuItem=None):
         """
@@ -502,16 +411,9 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
             for a in self.languageMenu.actions():
                 a.setChecked(False)
             menuItem.setChecked(True)
-        else:
-            if language == "es":
-                self.actEN.setChecked(False)
-                self.actES.setChecked(True)
-            else:
-                self.actES.setChecked(False)
-                self.actEN.setChecked(True)
 
         # Update language on other window widgets
-        self.widgetSetLanguage.emitSignal()
+        self.setLanguageWidget.emitSignal()
 
     def closeEvent(self, event):
         """
@@ -537,6 +439,20 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
             event.accept()
         else:
             event.ignore()
+
+    def resizeEvent(self, event):
+
+        # Update geometry includes position
+        base64Geometry = self.saveGeometry().toBase64()
+        b = base64Geometry.data()  # b is a bytes string
+        config.data.set(config.ConfigKey.Geometry, b)
+
+    def moveEvent(self, event):
+
+        # Update geometry includes position
+        base64Geometry = self.saveGeometry().toBase64()
+        b = base64Geometry.data()  # b is a bytes string
+        config.data.set(config.ConfigKey.Geometry, b)
 
     def checkDependencies(self):
         """check if MediaInfo library is present"""
