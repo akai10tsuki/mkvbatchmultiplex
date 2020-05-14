@@ -58,6 +58,7 @@ from .widgets import CommandWidget, JobsTableViewWidget, RenameWidget
 from .utils import (
     Text,
     OutputWindows,
+    preferences,
     Progress,
     yesNoDialog,
     setLanguageMenus,
@@ -73,7 +74,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
     def __init__(self, parent=None, palette=None):
         super(MainWindow, self).__init__(parent)
 
-        self.actEnableLogging = None
+        self.actEnableLoging = None
         self.actEN = None
         self.actES = None
         self.languageMenu = None
@@ -223,6 +224,12 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         fileMenu = QMenuWidget(Text.txt0020)
         closeIcon = self.style().standardIcon(QStyle.SP_DialogCloseButton)
 
+        # Preferences
+        actPreferences = QActionWidget(
+            "&Preferences", self, shortcut="Ctrl+P", tooltip="Setup program options"
+        )
+        actPreferences.triggered.connect(lambda: preferences(self))
+
         # Exit application
         actExit = QActionWidget(
             closeIcon, Text.txt0021, self, shortcut=Text.txt0022, tooltip=Text.txt0023,
@@ -234,7 +241,10 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         actAbort.triggered.connect(abort)
 
         # Add actions to SubMenu
+        fileMenu.addAction(actPreferences)
+        fileMenu.addSeparator()
         fileMenu.addAction(actExit)
+        fileMenu.addSeparator()
         fileMenu.addAction(actAbort)
         menuBar.addMenu(fileMenu)
 
@@ -242,9 +252,9 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         settingsMenu = QMenuWidget(Text.txt0040)
 
         # Enable logging
-        self.actEnableLogging = QActionWidget(Text.txt0041, self, checkable=True)
-        self.actEnableLogging.setStatusTip(Text.txt0042)
-        self.actEnableLogging.triggered.connect(self.enableLogging)
+        self.actEnableLoging = QActionWidget(Text.txt0041, self, checkable=True)
+        self.actEnableLoging.setStatusTip(Text.txt0042)
+        self.actEnableLoging.triggered.connect(self.enableLoging)
 
         # Font
         actSelectFont = QActionWidget(Text.txt0043, self)
@@ -276,7 +286,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.languageMenu.addAction(self.actES)
 
         # Add items to Settings SubMenu
-        settingsMenu.addAction(self.actEnableLogging)
+        settingsMenu.addAction(self.actEnableLoging)
         settingsMenu.addAction(actSelectFont)
         settingsMenu.addSeparator()
         settingsMenu.addMenu(self.languageMenu)
@@ -315,7 +325,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.setMenuBar(menuBar)
         self.setStatusBar(statusBar)
 
-    def enableLogging(self, state):
+    def enableLoging(self, state):
         """Activate logging"""
 
         self.log = state
@@ -324,7 +334,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.errorOutput.log = state
         self.tableViewWidget.log = state
         self.jobsQueue.log = state
-        msg = "Start Logging." if state else "Stop Logging."
+        msg = "Start Loging." if state else "Stop Loging."
         logging.info(msg)
 
     def configuration(self, action=None):
@@ -335,15 +345,15 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         defaultFont = QFont()
         defaultFont.fromString(config.data.get(config.ConfigKey.SystemFont))
         defaultFont.setPointSize(14)
-        bLogging = False
+        bLoging = False
 
         if action == config.Action.Reset:
             # Font
             self.setFont(defaultFont)
             self.setAppFont(defaultFont)
-            # Logging
-            self.actEnableLogging.setChecked(bLogging)
-            self.enableLoggin(bLogging)
+            # Loging
+            self.actEnableLoging.setChecked(bLoging)
+            self.enableLoggin(bLoging)
             # Geometry
             self.setGeometry(0, 0, 1280, 720)
             centerWidgets(self)
@@ -359,10 +369,10 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
                 self.setFont(defaultFont)
                 self.setAppFont(defaultFont)
 
-            # Logging
-            if bLogging := config.data.get(config.ConfigKey.Logging):
-                self.actEnableLogging.setChecked(bLogging)
-                self.enableLogging(bLogging)
+            # Loging
+            if bLoging := config.data.get(config.ConfigKey.Loging):
+                self.actEnableLoging.setChecked(bLoging)
+                self.enableLoging(bLoging)
 
             # Geometry
             if byteGeometry := config.data.get(config.ConfigKey.Geometry):
@@ -378,8 +388,8 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
                 self.tabs.setCurrentIndexSignal.emit(0)
 
         elif action in (config.Action.Save, config.Action.Update):
-            # Update Logging
-            config.data.set(config.ConfigKey.Logging, self.actEnableLogging.isChecked())
+            # Update Loging
+            config.data.set(config.ConfigKey.Loging, self.actEnableLoging.isChecked())
 
             # Update current font
             font = self.font()
@@ -493,6 +503,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
         # Update language on other window widgets
         self.widgetSetLanguage.emitSignal()
+
 
     def closeEvent(self, event):
         """
