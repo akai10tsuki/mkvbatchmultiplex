@@ -7,6 +7,8 @@ from PySide2.QtCore import QObject, Qt, Slot
 from PySide2.QtGui import QFont
 from PySide2.QtWidgets import QDialog, QDialogButtonBox
 
+from vsutillib.pyqt import centerWidget
+
 from .. import config
 from ..ui import Ui_PreferencesDialog
 
@@ -48,8 +50,11 @@ class PreferencesDialogWidget(QDialog):
         #
         # Loging
         #
-        if bLoging := config.data.get(config.ConfigKey.Loging):
-            self.ui.chkBoxEnableLoging.setChecked(bLoging)
+        self.ui.chkBoxEnableLoging.setChecked(config.data.get(config.ConfigKey.Loging))
+        #
+        # Restore Windows Size
+        #
+        self.ui.chkBoxRestoreWindowSize.setChecked(False)
 
     def _initHelper(self):
 
@@ -101,9 +106,7 @@ class PreferencesDialogWidget(QDialog):
         self.preferences.reset()
 
         rc = self.exec_()
-        if not rc:
-            self.preferences.reset()
-        if applyChanges:
+        if rc:
             self.applyChanges()
 
         return rc
@@ -111,9 +114,45 @@ class PreferencesDialogWidget(QDialog):
     def applyChanges(self):
 
         if self.preferences:
-            print("YEEEEEAH!!!, YEEEEEAH!!")
-        else:
-            print("Bummer!!")
+            if self.preferences.language is not None:
+                config.data.set(config.ConfigKey.Language, self.preferences.language)
+                self.parent.setLanguage()
+
+            if (self.preferences.font is not None) or (
+                self.preferences.fontSize is not None
+            ):
+                font = QFont()
+                font.fromString(config.data.get(config.ConfigKey.Font))
+
+                if self.preferences.font is not None:
+                    font = self.preferences.font
+
+                if self.preferences.fontSize is not None:
+                    font.setPointSize(self.preferences.fontSize)
+
+                self.parent.setFont(font)
+                self.parent.setAppFont(font)
+                config.data.set(config.ConfigKey.Font, font.toString())
+
+            if self.preferences.enableLoging is not None:
+                config.data.set(config.ConfigKey.Loging, self.preferences.enableLoging)
+                self.parent.enableLoging(self.preferences.enableLoging)
+
+            if self.preferences.restoreWindowSize is not None:
+
+                defaultGeometry = config.data.get(config.ConfigKey.DefaultGeometry)
+                self.parent.setGeometry(
+                    defaultGeometry[0],
+                    defaultGeometry[1],
+                    defaultGeometry[2],
+                    defaultGeometry[3],
+                )
+                centerWidget(self.parent)
+
+                # Update geometry includes position
+                base64Geometry = self.parent.saveGeometry().toBase64()
+                b = base64Geometry.data()  # b is a bytes string
+                config.data.set(config.ConfigKey.Geometry, b)
 
 
 class Preferences(QObject):
@@ -179,7 +218,7 @@ class Preferences(QObject):
     @Slot(object)
     def clickedButton(self, button):
 
-        buttonRole = self.parent.btnBox.buttonRole(button)
+        buttonRole = self.parent.ui.btnBox.buttonRole(button)
 
         if buttonRole in [QDialogButtonBox.AcceptRole, QDialogButtonBox.ResetRole]:
             if buttonRole == QDialogButtonBox.ResetRole:
