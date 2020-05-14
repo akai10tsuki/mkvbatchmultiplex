@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'DlgPreferences.ui'
+## Form generated from reading UI file 'PreferencesDialog.ui'
 ##
 ## Created by: Qt User Interface Compiler version 5.14.2
 ##
@@ -16,21 +16,21 @@ from PySide2.QtGui import (QBrush, QColor, QConicalGradient, QCursor, QFont,
 from PySide2.QtWidgets import *
 
 
-class Ui_DlgPreferences(object):
-    def setupUi(self, DlgPreferences):
-        if not DlgPreferences.objectName():
-            DlgPreferences.setObjectName(u"DlgPreferences")
-        DlgPreferences.resize(654, 347)
+class Ui_PreferencesDialog(object):
+    def setupUi(self, PreferencesDialog):
+        if not PreferencesDialog.objectName():
+            PreferencesDialog.setObjectName(u"PreferencesDialog")
+        PreferencesDialog.resize(654, 347)
         font = QFont()
         font.setPointSize(14)
-        DlgPreferences.setFont(font)
-        DlgPreferences.setContextMenuPolicy(Qt.DefaultContextMenu)
-        self.btnBox = QDialogButtonBox(DlgPreferences)
+        PreferencesDialog.setFont(font)
+        PreferencesDialog.setContextMenuPolicy(Qt.DefaultContextMenu)
+        self.btnBox = QDialogButtonBox(PreferencesDialog)
         self.btnBox.setObjectName(u"btnBox")
         self.btnBox.setGeometry(QRect(230, 280, 381, 32))
         self.btnBox.setOrientation(Qt.Horizontal)
         self.btnBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok|QDialogButtonBox.RestoreDefaults)
-        self.grpBox = QGroupBox(DlgPreferences)
+        self.grpBox = QGroupBox(PreferencesDialog)
         self.grpBox.setObjectName(u"grpBox")
         self.grpBox.setGeometry(QRect(30, 40, 591, 201))
         self.widget = QWidget(self.grpBox)
@@ -75,19 +75,19 @@ class Ui_DlgPreferences(object):
         self.gridLayout.addWidget(self.chkBoxRestoreWindowSize, 3, 0, 1, 2)
 
 
-        self.retranslateUi(DlgPreferences)
-        self.btnBox.accepted.connect(DlgPreferences.accept)
-        self.btnBox.rejected.connect(DlgPreferences.reject)
+        self.retranslateUi(PreferencesDialog)
+        self.btnBox.accepted.connect(PreferencesDialog.accept)
+        self.btnBox.rejected.connect(PreferencesDialog.reject)
 
-        QMetaObject.connectSlotsByName(DlgPreferences)
+        QMetaObject.connectSlotsByName(PreferencesDialog)
     # setupUi
 
-    def retranslateUi(self, DlgPreferences):
-        DlgPreferences.setWindowTitle(QCoreApplication.translate("DlgPreferences", u"Preferences", None))
-        self.grpBox.setTitle(QCoreApplication.translate("DlgPreferences", u"Options", None))
-        self.lblInterfaceLanguage.setText(QCoreApplication.translate("DlgPreferences", u"Interface Language:", None))
-        self.lblFontAndSize.setText(QCoreApplication.translate("DlgPreferences", u"Font & Size", None))
-        self.chkBoxEnableLoging.setText(QCoreApplication.translate("DlgPreferences", u"Enable Logging", None))
-        self.chkBoxRestoreWindowSize.setText(QCoreApplication.translate("DlgPreferences", u"Restore original window size", None))
+    def retranslateUi(self, PreferencesDialog):
+        PreferencesDialog.setWindowTitle(QCoreApplication.translate("PreferencesDialog", u"Preferences", None))
+        self.grpBox.setTitle(QCoreApplication.translate("PreferencesDialog", u"Options", None))
+        self.lblInterfaceLanguage.setText(QCoreApplication.translate("PreferencesDialog", u"Interface Language:", None))
+        self.lblFontAndSize.setText(QCoreApplication.translate("PreferencesDialog", u"Font & Size", None))
+        self.chkBoxEnableLoging.setText(QCoreApplication.translate("PreferencesDialog", u"Enable Logging", None))
+        self.chkBoxRestoreWindowSize.setText(QCoreApplication.translate("PreferencesDialog", u"Restore original window size", None))
     # retranslateUi
 

@@ -16,7 +16,7 @@ from vsutillib.pyqt import darkPalette
 
 def PreferencesDialogUI(uiDir):
 
-    ui_file_name = uiDir + "/DlgPreferences.ui"
+    ui_file_name = uiDir + "/PreferencesDialog.ui"
     ui_file = QFile(ui_file_name)
     if not ui_file.open(QIODevice.ReadOnly):
         raise ValueError("Cannot open {}: {}".format(ui_file_name, ui_file.errorString()))

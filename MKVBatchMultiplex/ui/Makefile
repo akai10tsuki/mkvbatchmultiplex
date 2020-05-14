@@ -3,7 +3,7 @@
 #
 UI2PY=pyside2-uic
 
-all: Ui_DlgPreferences.py
+all: Ui_PreferencesDialog.py
 
-Ui_DlgPreferences.py: DlgPreferences.ui
-	$(UI2PY) DlgPreferences.ui > Ui_DlgPreferences.py
+Ui_PreferencesDialog.py: PreferencesDialog.ui
+	$(UI2PY) PreferencesDialog.ui > Ui_PreferencesDialog.py
