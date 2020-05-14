@@ -11,18 +11,32 @@ from .PreferencesDialogUI import PreferencesDialogUI
 
 from .. import config
 
-class Preferences(QObject):
 
+class Preferences(QObject):
     def __init__(self, parent, prefDialog):
         super().__init__(parent)
 
         self.parent = parent
         self.prefDialog = prefDialog
+
+        self.enableLoging = None
         self.font = None
         self.fontSize = None
-        self.enableLoging = None
+        self.language = None
         self.restoreWindowSize = None
         self.__changedData = False
+
+    @Slot(int)
+    def interfaceLanguageChanged(self, index):
+
+        language = self.prefDialog.cmbBoxInterfaceLanguage.itemText(index)
+        languageDictionary = config.data.get(config.ConfigKey.InterfaceLanguages)
+        key = list(languageDictionary.keys())[
+            list(languageDictionary.values()).index(language)
+        ]
+        self.language = key
+        if not self.__changedData:
+            self.__changedData = True
 
     @Slot(object)
     def currentFontChanged(self, font):
@@ -67,6 +81,92 @@ class Preferences(QObject):
                 self.prefDialog.spinBoxFontSize.setValue(defaultFont.pointSize())
 
 
+class SetPreferences(QObject):
+    def __init__(self, parent):
+        super().__init__(parent)
+
+        self.__prefDialog = None
+        self.__pref = None
+        self.parent = parent
+
+        self._initHelper()
+
+    def _initHelper(self):
+        """
+        _initHelper init used classes and make all signal connections
+        """
+
+        uiDir = str(self.parent.appDirectory.parent) + "/ui"
+        self.__prefDialog = PreferencesDialogUI(uiDir)
+        self.__pref = Preferences(self.parent, self.__prefDialog)
+
+        #
+        # Interface Language
+        #
+        self.__prefDialog.cmbBoxInterfaceLanguage.currentIndexChanged.connect(
+            self.__pref.interfaceLanguageChanged
+        )
+        #
+        # Font & Size
+        #
+        self.__prefDialog.fcmbBoxFontFamily.currentFontChanged.connect(
+            self.__pref.currentFontChanged
+        )
+        self.__prefDialog.spinBoxFontSize.valueChanged.connect(
+            self.__pref.currentFontSizeChanged
+        )
+        #
+        # Loging
+        #
+        self.__prefDialog.chkBoxEnableLoging.stateChanged.connect(
+            self.__pref.enableLogingStateChanged
+        )
+        #
+        # Window size
+        #
+        self.__prefDialog.chkBoxRestoreWindowSize.stateChanged.connect(
+            self.__pref.restoreWindowSizeStateChanged
+        )
+        #
+        # Buttons
+        #
+        self.__prefDialog.btnBox.clicked.connect(self.__pref.clickedButton)
+
+    def _initUI(self):
+
+        #
+        # Interface Language
+        #
+        language = config.data.get(config.ConfigKey.Language)
+        index = 0
+        for key, value in config.data.get(config.ConfigKey.InterfaceLanguages).items():
+            self.__prefDialog.cmbBoxInterfaceLanguage.addItem(value)
+            if key == language:
+                self.__prefDialog.cmbBoxInterfaceLanguage.setCurrentIndex(index)
+            index += 1
+        #
+        # Font & Size
+        #
+        font = self.parent.font()
+        self.__prefDialog.fcmbBoxFontFamily.setCurrentFont(font.family())
+        self.__prefDialog.spinBoxFontSize.setValue(font.pointSize())
+        #
+        # Loging
+        #
+        if bLoging := config.data.get(config.ConfigKey.Loging):
+            self.__prefDialog.chkBoxEnableLoging.setChecked(bLoging)
+
+    def readPreferences(self):
+
+        self._initUI()
+
+        if self.__prefDialog.exec_():
+            if self.f__pref:
+                print("YEEEEEAH!!!, YEEEEEAH!!")
+        else:
+            print("Bummer!!")
+
+
 def preferences(mainWindow):
 
     uiDir = str(mainWindow.appDirectory.parent) + "/ui"
@@ -91,6 +191,9 @@ def preferences(mainWindow):
             dlgOptions.cmbBoxInterfaceLanguage.setCurrentIndex(index)
             languageIndex = index
         index += 1
+    dlgOptions.cmbBoxInterfaceLanguage.currentIndexChanged.connect(
+        pref.interfaceLanguageChanged
+    )
     #
     # Font & Size
     #
@@ -108,8 +211,9 @@ def preferences(mainWindow):
     #
     # Window size
     #
-    dlgOptions.chkBoxRestoreWindowSize.stateChanged.connect(pref.restoreWindowSizeStateChanged)
-
+    dlgOptions.chkBoxRestoreWindowSize.stateChanged.connect(
+        pref.restoreWindowSizeStateChanged
+    )
 
     if dlgOptions.exec_():
         if pref:
