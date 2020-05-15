@@ -44,13 +44,13 @@ class PreferencesDialogWidget(QDialog):
         #
         # Font & Size
         #
-        font = self.parent.font()
+        font = config.data.get(config.ConfigKey.Font)
         self.ui.fcmbBoxFontFamily.setCurrentFont(font.family())
         self.ui.spinBoxFontSize.setValue(font.pointSize())
         #
-        # Loging
+        # Logging is boolean value
         #
-        self.ui.chkBoxEnableLoging.setChecked(config.data.get(config.ConfigKey.Loging))
+        self.ui.chkBoxEnableLogging.setChecked(config.data.get(config.data.get(config.ConfigKey.Logging)))
         #
         # Restore Windows Size
         #
@@ -72,10 +72,10 @@ class PreferencesDialogWidget(QDialog):
         )
         self.ui.spinBoxFontSize.valueChanged.connect(self.__pref.currentFontSizeChanged)
         #
-        # Loging
+        # Logging
         #
-        self.ui.chkBoxEnableLoging.stateChanged.connect(
-            self.__pref.enableLogingStateChanged
+        self.ui.chkBoxEnableLogging.stateChanged.connect(
+            self.__pref.enableLoggingStateChanged
         )
         #
         # Window size
@@ -114,10 +114,15 @@ class PreferencesDialogWidget(QDialog):
     def applyChanges(self):
 
         if self.preferences:
+            #
+            # Language
+            #
             if self.preferences.language is not None:
                 config.data.set(config.ConfigKey.Language, self.preferences.language)
                 self.parent.setLanguage()
-
+            #
+            # Font & Size
+            #
             if (self.preferences.font is not None) or (
                 self.preferences.fontSize is not None
             ):
@@ -133,11 +138,15 @@ class PreferencesDialogWidget(QDialog):
                 self.parent.setFont(font)
                 self.parent.setAppFont(font)
                 config.data.set(config.ConfigKey.Font, font.toString())
-
-            if self.preferences.enableLoging is not None:
-                config.data.set(config.ConfigKey.Loging, self.preferences.enableLoging)
-                self.parent.enableLoging(self.preferences.enableLoging)
-
+            #
+            # Logging
+            #
+            if self.preferences.enableLogging is not None:
+                config.data.set(config.ConfigKey.Logging, self.preferences.enableLogging)
+                self.parent.enableLogging(self.preferences.enableLogging)
+            #
+            # Restore window size
+            #
             if self.preferences.restoreWindowSize is not None:
 
                 defaultGeometry = config.data.get(config.ConfigKey.DefaultGeometry)
@@ -147,8 +156,8 @@ class PreferencesDialogWidget(QDialog):
                     defaultGeometry[2],
                     defaultGeometry[3],
                 )
+                # Center window some title bar goes out of screen
                 centerWidget(self.parent)
-
                 # Update geometry includes position
                 base64Geometry = self.parent.saveGeometry().toBase64()
                 b = base64Geometry.data()  # b is a bytes string
@@ -165,7 +174,7 @@ class Preferences(QObject):
         self._initVars()
 
     def _initVars(self):
-        self.enableLoging = None
+        self.enableLogging = None
         self.font = None
         self.fontSize = None
         self.language = None
@@ -202,9 +211,9 @@ class Preferences(QObject):
             self.__changedData = True
 
     @Slot(int)
-    def enableLogingStateChanged(self, value):
+    def enableLoggingStateChanged(self, value):
 
-        self.enableLoging = bool(value)
+        self.enableLogging = bool(value)
         if not self.__changedData:
             self.__changedData = True
 
@@ -223,7 +232,7 @@ class Preferences(QObject):
         if buttonRole in [QDialogButtonBox.AcceptRole, QDialogButtonBox.ResetRole]:
             if buttonRole == QDialogButtonBox.ResetRole:
                 self.parent.ui.chkBoxRestoreWindowSize.setChecked(True)
-                self.parent.ui.chkBoxEnableLoging.setChecked(False)
+                self.parent.ui.chkBoxEnableLogging.setChecked(False)
                 defaultFont = QFont()
                 defaultFont.fromString(config.data.get(config.ConfigKey.SystemFont))
                 self.parent.ui.fcmbBoxFontFamily.setCurrentFont(defaultFont.family())
