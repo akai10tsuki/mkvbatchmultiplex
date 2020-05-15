@@ -40,7 +40,7 @@ PYTHONVERSIONS = ">=3.8.1, <3.9"
 QT_VERSION = "PYSIDE2"
 REQUIRED = [
     "PySide2>=5.14",
-    "vsutillib.files>=1.5.0",
+    "vsutillib.files>=1.5.1",
     "vsutillib.log>=1.5.0",
     "vsutillib.macos>=1.5.0",
     "vsutillib.media>=1.5.0",
@@ -277,7 +277,8 @@ def setRegEx():
                 currentSubString.append(e)
         data.set(Key.SubString, currentSubString)
 
-    # Todo: remove MaxCount
+    if data.get("MaxCount"):
+        data.delete("MaxCount")
     data.set(Key.MaxRegExCount, 20)
 
 
