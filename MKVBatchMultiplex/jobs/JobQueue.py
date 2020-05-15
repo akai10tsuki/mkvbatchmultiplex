@@ -57,6 +57,8 @@ class JobInfo:  # pylint: disable=too-many-instance-attributes
             # self.oCommand = MKVCommand(job[JobKey.Command], log=log)
             self.oCommand = MKVCommandParser(job[JobKey.Command], log=log)
 
+        self.startTime = []
+        self.stopTime = []
         self.errors = [] if errors is None else errors
         self.output = [] if output is None else output
 
