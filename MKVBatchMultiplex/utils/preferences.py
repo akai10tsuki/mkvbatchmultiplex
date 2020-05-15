@@ -23,7 +23,7 @@ class Preferences(QObject):
         self._initVars()
 
     def _initVars(self):
-        self.enableLoging = None
+        self.enableLogging = None
         self.font = None
         self.fontSize = None
         self.language = None
@@ -68,9 +68,9 @@ class Preferences(QObject):
             self.__changedData = True
 
     @Slot(int)
-    def enableLogingStateChanged(self, value):
+    def enableLoggingStateChanged(self, value):
 
-        self.enableLoging = bool(value)
+        self.enableLogging = bool(value)
         if not self.__changedData:
             self.__changedData = True
 
@@ -89,7 +89,7 @@ class Preferences(QObject):
         if buttonRole in [QDialogButtonBox.AcceptRole, QDialogButtonBox.ResetRole]:
             if buttonRole == QDialogButtonBox.ResetRole:
                 self.prefDialog.chkBoxRestoreWindowSize.setChecked(True)
-                self.prefDialog.chkBoxEnableLoging.setChecked(False)
+                self.prefDialog.chkBoxEnableLogging.setChecked(False)
                 defaultFont = QFont()
                 defaultFont.fromString(config.data.get(config.ConfigKey.SystemFont))
                 self.prefDialog.fcmbBoxFontFamily.setCurrentFont(defaultFont.family())
@@ -133,10 +133,10 @@ class SetPreferences(QObject):
             self.__pref.currentFontSizeChanged
         )
         #
-        # Loging
+        # Logging
         #
-        self.__prefDialog.chkBoxEnableLoging.stateChanged.connect(
-            self.__pref.enableLogingStateChanged
+        self.__prefDialog.chkBoxEnableLogging.stateChanged.connect(
+            self.__pref.enableLoggingStateChanged
         )
         #
         # Window size
@@ -168,10 +168,10 @@ class SetPreferences(QObject):
         self.__prefDialog.fcmbBoxFontFamily.setCurrentFont(font.family())
         self.__prefDialog.spinBoxFontSize.setValue(font.pointSize())
         #
-        # Loging
+        # Logging
         #
-        if bLoging := config.data.get(config.ConfigKey.Loging):
-            self.__prefDialog.chkBoxEnableLoging.setChecked(bLoging)
+        if bLogging := config.data.get(config.ConfigKey.Logging):
+            self.__prefDialog.chkBoxEnableLogging.setChecked(bLogging)
 
     def getPreferences(self, applyChanges=False):
 
@@ -231,11 +231,11 @@ def preferences(mainWindow):
     dlgOptions.fcmbBoxFontFamily.currentFontChanged.connect(pref.currentFontChanged)
     dlgOptions.spinBoxFontSize.valueChanged.connect(pref.currentFontSizeChanged)
     #
-    # Loging
+    # Logging
     #
-    if bLoging := config.data.get(config.ConfigKey.Loging):
-        dlgOptions.chkBoxEnableLoging.setChecked(True)
-    dlgOptions.chkBoxEnableLoging.stateChanged.connect(pref.enableLogingStateChanged)
+    if bLogging := config.data.get(config.ConfigKey.Logging):
+        dlgOptions.chkBoxEnableLogging.setChecked(True)
+    dlgOptions.chkBoxEnableLogging.stateChanged.connect(pref.enableLoggingStateChanged)
     #
     # Window size
     #
@@ -248,6 +248,6 @@ def preferences(mainWindow):
             print("YEEEEEAH!!!, YEEEEEAH!!")
     else:
         print("Bummer!!")
-    # if bLoging := config.data.get(config.ConfigKey.Loging):
-    #    mainWindow.actEnableLoging.setChecked(bLoging)
-    #    mainWindow.enableLoging(bLoging)
+    # if bLogging := config.data.get(config.ConfigKey.Logging):
+    #    mainWindow.actEnableLogging.setChecked(bLogging)
+    #    mainWindow.enableLogging(bLogging)

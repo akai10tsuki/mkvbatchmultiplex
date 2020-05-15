@@ -64,10 +64,10 @@ class Ui_PreferencesDialog(object):
 
         self.gridLayout.addWidget(self.spinBoxFontSize, 1, 2, 1, 1)
 
-        self.chkBoxEnableLoging = QCheckBox(self.widget)
-        self.chkBoxEnableLoging.setObjectName(u"chkBoxEnableLoging")
+        self.chkBoxEnableLogging = QCheckBox(self.widget)
+        self.chkBoxEnableLogging.setObjectName(u"chkBoxEnableLogging")
 
-        self.gridLayout.addWidget(self.chkBoxEnableLoging, 2, 0, 1, 1)
+        self.gridLayout.addWidget(self.chkBoxEnableLogging, 2, 0, 1, 1)
 
         self.chkBoxRestoreWindowSize = QCheckBox(self.widget)
         self.chkBoxRestoreWindowSize.setObjectName(u"chkBoxRestoreWindowSize")
@@ -87,7 +87,7 @@ class Ui_PreferencesDialog(object):
         self.grpBox.setTitle(QCoreApplication.translate("PreferencesDialog", u"Options", None))
         self.lblInterfaceLanguage.setText(QCoreApplication.translate("PreferencesDialog", u"Interface Language:", None))
         self.lblFontAndSize.setText(QCoreApplication.translate("PreferencesDialog", u"Font & Size", None))
-        self.chkBoxEnableLoging.setText(QCoreApplication.translate("PreferencesDialog", u"Enable Logging", None))
+        self.chkBoxEnableLogging.setText(QCoreApplication.translate("PreferencesDialog", u"Enable Logging", None))
         self.chkBoxRestoreWindowSize.setText(QCoreApplication.translate("PreferencesDialog", u"Restore original window size", None))
     # retranslateUi
 

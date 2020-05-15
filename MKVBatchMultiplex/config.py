@@ -100,7 +100,7 @@ class ConfigKey:  # pylint: disable=too-few-public-methods
     Geometry = "Geometry"
     InterfaceLanguages = "InterfaceLanguages"
     Language = "Language"
-    Loging = "Loging"
+    Logging = "Logging"
     SimulateRun = "SimulateRun"
     SystemFont = "SystemFont"
 
@@ -149,7 +149,7 @@ def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None, ap
     setDefaultFont(app)
 
     if FORCELOG:
-        data.set(ConfigKey.Loging, True)
+        data.set(ConfigKey.Logging, True)
 
     if data.get(ConfigKey.Language) is None:
         data.set(ConfigKey.Language, DEFAULTLANGUAGE)

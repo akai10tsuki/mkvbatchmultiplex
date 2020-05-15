@@ -284,7 +284,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.setMenuBar(menuBar)
         self.setStatusBar(statusBar)
 
-    def enableLoging(self, state):
+    def enableLogging(self, state):
         """Activate logging"""
 
         self.log = state
@@ -293,9 +293,9 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.errorOutput.log = state
         self.tableViewWidget.log = state
         self.jobsQueue.log = state
-        msg = "Start Loging." if state else "Stop Loging."
+        msg = "Start Logging." if state else "Stop Logging."
         logging.info(msg)
-        config.data.set(config.ConfigKey.Loging, state)
+        config.data.set(config.ConfigKey.Logging, state)
 
     def configuration(self, action=None):
         """
@@ -305,14 +305,14 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         defaultFont = QFont()
         defaultFont.fromString(config.data.get(config.ConfigKey.SystemFont))
         defaultFont.setPointSize(14)
-        bLoging = False
+        bLogging = False
 
         if action == config.Action.Reset:
             # Font
             self.setFont(defaultFont)
             self.setAppFont(defaultFont)
-            # Loging
-            self.enableLoging(bLoging)
+            # Logging
+            self.enableLogging(bLogging)
             # Geometry
             self.setGeometry(0, 0, 1280, 720)
             centerWidget(self)
@@ -328,9 +328,9 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
                 self.setFont(defaultFont)
                 self.setAppFont(defaultFont)
 
-            # Loging
-            if bLoging := config.data.get(config.ConfigKey.Loging):
-                self.enableLoging(bLoging)
+            # Logging
+            if bLogging := config.data.get(config.ConfigKey.Logging):
+                self.enableLogging(bLogging)
 
             # Geometry
             if byteGeometry := config.data.get(config.ConfigKey.Geometry):

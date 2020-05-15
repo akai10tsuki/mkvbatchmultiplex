@@ -83,7 +83,7 @@
       <widget class="QSpinBox" name="spinBoxFontSize"/>
      </item>
      <item row="2" column="0">
-      <widget class="QCheckBox" name="chkBoxEnableLoging">
+      <widget class="QCheckBox" name="chkBoxEnableLogging">
        <property name="text">
         <string>Enable Logging</string>
        </property>
