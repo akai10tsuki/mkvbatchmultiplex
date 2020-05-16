@@ -3,6 +3,18 @@ Classes representing Keys in job related lists
 """
 # pylint: disable=too-few-public-methods
 
+class JobsDBKey:
+    """
+     keys representing the jobs table fields
+    """
+
+    ID = "id"
+    addDate = "addDate"
+    addTime = "addTime"
+    startTime = "startTime"
+    endTime = "endTime"
+    job = "job"
+
 class JobKey:
 
     ID = 0
