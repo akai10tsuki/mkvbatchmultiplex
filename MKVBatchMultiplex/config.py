@@ -47,6 +47,7 @@ REQUIRED = [
     "vsutillib.mkv>=1.5.1",
     "vsutillib.process>=1.5.0",
     "vsutillib.pyqt>=1.5.1",
+    "vsutillib.sql>=1.5.1"
 ]
 
 # for app
@@ -75,6 +76,7 @@ FORCELOG = True
 ######################
 
 WORKERTHREADNAME = "jobsWorker"
+JOBSDATABASE = "jobsDb.db"
 
 #######################
 #######################
@@ -110,6 +112,7 @@ class ConfigKey:  # pylint: disable=too-few-public-methods
 
     Tab = "Tab"
     TabText = "TabText"
+    JobsDb = "JobsDb"
 
 
 class Key:
@@ -191,6 +194,8 @@ def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None, ap
     if data.get(Key.MaxRegExCount) is None:
         data.set(Key.MaxRegExCount, 20)
 
+    db = Path(filesPath, JOBSDATABASE)
+    data.set(ConfigKey.JobsDb, db)
 
 def setDefaultFont(app):
     """save and set default font point size"""
