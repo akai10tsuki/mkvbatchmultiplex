@@ -4,12 +4,16 @@ Class to process jobs queue
 # RJB0011
 
 import logging
+try:
+    import cPickle as pickle
+except:
+    import pickle
 import re
 
 # import threading
-import time
+from time import sleep, time
 
-from PySide2.QtCore import QObject, Qt, Signal
+from PySide2.QtCore import QObject, QModelIndex, Qt, Signal
 
 import vsutillib.mkv as mkv
 
@@ -20,6 +24,7 @@ from vsutillib.misc import staticVars
 from .. import config
 from ..models import TableProxyModel
 from .jobKeys import JobStatus, JobKey
+from .SqlJobsDb import SqlJobsDB
 
 
 MODULELOG = logging.getLogger(__name__)
@@ -282,6 +287,8 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
         str: Dummy  return value
     """
 
+    jobsDB = SqlJobsDB(config.data.get(config.ConfigKey.JobsDB))
+
     if runJobs.running:
         # Block direct calls while working there should be none
         return "Working..."
@@ -426,6 +433,7 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
                     if log:
                         MODULELOG.debug("RJB0007: Structure checks ok")
 
+                    job.starTime = time()
                     if bSimulateRun:
                         dummyRunCommand(funcProgress, indexTotal, controlQueue)
                     else:
@@ -433,6 +441,8 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
                         # the RunCommand
                         cli.command = cmd
                         cli.run()
+                    job.endTime = time()
+                    addToDb(jobsDB, job)
 
                 else:
                     job.errors.append(verify.analysis)
@@ -454,9 +464,9 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
                             findSource = True
                             for index, line in enumerate(lines):
                                 color = SvgColor.orange
-                                if findSource and ((
-                                    searchIndex := line.find("File Name")
-                                ) >= 0):
+                                if findSource and (
+                                    (searchIndex := line.find("File Name")) >= 0
+                                ):
                                     if searchIndex >= 0:
                                         color = SvgColor.tomato
                                         findSource = False
@@ -503,6 +513,8 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
                     job.oCommand.command,
                 )
 
+    jobsDB.close()
+
     for index in range(4):
         funcProgress.lblSetValue.emit(index, 0)
 
@@ -512,6 +524,19 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
     runJobs.running = False
 
     return "Job queue empty."
+
+
+def addToDb(db, job):
+
+    pklJob = pickle.dumps(job)
+    db.insert(
+        job.job[JobKey.ID],
+        job.date.isoformat(),
+        job.addTime,
+        job.starTime,
+        job.endTime,
+        pklJob,
+    )
 
 
 def dummyRunCommand(funcProgress, indexTotal, controlQueue):
@@ -525,7 +550,7 @@ def dummyRunCommand(funcProgress, indexTotal, controlQueue):
     while i < 100:
         i += 0.5
         funcProgress.pbSetValues.emit(i, indexTotal[1] + i)
-        time.sleep(0.0001)
+        sleep(0.0001)
         if controlQueue:
             queueStatus = controlQueue.popleft()
             controlQueue.appendleft(queueStatus)
