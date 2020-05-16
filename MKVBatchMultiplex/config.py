@@ -110,9 +110,10 @@ class ConfigKey:  # pylint: disable=too-few-public-methods
     # App Specific
     #
 
+    JobsDB = "JobsDB"
+    JobID = "JobID"
     Tab = "Tab"
     TabText = "TabText"
-    JobsDb = "JobsDb"
 
 
 class Key:
@@ -195,7 +196,7 @@ def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None, ap
         data.set(Key.MaxRegExCount, 20)
 
     db = Path(filesPath, JOBSDATABASE)
-    data.set(ConfigKey.JobsDb, db)
+    data.set(ConfigKey.JobsDB, str(db))
 
 def setDefaultFont(app):
     """save and set default font point size"""
