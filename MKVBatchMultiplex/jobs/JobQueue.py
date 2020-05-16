@@ -9,7 +9,8 @@ import copy
 import logging
 
 from collections import deque
-
+from datetime import datetime
+from time import time
 
 from PySide2.QtCore import QObject, Slot, Signal
 
@@ -25,6 +26,27 @@ from .RunJobs import RunJobs
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
+class FakeModelIndex:
+    """
+    Dummy QModelIndex
+
+    Returns:
+        Index: Dummy QModelIndex
+    """
+
+    def __init__(self, row, column):
+
+        self._row = row
+        self._column = column
+
+    def row(self):
+        return self._row
+
+    def column(self):
+        return self._column
+
+    def isValid(self):
+        return True
 
 class JobInfo:  # pylint: disable=too-many-instance-attributes
     """
@@ -56,9 +78,12 @@ class JobInfo:  # pylint: disable=too-many-instance-attributes
         if not self.oCommand:
             # self.oCommand = MKVCommand(job[JobKey.Command], log=log)
             self.oCommand = MKVCommandParser(job[JobKey.Command], log=log)
+            print("Bad oCommand found!!")
 
-        self.startTime = []
-        self.stopTime = []
+        self.date = datetime.today()
+        self.addTime = time()
+        self.startTime = None
+        self.stopTime = None
         self.errors = [] if errors is None else errors
         self.output = [] if output is None else output
 
@@ -229,14 +254,17 @@ class JobQueue(QObject):
             return False
 
         jobID = self.model.dataset[jobRow,][JobKey.ID]
-        jobIndex = self.model.index(jobRow, JobKey.ID)
-        statusIndex = self.model.index(jobRow, JobKey.Status)
-        commandIndex = self.model.index(jobRow, JobKey.Command)
+        #jobIndex = self.model.index(jobRow, JobKey.ID)
+        #statusIndex = self.model.index(jobRow, JobKey.Status)
+        #commandIndex = self.model.index(jobRow, JobKey.Command)
+        jobIndex = FakeModelIndex(jobRow, JobKey.ID)
+        statusIndex = FakeModelIndex(jobRow, JobKey.Status)
+        commandIndex = FakeModelIndex(jobRow, JobKey.Command)
 
         if not jobID:
             self.model.setData(jobIndex, self.__jobID)
             self.__jobID += 1
-            config.data.set("JobID", self.__jobID)
+            config.data.set(config.ConfigKey.JobID, self.__jobID)
 
         newJob = JobInfo(
             [jobIndex, statusIndex, commandIndex],
