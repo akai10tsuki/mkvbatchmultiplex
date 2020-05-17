@@ -129,8 +129,6 @@ class SqlJobsDB(SqlDb):
             if wClause == ""
             else " " + wClause)
         )
-        print(sqlFetchID)
-        print("values = {}".format(values))
 
         if values:
             cursor = self.sqlExecute(sqlFetchID, *values)
@@ -165,8 +163,6 @@ class SqlJobsDB(SqlDb):
                 strTmp += ", "
 
         sqlUpdateJob += strTmp + " WHERE id = ?"
-
-        print("args", args)
 
         for v in args:
             values.append(v)
