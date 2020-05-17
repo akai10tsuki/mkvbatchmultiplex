@@ -89,6 +89,8 @@ class TableData:
     """
     Class to represent data in a table with columns headers
 
+    data[x][y] = DataItem
+
     A header is a list of the form:
         [str, dict]
         str = string representing the column name
