@@ -61,13 +61,14 @@ class JobInfo:  # pylint: disable=too-many-instance-attributes
     """
 
     def __init__(
-        self, index, job, tableModel, errors=None, output=None, log=False,
+        self, jobRowNumber, index, jobRow, tableModel, errors=None, output=None, log=False,
     ):
 
+        self.jobRowNumber = jobRow
         self.jobIndex = index[JobKey.ID]
         self.statusIndex = index[JobKey.Status]
         self.commandIndex = index[JobKey.Command]
-        self.job = job
+        self.jobRow = jobRow
         self.command = job[JobKey.Command]
         self.oCommand = copy.deepcopy(
             tableModel.dataset.data[self.commandIndex.row()][
@@ -83,10 +84,9 @@ class JobInfo:  # pylint: disable=too-many-instance-attributes
         self.date = datetime.today()
         self.addTime = time()
         self.startTime = None
-        self.stopTime = None
+        self.endTime = None
         self.errors = [] if errors is None else errors
         self.output = [] if output is None else output
-
 
 class JobQueue(QObject):
     """
@@ -254,12 +254,13 @@ class JobQueue(QObject):
             return False
 
         jobID = self.model.dataset[jobRow,][JobKey.ID]
-        #jobIndex = self.model.index(jobRow, JobKey.ID)
-        #statusIndex = self.model.index(jobRow, JobKey.Status)
-        #commandIndex = self.model.index(jobRow, JobKey.Command)
-        jobIndex = FakeModelIndex(jobRow, JobKey.ID)
-        statusIndex = FakeModelIndex(jobRow, JobKey.Status)
-        commandIndex = FakeModelIndex(jobRow, JobKey.Command)
+        jobIndex = self.model.index(jobRow, JobKey.ID)
+        statusIndex = self.model.index(jobRow, JobKey.Status)
+        commandIndex = self.model.index(jobRow, JobKey.Command)
+
+        fJobIndex = FakeModelIndex(jobRow, JobKey.ID)
+        fStatusIndex = FakeModelIndex(jobRow, JobKey.Status)
+        fCommandIndex = FakeModelIndex(jobRow, JobKey.Command)
 
         if not jobID:
             self.model.setData(jobIndex, self.__jobID)
@@ -267,13 +268,16 @@ class JobQueue(QObject):
             config.data.set(config.ConfigKey.JobID, self.__jobID)
 
         newJob = JobInfo(
-            [jobIndex, statusIndex, commandIndex],
+            jobRow,
+            [fJobIndex, fStatusIndex, fCommandIndex],
             self.model.dataset[jobRow,],
             self.model,
             log=self.log,
         )
         self._workQueue.append(newJob)
+        #index = self.mode.index(statusIndex.row(), statusIndex.column())
         self.model.setData(statusIndex, JobStatus.Queue)
+        #self.model.setData(index, JobStatus.Queue)
 
         if self._workQueue:
             self.addQueueItemSignal.emit()
