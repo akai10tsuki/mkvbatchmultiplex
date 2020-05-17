@@ -3,15 +3,19 @@ Class to process jobs queue
 """
 # RJB0011
 
+import copy
 import logging
+
 try:
     import cPickle as pickle
 except:
     import pickle
 import re
+import zlib
 
 # import threading
 from time import sleep, time
+from datetime import datetime, timedelta
 
 from PySide2.QtCore import QObject, QModelIndex, Qt, Signal
 
@@ -23,7 +27,7 @@ from vsutillib.misc import staticVars
 
 from .. import config
 from ..models import TableProxyModel
-from .jobKeys import JobStatus, JobKey
+from .jobKeys import JobStatus, JobKey, JobsDBKey
 from .SqlJobsDb import SqlJobsDB
 
 
@@ -252,6 +256,8 @@ def displayRunJobs(line, job, output, indexTotal, funcProgress=None):
     funcProgress.lblSetValue.emit(2, indexTotal[0] + 1)
     n = -1
 
+    job.output.append(line)
+
     if m := regEx.search(line):
         n = int(m.group(1))
 
@@ -259,6 +265,7 @@ def displayRunJobs(line, job, output, indexTotal, funcProgress=None):
         if not displayRunJobs.printPercent:
             output.job.emit("\n", {})
             displayRunJobs.printPercent = True
+            job.output.append("")
 
         output.job.emit(line[:-1], {"replaceLine": True})
         funcProgress.pbSetValues.emit(n, indexTotal[1] + n)
@@ -272,6 +279,7 @@ def displayRunJobs(line, job, output, indexTotal, funcProgress=None):
 
     if (line.find("El multiplexado") == 0) or (line.find("Multiplexing took") == 0):
         output.job.emit("\n", {})
+        job.output.append("")
 
 
 @staticVars(running=False)
@@ -287,6 +295,9 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
         str: Dummy  return value
     """
 
+    #
+    # Always open to start saving in mid of worker operating
+    #
     jobsDB = SqlJobsDB(config.data.get(config.ConfigKey.JobsDB))
 
     if runJobs.running:
@@ -304,6 +315,11 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
     bSimulateRun = config.data.get(config.ConfigKey.SimulateRun)
 
     while job := jobQueue.popLeft():
+
+        # job = copy.deepcopy(qJob)
+
+        job.jobRow = model.dataset[job.jobRowNumber,]
+        statusIndex = model.index(job.jobRowNumber, JobKey.Status)
 
         if abortAll:
             jobQueue.statusUpdateSignal.emit(job, JobStatus.Aborted)
@@ -335,8 +351,8 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
 
         # Check Job Status for Skip
         #
-        sourceIndex = job.statusIndex
-        status = model.dataset[sourceIndex.row(), sourceIndex.column()]
+        #sourceIndex = job.statusIndex
+        status = model.dataset[statusIndex.row(), statusIndex.column()]
 
         if status == JobStatus.Skip:
             jobQueue.statusUpdateSignal.emit(job, JobStatus.Skipped)
@@ -355,14 +371,26 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
             log=log,
         )
 
+        historyOn = False
+
         if job.oCommand:
+            job.startTime = time()
+
+            if config.data.get(config.ConfigKey.JobHistory):
+                job.jobRow[JobKey.Status] = model.dataset[statusIndex.row(), statusIndex.column()]
+                addToDb(jobsDB, job)
+
+            dt = datetime.fromtimestamp(job.startTime)
+
             msg = "*******************\n"
-            msg += "Job ID: {} started.\n\n".format(job.job[JobKey.ID])
+            msg += "Job ID: {} started at {}.\n\n".format(
+                job.jobRow[JobKey.ID], dt.isoformat()
+            )
             output.job.emit(msg, {"color": SvgColor.cyan})
             exitStatus = "ended"
 
             if log:
-                MODULELOG.debug("RJB0005: Job ID: %s started.", job.job[JobKey.ID])
+                MODULELOG.debug("RJB0005: Job ID: %s started.", job.jobRow[JobKey.ID])
 
             updateStatus = True
 
@@ -378,8 +406,8 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
 
                 # Check Job Status for Abort
                 #
-                sourceIndex = job.statusIndex
-                status = model.dataset[sourceIndex.row(), sourceIndex.column()]
+                #sourceIndex = job.statusIndex
+                status = model.dataset[statusIndex.row(), statusIndex.column()]
 
                 ###
                 # Check controlQueue
@@ -405,6 +433,10 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
                     updateStatus = False
                     if exitStatus == "ended":
                         exitStatus = "aborted"
+                    job.endTime = time()
+                    if config.data.get(config.ConfigKey.JobHistory):
+                        job.jobRow[JobKey.Status] = JobStatus.Aborted
+                        addToDb(jobsDB, job, update=True)
                     break
                 #
                 # Check Job Status for Abort
@@ -433,7 +465,6 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
                     if log:
                         MODULELOG.debug("RJB0007: Structure checks ok")
 
-                    job.starTime = time()
                     if bSimulateRun:
                         dummyRunCommand(funcProgress, indexTotal, controlQueue)
                     else:
@@ -441,8 +472,6 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
                         # the RunCommand
                         cli.command = cmd
                         cli.run()
-                    job.endTime = time()
-                    addToDb(jobsDB, job)
 
                 else:
                     job.errors.append(verify.analysis)
@@ -451,7 +480,7 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
                     funcProgress.lblSetValue.emit(4, totalErrors)
 
                     msg = "Error Job ID: {} ---------------------".format(
-                        job.job[JobKey.ID]
+                        job.jobRow[JobKey.ID]
                     )
                     output.error.emit(msg, {"color": SvgColor.red, "appendEnd": True})
                     msg = "\nDestination File: {}\n\n".format(destinationFile)
@@ -478,7 +507,7 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
 
                     output.job.emit("", {"appendEnd": True})
                     msg = "Error Job ID: {} ---------------------\n\n".format(
-                        job.job[JobKey.ID]
+                        job.jobRow[JobKey.ID]
                     )
                     output.error.emit(msg, {"color": SvgColor.red, "appendEnd": True})
 
@@ -488,7 +517,22 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
                 indexTotal[1] += 100
                 indexTotal[0] += 1
 
-            msg = "\nJob ID: {} {}.\n".format(job.job[JobKey.ID], exitStatus)
+            job.endTime = time()
+            if config.data.get(config.ConfigKey.JobHistory):
+                job.jobRow[JobKey.Status] = JobStatus.Done
+                addToDb(jobsDB, job, update=True)
+
+            dtStart = datetime.fromtimestamp(job.startTime)
+            dtEnd = datetime.fromtimestamp(job.endTime)
+
+            dtDuration = dtEnd - dtStart
+
+            msg = "\nJob ID: {} {} - ended at {} - running time {}.\n".format(
+                job.jobRow[JobKey.ID],
+                exitStatus,
+                dtEnd.isoformat(),
+                dtDuration,
+            )
             msg += "*******************\n\n\n"
             output.job.emit(msg, {"color": SvgColor.cyan, "appendEnd": True})
 
@@ -496,20 +540,20 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
                 jobQueue.statusUpdateSignal.emit(job, JobStatus.Done)
 
             if log:
-                MODULELOG.debug("RJB0009: Job ID: %s finished.", job.job[JobKey.ID])
+                MODULELOG.debug("RJB0009: Job ID: %s finished.", job.jobRow[JobKey.ID])
 
         else:
             totalErrors += 1
             funcProgress.lblSetValue.emit(4, totalErrors)
             msg = "Job ID: {} cannot execute command.\n\nCommand: {}\n"
-            msg = msg.format(job.job[JobKey.ID], job.oCommand.command)
+            msg = msg.format(job.jobRow[JobKey.ID], job.oCommand.command)
             output.error.emit(msg, {"color": SvgColor.red})
             jobQueue.statusUpdateSignal.emit(job, JobStatus.Error)
 
             if log:
                 MODULELOG.debug(
                     "RJB0010: Job ID: %s cannot execute command: %s.",
-                    job.job[JobKey.ID],
+                    job.jobRow[JobKey.ID],
                     job.oCommand.command,
                 )
 
@@ -526,17 +570,34 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
     return "Job queue empty."
 
 
-def addToDb(db, job):
+def addToDb(db, job, update=False):
 
-    pklJob = pickle.dumps(job)
-    db.insert(
-        job.job[JobKey.ID],
-        job.date.isoformat(),
-        job.addTime,
-        job.starTime,
-        job.endTime,
-        pklJob,
-    )
+    cmpJob = zlib.compress(pickle.dumps(job))
+
+    # Compress:
+    # compressed = zlib.compress(cPickle.dumps(obj))
+
+    # Get it back:
+    # obj = cPickle.loads(zlib.decompress(compressed))
+
+    if not update:
+        db.insert(
+            job.jobRow[JobKey.ID],
+            job.date.isoformat(),
+            job.addTime,
+            job.startTime,
+            job.endTime,
+            cmpJob,
+        )
+    else:
+        # jobsDB.update(449, (JobsDBKey.startTime, ), 80)
+        db.update(
+            job.jobRow[JobKey.ID],
+            (JobsDBKey.startTime, JobsDBKey.endTime, JobsDBKey.job),
+            job.startTime,
+            job.endTime,
+            cmpJob,
+        )
 
 
 def dummyRunCommand(funcProgress, indexTotal, controlQueue):
