@@ -44,13 +44,18 @@ class PreferencesDialogWidget(QDialog):
         #
         # Font & Size
         #
-        font = config.data.get(config.ConfigKey.Font)
+        font = QFont()
+        font.fromString(config.data.get(config.ConfigKey.Font))
         self.ui.fcmbBoxFontFamily.setCurrentFont(font.family())
         self.ui.spinBoxFontSize.setValue(font.pointSize())
         #
         # Logging is boolean value
         #
-        self.ui.chkBoxEnableLogging.setChecked(config.data.get(config.data.get(config.ConfigKey.Logging)))
+        self.ui.chkBoxEnableLogging.setChecked(config.data.get(config.ConfigKey.Logging))
+        #
+        #
+        #
+        self.ui.chkBoxEnableJobHistory.setChecked(config.data.get(config.ConfigKey.JobHistory))
         #
         # Restore Windows Size
         #
@@ -76,6 +81,9 @@ class PreferencesDialogWidget(QDialog):
         #
         self.ui.chkBoxEnableLogging.stateChanged.connect(
             self.__pref.enableLoggingStateChanged
+        )
+        self.ui.chkBoxEnableJobHistory.stateChanged.connect(
+            self.__pref.enableJobHistoryChanged
         )
         #
         # Window size
@@ -145,6 +153,11 @@ class PreferencesDialogWidget(QDialog):
                 config.data.set(config.ConfigKey.Logging, self.preferences.enableLogging)
                 self.parent.enableLogging(self.preferences.enableLogging)
             #
+            # Job History
+            #
+            if self.preferences.enableJobHistory is not None:
+                config.data.set(config.ConfigKey.JobHistory, self.preferences.enableJobHistory)
+            #
             # Restore window size
             #
             if self.preferences.restoreWindowSize is not None:
@@ -174,6 +187,7 @@ class Preferences(QObject):
         self._initVars()
 
     def _initVars(self):
+        self.enableJobHistory = None
         self.enableLogging = None
         self.font = None
         self.fontSize = None
@@ -214,6 +228,13 @@ class Preferences(QObject):
     def enableLoggingStateChanged(self, value):
 
         self.enableLogging = bool(value)
+        if not self.__changedData:
+            self.__changedData = True
+
+    @Slot(int)
+    def enableJobHistoryChanged(self, value):
+
+        self.enableJobHistory = bool(value)
         if not self.__changedData:
             self.__changedData = True
 
