@@ -15,6 +15,13 @@ class JobsDBKey:
     endTime = "endTime"
     job = "job"
 
+    IDIndex = 0
+    addTimeIndex = 1
+    addTimeIndex = 2
+    startTimeIndex = 3
+    endTimeIndex = 4
+    jobIndex = 5
+
 class JobKey:
 
     ID = 0
