@@ -110,6 +110,7 @@ class ConfigKey:  # pylint: disable=too-few-public-methods
     # App Specific
     #
 
+    JobHistory = "JobHistory"
     JobsDB = "JobsDB"
     JobID = "JobID"
     Tab = "Tab"
@@ -194,6 +195,9 @@ def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None, ap
 
     if data.get(Key.MaxRegExCount) is None:
         data.set(Key.MaxRegExCount, 20)
+
+    if data.get(ConfigKey.JobHistory) is None:
+        data.set(ConfigKey.JobHistory, False)
 
     db = Path(filesPath, JOBSDATABASE)
     data.set(ConfigKey.JobsDB, str(db))
