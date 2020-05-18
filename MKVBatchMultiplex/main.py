@@ -57,6 +57,8 @@ from .models import TableProxyModel, JobsTableModel
 from .widgets import (
     CommandWidget,
     JobsHistoryViewWidget,
+    JobsOutputErrorsWidget,
+    JobsOutputWidget,
     JobsTableViewWidget,
     PreferencesDialogWidget,
     RenameWidget,
@@ -138,8 +140,10 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.tableViewWidget.tableView.sortByColumn(0, Qt.AscendingOrder)
         self.renameWidget = RenameWidget(self)
         self.commandWidget = CommandWidget(self, self.proxyModel)
-        self.jobsOutput = OutputTextWidget(self)
-        self.errorOutput = OutputTextWidget(self)
+        #self.jobsOutput = OutputTextWidget(self)
+        self.jobsOutput = JobsOutputWidget(self)
+        #self.errorOutput = OutputTextWidget(self)
+        self.errorOutput = JobsOutputErrorsWidget(self)
         self.historyWidget = JobsHistoryViewWidget(self, "Jobs Table")
 
         tabsList = []
