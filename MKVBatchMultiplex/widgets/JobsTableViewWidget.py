@@ -20,7 +20,7 @@ from PySide2.QtWidgets import (
     QApplication,
 )
 
-from vsutillib.pyqt import QPushButtonWidget, darkPalette
+from vsutillib.pyqt import QPushButtonWidget, darkPalette, TabWidgetExtension
 from vsutillib.process import isThreadRunning
 
 from .. import config
@@ -34,7 +34,7 @@ MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
 
-class JobsTableViewWidget(QWidget):
+class JobsTableViewWidget(TabWidgetExtension, QWidget):
     """
     JobsTableViewWidget [summary]
 
@@ -47,7 +47,7 @@ class JobsTableViewWidget(QWidget):
     __log = False
 
     def __init__(self, parent, proxyModel, controlQueue, title=None, log=None):
-        super(JobsTableViewWidget, self).__init__(parent)
+        super(JobsTableViewWidget, self).__init__(parent=parent, tabWidgetChild=self)
 
         self.__output = None
         self.__log = None

@@ -42,7 +42,7 @@ MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
 
-class RenameWidget(QWidget):
+class RenameWidget(pyqt.TabWidgetExtension, QWidget):
     """Central widget"""
 
     # pylint: disable=too-many-instance-attributes
@@ -82,7 +82,7 @@ class RenameWidget(QWidget):
         return cls.__log
 
     def __init__(self, parent, controlQueue=None, log=None):
-        super(RenameWidget, self).__init__(parent)
+        super(RenameWidget, self).__init__(parent=parent, tabWidgetChild=self)
 
         self.__log = None
         self.__output = None
@@ -167,7 +167,7 @@ class RenameWidget(QWidget):
 
         maxCount = config.data.get(Key.MaxRegECount)
         # local signals
-        self.setCurrentIndexSignal.connect(self._setCurrentIndex)
+        #self.setCurrentIndexSignal.connect(self._setCurrentIndex)
         self.setFilesSignal.connect(self.setFiles)
         self.textRegEx.cmdLine.currentTextChanged.connect(self._updateRegEx)
         self.textSubString.cmdLine.currentTextChanged.connect(self._updateRegEx)
@@ -217,26 +217,26 @@ class RenameWidget(QWidget):
         if isinstance(value, bool) or value is None:
             self.__log = value
 
-    @property
-    def tab(self):
-        return self.__tab
+    #@property
+    #def tab(self):
+    #    return self.__tab
 
-    @tab.setter
-    def tab(self, value):
-        self.__tab = value
+    #@tab.setter
+    #def tab(self, value):
+    #    self.__tab = value
 
-    @property
-    def tabWidget(self):
-        return self.__tabWidget
+    #@property
+    #def tabWidget(self):
+    #    return self.__tabWidget
 
-    @tabWidget.setter
-    def tabWidget(self, value):
-        self.__tabWidget = value
+    #@tabWidget.setter
+    #def tabWidget(self, value):
+    #    self.__tabWidget = value
 
-    @Slot()
-    def _setCurrentIndex(self):
-        if self.tabWidget:
-            self.tabWidget.setCurrentIndex(self.tab)
+    #@Slot()
+    #def _setCurrentIndex(self):
+    #    if self.tabWidget:
+    #        self.tabWidget.setCurrentIndex(self.tab)
 
     @property
     def output(self):

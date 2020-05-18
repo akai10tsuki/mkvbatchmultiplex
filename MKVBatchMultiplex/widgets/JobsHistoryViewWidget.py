@@ -22,7 +22,12 @@ from PySide2.QtWidgets import (
     QApplication,
 )
 
-from vsutillib.pyqt import QPushButtonWidget, darkPalette, OutputTextWidget
+from vsutillib.pyqt import (
+    darkPalette,
+    QPushButtonWidget,
+    OutputTextWidget,
+    TabWidgetExtension,
+)
 from vsutillib.process import isThreadRunning
 
 from .. import config
@@ -38,7 +43,7 @@ MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
 
-class JobsHistoryViewWidget(QWidget):
+class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
     """
     JobsHistoryViewWidget [summary]
 
@@ -48,11 +53,12 @@ class JobsHistoryViewWidget(QWidget):
     """
 
     def __init__(self, parent, title=None, log=None):
-        super(JobsHistoryViewWidget, self).__init__(parent)
+        super().__init__(parent=parent, tabWidgetChild=self)
 
         self.__output = None
         self.__log = None
         self.__tab = None
+        self.__originalTab = None
 
         queue = JobQueue
 
@@ -113,22 +119,6 @@ class JobsHistoryViewWidget(QWidget):
 
         self.btnGrid.itemAt(_Button.FETCHJOBHISTORY).widget().setEnabled(True)
 
-    @property
-    def tab(self):
-        return self.__tab
-
-    @tab.setter
-    def tab(self, value):
-        self.__tab = value
-
-    @property
-    def tabWidget(self):
-        return self.__tabWidget
-
-    @tabWidget.setter
-    def tabWidget(self, value):
-        self.__tabWidget = value
-
     def setLanguage(self):
         """
         setLanguage set labels according to locale
@@ -140,14 +130,14 @@ class JobsHistoryViewWidget(QWidget):
                 widget.setText("  " + _(widget.originalText) + "  ")
                 widget.setToolTip(_(widget.toolTip))
 
-        self.grpBox.setTitle(_(Text.txt0130))
-        self.model.setHeaderData(
-            JobKey.ID, Qt.Horizontal, "  " + _(Text.txt0131) + "  "
-        )
-        self.model.setHeaderData(
-            JobKey.Status, Qt.Horizontal, "  " + _(Text.txt0132) + "  "
-        )
-        self.model.setHeaderData(JobKey.Command, Qt.Horizontal, _(Text.txt0133))
+        #self.grpBox.setTitle(_(Text.txt0130))
+        #self.model.setHeaderData(
+        #    JobKey.ID, Qt.Horizontal, "  " + _(Text.txt0131) + "  "
+        #)
+        #self.model.setHeaderData(
+        #    JobKey.Status, Qt.Horizontal, "  " + _(Text.txt0132) + "  "
+        #)
+        #self.model.setHeaderData(JobKey.Command, Qt.Horizontal, _(Text.txt0133))
 
     def clearOutputWindow(self):
         """

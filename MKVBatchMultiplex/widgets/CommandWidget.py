@@ -27,7 +27,13 @@ from vsutillib.pyqt import (
     SvgColor,
 )
 from vsutillib.process import isThreadRunning
-from vsutillib.pyqt import checkColor, HorizontalLine, LineOutput, messageBox
+from vsutillib.pyqt import (
+    checkColor,
+    HorizontalLine,
+    LineOutput,
+    messageBox,
+    TabWidgetExtension,
+)
 from vsutillib.mkv import MKVCommand, MKVCommandParser
 
 from .. import config
@@ -40,7 +46,7 @@ MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
 
-class CommandWidget(QWidget):
+class CommandWidget(TabWidgetExtension, QWidget):
     """Output for running queue"""
 
     # log state
@@ -77,7 +83,7 @@ class CommandWidget(QWidget):
         return cls.__log
 
     def __init__(self, parent=None, proxyModel=None, controlQueue=None, log=None):
-        super(CommandWidget, self).__init__(parent)
+        super(CommandWidget, self).__init__(parent=parent, tabWidgetChild=self)
 
         self.__log = log
         self.__output = None
@@ -103,9 +109,7 @@ class CommandWidget(QWidget):
         #
         self.frmCmdLine = QFormLayout()
         btnPasteClipboard = QPushButtonWidget(
-            Text.txt0164,
-            function=self.pasteClipboard,
-            toolTip=Text.txt0165,
+            Text.txt0164, function=self.pasteClipboard, toolTip=Text.txt0165,
         )
         self.cmdLine = QLineEdit()
         self.cmdLine.setValidator(
@@ -138,9 +142,7 @@ class CommandWidget(QWidget):
             toolTip=Text.txt0167,
         )
         btnStartQueue = QPushButtonWidget(
-            Text.txt0126,
-            function=self.parent.jobsQueue.run,
-            toolTip=Text.txt0169,
+            Text.txt0126, function=self.parent.jobsQueue.run, toolTip=Text.txt0169,
         )
         btnAnalysis = QPushButtonWidget(
             Text.txt0170,
@@ -175,14 +177,10 @@ class CommandWidget(QWidget):
             toolTip=Text.txt0175,
         )
         btnClear = QPushButtonWidget(
-            Text.txt0176,
-            function=self.clearOutputWindow,
-            toolTip=Text.txt0177,
+            Text.txt0176, function=self.clearOutputWindow, toolTip=Text.txt0177,
         )
         btnReset = QPushButtonWidget(
-            Text.txt0178,
-            function=self.reset,
-            toolTip=Text.txt0179,
+            Text.txt0178, function=self.reset, toolTip=Text.txt0179,
         )
 
         self.btnGrid.addWidget(btnAddCommand, 0, 0)
@@ -239,7 +237,7 @@ class CommandWidget(QWidget):
         #
 
         # Command related
-        #self.frmCmdLine.itemAt(0, QFormLayout.LabelRole).widget().setEnabled(False)
+        # self.frmCmdLine.itemAt(0, QFormLayout.LabelRole).widget().setEnabled(False)
         self.cliButtonsState(False)
         self.btnGrid.itemAt(_Button.ANALYSIS).widget().setEnabled(False)
 
@@ -287,21 +285,21 @@ class CommandWidget(QWidget):
             ValidateCommand.classLog(value)
             self.outputWindow.log = value
 
-    @property
-    def tab(self):
-        return self.__tab
+    #@property
+    #def tab(self):
+    #    return self.__tab
 
-    @tab.setter
-    def tab(self, value):
-        self.__tab = value
+    #@tab.setter
+    #def tab(self, value):
+    #    self.__tab = value
 
-    @property
-    def tabWidget(self):
-        return self.__tabWidget
+    #@property
+    #def tabWidget(self):
+    #    return self.__tabWidget
 
-    @tabWidget.setter
-    def tabWidget(self, value):
-        self.__tabWidget = value
+    #@tabWidget.setter
+    #def tabWidget(self, value):
+    #    self.__tabWidget = value
 
     @property
     def output(self):
@@ -409,7 +407,9 @@ class CommandWidget(QWidget):
         if running:
             self.jobStartQueueState(False)
             palette = QPalette()
-            color = checkColor(QColor(42, 130, 218), config.data.get(config.ConfigKey.DarkMode))
+            color = checkColor(
+                QColor(42, 130, 218), config.data.get(config.ConfigKey.DarkMode)
+            )
             palette.setColor(QPalette.WindowText, color)
             self.parent.jobsLabel.setPalette(palette)
         else:
