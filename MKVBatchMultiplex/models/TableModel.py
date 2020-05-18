@@ -220,10 +220,11 @@ class TableModel(QAbstractTableModel):
             elif role == Qt.ToolTipRole:
                 toolTip = None
 
-                if column == JOBCOMMAND:
-                    toolTip = self.dataset.data[row][column].toolTip
+                #if column == JOBCOMMAND:
+                toolTip = self.dataset.data[row][column].toolTip
 
-                return toolTip
+                if toolTip:
+                    return toolTip
 
             elif role == Qt.TextAlignmentRole:
                 if self.dataset.headers[column].attribute["Alignment"] == "right":
