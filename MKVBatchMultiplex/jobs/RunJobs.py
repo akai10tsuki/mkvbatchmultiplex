@@ -27,8 +27,8 @@ from vsutillib.misc import staticVars
 
 from .. import config
 from ..models import TableProxyModel
-from .jobKeys import JobStatus, JobKey, JobsDBKey
-from .SqlJobsDb import SqlJobsDB
+from .jobKeys import JobStatus, JobKey, JobsTableKey
+from .SqlJobsTable import SqlJobsTable
 
 
 MODULELOG = logging.getLogger(__name__)
@@ -298,7 +298,7 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
     #
     # Always open to start saving in mid of worker operating
     #
-    jobsDB = SqlJobsDB(config.data.get(config.ConfigKey.JobsDB))
+    jobsDB = SqlJobsTable(config.data.get(config.ConfigKey.SystemDB))
 
     if runJobs.running:
         # Block direct calls while working there should be none
@@ -590,10 +590,10 @@ def addToDb(db, job, update=False):
             cmpJob,
         )
     else:
-        # jobsDB.update(449, (JobsDBKey.startTime, ), 80)
+        # jobsDB.update(449, (JobsTableKey.startTime, ), 80)
         db.update(
             job.jobRow[JobKey.ID],
-            (JobsDBKey.startTime, JobsDBKey.endTime, JobsDBKey.job),
+            (JobsTableKey.startTime, JobsTableKey.endTime, JobsTableKey.job),
             job.startTime,
             job.endTime,
             cmpJob,

@@ -3,7 +3,7 @@ Classes representing Keys in job related lists
 """
 # pylint: disable=too-few-public-methods
 
-class JobsDBKey:
+class JobsTableKey:
     """
      keys representing the jobs table fields
     """

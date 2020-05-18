@@ -76,7 +76,7 @@ FORCELOG = True
 ######################
 
 WORKERTHREADNAME = "jobsWorker"
-JOBSDATABASE = "jobsDb.db"
+SYSTEMDATABASE = "itsue.db"
 
 #######################
 #######################
@@ -104,6 +104,7 @@ class ConfigKey:  # pylint: disable=too-few-public-methods
     Language = "Language"
     Logging = "Logging"
     SimulateRun = "SimulateRun"
+    SystemDB = "SystemDB"
     SystemFont = "SystemFont"
 
     #
@@ -188,6 +189,9 @@ def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None, ap
     setInterfaceLanguage()
     setDefaultGeometry()
 
+    db = Path(filesPath, SYSTEMDATABASE)
+    data.set(ConfigKey.SystemDB, str(db))
+
     #
     # App Specific
     #
@@ -199,7 +203,7 @@ def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None, ap
     if data.get(ConfigKey.JobHistory) is None:
         data.set(ConfigKey.JobHistory, False)
 
-    db = Path(filesPath, JOBSDATABASE)
+    db = Path(filesPath, SYSTEMDATABASE)
     data.set(ConfigKey.JobsDB, str(db))
 
 def setDefaultFont(app):

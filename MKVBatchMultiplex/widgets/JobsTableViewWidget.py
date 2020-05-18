@@ -24,7 +24,7 @@ from vsutillib.pyqt import QPushButtonWidget, darkPalette, TabWidgetExtension
 from vsutillib.process import isThreadRunning
 
 from .. import config
-from ..jobs import JobStatus, JobKey, SqlJobsDB, JobsDBKey
+from ..jobs import JobStatus, JobKey, SqlJobsTable, JobsTableKey
 from ..delegates import StatusComboBoxDelegate
 from ..utils import populate, Text, yesNoDialog
 

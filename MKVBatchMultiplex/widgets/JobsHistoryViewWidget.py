@@ -31,7 +31,7 @@ from vsutillib.pyqt import (
 from vsutillib.process import isThreadRunning
 
 from .. import config
-from ..jobs import JobHistoryKey, JobStatus, JobKey, SqlJobsDB, JobsDBKey, JobQueue
+from ..jobs import JobHistoryKey, JobStatus, JobKey, SqlJobsTable, JobsTableKey, JobQueue
 from ..dataset import TableData, tableHeaders, tableHistoryHeaders
 from ..delegates import StatusComboBoxDelegate
 from ..models import TableModel, TableProxyModel, JobsTableModel
@@ -153,16 +153,16 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
         # ]
 
     def fetchJobHistory(self):
-        jobsDB = SqlJobsDB(config.data.get(config.ConfigKey.JobsDB))
+        jobsDB = SqlJobsTable(config.data.get(config.ConfigKey.SystemDB))
 
         if jobsDB:
             rows = jobsDB.fetchJob(0)
             rowNumber = 0
             for row in rows:
                 viewRow = [None, None, None, None]
-                job = pickle.loads(zlib.decompress(row[JobsDBKey.jobIndex]))
+                job = pickle.loads(zlib.decompress(row[JobsTableKey.jobIndex]))
                 dt = datetime.fromtimestamp(job.startTime)
-                viewRow[JobHistoryKey.ID] = [row[JobsDBKey.IDIndex], "", None]
+                viewRow[JobHistoryKey.ID] = [row[JobsTableKey.IDIndex], "", None]
                 viewRow[JobHistoryKey.Date] = [
                     dt.isoformat(),
                     "Date job was executed",
@@ -183,15 +183,15 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
 
     def refresh(self):
 
-        jobsDB = SqlJobsDB(config.data.get(config.ConfigKey.JobsDB))
+        jobsDB = SqlJobsTable(config.data.get(config.ConfigKey.SystemDB))
 
         if jobsDB:
             rows = jobsDB.fetchJob(0)
             for row in rows:
-                job = pickle.loads(zlib.decompress(row[JobsDBKey.jobIndex]))
+                job = pickle.loads(zlib.decompress(row[JobsTableKey.jobIndex]))
                 print(
                     "Job ID = {} Status = {}".format(
-                        row[JobsDBKey.IDIndex], job.jobRow[JobKey.Status]
+                        row[JobsTableKey.IDIndex], job.jobRow[JobKey.Status]
                     )
                 )
 
