@@ -52,6 +52,7 @@ class JobsTableView(QTableView):
         self.log = log
 
         self.setModel(proxyModel)
+        self.sortByColumn(0, Qt.AscendingOrder)
         self.setSortingEnabled(True)
 
         self._initHelper()
