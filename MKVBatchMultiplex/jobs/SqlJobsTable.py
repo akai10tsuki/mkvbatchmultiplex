@@ -5,7 +5,7 @@
 from vsutillib.sql import SqlDb
 
 
-class SqlJobsDB(SqlDb):
+class SqlJobsTable(SqlDb):
     """
     SqlJobsDB sqlite database for jobs history
 
@@ -20,17 +20,76 @@ class SqlJobsDB(SqlDb):
 
         # Create jobs table
         if self.connection is not None:
+            self._createJobsTable()
+
+    def _createJobsTable(self):
+        # Create jobs table
+        if self.connection is not None:
             sqlJobsTable = """ CREATE TABLE IF NOT EXISTS jobs (
                                 id INTEGER,
                                 addDate TEXT,
                                 addTime REAL,
                                 startTime REAL,
                                 endTime REAL,
-                                job BLOB
+                                job BLOB,
+                                projectName TEXT,
+                                projectInfo TEXT,
+                                saved INTEGER,
+                                delete INTEGER
+                                ) """
+            sqlDbInfoTable = """ CREATE TABLE IF NOT EXISTS dbInfo (
+                                dbTable TEXT NOT NULL UNIQUE,
+                                version TEXT NOT NULL
                                 ) """
             self.sqlExecute(sqlJobsTable)
+            self.sqlExecute(sqlDbInfoTable)
+            if self.version("jobs") is None:
+                updateTablesFromNone(self)
+                self.setVersion("jobs", "2.0.0a1")
+
+    def setVersion(self, *args):
+        """
+        set table version
+
+        Args:
+            dbTable (str): sql table
+            version (str): table version
+        """
+
+        sqlSetVersion = """
+            INSERT INTO
+                dbInfo(dbTable, version)
+                VALUES(?, ?)
+        """
+
+        self.sqlExecute(sqlSetVersion, *args)
+        self.connection.commit()
+
+    def version(self, dbTable):
+        """
+        version get table version
+
+        Args:
+            dbTable (str): sql table
+
+        Returns:
+            str: version of table
+        """
+
+        sqlVersion = "SELECT version FROM dbInfo WHERE dbTable = ?"
+
+        cursor = self.sqlExecute(sqlVersion, dbTable)
+
+        if cursor:
+            row = cursor.fetchone()
+            if row:
+                return row[0]
+
+        return None
 
     def connect(self, database, autoCommit=False):
+        """override connect to create tables"""
+
         super().connect(database, autoCommit)
 
         self._initHelper()
@@ -178,3 +237,55 @@ class SqlJobsDB(SqlDb):
                 self.connection.commit()
 
         return cursor
+
+def updateTablesFromNone(database):
+    """
+    update jobs table form no version to version 2.0.0a1
+    """
+
+    sqlScript = """
+        -- disable foreign key constraint check
+        PRAGMA foreign_keys=off;
+
+        -- start a transaction
+        BEGIN TRANSACTION;
+
+        -- Here you can drop column or rename column
+        CREATE TABLE IF NOT EXISTS new_jobs_table(
+            id INTEGER,
+            addDate TEXT,
+            addTime REAL,
+            startTime REAL,
+            endTime REAL,
+            job BLOB,
+            projectName TEXT,
+            projectInfo TEXT,
+            saved INTEGER,
+            toDelete INTEGER
+        );
+        -- copy data from the table to the new_table
+        INSERT INTO new_jobs_table(id, addDate, addTime, startTime, endTime, job)
+        SELECT id, addDate, addTime, startTime, endTime, job
+        FROM jobs;
+
+        -- drop the table
+        DROP TABLE jobs;
+
+        -- rename the new_table to the table
+        ALTER TABLE new_jobs_table RENAME TO jobs;
+
+        -- set new fields with default values
+        UPDATE jobs SET
+          projectName = "AutoSaved",
+          projectInfo = "AutoSaved",
+          saved = 0,
+          toDelete = 0;
+
+        -- commit the transaction
+        COMMIT;
+
+        -- enable foreign key constraint check
+        PRAGMA foreign_keys=on; """
+
+    cursor = database.connection.cursor()
+    cursor.executescript(sqlScript)
