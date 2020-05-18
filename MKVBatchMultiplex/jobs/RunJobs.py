@@ -310,7 +310,7 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
     currentJob = 0
     indexTotal = [0, 0]
     verify = mkv.VerifyStructure(log=log)
-    totalErrors = 0
+    totalErrors = funcProgress.lbl[4]
     abortAll = False
     bSimulateRun = config.data.get(config.ConfigKey.SimulateRun)
 
