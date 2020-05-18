@@ -377,7 +377,8 @@ class JobQueue(QObject):
         self.runJobs.log = self.log
 
         if JobQueue.__firstRun:
-            self.parent.jobsOutput.setCurrentIndexSignal.emit()
+            #self.parent.jobsOutput.setCurrentIndexSignal.emit()
+            self.parent.jobsOutput.setAsCurrentTab()
             JobQueue.__firstRun = False
 
         self.runJobs.run()
