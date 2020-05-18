@@ -167,17 +167,11 @@ class PreferencesDialogWidget(QDialog):
                 )
                 if self.preferences.enableJobHistory:
                     if self.parent.historyWidget.tab < 0:
-                        tabWidgetList = [
-                            self.parent.historyWidget,
-                            "Jobs History",
-                            "Examine any jobs saved.",
-                        ]
-                        self.parent.tabs.unHideTab(
-                            tabWidgetList
-                        )
+                        self.parent.historyWidget.unHideTab()
+                        self.parent.historyWidget.setAsCurrentTab()
                 else:
                     if self.parent.historyWidget.tab >= 0:
-                        self.parent.tabs.hideTab(self.parent.historyWidget.tab)
+                        self.parent.historyWidget.hideTab()
             #
             # Restore window size
             #
