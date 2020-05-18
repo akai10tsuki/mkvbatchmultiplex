@@ -4,6 +4,13 @@ JobsTableWidget
 
 import logging
 
+try:
+    import cPickle as pickle
+except:
+    import pickle
+import zlib
+
+
 from PySide2.QtCore import QThreadPool, Qt, Slot
 from PySide2.QtWidgets import (
     QWidget,
@@ -90,11 +97,6 @@ class JobsTableViewWidget(QWidget):
         btnAbortJobs = QPushButtonWidget(
             Text.txt0136, function=self.abortCurrentJob, toolTip=Text.txt0137,
         )
-        btnFetchJobHistory = QPushButtonWidget(
-            "Fetch History",
-            function=self.fetchJobHistory,
-            toolTip="Fetch and display old saved jobs processed by worker",
-        )
 
         self.btnGrid = QHBoxLayout()
         self.btnGrid.addWidget(btnAddWaitingJobsToQueue)
@@ -103,8 +105,6 @@ class JobsTableViewWidget(QWidget):
         self.btnGrid.addWidget(btnAbortCurrentJob)
         self.btnGrid.addWidget(btnAbortJobs)
         self.btnGrid.addStretch()
-        if config.data.get(config.ConfigKey.JobHistory):
-            self.btnGrid.addWidget(btnFetchJobHistory)
         if config.data.get(config.ConfigKey.SimulateRun):
             self.btnGrid.addWidget(btnPopulate)
             self.btnGrid.addWidget(btnPrintDataset)
@@ -163,9 +163,6 @@ class JobsTableViewWidget(QWidget):
         self.btnGrid.itemAt(_Button.CLEARQUEUE).widget().setEnabled(False)
         self.btnGrid.itemAt(_Button.ABORTCURRENTJOB).widget().setEnabled(False)
         self.btnGrid.itemAt(_Button.ABORTJOBS).widget().setEnabled(False)
-
-        if config.data.get(config.ConfigKey.JobHistory):
-            self.btnGrid.itemAt(_Button.FETCHJOBHISTORY).widget().setEnabled(True)
 
     @classmethod
     def classLog(cls, setLogging=None):
@@ -297,14 +294,6 @@ class JobsTableViewWidget(QWidget):
         )
         self.model.setHeaderData(JobKey.Command, Qt.Horizontal, _(Text.txt0133))
 
-    def fetchJobHistory(self):
-        jobsDB = SqlJobsDB(config.data.get(config.ConfigKey.JobsDB))
-
-        if jobsDB:
-            rows = jobsDB.fetchJob(0)
-            for row in rows:
-                print("Job ID = {}".format(row[JobsDBKey.IDIndex]))
-
     def printDataset(self):
         """
         printDataset development debug
@@ -337,9 +326,6 @@ class JobsTableViewWidget(QWidget):
 
     @Slot(bool)
     def jobStartQueueState(self, state):
-
-        if state:
-            self.btnGrid.itemAt(_Button.FETCHJOBHISTORY).widget().setEnabled(False)
 
         if state and not isThreadRunning(config.WORKERTHREADNAME):
             self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(state)
