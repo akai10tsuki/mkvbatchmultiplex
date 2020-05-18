@@ -21,8 +21,8 @@ class SqlJobsDB(SqlDb):
         # Create jobs table
         if self.connection is not None:
             sqlJobsTable = """ CREATE TABLE IF NOT EXISTS jobs (
-                                id integer PRIMARY KEY,
-                                addDate text,
+                                id INTEGER,
+                                addDate TEXT,
                                 addTime REAL,
                                 startTime REAL,
                                 endTime REAL,
@@ -75,7 +75,7 @@ class SqlJobsDB(SqlDb):
 
         return cursor
 
-    def fetchJob(self, jobID, *args, fetchAll=False, whereClause=None):
+    def fetchJob(self, jobID, *args, fetchAll=False, whereClause=None, orderClause=None):
         """
         fetchJob fetch information from database by job id
 

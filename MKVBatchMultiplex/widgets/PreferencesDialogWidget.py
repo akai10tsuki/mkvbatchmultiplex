@@ -51,11 +51,15 @@ class PreferencesDialogWidget(QDialog):
         #
         # Logging is boolean value
         #
-        self.ui.chkBoxEnableLogging.setChecked(config.data.get(config.ConfigKey.Logging))
+        self.ui.chkBoxEnableLogging.setChecked(
+            config.data.get(config.ConfigKey.Logging)
+        )
         #
+        # Enable History
         #
-        #
-        self.ui.chkBoxEnableJobHistory.setChecked(config.data.get(config.ConfigKey.JobHistory))
+        self.ui.chkBoxEnableJobHistory.setChecked(
+            config.data.get(config.ConfigKey.JobHistory)
+        )
         #
         # Restore Windows Size
         #
@@ -150,13 +154,30 @@ class PreferencesDialogWidget(QDialog):
             # Logging
             #
             if self.preferences.enableLogging is not None:
-                config.data.set(config.ConfigKey.Logging, self.preferences.enableLogging)
+                config.data.set(
+                    config.ConfigKey.Logging, self.preferences.enableLogging
+                )
                 self.parent.enableLogging(self.preferences.enableLogging)
             #
             # Job History
             #
             if self.preferences.enableJobHistory is not None:
-                config.data.set(config.ConfigKey.JobHistory, self.preferences.enableJobHistory)
+                config.data.set(
+                    config.ConfigKey.JobHistory, self.preferences.enableJobHistory
+                )
+                if self.preferences.enableJobHistory:
+                    if self.parent.historyWidget.tab < 0:
+                        tabWidgetList = [
+                            self.parent.historyWidget,
+                            "Jobs History",
+                            "Examine any jobs saved.",
+                        ]
+                        self.parent.tabs.unHideTab(
+                            tabWidgetList
+                        )
+                else:
+                    if self.parent.historyWidget.tab >= 0:
+                        self.parent.tabs.hideTab(self.parent.historyWidget.tab)
             #
             # Restore window size
             #

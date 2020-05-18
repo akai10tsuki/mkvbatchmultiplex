@@ -56,6 +56,7 @@ from .jobs import JobQueue
 from .models import TableProxyModel, JobsTableModel
 from .widgets import (
     CommandWidget,
+    JobsHistoryViewWidget,
     JobsTableViewWidget,
     PreferencesDialogWidget,
     RenameWidget,
@@ -139,6 +140,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.commandWidget = CommandWidget(self, self.proxyModel)
         self.jobsOutput = OutputTextWidget(self)
         self.errorOutput = OutputTextWidget(self)
+        self.historyWidget = JobsHistoryViewWidget(self, "Jobs Table")
 
         tabsList = []
         tabsList.append(
@@ -176,7 +178,18 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
                 "Rename the output files ej. Series Name - S01E01.mkv, ...",
             ]
         )
+        if config.data.get(config.ConfigKey.JobHistory):
+            tabsList.append(
+                [
+                    self.historyWidget,
+                    "Jobs History",
+                    "Examine any jobs saved.",
+                ]
+            )
         self.tabs = TabWidget(self, tabsList)
+        if not config.data.get(config.ConfigKey.JobHistory):
+            self.historyWidget.tab = (-1)
+            self.historyWidget.tabWidget = self.tabs
 
     def _initHelper(self):
         """
