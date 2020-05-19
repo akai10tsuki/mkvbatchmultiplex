@@ -47,7 +47,7 @@ REQUIRED = [
     "vsutillib.mkv>=1.5.1",
     "vsutillib.process>=1.5.0",
     "vsutillib.pyqt>=1.5.1",
-    "vsutillib.sql>=1.5.1"
+    "vsutillib.sql>=1.5.1",
 ]
 
 # for app
@@ -112,7 +112,7 @@ class ConfigKey:  # pylint: disable=too-few-public-methods
     #
 
     JobHistory = "JobHistory"
-    JobsDB = "JobsDB"
+    JobsTable = "jobs"
     JobID = "JobID"
     Tab = "Tab"
     TabText = "TabText"
@@ -203,8 +203,6 @@ def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None, ap
     if data.get(ConfigKey.JobHistory) is None:
         data.set(ConfigKey.JobHistory, False)
 
-    db = Path(filesPath, SYSTEMDATABASE)
-    data.set(ConfigKey.JobsDB, str(db))
 
 def setDefaultFont(app):
     """save and set default font point size"""
