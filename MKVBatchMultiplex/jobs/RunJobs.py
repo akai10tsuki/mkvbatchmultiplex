@@ -278,8 +278,8 @@ def displayRunJobs(line, job, output, indexTotal, funcProgress=None):
         output.job.emit(line[:-1], {"appendLine": True})
 
     if (line.find("El multiplexado") == 0) or (line.find("Multiplexing took") == 0):
-        output.job.emit("\n", {})
-        job.output.append("")
+        output.job.emit("\n\n\n", {})
+        job.output.append("\n\n")
 
 
 @staticVars(running=False)
@@ -403,10 +403,9 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
                 (cmd, baseFiles, sourceFiles, destinationFile, _, _, _),
             ) in enumerate(job.oCommand):
                 funcProgress.lblSetValue.emit(2, indexTotal[0] + 1)
-
+                #
                 # Check Job Status for Abort
                 #
-                #sourceIndex = job.statusIndex
                 status = model.dataset[statusIndex.row(), statusIndex.column()]
 
                 ###
@@ -438,10 +437,8 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
                         job.jobRow[JobKey.Status] = JobStatus.Aborted
                         addToDb(jobsDB, job, update=True)
                     break
-                #
-                # Check Job Status for Abort
 
-                verify.verifyStructure(baseFiles, sourceFiles)
+                verify.verifyStructure(baseFiles, sourceFiles, destinationFile)
 
                 if log:
                     msg = (
@@ -475,17 +472,17 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
 
                 else:
                     job.errors.append(verify.analysis)
-
                     totalErrors += 1
                     funcProgress.lblSetValue.emit(4, totalErrors)
 
-                    msg = "Error Job ID: {} ---------------------".format(
+                    msg = "Error Job ID: {} ---------------------\n\n".format(
                         job.jobRow[JobKey.ID]
                     )
                     output.error.emit(msg, {"color": SvgColor.red, "appendEnd": True})
-                    msg = "\nDestination File: {}\n\n".format(destinationFile)
+                    msg = "Destination File: {}\n\n".format(destinationFile)
+                    job.output.append(msg)
                     output.job.emit(msg, {"color": SvgColor.red, "appendEnd": True})
-                    output.error.emit(msg, {"color": SvgColor.red, "appendEnd": True})
+                    #output.error.emit(msg, {"color": SvgColor.red, "appendEnd": True})
 
                     for i, m in enumerate(verify.analysis):
                         if i == 0:
@@ -501,11 +498,14 @@ def runJobs(jobQueue, output, model, funcProgress, controlQueue, log=False):
                                         findSource = False
                                 output.job.emit(line + "\n", {"color": color})
                                 output.error.emit(line + "\n", {"color": color})
+                                job.output.append(line + "\n")
                         else:
-                            output.job.emit(m + "\n", {"color": SvgColor.red})
+                            output.job.emit(m, {"color": SvgColor.red})
+                            job.output.append(m + "\n")
                             output.error.emit(m, {"color": SvgColor.red})
 
-                    output.job.emit("", {"appendEnd": True})
+                    job.output.append("\n")
+                    #output.job.emit("", {"appendEnd": True})
                     msg = "Error Job ID: {} ---------------------\n\n".format(
                         job.jobRow[JobKey.ID]
                     )
