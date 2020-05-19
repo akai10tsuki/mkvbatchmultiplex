@@ -14,6 +14,6 @@ class JobsOutputErrorsWidget(TabWidgetExtension, OutputTextWidget):
 
     def clear(self):
 
-        self.parent.progress.lblSetValue.emit(4, totalErrors)
+        self.parent.progress.lblSetValue.emit(4, 0)
 
         super().clear()

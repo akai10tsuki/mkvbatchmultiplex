@@ -8,6 +8,7 @@ try:
     import cPickle as pickle
 except:
     import pickle
+import re
 import zlib
 
 from datetime import datetime
@@ -26,12 +27,21 @@ from vsutillib.pyqt import (
     darkPalette,
     QPushButtonWidget,
     OutputTextWidget,
+    SvgColor,
     TabWidgetExtension,
 )
 from vsutillib.process import isThreadRunning
+from vsutillib.mkv import MKVParseKey
 
 from .. import config
-from ..jobs import JobHistoryKey, JobStatus, JobKey, SqlJobsTable, JobsTableKey, JobQueue
+from ..jobs import (
+    JobHistoryKey,
+    JobStatus,
+    JobKey,
+    SqlJobsTable,
+    JobsTableKey,
+    JobQueue,
+)
 from ..dataset import TableData, tableHeaders, tableHistoryHeaders
 from ..delegates import StatusComboBoxDelegate
 from ..models import TableModel, TableProxyModel, JobsTableModel
@@ -97,9 +107,19 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
             function=self.refresh,
             toolTip="Refresh table view with any new information",
         )
+        btnShowOutput = QPushButtonWidget(
+            "Show Output", function=self.showOutput, toolTip="Show job output run"
+        )
+        btnShowOutputErrors = QPushButtonWidget(
+            "Show Errors",
+            function=self.showOutputErrors,
+            toolTip="Show job output errors",
+        )
 
         self.btnGrid = QHBoxLayout()
         self.btnGrid.addWidget(btnFetchJobHistory)
+        self.btnGrid.addWidget(btnShowOutput)
+        self.btnGrid.addWidget(btnShowOutputErrors)
         self.btnGrid.addStretch()
         self.btnGrid.addWidget(btnClearOutput)
 
@@ -119,6 +139,7 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
 
         self.btnGrid.itemAt(_Button.FETCHJOBHISTORY).widget().setEnabled(True)
 
+    @Slot()
     def setLanguage(self):
         """
         setLanguage set labels according to locale
@@ -130,14 +151,14 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
                 widget.setText("  " + _(widget.originalText) + "  ")
                 widget.setToolTip(_(widget.toolTip))
 
-        #self.grpBox.setTitle(_(Text.txt0130))
-        #self.model.setHeaderData(
+        # self.grpBox.setTitle(_(Text.txt0130))
+        # self.model.setHeaderData(
         #    JobKey.ID, Qt.Horizontal, "  " + _(Text.txt0131) + "  "
-        #)
-        #self.model.setHeaderData(
+        # )
+        # self.model.setHeaderData(
         #    JobKey.Status, Qt.Horizontal, "  " + _(Text.txt0132) + "  "
-        #)
-        #self.model.setHeaderData(JobKey.Command, Qt.Horizontal, _(Text.txt0133))
+        # )
+        # self.model.setHeaderData(JobKey.Command, Qt.Horizontal, _(Text.txt0133))
 
     def clearOutputWindow(self):
         """
@@ -172,7 +193,7 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
                 viewRow[JobHistoryKey.Command] = [
                     job.jobRow[JobKey.Command],
                     job.jobRow[JobKey.Command],
-                    job.output,
+                    job,
                 ]
                 self.model.insertRows(rowNumber, 1, data=viewRow)
                 rowNumber += 1
@@ -180,6 +201,84 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
             # jobOutputRun = self.model.dataset.data[0][JobHistoryKey.Command].obj
 
         jobsDB.close()
+
+    def showOutput(self):
+
+        regPercentEx = re.compile(r":\W*(\d+)%$")
+        # The file 'U:\Work\Guilty Crown\[SCY] Guilty Crown - 01 (BD 1080p Hi10 FLAC) [2E38B6BE].mkv' has been opened for writing.
+        regOutputFileEx = re.compile(r"file (.*?) has")
+        indexes = self.tableView.selectedIndexes()
+        if indexes:
+            self.output.clear()
+            index = indexes[0]
+            sourceIndex = self.proxyModel.mapToSource(index)
+            row = sourceIndex.row()
+            column = sourceIndex.column()
+            jobID = self.model.dataset.data[row][column].data
+            job = self.model.dataset.data[row][JobHistoryKey.Command].obj
+            processedFiles = 0
+            totalFiles = len(job.oCommand)
+            for line in job.output:
+                if m := regPercentEx.search(line):
+                    n = int(m.group(1))
+                    if n < 100:
+                        continue
+                if f := regOutputFileEx.search(line):
+                    processedFiles += 1
+                self.output.insertTextSignal.emit(line, {})
+            msg = stats(job)
+
+            self.output.insertTextSignal.emit(msg, {})
+
+    def showOutputErrors(self):
+
+        indexes = self.tableView.selectedIndexes()
+        if indexes:
+            self.output.clear()
+            index = indexes[0]
+            sourceIndex = self.proxyModel.mapToSource(index)
+            row = sourceIndex.row()
+            column = sourceIndex.column()
+            jobID = self.model.dataset.data[row][column].data
+            job = self.model.dataset.data[row][JobHistoryKey.Command].obj
+
+            for analysis in job.errors:
+
+                msg = "Error Job ID: {} ---------------------\n\n".format(
+                    job.jobRow[JobKey.ID]
+                )
+
+                self.output.insertTextSignal.emit(
+                    msg, {"color": SvgColor.red, "appendEnd": True}
+                )
+
+                # msg = "\nDestination File: {}\n\n".format(destinationFile)
+                # output.error.emit(msg, {"color": SvgColor.red, "appendEnd": True})
+
+                for i, m in enumerate(analysis):
+                    if i == 0:
+                        lines = m.split("\n")
+                        findSource = True
+                        for index, line in enumerate(lines):
+                            color = SvgColor.orange
+                            if findSource and (
+                                (searchIndex := line.find("File Name")) >= 0
+                            ):
+                                if searchIndex >= 0:
+                                    color = SvgColor.tomato
+                                    findSource = False
+                            self.output.insertTextSignal.emit(
+                                line + "\n", {"color": color}
+                            )
+                    else:
+                        self.output.insertTextSignal.emit(m, {"color": SvgColor.red})
+
+                msg = "Error Job ID: {} ---------------------\n\n".format(
+                    job.jobRow[JobKey.ID]
+                )
+                self.output.insertTextSignal.emit(
+                    msg, {"color": SvgColor.red, "appendEnd": True}
+                )
 
     def refresh(self):
 
@@ -196,6 +295,44 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
                 )
 
         jobsDB.close()
+
+
+def stats(job):
+
+    totalFiles = len(job.oCommand)
+    totalErrors = len(job.errors)
+
+    dtStart = datetime.fromtimestamp(job.startTime)
+    dtEnd = datetime.fromtimestamp(job.endTime)
+    dtDuration = dtEnd - dtStart
+
+    # msg = "\nJob ID = {}\n\nProcessed: {}\nProcessed time: {}\nTotal Files: {} proccessed file {} Errors {}".format(
+    #    jobID, dtStart.isoformat(), dtDuration, totalFiles, processedFiles, totalFiles - processedFiles
+    # )
+
+    msg = """
+
+    Job ID = {}
+
+    Processed: {}
+    Processed time: {}
+
+    Total files: {}
+    Proccessed files: {}
+    Errors {}
+
+    """
+
+    msg = msg.format(
+        job.jobRow[JobKey.ID],
+        dtStart.isoformat(),
+        dtDuration,
+        totalFiles,
+        totalFiles - totalErrors,
+        totalErrors,
+    )
+
+    return msg
 
 
 class _Button:
