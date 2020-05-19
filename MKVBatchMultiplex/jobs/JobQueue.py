@@ -65,7 +65,6 @@ class JobInfo:  # pylint: disable=too-many-instance-attributes
     def __init__(
         self,
         jobRowNumber,
-        index,
         jobRow,
         tableModel,
         errors=None,
@@ -75,12 +74,12 @@ class JobInfo:  # pylint: disable=too-many-instance-attributes
 
         self.jobRowNumber = jobRowNumber
 
-        self.jobIndex = index[JobKey.ID]
-        self.statusIndex = index[JobKey.Status]
-        self.commandIndex = index[JobKey.Command]
+        #self.jobIndex = index[JobKey.ID]
+        #self.statusIndex = index[JobKey.Status]
+        #self.commandIndex = index[JobKey.Command]
 
         self.jobRow = jobRow
-        self.command = jobRow[JobKey.Command]
+        #self.command = jobRow[JobKey.Command]
         self.oCommand = copy.deepcopy(
             tableModel.dataset.data[jobRowNumber][JobKey.Command].obj
         )
@@ -250,7 +249,8 @@ class JobQueue(QObject):
     @Slot(object, str)
     def statusUpdate(self, job, status):
 
-        self.model.setData(job.statusIndex, status)
+        index = self.model.index(job.jobRowNumber, JobKey.Status)
+        self.model.setData(index, status)
 
     def append(self, jobRow):
         """
@@ -289,9 +289,16 @@ class JobQueue(QObject):
             self.__jobID += 1
             config.data.set(config.ConfigKey.JobID, self.__jobID)
 
+        #newJob = JobInfo(
+        #    jobRow,
+        #    [fJobIndex, fStatusIndex, fCommandIndex],
+        #    self.model.dataset[jobRow,],
+        #    self.model,
+        #    log=self.log,
+        #)
+
         newJob = JobInfo(
             jobRow,
-            [fJobIndex, fStatusIndex, fCommandIndex],
             self.model.dataset[jobRow,],
             self.model,
             log=self.log,
