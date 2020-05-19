@@ -219,6 +219,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.setLanguageWidget.addSlot(self.commandWidget.setLanguage)
         self.setLanguageWidget.addSlot(self.tabs.setLanguage)
         self.setLanguageWidget.addSlot(self.renameWidget.setLanguage)
+        self.setLanguageWidget.addSlot(self.historyWidget.setLanguage)
 
         # connect to tabs widget tab change Signal
         self.tabs.currentChanged.connect(tabChange)
@@ -359,7 +360,8 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
             # Current tab
             if tabIndex := config.data.get("Tab"):
                 # setting tab to jobs
-                self.tabs.setCurrentIndexSignal.emit(0)
+                #self.tabs.setCurrentIndexSignal.emit(0)
+                self.tabs.setCurrentIndexSignal.emit(tabIndex)
 
         elif action == config.Action.Save:
 
