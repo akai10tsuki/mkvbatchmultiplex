@@ -38,5 +38,10 @@
         <source>Font &amp; Size:</source>
         <translation></translation>
     </message>
+    <message>
+        <location filename="PreferencesDialog.ui" line="119"/>
+        <source>Restore Defaults</source>
+        <translation></translation>
+    </message>
 </context>
 </TS>
