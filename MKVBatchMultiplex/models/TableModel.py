@@ -220,7 +220,7 @@ class TableModel(QAbstractTableModel):
             elif role == Qt.ToolTipRole:
                 toolTip = None
 
-                #if column == JOBCOMMAND:
+                # if column == JOBCOMMAND:
                 toolTip = self.dataset.data[row][column].toolTip
 
                 if toolTip:
@@ -338,6 +338,20 @@ class TableModel(QAbstractTableModel):
             return True
 
         return False
+
+    def removeRows(self, position, rows, parent):
+
+        rowCount = self.rowCount()
+
+        if position <= rowCount:
+            self.beginRemoveRows(QModelIndex(), position, position + rows - 1)
+
+            for row in range(0, rows):
+                self.dataset.removeRow(row)
+
+            self.endRemoveRows()
+
+        return True
 
     #
     # Enable Drag and Drop
