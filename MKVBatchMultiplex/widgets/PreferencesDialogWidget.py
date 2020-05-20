@@ -3,7 +3,7 @@
 """
 
 
-from PySide2.QtCore import QObject, Qt, Slot
+from PySide2.QtCore import QCoreApplication, QObject, Qt, Slot, QLocale
 from PySide2.QtGui import QFont
 from PySide2.QtWidgets import QDialog, QDialogButtonBox
 
@@ -26,7 +26,7 @@ class PreferencesDialogWidget(QDialog):
 
         # remove ? help symbol from dialog header
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
-
+        self.ui.cmbBoxInterfaceLanguage.setDuplicatesEnabled(False)
         self._initHelper()
 
     def _initUI(self):
@@ -36,6 +36,7 @@ class PreferencesDialogWidget(QDialog):
         #
         language = config.data.get(config.ConfigKey.Language)
         index = 0
+        self.ui.cmbBoxInterfaceLanguage.clear()
         for key, value in config.data.get(config.ConfigKey.InterfaceLanguages).items():
             self.ui.cmbBoxInterfaceLanguage.addItem(value)
             if key == language:
@@ -191,6 +192,14 @@ class PreferencesDialogWidget(QDialog):
                 b = base64Geometry.data()  # b is a bytes string
                 config.data.set(config.ConfigKey.Geometry, b)
 
+    def retranslateUi(self):
+        self.ui.retranslateUi(self)
+        for button in self.ui.btnBox.buttons():
+            text = button.text()
+            print(text)
+            button.setText("  " + "Uno" + "  ")
+        self.ui.btnBox.update()
+
 
 class Preferences(QObject):
     def __init__(self, parent):
@@ -217,13 +226,15 @@ class Preferences(QObject):
     def interfaceLanguageChanged(self, index):
 
         language = self.parent.ui.cmbBoxInterfaceLanguage.itemText(index)
-        languageDictionary = config.data.get(config.ConfigKey.InterfaceLanguages)
-        key = list(languageDictionary.keys())[
-            list(languageDictionary.values()).index(language)
-        ]
-        self.language = key
-        if not self.__changedData:
-            self.__changedData = True
+        # print("Language selected in combo [{}]".format(language))
+        if language:
+            languageDictionary = config.data.get(config.ConfigKey.InterfaceLanguages)
+            key = list(languageDictionary.keys())[
+                list(languageDictionary.values()).index(language)
+            ]
+            self.language = key
+            if not self.__changedData:
+                self.__changedData = True
 
     @Slot(object)
     def currentFontChanged(self, font):
