@@ -16,11 +16,20 @@ import webbrowser
 from collections import deque
 from pathlib import Path
 
-from PySide2.QtCore import QByteArray, QSize, Slot
+from PySide2.QtCore import (
+    QByteArray,
+    QCoreApplication,
+    QLibraryInfo,
+    QLocale,
+    QSize,
+    QTranslator,
+    Slot,
+)
 from PySide2.QtGui import QColor, QFont, QFontMetrics, QIcon, Qt
 from PySide2.QtWidgets import (
     QAction,
     QApplication,
+    QLabel,
     QMainWindow,
     QMessageBox,
     QMenuBar,
@@ -72,6 +81,7 @@ from .utils import (
     setLanguageMenus,
     SetLanguage,
     SetPreferences,
+    UiSetLanguage,
 )
 
 
@@ -88,13 +98,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.jobsQueue = JobQueue(self, controlQueue=self.controlQueue)
         self.defaultPalette = palette
         self.setLanguageWidget = SetLanguage()
-        self.progressSpin = QProgressIndicator(self)
-        self.progressSpin.color = checkColor(
-            QColor(42, 130, 218), config.data.get(config.ConfigKey.DarkMode)
-        )
-        self.progressSpin.delay = 50
-        self.progressSpin.displayedWhenStopped = True
-        self.setPreferences = PreferencesDialogWidget(self)
+        self.uiSetLanguage = UiSetLanguage(self)
 
         #
         # Where am I running from
@@ -111,8 +115,8 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         )
 
         # Setup User Interface
-        self._initMenu()
         self._initControls()
+        self._initMenu()
         self._initUI()
         self._initHelper()
 
@@ -122,6 +126,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
         self.show()
 
+        # Must init after show
         self.progressBar.initTaskbarButton()
 
     def _initControls(self):
@@ -133,6 +138,9 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.jobsQueue.proxyModel = self.proxyModel
         self.jobsQueue.progress = self.progress
 
+        self.progressSpin = QProgressIndicator(self)
+        self.setPreferences = PreferencesDialogWidget(self)
+
         # Widgets for tabs
         self.tableViewWidget = JobsTableViewWidget(
             self, self.proxyModel, self.controlQueue, "Jobs Table"
@@ -140,11 +148,10 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.tableViewWidget.tableView.sortByColumn(0, Qt.AscendingOrder)
         self.renameWidget = RenameWidget(self)
         self.commandWidget = CommandWidget(self, self.proxyModel)
-        #self.jobsOutput = OutputTextWidget(self)
         self.jobsOutput = JobsOutputWidget(self)
-        #self.errorOutput = OutputTextWidget(self)
         self.errorOutput = JobsOutputErrorsWidget(self)
         self.historyWidget = JobsHistoryViewWidget(self, "Jobs Table")
+        self.historyWidget.tableView.sortByColumn(0, Qt.DescendingOrder)
 
         tabsList = []
         tabsList.append(
@@ -184,21 +191,24 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         )
         if config.data.get(config.ConfigKey.JobHistory):
             tabsList.append(
-                [
-                    self.historyWidget,
-                    "Jobs History",
-                    "Examine any jobs saved.",
-                ]
+                [self.historyWidget, "Jobs History", "Examine any jobs saved.",]
             )
         self.tabs = TabWidget(self, tabsList)
         if not config.data.get(config.ConfigKey.JobHistory):
-            self.historyWidget.tab = (-1)
+            self.historyWidget.tab = -1
             self.historyWidget.tabWidget = self.tabs
 
     def _initHelper(self):
         """
         _initHelper setup signals, do any late binds and misc configuration
         """
+
+        # progress spin
+        self.progressSpin.displayedWhenStopped = True
+        self.progressSpin.color = checkColor(
+            QColor(42, 130, 218), config.data.get(config.ConfigKey.DarkMode)
+        )
+        self.progressSpin.delay = 60
 
         # Set output to contain output windows objects
         self.output = OutputWindows(
@@ -211,7 +221,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.commandWidget.outputWindow.setReadOnly(True)
         self.jobsOutput.setReadOnly(True)
         self.errorOutput.setReadOnly(True)
-
+        self.historyWidget.output.setReadOnly(True)
         self.jobsOutput.textChanged.connect(self.commandWidget.resetButtonState)
 
         # setup widgets setLanguage to SetLanguage change signal
@@ -220,7 +230,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.setLanguageWidget.addSlot(self.tabs.setLanguage)
         self.setLanguageWidget.addSlot(self.renameWidget.setLanguage)
         self.setLanguageWidget.addSlot(self.historyWidget.setLanguage)
-
+        self.setLanguageWidget.addSlot(self.setPreferences.retranslateUi)
         # connect to tabs widget tab change Signal
         self.tabs.currentChanged.connect(tabChange)
 
@@ -360,14 +370,13 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
             # Current tab
             if tabIndex := config.data.get("Tab"):
                 # setting tab to jobs
-                #self.tabs.setCurrentIndexSignal.emit(0)
+                # self.tabs.setCurrentIndexSignal.emit(0)
                 self.tabs.setCurrentIndexSignal.emit(tabIndex)
 
         elif action == config.Action.Save:
 
             if action == config.Action.Save:
                 config.data.saveToFile()
-
 
     def setAppFont(self, font):
         """
@@ -399,7 +408,6 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         QToolTip.setFont(font)
         config.data.set(config.ConfigKey.Font, font.toString())
 
-
     def setLanguage(self, language=None, menuItem=None):
         """
         Set application language the scheme permits runtime changes
@@ -416,6 +424,8 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         lang = gettext.translation(
             config.NAME, localedir=str(config.LOCALE), languages=[language]
         )
+        if self.uiSetLanguage.setLanguage(language):
+            pass
         lang.install(names=("ngettext",))
         config.data.set(config.ConfigKey.Language, language)
         self.setWindowTitle(Text.txt0001)
@@ -541,7 +551,7 @@ def mainApp():
 
     config.init(app=app)
 
-    # Palette will change on macOS according to current theme
+    # Palette will change on macOS accor-+-ding to current theme
     # will create a poor mans dark theme for windows
     if platform.system() == "Windows":
         # use a dark palette on Windows 10
