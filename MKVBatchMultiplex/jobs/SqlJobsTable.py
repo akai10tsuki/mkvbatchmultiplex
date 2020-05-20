@@ -25,6 +25,7 @@ class SqlJobsTable(SqlDb):
     def _createJobsTable(self):
         # Create jobs table
         if self.connection is not None:
+            # version 2.0.0a2
             sqlJobsTable = """ CREATE TABLE IF NOT EXISTS jobs (
                                 id INTEGER,
                                 addDate TEXT,
@@ -32,20 +33,27 @@ class SqlJobsTable(SqlDb):
                                 startTime REAL,
                                 endTime REAL,
                                 job BLOB,
+                                command TEXT,
                                 projectName TEXT,
                                 projectInfo TEXT,
                                 saved INTEGER,
                                 delete INTEGER
-                                ) """
+                                ); """
             sqlDbInfoTable = """ CREATE TABLE IF NOT EXISTS dbInfo (
                                 dbTable TEXT NOT NULL UNIQUE,
                                 version TEXT NOT NULL
-                                ) """
+                                ); """
             self.sqlExecute(sqlJobsTable)
             self.sqlExecute(sqlDbInfoTable)
+            version = self.version("jobs")
             if self.version("jobs") is None:
-                updateTablesFromNone(self)
-                self.setVersion("jobs", "2.0.0a1")
+                print("Version not found.")
+                updateTables(self, "2.0.0a1", "")
+                self.setVersion("jobs", "2.0.0a2")
+            elif version == "2.0.0a1":
+                print("Update to version 2.0.0a2")
+                updateTables(self, "2.0.0a1", "2.0.0a2")
+                self.setVersion("jobs", "2.0.0a2")
 
     def setVersion(self, *args):
         """
@@ -56,14 +64,25 @@ class SqlJobsTable(SqlDb):
             version (str): table version
         """
 
-        sqlSetVersion = """
-            INSERT INTO
-                dbInfo(dbTable, version)
-                VALUES(?, ?)
-        """
+        version = self.version(args[0])
+        print("Table ", version)
 
-        self.sqlExecute(sqlSetVersion, *args)
-        self.connection.commit()
+        if version is None:
+            sqlSetVersion = """
+                INSERT INTO
+                    dbInfo(dbTable, version)
+                    VALUES(?, ?)
+                """
+            self.sqlExecute(sqlSetVersion, *args)
+        else:
+            sqlSetVersion = """
+                UPDATE dbInfo SET
+                    version = ?
+                    WHERE dbTable = ?;
+                """
+            self.sqlExecute(sqlSetVersion, args[1], args[0])
+
+        #self.connection.commit()
 
     def version(self, dbTable):
         """
@@ -76,7 +95,7 @@ class SqlJobsTable(SqlDb):
             str: version of table
         """
 
-        sqlVersion = "SELECT version FROM dbInfo WHERE dbTable = ?"
+        sqlVersion = "SELECT version FROM dbInfo WHERE dbTable = ?;"
 
         cursor = self.sqlExecute(sqlVersion, dbTable)
 
@@ -90,9 +109,11 @@ class SqlJobsTable(SqlDb):
     def connect(self, database, autoCommit=False):
         """override connect to create tables"""
 
-        super().connect(database, autoCommit)
+        rc = super().connect(database, autoCommit)
 
         self._initHelper()
+
+        return rc
 
     def delete(self, jobID):
         """
@@ -107,7 +128,7 @@ class SqlJobsTable(SqlDb):
 
         cursor = None
         if isinstance(jobID, int):
-            sqlDeleteJob = "DELETE FROM jobs WHERE id=?"
+            sqlDeleteJob = "DELETE FROM jobs WHERE id=?;"
             cursor = self.sqlExecute(sqlDeleteJob, jobID)
             if cursor is not None:
                 self.connection.commit()
@@ -127,7 +148,7 @@ class SqlJobsTable(SqlDb):
 
         sqlJob = """ INSERT INTO
                      jobs(id, addDate, addTime, startTime, endTime, job)
-                     VALUES(?, ?, ?, ?, ?, ?) """
+                     VALUES(?, ?, ?, ?, ?, ?); """
         cursor = self.sqlExecute(sqlJob, *args)
         if cursor is not None:
             self.connection.commit()
@@ -186,7 +207,7 @@ class SqlJobsTable(SqlDb):
         sqlFetchID = (
             "SELECT " + fetchFields + " FROM jobs" + (""
             if wClause == ""
-            else " " + wClause)
+            else " " + wClause) + ";"
         )
 
         if values:
@@ -221,7 +242,7 @@ class SqlJobsTable(SqlDb):
             if i < (totalFields - 1):
                 strTmp += ", "
 
-        sqlUpdateJob += strTmp + " WHERE id = ?"
+        sqlUpdateJob += strTmp + " WHERE id = ?;"
 
         for v in args:
             values.append(v)
@@ -238,54 +259,103 @@ class SqlJobsTable(SqlDb):
 
         return cursor
 
-def updateTablesFromNone(database):
+def updateTables(database, fromVersion, toVersion):
     """
     update jobs table form no version to version 2.0.0a1
     """
 
-    sqlScript = """
-        -- disable foreign key constraint check
-        PRAGMA foreign_keys=off;
+    sqlScript = ""
 
-        -- start a transaction
-        BEGIN TRANSACTION;
+    if toVersion == "2.0.0a1" and fromVersion == "":
+        sqlScript = """
+            -- disable foreign key constraint check
+            PRAGMA foreign_keys=off;
 
-        -- Here you can drop column or rename column
-        CREATE TABLE IF NOT EXISTS new_jobs_table(
-            id INTEGER,
-            addDate TEXT,
-            addTime REAL,
-            startTime REAL,
-            endTime REAL,
-            job BLOB,
-            projectName TEXT,
-            projectInfo TEXT,
-            saved INTEGER,
-            toDelete INTEGER
-        );
-        -- copy data from the table to the new_table
-        INSERT INTO new_jobs_table(id, addDate, addTime, startTime, endTime, job)
-        SELECT id, addDate, addTime, startTime, endTime, job
-        FROM jobs;
+            -- start a transaction
+            BEGIN TRANSACTION;
 
-        -- drop the table
-        DROP TABLE jobs;
+            -- Here you can drop column or rename column
+            CREATE TABLE IF NOT EXISTS new_jobs_table(
+                id INTEGER,
+                addDate TEXT,
+                addTime REAL,
+                startTime REAL,
+                endTime REAL,
+                job BLOB,
+                projectName TEXT,
+                projectInfo TEXT,
+                saved INTEGER,
+                toDelete INTEGER
+            );
+            -- copy data from the table to the new_table
+            INSERT INTO new_jobs_table(id, addDate, addTime, startTime, endTime, job)
+            SELECT id, addDate, addTime, startTime, endTime, job
+            FROM jobs;
 
-        -- rename the new_table to the table
-        ALTER TABLE new_jobs_table RENAME TO jobs;
+            -- drop the table
+            DROP TABLE jobs;
 
-        -- set new fields with default values
-        UPDATE jobs SET
-          projectName = "AutoSaved",
-          projectInfo = "AutoSaved",
-          saved = 0,
-          toDelete = 0;
+            -- rename the new_table to the table
+            ALTER TABLE new_jobs_table RENAME TO jobs;
 
-        -- commit the transaction
-        COMMIT;
+            -- set new fields with default values
+            UPDATE jobs SET
+            projectName = "AutoSaved",
+            projectInfo = "AutoSaved",
+            saved = 0,
+            toDelete = 0;
 
-        -- enable foreign key constraint check
-        PRAGMA foreign_keys=on; """
+            -- commit the transaction
+            COMMIT;
 
-    cursor = database.connection.cursor()
-    cursor.executescript(sqlScript)
+            -- enable foreign key constraint check
+            PRAGMA foreign_keys=on; """
+
+    if toVersion == "2.0.0a2" and fromVersion == "2.0.0a1":
+        sqlScript = """
+            -- disable foreign key constraint check
+            PRAGMA foreign_keys=off;
+
+            -- start a transaction
+            BEGIN TRANSACTION;
+
+            -- Here you can drop column or rename column
+            CREATE TABLE IF NOT EXISTS new_jobs_table(
+                id INTEGER,
+                addDate TEXT,
+                addTime REAL,
+                startTime REAL,
+                endTime REAL,
+                job BLOB,
+                command TEXT,
+                projectName TEXT,
+                projectInfo TEXT,
+                saved INTEGER,
+                Deleted INTEGER
+            );
+            -- copy data from the table to the new_table
+            INSERT INTO new_jobs_table(id, addDate, addTime, startTime, endTime, job,
+                projectName, projectInfo, saved, Deleted)
+            SELECT id, addDate, addTime, startTime, endTime, job, "AutoSaved", "AutoSaved", 0, 0
+            FROM jobs;
+
+            -- drop the table
+            DROP TABLE jobs;
+
+            -- rename the new_table to the table
+            ALTER TABLE new_jobs_table RENAME TO jobs;
+
+            -- set new fields with default values
+            UPDATE jobs SET
+            command = "";
+
+            -- commit the transaction
+            COMMIT;
+
+            -- enable foreign key constraint check
+            PRAGMA foreign_keys=on; """
+
+    if sqlScript:
+        print("Updating database...")
+        cursor = database.connection.cursor()
+        cursor.executescript(sqlScript)
