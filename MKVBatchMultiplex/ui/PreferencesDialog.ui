@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>674</width>
+    <width>744</width>
     <height>395</height>
    </rect>
   </property>
@@ -24,9 +24,9 @@
   <widget class="QDialogButtonBox" name="btnBox">
    <property name="geometry">
     <rect>
-     <x>40</x>
+     <x>460</x>
      <y>320</y>
-     <width>591</width>
+     <width>241</width>
      <height>32</height>
     </rect>
    </property>
@@ -34,7 +34,7 @@
     <enum>Qt::Horizontal</enum>
    </property>
    <property name="standardButtons">
-    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok|QDialogButtonBox::RestoreDefaults</set>
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
   <widget class="QGroupBox" name="grpBox">
@@ -42,7 +42,7 @@
     <rect>
      <x>30</x>
      <y>40</y>
-     <width>611</width>
+     <width>681</width>
      <height>241</height>
     </rect>
    </property>
@@ -52,13 +52,16 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>42</y>
-      <width>571</width>
-      <height>165</height>
+      <x>22</x>
+      <y>44</y>
+      <width>641</width>
+      <height>181</height>
      </rect>
     </property>
-    <layout class="QGridLayout" name="gridLayout">
+    <layout class="QGridLayout" name="gridLayout" columnstretch="0,6,1">
+     <property name="spacing">
+      <number>10</number>
+     </property>
      <item row="0" column="0">
       <widget class="QLabel" name="lblInterfaceLanguage">
        <property name="text">
@@ -105,6 +108,19 @@
      </item>
     </layout>
    </widget>
+  </widget>
+  <widget class="QPushButton" name="btnRestoreDefaults">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>320</y>
+     <width>351</width>
+     <height>34</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Restore Defaults</string>
+   </property>
   </widget>
  </widget>
  <resources/>

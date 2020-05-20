@@ -100,6 +100,10 @@ class PreferencesDialogWidget(QDialog):
         # Buttons
         #
         self.ui.btnBox.clicked.connect(self.__pref.clickedButton)
+        #
+        # Restore Defaults
+        #
+        self.ui.btnRestoreDefaults.clicked.connect(self.__pref.restoreDefaults)
 
     @property
     def parent(self):
@@ -194,11 +198,6 @@ class PreferencesDialogWidget(QDialog):
 
     def retranslateUi(self):
         self.ui.retranslateUi(self)
-        for button in self.ui.btnBox.buttons():
-            text = button.text()
-            print(text)
-            button.setText("  " + "Uno" + "  ")
-        self.ui.btnBox.update()
 
 
 class Preferences(QObject):
@@ -284,6 +283,17 @@ class Preferences(QObject):
                 defaultFont.fromString(config.data.get(config.ConfigKey.SystemFont))
                 self.parent.ui.fcmbBoxFontFamily.setCurrentFont(defaultFont.family())
                 self.parent.ui.spinBoxFontSize.setValue(defaultFont.pointSize())
+
+    @Slot(bool)
+    def restoreDefaults(self, checked=False):
+
+        self.parent.ui.chkBoxRestoreWindowSize.setChecked(True)
+        self.parent.ui.chkBoxEnableLogging.setChecked(False)
+        self.parent.ui.chkBoxEnableJobHistory.setChecked(False)
+        defaultFont = QFont()
+        defaultFont.fromString(config.data.get(config.ConfigKey.SystemFont))
+        self.parent.ui.fcmbBoxFontFamily.setCurrentFont(defaultFont.family())
+        self.parent.ui.spinBoxFontSize.setValue(defaultFont.pointSize())
 
     def reset(self):
         self._initVars()

@@ -20,23 +20,24 @@ class Ui_PreferencesDialog(object):
     def setupUi(self, PreferencesDialog):
         if not PreferencesDialog.objectName():
             PreferencesDialog.setObjectName(u"PreferencesDialog")
-        PreferencesDialog.resize(674, 395)
+        PreferencesDialog.resize(744, 395)
         font = QFont()
         font.setPointSize(14)
         PreferencesDialog.setFont(font)
         PreferencesDialog.setContextMenuPolicy(Qt.DefaultContextMenu)
         self.btnBox = QDialogButtonBox(PreferencesDialog)
         self.btnBox.setObjectName(u"btnBox")
-        self.btnBox.setGeometry(QRect(60, 320, 531, 32))
+        self.btnBox.setGeometry(QRect(460, 320, 241, 32))
         self.btnBox.setOrientation(Qt.Horizontal)
-        self.btnBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok|QDialogButtonBox.RestoreDefaults)
+        self.btnBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
         self.grpBox = QGroupBox(PreferencesDialog)
         self.grpBox.setObjectName(u"grpBox")
-        self.grpBox.setGeometry(QRect(30, 40, 611, 241))
+        self.grpBox.setGeometry(QRect(30, 40, 681, 241))
         self.layoutWidget = QWidget(self.grpBox)
         self.layoutWidget.setObjectName(u"layoutWidget")
-        self.layoutWidget.setGeometry(QRect(20, 42, 571, 165))
+        self.layoutWidget.setGeometry(QRect(22, 44, 641, 181))
         self.gridLayout = QGridLayout(self.layoutWidget)
+        self.gridLayout.setSpacing(10)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.lblInterfaceLanguage = QLabel(self.layoutWidget)
@@ -79,6 +80,11 @@ class Ui_PreferencesDialog(object):
 
         self.gridLayout.addWidget(self.chkBoxRestoreWindowSize, 4, 0, 1, 2)
 
+        self.gridLayout.setColumnStretch(1, 6)
+        self.gridLayout.setColumnStretch(2, 1)
+        self.btnRestoreDefaults = QPushButton(PreferencesDialog)
+        self.btnRestoreDefaults.setObjectName(u"btnRestoreDefaults")
+        self.btnRestoreDefaults.setGeometry(QRect(50, 320, 351, 34))
 
         self.retranslateUi(PreferencesDialog)
         self.btnBox.accepted.connect(PreferencesDialog.accept)
@@ -95,5 +101,6 @@ class Ui_PreferencesDialog(object):
         self.chkBoxEnableLogging.setText(QCoreApplication.translate("PreferencesDialog", u"Enable Logging", None))
         self.chkBoxEnableJobHistory.setText(QCoreApplication.translate("PreferencesDialog", u"Enable jobs history", None))
         self.chkBoxRestoreWindowSize.setText(QCoreApplication.translate("PreferencesDialog", u"Restore original window size", None))
+        self.btnRestoreDefaults.setText(QCoreApplication.translate("PreferencesDialog", u"Restore Defaults", None))
     # retranslateUi
 
