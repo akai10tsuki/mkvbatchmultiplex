@@ -296,6 +296,20 @@ class TableData:
 
         return element
 
+    def removeRow(self, index):
+        """
+        Delete a data row
+
+        Arguments:
+            index {int} -- row number to delete 0 based
+
+        Returns:
+            list -- row deleted
+        """
+        element = self.data.pop(index)
+
+        return element
+
     def insertColumn(self, position=0, columnHeader=None, columnData=None):
         """
         Insert a data column
