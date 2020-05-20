@@ -174,6 +174,13 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
         # ]
 
     def fetchJobHistory(self):
+
+        #self.model.dataset.data.clear()
+
+        while (self.model.rowCount() > 0):
+            element = self.model.removeRow(0)
+            print("Remove", element)
+
         jobsDB = SqlJobsTable(config.data.get(config.ConfigKey.SystemDB))
 
         if jobsDB:
@@ -301,10 +308,17 @@ def stats(job):
 
     totalFiles = len(job.oCommand)
     totalErrors = len(job.errors)
+    processedFiles = totalFiles - totalErrors
 
     dtStart = datetime.fromtimestamp(job.startTime)
-    dtEnd = datetime.fromtimestamp(job.endTime)
-    dtDuration = dtEnd - dtStart
+    dtStartSuffix = ""
+    if job.endTime is not None:
+        dtEnd = datetime.fromtimestamp(job.endTime)
+        dtDuration = dtEnd - dtStart
+    else:
+        dtStartSuffix += " - Did not end execution"
+        processedFiles = "undetermined"
+        dtDuration = 0
 
     # msg = "\nJob ID = {}\n\nProcessed: {}\nProcessed time: {}\nTotal Files: {} proccessed file {} Errors {}".format(
     #    jobID, dtStart.isoformat(), dtDuration, totalFiles, processedFiles, totalFiles - processedFiles
@@ -325,10 +339,10 @@ def stats(job):
 
     msg = msg.format(
         job.jobRow[JobKey.ID],
-        dtStart.isoformat(),
+        dtStart.isoformat() + dtStartSuffix,
         dtDuration,
         totalFiles,
-        totalFiles - totalErrors,
+        processedFiles,
         totalErrors,
     )
 
