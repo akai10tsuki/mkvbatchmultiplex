@@ -4,17 +4,17 @@ Define different signals for progress updates
 
 from PySide2.QtCore import QObject, Signal
 
-from vsutillib.pyqt import DualProgressBar, FormatLabel
+from vsutillib.pyqt import DualProgressBar, QFormatLabel
 
 
 class Progress(QObject):
     """
-    Progress class to connect Signals to DualProgressBar and FormatLabel classes
+    Progress class to connect Signals to DualProgressBar and QFormatLabel classes
 
     Args:
         parent (QWidget): parent widget
         progressBar (DualProgressBar): progress bar widget
-        formatLabel (FormatLabel, optional): label with text defined as
+        formatLabel (QFormatLabel, optional): label with text defined as
                                              a format string.
             Defaults to None.
     """
@@ -72,5 +72,5 @@ class Progress(QObject):
 
     @formatLabel.setter
     def formatLabel(self, value):
-        if isinstance(value, FormatLabel):
+        if isinstance(value, QFormatLabel):
             self.lbl = value
