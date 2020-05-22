@@ -72,6 +72,79 @@ class JobInfo:  # pylint: disable=too-many-instance-attributes
         log=False,
     ):
 
+        self.__jobRow = []
+
+        self.jobRowNumber = jobRowNumber
+
+        #self.jobIndex = index[JobKey.ID]
+        #self.statusIndex = index[JobKey.Status]
+        #self.commandIndex = index[JobKey.Command]
+
+        self.jobRow = jobRow
+        #self.command = jobRow[JobKey.Command]
+        self.oCommand = copy.deepcopy(
+            tableModel.dataset.data[jobRowNumber][JobKey.Command].obj
+        )
+
+        if not self.oCommand:
+            self.oCommand = MKVCommandParser(job[JobKey.Command], log=log)
+            if log:
+                MODULELOG.debug(
+                    "JBQ0001: Job %s- Bad MKVCommandParser object.", jobRow[JobKey.ID]
+                )
+
+        self.date = datetime.today()
+        self.addTime = time()
+        self.startTime = None
+        self.endTime = None
+        self.errors = [] if errors is None else errors
+        self.output = [] if output is None else output
+
+
+    @property
+    def jobRow(self):
+        return self.__jobRow
+
+    @jobRow.setter
+    def jobRow(self, value):
+
+        if isinstance(value, list):
+            self.__jobRow = []
+            for cell in value:
+                self.__jobRow.append(cell)
+
+    @property
+    def status(self):
+        return self.jobRow[JobKey.Status]
+
+    @status.setter
+    def status(self, value):
+        if isinstance(value, str):
+            self.jobRow[JobKey.Status] = value
+
+
+class JobInfoOriginal:  # pylint: disable=too-many-instance-attributes
+    """
+    JobInfo Information for a job
+
+    Args:
+        status (str, optional): job status. Defaults to "".
+        index ([type], optional): index on job table. Defaults to None.
+        job (list, optional): row on job table. Defaults to None.
+        errors (list, optional): errors on job execution. Defaults to None.
+        output (list, optional): job output. Defaults to None.
+    """
+
+    def __init__(
+        self,
+        jobRowNumber,
+        jobRow,
+        tableModel,
+        errors=None,
+        output=None,
+        log=False,
+    ):
+
         self.jobRowNumber = jobRowNumber
 
         #self.jobIndex = index[JobKey.ID]
@@ -106,7 +179,6 @@ class JobInfo:  # pylint: disable=too-many-instance-attributes
     def status(self, value):
         if isinstance(value, str):
             self.jobRow[JobKey.Status] = value
-
 
 class JobQueue(QObject):
     """
