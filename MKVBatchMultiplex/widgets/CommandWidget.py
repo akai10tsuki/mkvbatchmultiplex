@@ -21,7 +21,7 @@ from PySide2.QtWidgets import (
 )
 
 from vsutillib.pyqt import (
-    OutputTextWidget,
+    QOutputTextWidget,
     QPushButtonWidget,
     runFunctionInThread,
     SvgColor,
@@ -96,7 +96,7 @@ class CommandWidget(TabWidgetExtension, QWidget):
         self.parent = parent
         self.proxyModel = proxyModel
         self.model = proxyModel.sourceModel()
-        self.outputWindow = OutputTextWidget(self)
+        self.outputWindow = QOutputTextWidget(self)
         self.log = log
 
         self._initControls()

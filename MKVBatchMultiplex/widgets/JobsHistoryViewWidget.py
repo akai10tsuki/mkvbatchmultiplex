@@ -2,6 +2,7 @@
 JobsHistoryViewWidget
 """
 
+import copy
 import logging
 
 try:
@@ -13,6 +14,7 @@ import zlib
 
 from datetime import datetime
 from pprint import pprint
+from time import sleep
 
 from PySide2.QtCore import QThreadPool, Qt, Slot
 from PySide2.QtWidgets import (
@@ -26,7 +28,7 @@ from PySide2.QtWidgets import (
 from vsutillib.pyqt import (
     darkPalette,
     QPushButtonWidget,
-    OutputTextWidget,
+    QOutputTextWidget,
     SvgColor,
     TabWidgetExtension,
 )
@@ -90,12 +92,17 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
         self.grpGrid = QGridLayout()
         self.grpBox = QGroupBox(title)
 
-        self.output = OutputTextWidget(self)
+        self.output = QOutputTextWidget(self)
 
         btnFetchJobHistory = QPushButtonWidget(
             "Fetch History",
             function=self.fetchJobHistory,
             toolTip="Fetch and display old saved jobs processed by worker",
+        )
+        btnClearSelection = QPushButtonWidget(
+            "Clear Selection",
+            function=self.tableView.clearSelection,
+            toolTip="Clear selected rows",
         )
         btnClearOutput = QPushButtonWidget(
             "Clear Output",
@@ -106,6 +113,9 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
             "Refresh",
             function=self.refresh,
             toolTip="Refresh table view with any new information",
+        )
+        btnSelectAll = QPushButtonWidget(
+            "Select All", function=self.tableView.selectAll, toolTip="Select all rows"
         )
         btnShowOutput = QPushButtonWidget(
             "Show Output", function=self.showOutput, toolTip="Show job output run"
@@ -121,6 +131,8 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
         self.btnGrid.addWidget(btnShowOutput)
         self.btnGrid.addWidget(btnShowOutputErrors)
         self.btnGrid.addStretch()
+        self.btnGrid.addWidget(btnSelectAll)
+        self.btnGrid.addWidget(btnClearSelection)
         self.btnGrid.addWidget(btnClearOutput)
 
         self.btnGroup = QGroupBox("")
@@ -175,35 +187,43 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
 
     def fetchJobHistory(self):
 
-        #self.model.dataset.data.clear()
+        # self.model.dataset.data.clear()
 
-        while (self.model.rowCount() > 0):
+        while self.model.rowCount() > 0:
             element = self.model.removeRow(0)
-            print("Remove", element)
 
         jobsDB = SqlJobsTable(config.data.get(config.ConfigKey.SystemDB))
 
         if jobsDB:
             rows = jobsDB.fetchJob(0)
             rowNumber = 0
-            for row in rows:
-                viewRow = [None, None, None, None]
-                job = pickle.loads(zlib.decompress(row[JobsTableKey.jobIndex]))
-                dt = datetime.fromtimestamp(job.startTime)
-                viewRow[JobHistoryKey.ID] = [row[JobsTableKey.IDIndex], "", None]
-                viewRow[JobHistoryKey.Date] = [
-                    dt.isoformat(),
-                    "Date job was executed",
-                    None,
-                ]
-                viewRow[JobHistoryKey.Status] = [job.jobRow[JobKey.Status], "", None]
-                viewRow[JobHistoryKey.Command] = [
-                    job.jobRow[JobKey.Command],
-                    job.jobRow[JobKey.Command],
-                    job,
-                ]
-                self.model.insertRows(rowNumber, 1, data=viewRow)
-                rowNumber += 1
+            if rows:
+                for row in rows:
+                    viewRow = [None, None, None, None]
+                    job = pickle.loads(zlib.decompress(row[JobsTableKey.jobIndex]))
+                    dt = datetime.fromtimestamp(job.startTime)
+                    viewRow[JobHistoryKey.ID] = [
+                        row[JobsTableKey.IDIndex],
+                        "",
+                        row[JobsTableKey.rowidIndex],
+                    ]
+                    viewRow[JobHistoryKey.Date] = [
+                        dt.isoformat(sep=" "),
+                        "Date job was executed",
+                        None,
+                    ]
+                    viewRow[JobHistoryKey.Status] = [
+                        job.jobRow[JobKey.Status],
+                        "",
+                        None,
+                    ]
+                    viewRow[JobHistoryKey.Command] = [
+                        job.jobRow[JobKey.Command],
+                        job.jobRow[JobKey.Command],
+                        None,
+                    ]
+                    self.model.insertRows(rowNumber, 1, data=viewRow)
+                    rowNumber += 1
 
             # jobOutputRun = self.model.dataset.data[0][JobHistoryKey.Command].obj
 
@@ -211,18 +231,39 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
 
     def showOutput(self):
 
-        regPercentEx = re.compile(r":\W*(\d+)%$")
-        # The file 'U:\Work\Guilty Crown\[SCY] Guilty Crown - 01 (BD 1080p Hi10 FLAC) [2E38B6BE].mkv' has been opened for writing.
-        regOutputFileEx = re.compile(r"file (.*?) has")
-        indexes = self.tableView.selectedIndexes()
-        if indexes:
-            self.output.clear()
-            index = indexes[0]
-            sourceIndex = self.proxyModel.mapToSource(index)
-            row = sourceIndex.row()
-            column = sourceIndex.column()
-            jobID = self.model.dataset.data[row][column].data
+        indexes = self.tableView.selectionModel().selectedRows()
+
+        if len(indexes) == 1:
+            self.parent.progressSpin.startAnimationSignal.emit()
+            sleep(1)
+            jobsDB = SqlJobsTable(config.data.get(config.ConfigKey.SystemDB))
+
+            index = self.proxyModel.mapToSource(indexes[0])
+            row = index.row()
+            column = index.column()
+            jobID = self.model.dataset.data[row][column].cell
             job = self.model.dataset.data[row][JobHistoryKey.Command].obj
+            rowid = self.model.dataset.data[row][JobHistoryKey.ID].obj
+            if job is None:
+                records = jobsDB.fetchJob({"rowid": rowid}, JobsTableKey.job)
+                if records:
+                    record = records.fetchone()
+                    job = pickle.loads(zlib.decompress(record[1]))
+                    self.model.dataset.data[row][
+                        JobHistoryKey.Command
+                    ].obj = copy.deepcopy(job)
+                    print("Job Fetched {}".format(job.jobRow[JobKey.ID]))
+                else:
+                    msg = "Information cannot be read."
+                    self.output.insertTextSignal.emit(msg, {})
+                    return
+
+            regPercentEx = re.compile(r":\W*(\d+)%$")
+            # The file 'file name' has been opened for writing.
+            regOutputFileEx = re.compile(r"file (.*?) has")
+            indexes = self.tableView.selectedIndexes()
+
+            self.output.clear()
             processedFiles = 0
             totalFiles = len(job.oCommand)
             for line in job.output:
@@ -236,6 +277,7 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
             msg = stats(job)
 
             self.output.insertTextSignal.emit(msg, {})
+            self.parent.progressSpin.stopAnimationSignal.emit()
 
     def showOutputErrors(self):
 
@@ -246,7 +288,7 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
             sourceIndex = self.proxyModel.mapToSource(index)
             row = sourceIndex.row()
             column = sourceIndex.column()
-            jobID = self.model.dataset.data[row][column].data
+            jobID = self.model.dataset.data[row][column].cell
             job = self.model.dataset.data[row][JobHistoryKey.Command].obj
 
             for analysis in job.errors:

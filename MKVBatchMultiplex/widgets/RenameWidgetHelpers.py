@@ -34,7 +34,7 @@ from pathlib import Path
 
 from PySide2.QtWidgets import QFormLayout, QLabel, QVBoxLayout, QWidget
 
-from vsutillib.pyqt import ComboLineEdit, OutputTextWidget, FileListWidget
+from vsutillib.pyqt import QComboLineEdit, QOutputTextWidget, QFileListWidget
 
 class RegExLineInputWidget(QWidget):
     """Input line with text labels"""
@@ -45,7 +45,7 @@ class RegExLineInputWidget(QWidget):
         self.label = lblText
         self.toolTip = strToolTip
         self.lblText = QLabel(lblText)
-        self.cmdLine = ComboLineEdit(self)
+        self.cmdLine = QComboLineEdit(self)
         self.cmdLine.setToolTip(strToolTip)
         self.frmCmdLine = QFormLayout()
         self.frmCmdLine.addRow(self.lblText, self.cmdLine)
@@ -62,7 +62,7 @@ class RegExInputWidget(QWidget):
         self.label = lblText
         self.toolTip = strToolTip
         self.lblText = QLabel(lblText)
-        self.textBox = OutputTextWidget(self)
+        self.textBox = QOutputTextWidget(self)
         self.textBox.setToolTip(strToolTip)
         vboxLayout = QVBoxLayout()
         vboxLayout.addWidget(self.lblText)
@@ -79,7 +79,7 @@ class RegExFilesWidget(QWidget):
         self.label = lblText
         self.toolTip = strToolTip
         self.lblText = QLabel(lblText)
-        self.textBox = FileListWidget(self)
+        self.textBox = QFileListWidget(self)
         self.textBox.setToolTip(strToolTip)
         vboxLayout = QVBoxLayout()
         vboxLayout.addWidget(self.lblText)

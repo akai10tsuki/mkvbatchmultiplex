@@ -8,7 +8,7 @@ import logging
 import io
 import csv
 
-from PySide2.QtCore import Qt
+from PySide2.QtCore import Qt, QPersistentModelIndex, QModelIndex, Slot
 
 from PySide2.QtWidgets import (
     QTableView,
@@ -54,8 +54,19 @@ class JobsHistoryView(QTableView):
         self.setModel(proxyModel)
         self.sortByColumn(0, Qt.AscendingOrder)
         self.setSortingEnabled(True)
-        self.setSelectionMode(QAbstractItemView.SingleSelection)
+        # self.setSelectionMode(QAbstractItemView.SingleSelection)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.clicked.connect(self.clickClear)
+
+
+
+
+
+
+
+
+
+
 
         self._initHelper()
 
@@ -145,12 +156,15 @@ class JobsHistoryView(QTableView):
             menu.setFont(self.parent.font())
             menu.addAction("Copy")
             menu.addAction("Remove")
+            menu.addAction("Delete")
 
             if action := menu.exec_(event.globalPos()):
                 result = action.text()
 
                 if result == "Copy":
                     self.copyCommand()
+                if result == "Delete":
+                    self.deleteSelectedRows()
                 elif result == "Remove":
                     self.proxyModel.filterConditions["Remove"].append(row)
                     self.proxyModel.setFilterFixedString("")
@@ -172,7 +186,7 @@ class JobsHistoryView(QTableView):
         contextMenu = QMenu(self)
         menuItems = {}
 
-        for item in ["Copy", "Remove"]:  # Build menu first
+        for item in ["Copy", "Delete", "Remove"]:  # Build menu first
             menuItems[item] = contextMenu.addAction(item)
 
         selection = contextMenu.exec_(event.globalPos())  # Identify the selected item
@@ -182,6 +196,8 @@ class JobsHistoryView(QTableView):
         elif selection == menuItems["Remove"]:
             self.proxyModel.filterConditions["Remove"].append(row)
             self.proxyModel.setFilterFixedString("")
+        elif selection == menuItems["Delete"]:
+            self.deleteSelectedRows()
 
     def resizeEvent(self, event):
 
@@ -213,9 +229,47 @@ class JobsHistoryView(QTableView):
                 model = self.proxyModel.sourceModel()
                 row = rows[3]
                 column = columns[3]
-                command = model.dataset.data[row][column].data
+                command = model.dataset.data[row][column].cell
                 QApplication.clipboard().setText(command)
 
     def supportedDropActions(self):  # pylint: disable=no-self-use
 
         return Qt.CopyAction | Qt.MoveAction
+
+    def deleteSelectedRows(self):
+
+        model = self.proxyModel.sourceModel()
+
+        proxyIndexList = []
+        for i in self.selectionModel().selectedRows():
+            index = QPersistentModelIndex(i)
+            proxyIndexList.append(index)
+
+        for index in proxyIndexList:
+            modelIndex = self.proxyModel.mapToSource(index)
+            row = modelIndex.row()
+            rowid = model.dataset.data[row][JobHistoryKey.ID].obj
+            model.removeRow(row)
+
+    def rowsAboutToBeRemoved(self, parent, first, last):
+
+        if parent.isValid():
+            print("parent is valid")
+        else:
+            print("no papa")
+
+        print("sort ascending", first, last)
+
+    def rowsRemoved(self, parent, first, last):
+
+        if parent.isVallid():
+            print("parent is valid")
+        else:
+            print("no papa")
+
+        print("sort descending", first, last)
+
+    @Slot(object)
+    def clickClear(index):
+
+        print("clicked")

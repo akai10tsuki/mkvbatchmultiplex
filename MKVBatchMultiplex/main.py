@@ -49,8 +49,8 @@ from vsutillib.pyqt import (
     checkColor,
     darkPalette,
     DualProgressBar,
-    FormatLabel,
-    OutputTextWidget,
+    QFormatLabel,
+    QOutputTextWidget,
     QActionWidget,
     QMenuWidget,
     QProgressIndicator,
@@ -93,30 +93,21 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
     def __init__(self, parent=None, palette=None):
         super(MainWindow, self).__init__(parent)
 
-        self.progress = None
-        self.controlQueue = deque()
-        self.jobsQueue = JobQueue(self, controlQueue=self.controlQueue)
         self.defaultPalette = palette
-        self.setLanguageWidget = SetLanguage()
-        self.uiSetLanguage = UiSetLanguage(self)
+        self.parent = parent
 
-        #
-        # Where am I running from
-        #
-        if getattr(sys, "frozen", False):
-            # Running in a pyinstaller bundle
-            self.appDirectory = Path(os.path.dirname(__file__))
-        else:
-            self.appDirectory = Path(os.path.realpath(__file__))
+        # initialize the gazillion variables
+        self._initVars()
 
+        # Widow Title self.appDirectory on _initVars()
         self.setWindowTitle(config.APPNAME + ": " + config.DESCRIPTION)
         self.setWindowIcon(
             QIcon(str(self.appDirectory.parent) + "/images/Itsue256x256.png")
         )
 
         # Setup User Interface
-        self._initControls()
         self._initMenu()
+        self._initControls()
         self._initUI()
         self._initHelper()
 
@@ -129,7 +120,24 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         # Must init after show
         self.progressBar.initTaskbarButton()
 
-    def _initControls(self):
+    def _initVars(self):
+
+        #
+        # Where am I running from
+        #
+        if getattr(sys, "frozen", False):
+            # Running in a pyinstaller bundle
+            self.appDirectory = Path(os.path.dirname(__file__))
+        else:
+            self.appDirectory = Path(os.path.realpath(__file__))
+
+        self.controlQueue = deque()
+        self.jobsQueue = JobQueue(self, controlQueue=self.controlQueue)
+        self.setLanguageWidget = SetLanguage()
+        self.uiSetLanguage = UiSetLanguage(self)
+        self.progressBar = DualProgressBar(self, align=Qt.Horizontal)
+        self.jobsLabel = QFormatLabel(Text.txt0085, init=[0, 0, 0, 0, 0],)
+        self.progress = Progress(self, self.progressBar, self.jobsLabel)
 
         headers = tableHeaders()
         self.tableData = TableData(headerList=headers, dataList=[])
@@ -140,6 +148,70 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
         self.progressSpin = QProgressIndicator(self)
         self.setPreferences = PreferencesDialogWidget(self)
+
+    def _initMenu(self):  # pylint: disable=too-many-statements
+
+        menuBar = QMenuBar()
+
+        # File SubMenu
+        fileMenu = QMenuWidget(Text.txt0020)
+        closeIcon = self.style().standardIcon(QStyle.SP_DialogCloseButton)
+
+        # Preferences
+        actPreferences = QActionWidget(
+            "&Preferences", self, shortcut="Ctrl+P", tooltip="Setup program options"
+        )
+        actPreferences.triggered.connect(
+            lambda: self.setPreferences.getPreferences(True)
+        )
+
+        # Exit application
+        actExit = QActionWidget(
+            closeIcon, Text.txt0021, self, shortcut=Text.txt0022, tooltip=Text.txt0023,
+        )
+        actExit.triggered.connect(self.close)
+
+        # Abort
+        actAbort = QActionWidget(Text.txt0024, self, tooltip=Text.txt0025)
+        actAbort.triggered.connect(abort)
+
+        # Add actions to SubMenu
+        fileMenu.addAction(actPreferences)
+        fileMenu.addSeparator()
+        fileMenu.addAction(actExit)
+        fileMenu.addSeparator()
+        fileMenu.addAction(actAbort)
+        menuBar.addMenu(fileMenu)
+
+        # Help Menu
+        actHelpContents = QActionWidget(Text.txt0061 + "...", self)
+        actHelpContents.triggered.connect(lambda: _help(self.appDirectory, 0))
+        actHelpUsing = QActionWidget(Text.txt0062, self)
+        actHelpUsing.triggered.connect(lambda: _help(self.appDirectory, 1))
+        actAbout = QActionWidget(Text.txt0063, self)
+        actAbout.triggered.connect(self.about)
+        actAboutQt = QActionWidget(Text.txt0064, self)
+        actAboutQt.triggered.connect(self.aboutQt)
+        helpMenu = QMenuWidget(Text.txt0060)
+        helpMenu.addAction(actHelpContents)
+        helpMenu.addAction(actHelpUsing)
+        helpMenu.addSeparator()
+        helpMenu.addAction(actAbout)
+        helpMenu.addAction(actAboutQt)
+        menuBar.addMenu(helpMenu)
+
+        # Init status var
+        statusBar = QStatusBar()  # pylint: disable=unused-variable
+        statusBar.addPermanentWidget(VerticalLine())
+        statusBar.addPermanentWidget(self.jobsLabel)
+        statusBar.addPermanentWidget(VerticalLine())
+        statusBar.addPermanentWidget(self.progressBar)
+        statusBar.addPermanentWidget(self.progressSpin)
+
+        self.setMenuBar(menuBar)
+        self.setStatusBar(statusBar)
+
+    def _initControls(self):
 
         # Widgets for tabs
         self.tableViewWidget = JobsTableViewWidget(
@@ -246,71 +318,6 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         layout.addWidget(self.tabs)
         widget.setLayout(layout)
         self.setCentralWidget(widget)
-
-    def _initMenu(self):  # pylint: disable=too-many-statements
-
-        menuBar = QMenuBar()
-
-        # File SubMenu
-        fileMenu = QMenuWidget(Text.txt0020)
-        closeIcon = self.style().standardIcon(QStyle.SP_DialogCloseButton)
-
-        # Preferences
-        actPreferences = QActionWidget(
-            "&Preferences", self, shortcut="Ctrl+P", tooltip="Setup program options"
-        )
-        actPreferences.triggered.connect(
-            lambda: self.setPreferences.getPreferences(True)
-        )
-
-        # Exit application
-        actExit = QActionWidget(
-            closeIcon, Text.txt0021, self, shortcut=Text.txt0022, tooltip=Text.txt0023,
-        )
-        actExit.triggered.connect(self.close)
-
-        # Abort
-        actAbort = QActionWidget(Text.txt0024, self, tooltip=Text.txt0025)
-        actAbort.triggered.connect(abort)
-
-        # Add actions to SubMenu
-        fileMenu.addAction(actPreferences)
-        fileMenu.addSeparator()
-        fileMenu.addAction(actExit)
-        fileMenu.addSeparator()
-        fileMenu.addAction(actAbort)
-        menuBar.addMenu(fileMenu)
-
-        # Help Menu
-        actHelpContents = QActionWidget(Text.txt0061 + "...", self)
-        actHelpContents.triggered.connect(lambda: _help(self.appDirectory, 0))
-        actHelpUsing = QActionWidget(Text.txt0062, self)
-        actHelpUsing.triggered.connect(lambda: _help(self.appDirectory, 1))
-        actAbout = QActionWidget(Text.txt0063, self)
-        actAbout.triggered.connect(self.about)
-        actAboutQt = QActionWidget(Text.txt0064, self)
-        actAboutQt.triggered.connect(self.aboutQt)
-        helpMenu = QMenuWidget(Text.txt0060)
-        helpMenu.addAction(actHelpContents)
-        helpMenu.addAction(actHelpUsing)
-        helpMenu.addSeparator()
-        helpMenu.addAction(actAbout)
-        helpMenu.addAction(actAboutQt)
-        menuBar.addMenu(helpMenu)
-
-        # Init status var
-        self.progressBar = DualProgressBar(self, align=Qt.Horizontal)
-        self.jobsLabel = FormatLabel(" " + Text.txt0085 + " ", init=[0, 0, 0, 0, 0],)
-        statusBar = QStatusBar()  # pylint: disable=unused-variable
-        statusBar.addPermanentWidget(VerticalLine())
-        statusBar.addPermanentWidget(self.jobsLabel)
-        statusBar.addPermanentWidget(VerticalLine())
-        statusBar.addPermanentWidget(self.progressBar)
-        statusBar.addPermanentWidget(self.progressSpin)
-        self.progress = Progress(self, self.progressBar, self.jobsLabel)
-
-        self.setMenuBar(menuBar)
-        self.setStatusBar(statusBar)
 
     def enableLogging(self, state):
         """Activate logging"""
@@ -551,7 +558,7 @@ def mainApp():
 
     config.init(app=app)
 
-    # Palette will change on macOS accor-+-ding to current theme
+    # Palette will change on macOS according to current theme
     # will create a poor mans dark theme for windows
     if platform.system() == "Windows":
         # use a dark palette on Windows 10
@@ -559,7 +566,7 @@ def mainApp():
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myAppID)
         darkPalette(app)
         config.data.set(config.ConfigKey.DarkMode, True)
-        OutputTextWidget.isDarkMode = True
+        QOutputTextWidget.isDarkMode = True
 
     win = MainWindow()
     app.exec_()
