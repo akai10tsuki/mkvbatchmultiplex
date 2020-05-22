@@ -37,7 +37,7 @@ class HeaderAttributeKey:
 
 class DataKey:
 
-    Data = 0
+    Cell = 0
     ToolTip = 1
     Obj = 2
 
@@ -58,7 +58,7 @@ class DataItem:
     Data item information
     """
 
-    data = None
+    cell = None
     toolTip = None
     obj = None
 
@@ -158,11 +158,11 @@ class TableData:
                 currentRow = self.data[row]
 
                 for r in currentRow:
-                    returnRow.append(r.data)
+                    returnRow.append(r.cell)
 
                 return returnRow
 
-            return self.data[row][col].data
+            return self.data[row][col].cell
 
         raise TypeError("Invalid index type")
 
@@ -217,11 +217,11 @@ class TableData:
             column = index.column()
 
             if isinstance(value, DataItem):
-                self.data[row][column].data = value.data
+                self.data[row][column].cell = value.cell
                 self.data[row][column].toolTip = value.toolTip
                 self.data[row][column].obj = value.obj
             else:
-                self.data[row][column].data = value
+                self.data[row][column].cell = value
 
             return True
 
@@ -267,7 +267,7 @@ class TableData:
             for column, value in enumerate(row):
                 if isinstance(value, list):
                     newItem = DataItem()
-                    newItem.data = value[DataKey.Data]
+                    newItem.cell = value[DataKey.Cell]
                     newItem.toolTip = value[DataKey.ToolTip]
                     newItem.obj = value[DataKey.Obj]
                     index = Index(position, column)
@@ -281,20 +281,6 @@ class TableData:
             for _ in itertools.repeat(None, totalColumns):
                 emptyRow.append("")
             self.data.insert(position, emptyRow)
-
-    def deleteRow(self, index):
-        """
-        Delete a data row
-
-        Arguments:
-            index {int} -- row number to delete 0 based
-
-        Returns:
-            list -- row deleted
-        """
-        element = self.data.pop(index)
-
-        return element
 
     def removeRow(self, index):
         """
@@ -342,7 +328,7 @@ class TableData:
         else:
             for _, r in enumerate(self.data):
                 element = DataItem()
-                element.data = columnData[0]
+                element.cell = columnData[0]
                 r.insert(position, columnData[1])
 
     def deleteColumn(self, index):
