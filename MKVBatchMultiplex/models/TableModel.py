@@ -212,9 +212,9 @@ class TableModel(QAbstractTableModel):
             column = index.column()
 
             if role in [Qt.DisplayRole, Qt.EditRole]:
-                if self.dataset.data[row][column].data != "":
+                if self.dataset.data[row][column].cell != "":
                     return self.dataset.headers[column].attribute["CastFunction"](
-                        self.dataset.data[row][column].data
+                        self.dataset.data[row][column].cell
                     )
 
             elif role == Qt.ToolTipRole:
@@ -347,7 +347,7 @@ class TableModel(QAbstractTableModel):
             self.beginRemoveRows(QModelIndex(), position, position + rows - 1)
 
             for row in range(0, rows):
-                self.dataset.removeRow(row)
+                self.dataset.removeRow(position + row)
 
             self.endRemoveRows()
 
