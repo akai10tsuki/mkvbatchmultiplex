@@ -54,7 +54,7 @@ class JobsTableModel(TableModel):
 
             if role == Qt.ForegroundRole:
                 if column == JobKey.Status:
-                    value = self.dataset.data[row][column].data
+                    value = self.dataset.data[row][column].cell
                     if value == JobStatus.Done:
                         return SvgColor.cyan
                     elif value == JobStatus.Running:
@@ -82,7 +82,7 @@ class JobsTableModel(TableModel):
 
             if role == Qt.ToolTipRole:
                 if column == JobKey.Status:
-                    value = self.dataset.data[row][column].data
+                    value = self.dataset.data[row][column].cell
                     return jobStatusTooltip(value)
 
         superReturn = super().data(index, role)
