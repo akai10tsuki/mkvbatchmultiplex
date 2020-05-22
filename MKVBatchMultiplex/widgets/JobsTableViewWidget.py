@@ -328,9 +328,9 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
     def jobStartQueueState(self, state):
 
         if state and not isThreadRunning(config.WORKERTHREADNAME):
-            self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(state)
+            self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(True)
         else:
-            self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(state)
+            self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(False)
 
     @Slot(bool)
     def jobStatus(self, running):
