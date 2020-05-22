@@ -29,7 +29,7 @@ class UiSetLanguage:
         # English
         #
         self.enBaseTranslator = QTranslator(parent)
-        self.enBaseTranslator.load("qt_en", libPath)
+        self.enBaseTranslator.load("qtbase_en", libPath)
         self.enTranslator = QTranslator(parent)
         self.enTranslator.load("ui_en", str(config.LOCALE) + "/en/LC_MESSAGES")
 
@@ -37,7 +37,7 @@ class UiSetLanguage:
         # Español
         #
         self.esBaseTranslator = QTranslator(parent)
-        self.esBaseTranslator.load("qt_es", libPath)
+        self.esBaseTranslator.load("qtbase_es", libPath)
         self.esTranslator = QTranslator(parent)
         self.esTranslator.load("ui_es", str(config.LOCALE) + "/es/LC_MESSAGES")
 
