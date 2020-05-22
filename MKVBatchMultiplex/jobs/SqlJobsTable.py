@@ -1,6 +1,7 @@
 """
  Jobs database
 """
+from sqlite3 import Error as SQLiteError
 
 from vsutillib.sql import SqlDb
 
@@ -14,10 +15,14 @@ class SqlJobsTable(SqlDb):
     """
 
     def __init__(self, dbFile=None):
+
+        # initialize local properties
+        self.__lastError = None
+
+        # call parent init
         super().__init__(dbFile)
 
     def _initHelper(self):
-
         # Create jobs table
         if self.connection is not None:
             self._createJobsTable()
@@ -26,34 +31,58 @@ class SqlJobsTable(SqlDb):
         # Create jobs table
         if self.connection is not None:
             # version 2.0.0a2
-            sqlJobsTable = """ CREATE TABLE IF NOT EXISTS jobs (
-                                id INTEGER,
-                                addDate TEXT,
-                                addTime REAL,
-                                startTime REAL,
-                                endTime REAL,
-                                job BLOB,
-                                command TEXT,
-                                projectName TEXT,
-                                projectInfo TEXT,
-                                saved INTEGER,
-                                delete INTEGER
-                                ); """
-            sqlDbInfoTable = """ CREATE TABLE IF NOT EXISTS dbInfo (
-                                dbTable TEXT NOT NULL UNIQUE,
-                                version TEXT NOT NULL
-                                ); """
-            self.sqlExecute(sqlJobsTable)
-            self.sqlExecute(sqlDbInfoTable)
-            version = self.version("jobs")
-            if self.version("jobs") is None:
-                print("Version not found.")
-                updateTables(self, "2.0.0a1", "")
-                self.setVersion("jobs", "2.0.0a2")
-            elif version == "2.0.0a1":
-                print("Update to version 2.0.0a2")
-                updateTables(self, "2.0.0a1", "2.0.0a2")
-                self.setVersion("jobs", "2.0.0a2")
+
+            sqlScript = """
+                -- start a transaction
+                BEGIN TRANSACTION;
+
+                -- create jobs and dbInfo tables
+                CREATE TABLE IF NOT EXISTS jobs (
+                    id INTEGER,
+                    addDate TEXT,
+                    addTime REAL,
+                    startTime REAL,
+                    endTime REAL,
+                    job BLOB,
+                    command TEXT,
+                    projectName TEXT,
+                    projectInfo TEXT,
+                    saved INTEGER,
+                    deleteMark INTEGER
+                );
+
+                CREATE TABLE IF NOT EXISTS dbInfo (
+                    dbTable TEXT NOT NULL UNIQUE,
+                    version TEXT NOT NULL
+                ); """
+
+            self.__lastError = None
+
+            try:
+                self.connection.executescript(sqlScript)
+                self.commit()
+            except SQLiteError as e:
+                self.__lastError = "SQLiteError: {}".format(e)
+                self.rollback()
+
+            if self.__lastError is None:
+                version = self.version("jobs")
+                if version is None:
+                    self.setVersion("jobs", "2.0.0")
+
+    @property
+    def error(self):
+        """
+        error needed to preserve error status on methods with more than one
+            execute commands
+
+        Returns:
+            str: value of last error
+        """
+        if self.__lastError is not None:
+            return self.__lastError
+
+        return super().error
 
     def setVersion(self, *args):
         """
@@ -65,7 +94,8 @@ class SqlJobsTable(SqlDb):
         """
 
         version = self.version(args[0])
-        print("Table ", version)
+
+        self.__lastError = None
 
         if version is None:
             sqlSetVersion = """
@@ -82,7 +112,6 @@ class SqlJobsTable(SqlDb):
                 """
             self.sqlExecute(sqlSetVersion, args[1], args[0])
 
-        #self.connection.commit()
 
     def version(self, dbTable):
         """
@@ -94,6 +123,8 @@ class SqlJobsTable(SqlDb):
         Returns:
             str: version of table
         """
+
+        self.__lastError = None
 
         sqlVersion = "SELECT version FROM dbInfo WHERE dbTable = ?;"
 
@@ -108,6 +139,7 @@ class SqlJobsTable(SqlDb):
 
     def connect(self, database, autoCommit=False):
         """override connect to create tables"""
+        self.__lastError = None
 
         rc = super().connect(database, autoCommit)
 
@@ -126,12 +158,14 @@ class SqlJobsTable(SqlDb):
             sqlite3.cursor: cursor to the database aftter operation
         """
 
+        self.__lastError = None
+
         cursor = None
         if isinstance(jobID, int):
-            sqlDeleteJob = "DELETE FROM jobs WHERE id=?;"
+            sqlDeleteJob = "DELETE FROM jobs WHERE id = ?;"
             cursor = self.sqlExecute(sqlDeleteJob, jobID)
-            if cursor is not None:
-                self.connection.commit()
+            #if cursor is not None:
+            #    self.connection.commit()
 
         return cursor
 
@@ -145,28 +179,38 @@ class SqlJobsTable(SqlDb):
         Returns:
             sqlite3.cursor: cursor to the database after operation
         """
+        self.__lastError = None
 
         sqlJob = """ INSERT INTO
-                     jobs(id, addDate, addTime, startTime, endTime, job)
-                     VALUES(?, ?, ?, ?, ?, ?); """
+                     jobs(id, addDate, addTime, startTime, endTime, job,
+                        command, projectName, projectInfo, saved, deleteMark)
+                     VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?); """
         cursor = self.sqlExecute(sqlJob, *args)
         if cursor is not None:
             self.connection.commit()
+            return cursor.lastrowid
 
-        return cursor
+        return 0
 
-    def fetchJob(self, jobID, *args, fetchAll=False, whereClause=None, orderClause=None):
+    def fetchJob(
+        self, jobID, *args, fetchAll=False, whereClause=None, orderClause=None
+    ):
         """
         fetchJob fetch information from database by job id
 
+        if jobID is a dict the a WHERE clause with AND will be constructed
+
         Args:
-            jobID (int): job identification number
-            fields (tuple, optional): tuple with fields. Defaults to None.
+            jobID (int, dict): WHERE clause AND members and integer implies
+                WHERE id = ?
+            *args (tuple, optional): tuple with fields. Defaults to None.
             fetchAll (bool, optional): fetch all records in query. Defaults to False.
 
         Returns:
             sqlite3.cursor: cursor to the operation results
         """
+
+        self.__lastError = None
 
         fetchFields = ""
         wClause = ""
@@ -177,7 +221,7 @@ class SqlJobsTable(SqlDb):
             totalFields = len(jobID)
             values = []
             for i, (f, v) in enumerate(jobID.items()):
-                strTmp += f + " = ?"
+                strTmp += "jobs." + f + " = ?"
                 if i < (totalFields - 1):
                     strTmp += " AND "
                 values.append(v)
@@ -186,17 +230,17 @@ class SqlJobsTable(SqlDb):
                 strTmp = ""
                 totalFields = len(args)
                 for i, f in enumerate(args):
-                    fetchFields += f
+                    fetchFields += "jobs." + f
                     if i < (totalFields - 1):
                         fetchFields += ", "
             else:
-                fetchFields = "*"
+                fetchFields = "jobs.*"
         elif isinstance(jobID, int):
             if jobID <= 0:
-                fetchFields = "*"
+                fetchFields = "jobs.*"
                 wClause = ""
             else:
-                fetchFields = "*"
+                fetchFields = "jobs.*"
                 wClause = "WHERE id = ?"
                 values = [jobID]
 
@@ -205,9 +249,11 @@ class SqlJobsTable(SqlDb):
             wClause = whereClause
 
         sqlFetchID = (
-            "SELECT " + fetchFields + " FROM jobs" + (""
-            if wClause == ""
-            else " " + wClause) + ";"
+            "SELECT rowid, "
+            + fetchFields
+            + " FROM jobs"
+            + ("" if wClause == "" else " " + wClause)
+            + ";"
         )
 
         if values:
@@ -220,7 +266,7 @@ class SqlJobsTable(SqlDb):
 
         return cursor
 
-    def update(self, jobID, fields, *args):
+    def update(self, jobID, fields, *args, whereClause=None):
         """
         update job information on database
 
@@ -232,8 +278,34 @@ class SqlJobsTable(SqlDb):
             args (tuple): values to update
         """
 
-        sqlUpdateJob = "UPDATE jobs SET "
+        self.__lastError = None
+
+        wClause = ""
         values = []
+
+        for v in args:
+            values.append(v)
+
+        if isinstance(jobID, dict):
+            strTmp = ""
+            wClause = "WHERE "
+            totalFields = len(jobID)
+            for i, (f, v) in enumerate(jobID.items()):
+                strTmp += f + " = ?"
+                if i < (totalFields - 1):
+                    strTmp += " AND "
+                values.append(v)
+            wClause += strTmp
+        elif isinstance(jobID, int):
+            wClause = "WHERE id = ?"
+            values.append(jobID)
+
+
+        cursor = None
+        if whereClause is not None:
+            wClause = whereClause
+
+        sqlUpdateJob = "UPDATE jobs SET "
         totalFields = len(fields)
         strTmp = ""
 
@@ -242,22 +314,15 @@ class SqlJobsTable(SqlDb):
             if i < (totalFields - 1):
                 strTmp += ", "
 
-        sqlUpdateJob += strTmp + " WHERE id = ?;"
-
-        for v in args:
-            values.append(v)
-
-        values.append(jobID)
+        sqlUpdateJob += strTmp + ("" if wClause == "" else " " + wClause) + ";"
 
         cursor = None
 
-        if isinstance(jobID, int) and isinstance(fields, tuple):
-
+        if values:
             cursor = self.sqlExecute(sqlUpdateJob, *values)
-            if cursor is not None:
-                self.connection.commit()
 
         return cursor
+
 
 def updateTables(database, fromVersion, toVersion):
     """
