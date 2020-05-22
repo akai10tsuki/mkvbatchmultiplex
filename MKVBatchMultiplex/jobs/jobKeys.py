@@ -3,24 +3,38 @@ Classes representing Keys in job related lists
 """
 # pylint: disable=too-few-public-methods
 
+
 class JobsTableKey:
     """
      keys representing the jobs table fields
     """
 
+    rowid = "rowid"
     ID = "id"
     addDate = "addDate"
     addTime = "addTime"
     startTime = "startTime"
     endTime = "endTime"
     job = "job"
+    command = "command"
+    projectName = "projectName"
+    projectInfo = "projectInfo"
+    saved = "saved"
+    deleteMark = "deleteMark"
 
-    IDIndex = 0
-    addTimeIndex = 1
-    addTimeIndex = 2
-    startTimeIndex = 3
-    endTimeIndex = 4
-    jobIndex = 5
+    rowidIndex = 0
+    IDIndex = 1
+    addDateIndex = 2
+    addTimeIndex = 3
+    startTimeIndex = 4
+    endTimeIndex = 5
+    jobIndex = 6
+    commandIndex = 7
+    projectNameIndex = 8
+    projectInfoIndex = 9
+    savedIndex = 10
+    deleteMarkIndex = 11
+
 
 class JobKey:
 
@@ -28,12 +42,14 @@ class JobKey:
     Status = 1
     Command = 2
 
+
 class JobHistoryKey:
 
     ID = 0
     Date = 1
     Status = 2
     Command = 3
+
 
 class JobStatus:
     """Key values for job related work"""
@@ -55,6 +71,7 @@ class JobStatus:
     Stop = "Stop"
     Stopped = "Stopped"
     Waiting = "Waiting"
+
 
 def jobStatusTooltip(status):
     """Tooltips for Status column"""
