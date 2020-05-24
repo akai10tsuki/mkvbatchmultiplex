@@ -339,14 +339,17 @@ class TableModel(QAbstractTableModel):
 
         return False
 
-    def removeRows(self, position, rows, parent):
+    def removeRows(self, position, rows, parent=QModelIndex()):
+
+        if position < 0:
+            return False
 
         rowCount = self.rowCount()
 
         if position <= rowCount:
-            self.beginRemoveRows(QModelIndex(), position, position + rows - 1)
+            self.beginRemoveRows(parent, position, position + rows - 1)
 
-            for row in range(0, rows):
+            for row in range(0, rows, -1):
                 self.dataset.removeRow(position + row)
 
             self.endRemoveRows()
