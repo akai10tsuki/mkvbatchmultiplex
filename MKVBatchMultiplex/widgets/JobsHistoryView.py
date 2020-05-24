@@ -241,24 +241,8 @@ class JobsHistoryView(QTableView):
             model.removeRow(row)
 
     def rowsAboutToBeRemoved(self, parent, first, last):
-
-        if parent.isValid():
-            print("parent is valid")
-        else:
-            print("no papa")
-
-        print("sort ascending", first, last)
-
-    def rowsRemoved(self, parent, first, last):
-
-        if parent.isVallid():
-            print("parent is valid")
-        else:
-            print("no papa")
-
-        print("sort descending", first, last)
+        pass
 
     @Slot(object)
     def clickClear(index):
-
-        print("clicked")
+        pass
