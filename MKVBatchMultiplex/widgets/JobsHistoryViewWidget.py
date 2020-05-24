@@ -33,6 +33,7 @@ from vsutillib.pyqt import (
     TabWidgetExtension,
 )
 from vsutillib.process import isThreadRunning
+from vsutillib.misc import strFormatTimeDelta
 from vsutillib.mkv import MKVParseKey
 
 from .. import config
@@ -50,6 +51,7 @@ from ..models import TableModel, TableProxyModel, JobsTableModel
 from ..utils import populate, Text, yesNoDialog
 
 from .JobsHistoryView import JobsHistoryView
+from .SearchTextDialogWidget import SearchTextDialogWidget
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -80,7 +82,7 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
         self.model = TableModel(self.tableData)
         self.proxyModel = TableProxyModel(self.model)
         self.tableView = JobsHistoryView(self, self.proxyModel, title)
-
+        self.search = SearchTextDialogWidget(self)
         self._initUI(title)
         self._initHelper()
 
@@ -98,6 +100,11 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
             "Fetch History",
             function=self.fetchJobHistory,
             toolTip="Fetch and display old saved jobs processed by worker",
+        )
+        btnSearchText = QPushButtonWidget(
+            "Search",
+            function=self.searchText,
+            toolTip="Do full text search on commands",
         )
         btnClearSelection = QPushButtonWidget(
             "Clear Selection",
@@ -128,6 +135,7 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
 
         self.btnGrid = QHBoxLayout()
         self.btnGrid.addWidget(btnFetchJobHistory)
+        self.btnGrid.addWidget(btnSearchText)
         self.btnGrid.addWidget(btnShowOutput)
         self.btnGrid.addWidget(btnShowOutputErrors)
         self.btnGrid.addStretch()
@@ -179,53 +187,35 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
 
         self.output.clear()
 
-        # [
-        #    [1, "", None],
-        #    [job.AddToQueue, "", None],
-        #    [job.oCommand.strCommand, job.oCommand.strCommand, None],
-        # ]
-
     def fetchJobHistory(self):
 
-        # self.model.dataset.data.clear()
-
-        while self.model.rowCount() > 0:
-            element = self.model.removeRow(0)
+        #while self.model.rowCount() > 0:
+        #    element = self.model.removeRow(0)
 
         jobsDB = SqlJobsTable(config.data.get(config.ConfigKey.SystemDB))
 
         if jobsDB:
             rows = jobsDB.fetchJob(0)
-            rowNumber = 0
             if rows:
-                for row in rows:
-                    viewRow = [None, None, None, None]
-                    job = pickle.loads(zlib.decompress(row[JobsTableKey.jobIndex]))
-                    dt = datetime.fromtimestamp(job.startTime)
-                    viewRow[JobHistoryKey.ID] = [
-                        row[JobsTableKey.IDIndex],
-                        "",
-                        row[JobsTableKey.rowidIndex],
-                    ]
-                    viewRow[JobHistoryKey.Date] = [
-                        dt.isoformat(sep=" "),
-                        "Date job was executed",
-                        None,
-                    ]
-                    viewRow[JobHistoryKey.Status] = [
-                        job.jobRow[JobKey.Status],
-                        "",
-                        None,
-                    ]
-                    viewRow[JobHistoryKey.Command] = [
-                        job.jobRow[JobKey.Command],
-                        job.jobRow[JobKey.Command],
-                        None,
-                    ]
-                    self.model.insertRows(rowNumber, 1, data=viewRow)
-                    rowNumber += 1
+                totalRows = self.model.rowCount()
+                if totalRows > 0:
+                    self.model.removeRows(0, totalRows)
+                fillRows(self, rows)
 
-            # jobOutputRun = self.model.dataset.data[0][JobHistoryKey.Command].obj
+        jobsDB.close()
+
+    def searchText(self):
+
+        jobsDB = SqlJobsTable(config.data.get(config.ConfigKey.SystemDB))
+
+        if jobsDB:
+            rows = self.search.searchText(jobsDB)
+            if rows:
+                totalRows = self.model.rowCount()
+                if totalRows > 0:
+                    self.model.removeRows(0, totalRows)
+                    #element = self.model.removeRow(0)
+                fillRows(self, rows)
 
         jobsDB.close()
 
@@ -235,7 +225,7 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
 
         if len(indexes) == 1:
             self.parent.progressSpin.startAnimationSignal.emit()
-            sleep(1)
+            sleep(5)
             jobsDB = SqlJobsTable(config.data.get(config.ConfigKey.SystemDB))
 
             index = self.proxyModel.mapToSource(indexes[0])
@@ -345,6 +335,37 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
 
         jobsDB.close()
 
+def fillRows(self, rows):
+
+    rowNumber = 0
+    if rows:
+        for row in rows:
+            viewRow = [None, None, None, None]
+            job = pickle.loads(zlib.decompress(row[JobsTableKey.jobIndex]))
+            dt = datetime.fromtimestamp(job.startTime)
+            viewRow[JobHistoryKey.ID] = [
+                row[JobsTableKey.IDIndex],
+                "",
+                row[JobsTableKey.rowidIndex],
+            ]
+            viewRow[JobHistoryKey.Date] = [
+                dt.isoformat(sep=" "),
+                "Date job was executed",
+                None,
+            ]
+            viewRow[JobHistoryKey.Status] = [
+                job.jobRow[JobKey.Status],
+                "",
+                None,
+            ]
+            viewRow[JobHistoryKey.Command] = [
+                job.jobRow[JobKey.Command],
+                job.jobRow[JobKey.Command],
+                None,
+            ]
+            self.model.insertRows(rowNumber, 1, data=viewRow)
+            rowNumber += 1
+
 
 def stats(job):
 
@@ -358,7 +379,7 @@ def stats(job):
         dtEnd = datetime.fromtimestamp(job.endTime)
         dtDuration = dtEnd - dtStart
     else:
-        dtStartSuffix += " - Did not end execution"
+        dtStartSuffix += " - undetermined execution"
         processedFiles = "undetermined"
         dtDuration = 0
 
@@ -381,8 +402,8 @@ def stats(job):
 
     msg = msg.format(
         job.jobRow[JobKey.ID],
-        dtStart.isoformat() + dtStartSuffix,
-        dtDuration,
+        dtStart.isoformat(sep=" ") + dtStartSuffix,
+        strFormatTimeDelta(dtDuration),
         totalFiles,
         processedFiles,
         totalErrors,
