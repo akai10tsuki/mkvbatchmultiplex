@@ -57,17 +57,6 @@ class JobsHistoryView(QTableView):
         # self.setSelectionMode(QAbstractItemView.SingleSelection)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.clicked.connect(self.clickClear)
-
-
-
-
-
-
-
-
-
-
-
         self._initHelper()
 
     def _initHelper(self):
