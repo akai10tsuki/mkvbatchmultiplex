@@ -3,9 +3,10 @@ jobsWorker
 """
 
 import logging
+
 try:
     import cPickle as pickle
-except: # pylint: disable=bare-except
+except:  # pylint: disable=bare-except
     import pickle
 import re
 import sys
@@ -16,7 +17,7 @@ from time import time, sleep
 
 import vsutillib.mkv as mkv
 
-from vsutillib.misc import staticVars
+from vsutillib.misc import staticVars, strFormatTimeDelta
 from vsutillib.process import RunCommand
 from vsutillib.pyqt import SvgColor
 
@@ -66,7 +67,9 @@ def jobsWorker(jobQueue, output, model, funcProgress, controlQueue, log=False):
 
         # job = copy.deepcopy(qJob)
 
-        job.jobRow = model.dataset[job.jobRowNumber,]
+        job.jobRow = model.dataset[
+            job.jobRowNumber,
+        ]
         statusIndex = model.index(job.jobRowNumber, JobKey.Status)
 
         if abortAll:
@@ -99,7 +102,7 @@ def jobsWorker(jobQueue, output, model, funcProgress, controlQueue, log=False):
 
         # Check Job Status for Skip
         #
-        #sourceIndex = job.statusIndex
+        # sourceIndex = job.statusIndex
         status = model.dataset[statusIndex.row(), statusIndex.column()]
 
         if status == JobStatus.Skip:
@@ -229,7 +232,7 @@ def jobsWorker(jobQueue, output, model, funcProgress, controlQueue, log=False):
                     msg = "Destination File: {}\n\n".format(destinationFile)
                     job.output.append(msg)
                     output.job.emit(msg, {"color": SvgColor.red, "appendEnd": True})
-                    #output.error.emit(msg, {"color": SvgColor.red, "appendEnd": True})
+                    # output.error.emit(msg, {"color": SvgColor.red, "appendEnd": True})
 
                     for i, m in enumerate(verify.analysis):
                         if i == 0:
@@ -252,7 +255,7 @@ def jobsWorker(jobQueue, output, model, funcProgress, controlQueue, log=False):
                             output.error.emit(m, {"color": SvgColor.red})
 
                     job.output.append("\n")
-                    #output.job.emit("", {"appendEnd": True})
+                    # output.job.emit("", {"appendEnd": True})
                     msg = "Error Job ID: {} ---------------------\n\n".format(
                         job.jobRow[JobKey.ID]
                     )
@@ -273,11 +276,11 @@ def jobsWorker(jobQueue, output, model, funcProgress, controlQueue, log=False):
 
             dtDuration = dtEnd - dtStart
 
-            msg = "\nJob ID: {} {} - ended at {} - running time {}.\n".format(
+            msg = "Job ID: {} {} - date {} - running time {}.\n".format(
                 job.jobRow[JobKey.ID],
                 exitStatus,
                 dtEnd.isoformat(),
-                dtDuration,
+                strFormatTimeDelta(dtDuration),
             )
             job.output.append(msg)
             msg += "*******************\n\n\n"
@@ -348,7 +351,6 @@ def addToDb(database, job, update=False):
     bSimulateRun = config.data.get(config.ConfigKey.SimulateRun)
     rc = 0
 
-
     if not bSimulateRun:
         cmpJob = zlib.compress(pickle.dumps(job))
         if not update:
@@ -366,7 +368,18 @@ def addToDb(database, job, update=False):
                 0,
             )
             rc = rowid
-            print("rowid", rowid)
+
+            if rowid > 0:
+                sqlSearchUpdate = sqlJob = """
+                    INSERT INTO jobsSearch(rowidKey, id, startTime, command)
+                        VALUES(?, ?, ?, ?); """
+                database.sqlExecute(
+                    sqlSearchUpdate,
+                    rowid,
+                    job.jobRow[JobKey.ID],
+                    job.startTime,
+                    job.oCommand.command,
+                )
             if rowid == 0:
                 print("error", database.error)
                 sys.exit()
@@ -381,6 +394,7 @@ def addToDb(database, job, update=False):
             )
 
     return rc
+
 
 def dummyRunCommand(funcProgress, indexTotal, controlQueue):
     """
@@ -410,7 +424,8 @@ def errorMsg(output, msg, kwargs):
     output.error.emit(msg, kwargs)
     output.job.emit(msg, kwargs)
 
-@staticVars(printPercent=False)
+
+@staticVars(printPercent=False, counting=False, count=0)
 def displayRunJobs(line, job, output, indexTotal, funcProgress=None):
     """
     Convenience function used by jobsWorker
@@ -443,9 +458,15 @@ def displayRunJobs(line, job, output, indexTotal, funcProgress=None):
         if displayRunJobs.printPercent:
             # output.job.emit("\n", {})
             displayRunJobs.printPercent = False
+            displayRunJobs.counting = True
+            displayRunJobs.count = 0
+        if displayRunJobs.counting:
+            displayRunJobs.count += 1
 
         output.job.emit(line[:-1], {"appendLine": True})
 
     if (line.find("El multiplexado") == 0) or (line.find("Multiplexing took") == 0):
-        output.job.emit("\n\n\n", {})
+        print(f"Count lines = {displayRunJobs.count}")
+        displayRunJobs.count = 0
+        output.job.emit("\n\n", {})
         job.output.append("\n\n")
