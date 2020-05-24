@@ -54,7 +54,11 @@ class SqlJobsTable(SqlDb):
                 CREATE TABLE IF NOT EXISTS dbInfo (
                     dbTable TEXT NOT NULL UNIQUE,
                     version TEXT NOT NULL
-                ); """
+                );
+
+                CREATE VIRTUAL TABLE IF NOT EXISTS jobsSearch
+                    USING fts5(rowidKey, id, startTime, command);
+                """
 
             self.__lastError = None
 
@@ -112,7 +116,6 @@ class SqlJobsTable(SqlDb):
                 """
             self.sqlExecute(sqlSetVersion, args[1], args[0])
 
-
     def version(self, dbTable):
         """
         version get table version
@@ -164,7 +167,7 @@ class SqlJobsTable(SqlDb):
         if isinstance(jobID, int):
             sqlDeleteJob = "DELETE FROM jobs WHERE id = ?;"
             cursor = self.sqlExecute(sqlDeleteJob, jobID)
-            #if cursor is not None:
+            # if cursor is not None:
             #    self.connection.commit()
 
         return cursor
@@ -253,6 +256,7 @@ class SqlJobsTable(SqlDb):
             + fetchFields
             + " FROM jobs"
             + ("" if wClause == "" else " " + wClause)
+            + ("" if orderClause is None else " " + orderClause)
             + ";"
         )
 
@@ -263,6 +267,32 @@ class SqlJobsTable(SqlDb):
 
         if fetchAll:
             cursor.fetchall()
+
+        return cursor
+
+    def textSearch(self, searchText):
+        """
+        textSearch do a full text search on jobs table command field
+
+        Args:
+            searchText (str): text to search
+
+        Returns:
+            sqlite3.cursor: cursor to the operation results
+        """
+
+        if not isinstance(searchText, str):
+            return None
+
+        sqlSearch = """
+            SELECT rowid, jobs.* FROM jobs
+            WHERE rowid IN (
+                SELECT rowidKey
+                    FROM jobsSearch
+                    WHERE jobsSearch MATCH ?);
+            """
+
+        cursor = self.sqlExecute(sqlSearch, searchText)
 
         return cursor
 
@@ -299,7 +329,6 @@ class SqlJobsTable(SqlDb):
         elif isinstance(jobID, int):
             wClause = "WHERE id = ?"
             values.append(jobID)
-
 
         cursor = None
         if whereClause is not None:
@@ -354,8 +383,8 @@ def updateTables(database, fromVersion, toVersion):
             );
             -- copy data from the table to the new_table
             INSERT INTO new_jobs_table(id, addDate, addTime, startTime, endTime, job)
-            SELECT id, addDate, addTime, startTime, endTime, job
-            FROM jobs;
+                SELECT id, addDate, addTime, startTime, endTime, job
+                    FROM jobs;
 
             -- drop the table
             DROP TABLE jobs;
