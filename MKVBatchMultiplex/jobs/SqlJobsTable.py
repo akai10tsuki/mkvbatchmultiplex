@@ -296,6 +296,9 @@ class SqlJobsTable(SqlDb):
 
         return cursor
 
+    def deleteJob(self, jobID):
+        pass
+
     def update(self, jobID, fields, *args, whereClause=None):
         """
         update job information on database
