@@ -348,7 +348,10 @@ class TableModel(QAbstractTableModel):
 
         if position <= rowCount:
             self.beginRemoveRows(parent, position, position + rows - 1)
+            # del self.dataset[position:rows + 1] verify
 
+            # delete rows starting from highest index
+            # in the range going backwards
             for row in range(0, rows, -1):
                 self.dataset.removeRow(position + row)
 
