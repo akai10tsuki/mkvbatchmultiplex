@@ -16,7 +16,7 @@ from datetime import datetime
 from pprint import pprint
 from time import sleep
 
-from PySide2.QtCore import QThreadPool, Qt, Slot
+from PySide2.QtCore import Qt, Slot
 from PySide2.QtWidgets import (
     QWidget,
     QHBoxLayout,
@@ -29,6 +29,7 @@ from vsutillib.pyqt import (
     darkPalette,
     QPushButtonWidget,
     QOutputTextWidget,
+    runFunctionInThread,
     SvgColor,
     TabWidgetExtension,
 )
@@ -36,7 +37,9 @@ from vsutillib.process import isThreadRunning
 from vsutillib.misc import strFormatTimeDelta
 from vsutillib.mkv import MKVParseKey
 
-from .. import config
+from ..config import data as config
+from ..config import ConfigKey
+
 from ..jobs import (
     JobHistoryKey,
     JobStatus,
@@ -125,7 +128,7 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
             "Select All", function=self.tableView.selectAll, toolTip="Select all rows"
         )
         btnShowOutput = QPushButtonWidget(
-            "Show Output", function=self.showOutput, toolTip="Show job output run"
+            "Show Output", function=self.showOutput, toolTip="Show job output run",
         )
         btnShowOutputErrors = QPushButtonWidget(
             "Show Errors",
@@ -189,10 +192,10 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
 
     def fetchJobHistory(self):
 
-        #while self.model.rowCount() > 0:
+        # while self.model.rowCount() > 0:
         #    element = self.model.removeRow(0)
 
-        jobsDB = SqlJobsTable(config.data.get(config.ConfigKey.SystemDB))
+        jobsDB = SqlJobsTable(config.get(ConfigKey.SystemDB))
 
         if jobsDB:
             rows = jobsDB.fetchJob(0)
@@ -206,7 +209,7 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
 
     def searchText(self):
 
-        jobsDB = SqlJobsTable(config.data.get(config.ConfigKey.SystemDB))
+        jobsDB = SqlJobsTable(config.get(ConfigKey.SystemDB))
 
         if jobsDB:
             rows = self.search.searchText(jobsDB)
@@ -214,114 +217,38 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
                 totalRows = self.model.rowCount()
                 if totalRows > 0:
                     self.model.removeRows(0, totalRows)
-                    #element = self.model.removeRow(0)
+                    # element = self.model.removeRow(0)
                 fillRows(self, rows)
 
         jobsDB.close()
 
     def showOutput(self):
 
-        indexes = self.tableView.selectionModel().selectedRows()
+        runFunctionInThread(
+            showOutputLines,
+            tableView=self.tableView,
+            proxyModel=self.proxyModel,
+            output=self.output,
+            funcStart=self.parent.progressSpin.startAnimation,
+            funcFinished=self.parent.progressSpin.stopAnimation,
+        )
 
-        if len(indexes) == 1:
-            self.parent.progressSpin.startAnimationSignal.emit()
-            sleep(5)
-            jobsDB = SqlJobsTable(config.data.get(config.ConfigKey.SystemDB))
-
-            index = self.proxyModel.mapToSource(indexes[0])
-            row = index.row()
-            column = index.column()
-            jobID = self.model.dataset.data[row][column].cell
-            job = self.model.dataset.data[row][JobHistoryKey.Command].obj
-            rowid = self.model.dataset.data[row][JobHistoryKey.ID].obj
-            if job is None:
-                records = jobsDB.fetchJob({"rowid": rowid}, JobsTableKey.job)
-                if records:
-                    record = records.fetchone()
-                    job = pickle.loads(zlib.decompress(record[1]))
-                    self.model.dataset.data[row][
-                        JobHistoryKey.Command
-                    ].obj = copy.deepcopy(job)
-                    print("Job Fetched {}".format(job.jobRow[JobKey.ID]))
-                else:
-                    msg = "Information cannot be read."
-                    self.output.insertTextSignal.emit(msg, {})
-                    return
-
-            regPercentEx = re.compile(r":\W*(\d+)%$")
-            # The file 'file name' has been opened for writing.
-            regOutputFileEx = re.compile(r"file (.*?) has")
-            indexes = self.tableView.selectedIndexes()
-
-            self.output.clear()
-            processedFiles = 0
-            totalFiles = len(job.oCommand)
-            for line in job.output:
-                if m := regPercentEx.search(line):
-                    n = int(m.group(1))
-                    if n < 100:
-                        continue
-                if f := regOutputFileEx.search(line):
-                    processedFiles += 1
-                self.output.insertTextSignal.emit(line, {})
-            msg = stats(job)
-
-            self.output.insertTextSignal.emit(msg, {})
-            self.parent.progressSpin.stopAnimationSignal.emit()
 
     def showOutputErrors(self):
 
-        indexes = self.tableView.selectedIndexes()
-        if indexes:
-            self.output.clear()
-            index = indexes[0]
-            sourceIndex = self.proxyModel.mapToSource(index)
-            row = sourceIndex.row()
-            column = sourceIndex.column()
-            jobID = self.model.dataset.data[row][column].cell
-            job = self.model.dataset.data[row][JobHistoryKey.Command].obj
+        runFunctionInThread(
+            showErrorsLines,
+            tableView=self.tableView,
+            proxyModel=self.proxyModel,
+            output=self.output,
+            funcStart=self.parent.progressSpin.startAnimation,
+            funcFinished=self.parent.progressSpin.stopAnimation,
+        )
 
-            for analysis in job.errors:
-
-                msg = "Error Job ID: {} ---------------------\n\n".format(
-                    job.jobRow[JobKey.ID]
-                )
-
-                self.output.insertTextSignal.emit(
-                    msg, {"color": SvgColor.red, "appendEnd": True}
-                )
-
-                # msg = "\nDestination File: {}\n\n".format(destinationFile)
-                # output.error.emit(msg, {"color": SvgColor.red, "appendEnd": True})
-
-                for i, m in enumerate(analysis):
-                    if i == 0:
-                        lines = m.split("\n")
-                        findSource = True
-                        for index, line in enumerate(lines):
-                            color = SvgColor.orange
-                            if findSource and (
-                                (searchIndex := line.find("File Name")) >= 0
-                            ):
-                                if searchIndex >= 0:
-                                    color = SvgColor.tomato
-                                    findSource = False
-                            self.output.insertTextSignal.emit(
-                                line + "\n", {"color": color}
-                            )
-                    else:
-                        self.output.insertTextSignal.emit(m, {"color": SvgColor.red})
-
-                msg = "Error Job ID: {} ---------------------\n\n".format(
-                    job.jobRow[JobKey.ID]
-                )
-                self.output.insertTextSignal.emit(
-                    msg, {"color": SvgColor.red, "appendEnd": True}
-                )
 
     def refresh(self):
 
-        jobsDB = SqlJobsTable(config.data.get(config.ConfigKey.SystemDB))
+        jobsDB = SqlJobsTable(config.get(ConfigKey.SystemDB))
 
         if jobsDB:
             rows = jobsDB.fetchJob(0)
@@ -334,6 +261,7 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
                 )
 
         jobsDB.close()
+
 
 def fillRows(self, rows):
 
@@ -383,10 +311,6 @@ def stats(job):
         processedFiles = "undetermined"
         dtDuration = 0
 
-    # msg = "\nJob ID = {}\n\nProcessed: {}\nProcessed time: {}\nTotal Files: {} proccessed file {} Errors {}".format(
-    #    jobID, dtStart.isoformat(), dtDuration, totalFiles, processedFiles, totalFiles - processedFiles
-    # )
-
     msg = """
 
     Job ID = {}
@@ -410,6 +334,131 @@ def stats(job):
     )
 
     return msg
+
+
+def showOutputLines(**kwargs):
+
+    tableView = kwargs.pop("tableView", None)
+    proxyModel = kwargs.pop("proxyModel", None)
+    output = kwargs.pop("output", None)
+
+    indexes = tableView.selectionModel().selectedRows()
+
+    if len(indexes) == 1:
+        output.clearSignal.emit()
+
+        jobsDB = SqlJobsTable(config.get(ConfigKey.SystemDB))
+
+        index = proxyModel.mapToSource(indexes[0])
+        model = proxyModel.sourceModel()
+
+        row = index.row()
+        column = index.column()
+        jobID = model.dataset.data[row][column].cell
+        job = model.dataset.data[row][JobHistoryKey.Command].obj
+        rowid = model.dataset.data[row][JobHistoryKey.ID].obj
+        if job is None:
+            records = jobsDB.fetchJob({"rowid": rowid}, JobsTableKey.job)
+            if records:
+                record = records.fetchone()
+                job = pickle.loads(zlib.decompress(record[1]))
+                model.dataset.data[row][JobHistoryKey.Command].obj = copy.deepcopy(job)
+            else:
+                msg = "Information cannot be read."
+                output.insertTextSignal.emit(msg, {"log": False})
+                return
+
+        regPercentEx = re.compile(r":\W*(\d+)%$")
+        # The file 'file name' has been opened for writing.
+        regOutputFileEx = re.compile(r"file (.*?) has")
+        indexes = tableView.selectedIndexes()
+
+        processedFiles = 0
+        totalFiles = len(job.oCommand)
+        for line in job.output:
+            if m := regPercentEx.search(line):
+                n = int(m.group(1))
+                if n < 100:
+                    continue
+            if f := regOutputFileEx.search(line):
+                processedFiles += 1
+            output.insertTextSignal.emit(line, {"log": False})
+            # The signals are generated to fast and the History window
+            # seems unresponsive
+            sleep(0.000001)
+        msg = stats(job)
+
+        output.insertTextSignal.emit(msg, {"log": False})
+
+def showErrorsLines(**kwargs):
+
+    tableView = kwargs.pop("tableView", None)
+    proxyModel = kwargs.pop("proxyModel", None)
+    output = kwargs.pop("output", None)
+
+    indexes = tableView.selectedIndexes()
+    if indexes:
+        output.clearSignal.emit()
+
+        jobsDB = SqlJobsTable(config.get(ConfigKey.SystemDB))
+
+        index = proxyModel.mapToSource(indexes[0])
+        model = proxyModel.sourceModel()
+
+        row = index.row()
+        column = index.column()
+        jobID = model.dataset.data[row][column].cell
+        job = model.dataset.data[row][JobHistoryKey.Command].obj
+        rowid = model.dataset.data[row][JobHistoryKey.ID].obj
+        if job is None:
+            records = jobsDB.fetchJob({"rowid": rowid}, JobsTableKey.job)
+            if records:
+                record = records.fetchone()
+                job = pickle.loads(zlib.decompress(record[1]))
+                model.dataset.data[row][JobHistoryKey.Command].obj = copy.deepcopy(job)
+            else:
+                msg = "Information cannot be read."
+                output.insertTextSignal.emit(msg, {"log": False})
+                return
+
+        for analysis in job.errors:
+
+            msg = "Error Job ID: {} ---------------------\n\n".format(
+                job.jobRow[JobKey.ID]
+            )
+
+            output.insertTextSignal.emit(
+                msg, {"color": SvgColor.red, "appendEnd": True}
+            )
+
+            # msg = "\nDestination File: {}\n\n".format(destinationFile)
+            # output.error.emit(msg, {"color": SvgColor.red, "appendEnd": True})
+
+            for i, m in enumerate(analysis):
+                if i == 0:
+                    lines = m.split("\n")
+                    findSource = True
+                    for index, line in enumerate(lines):
+                        color = SvgColor.orange
+                        if findSource and (
+                            (searchIndex := line.find("File Name")) >= 0
+                        ):
+                            if searchIndex >= 0:
+                                color = SvgColor.tomato
+                                findSource = False
+                        output.insertTextSignal.emit(
+                            line + "\n", {"color": color}
+                        )
+                        sleep(0.000001)
+                else:
+                    output.insertTextSignal.emit(m, {"color": SvgColor.red})
+
+            msg = "Error Job ID: {} ---------------------\n\n".format(
+                job.jobRow[JobKey.ID]
+            )
+            output.insertTextSignal.emit(
+                msg, {"color": SvgColor.red, "appendEnd": True}
+            )
 
 
 class _Button:

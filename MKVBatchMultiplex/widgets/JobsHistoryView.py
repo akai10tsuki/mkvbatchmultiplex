@@ -238,6 +238,8 @@ class JobsHistoryView(QTableView):
             modelIndex = self.proxyModel.mapToSource(index)
             row = modelIndex.row()
             rowid = model.dataset.data[row][JobHistoryKey.ID].obj
+            rowid0 = model.dataset[row, JobHistoryKey.ID].obj
+            print(f"data {rowid} dataset {rowid0}")
             model.removeRow(row)
 
     def rowsAboutToBeRemoved(self, parent, first, last):
