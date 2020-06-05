@@ -4,6 +4,8 @@ r"""
 JobsTable
 """
 
+# MAI0003
+
 import ctypes
 import gettext
 import logging
@@ -328,7 +330,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.errorOutput.log = state
         self.tableViewWidget.log = state
         self.jobsQueue.log = state
-        msg = "Start Logging." if state else "Stop Logging."
+        msg = "MAI0001: Start Logging." if state else "MAI0002: Stop Logging."
         logging.info(msg)
         config.data.set(config.ConfigKey.Logging, state)
 
