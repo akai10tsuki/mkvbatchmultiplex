@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'PreferencesDialog.ui'
 ##
-## Created by: Qt User Interface Compiler version 5.14.2
+## Created by: Qt User Interface Compiler version 5.15.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -20,71 +20,53 @@ class Ui_PreferencesDialog(object):
     def setupUi(self, PreferencesDialog):
         if not PreferencesDialog.objectName():
             PreferencesDialog.setObjectName(u"PreferencesDialog")
-        PreferencesDialog.resize(744, 395)
+        PreferencesDialog.resize(744, 430)
         font = QFont()
         font.setPointSize(14)
         PreferencesDialog.setFont(font)
         PreferencesDialog.setContextMenuPolicy(Qt.DefaultContextMenu)
         self.btnBox = QDialogButtonBox(PreferencesDialog)
         self.btnBox.setObjectName(u"btnBox")
-        self.btnBox.setGeometry(QRect(460, 320, 241, 32))
+        self.btnBox.setGeometry(QRect(460, 350, 241, 32))
         self.btnBox.setOrientation(Qt.Horizontal)
         self.btnBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
         self.grpBox = QGroupBox(PreferencesDialog)
         self.grpBox.setObjectName(u"grpBox")
-        self.grpBox.setGeometry(QRect(30, 40, 681, 241))
-        self.layoutWidget = QWidget(self.grpBox)
-        self.layoutWidget.setObjectName(u"layoutWidget")
-        self.layoutWidget.setGeometry(QRect(22, 44, 641, 181))
-        self.gridLayout = QGridLayout(self.layoutWidget)
-        self.gridLayout.setSpacing(10)
-        self.gridLayout.setObjectName(u"gridLayout")
-        self.gridLayout.setContentsMargins(0, 0, 0, 0)
-        self.lblInterfaceLanguage = QLabel(self.layoutWidget)
+        self.grpBox.setGeometry(QRect(30, 40, 681, 281))
+        self.lblInterfaceLanguage = QLabel(self.grpBox)
         self.lblInterfaceLanguage.setObjectName(u"lblInterfaceLanguage")
-
-        self.gridLayout.addWidget(self.lblInterfaceLanguage, 0, 0, 1, 1)
-
-        self.cmbBoxInterfaceLanguage = QComboBox(self.layoutWidget)
-        self.cmbBoxInterfaceLanguage.setObjectName(u"cmbBoxInterfaceLanguage")
-
-        self.gridLayout.addWidget(self.cmbBoxInterfaceLanguage, 0, 1, 1, 2)
-
-        self.lblFontAndSize = QLabel(self.layoutWidget)
-        self.lblFontAndSize.setObjectName(u"lblFontAndSize")
-
-        self.gridLayout.addWidget(self.lblFontAndSize, 1, 0, 1, 1)
-
-        self.fcmbBoxFontFamily = QFontComboBox(self.layoutWidget)
+        self.lblInterfaceLanguage.setGeometry(QRect(21, 46, 172, 23))
+        self.fcmbBoxFontFamily = QFontComboBox(self.grpBox)
         self.fcmbBoxFontFamily.setObjectName(u"fcmbBoxFontFamily")
-
-        self.gridLayout.addWidget(self.fcmbBoxFontFamily, 1, 1, 1, 1)
-
-        self.spinBoxFontSize = QSpinBox(self.layoutWidget)
-        self.spinBoxFontSize.setObjectName(u"spinBoxFontSize")
-
-        self.gridLayout.addWidget(self.spinBoxFontSize, 1, 2, 1, 1)
-
-        self.chkBoxEnableLogging = QCheckBox(self.layoutWidget)
-        self.chkBoxEnableLogging.setObjectName(u"chkBoxEnableLogging")
-
-        self.gridLayout.addWidget(self.chkBoxEnableLogging, 2, 0, 1, 1)
-
-        self.chkBoxEnableJobHistory = QCheckBox(self.layoutWidget)
-        self.chkBoxEnableJobHistory.setObjectName(u"chkBoxEnableJobHistory")
-
-        self.gridLayout.addWidget(self.chkBoxEnableJobHistory, 3, 0, 1, 2)
-
-        self.chkBoxRestoreWindowSize = QCheckBox(self.layoutWidget)
+        self.fcmbBoxFontFamily.setGeometry(QRect(221, 85, 371, 29))
+        self.chkBoxRestoreWindowSize = QCheckBox(self.grpBox)
         self.chkBoxRestoreWindowSize.setObjectName(u"chkBoxRestoreWindowSize")
-
-        self.gridLayout.addWidget(self.chkBoxRestoreWindowSize, 4, 0, 1, 2)
-
-        self.gridLayout.setColumnStretch(1, 6)
-        self.gridLayout.setColumnStretch(2, 1)
+        self.chkBoxRestoreWindowSize.setGeometry(QRect(21, 235, 631, 27))
+        self.label = QLabel(self.grpBox)
+        self.label.setObjectName(u"label")
+        self.label.setGeometry(QRect(203, 46, 16, 23))
+        self.chkBoxEnableLogging = QCheckBox(self.grpBox)
+        self.chkBoxEnableLogging.setObjectName(u"chkBoxEnableLogging")
+        self.chkBoxEnableLogging.setGeometry(QRect(21, 124, 631, 27))
+        self.lblFontAndSize = QLabel(self.grpBox)
+        self.lblFontAndSize.setObjectName(u"lblFontAndSize")
+        self.lblFontAndSize.setGeometry(QRect(21, 85, 171, 23))
+        self.chkBoxEnableJobHistory = QCheckBox(self.grpBox)
+        self.chkBoxEnableJobHistory.setObjectName(u"chkBoxEnableJobHistory")
+        self.chkBoxEnableJobHistory.setGeometry(QRect(21, 198, 631, 27))
+        self.chkBoxEnableLogViewer = QCheckBox(self.grpBox)
+        self.chkBoxEnableLogViewer.setObjectName(u"chkBoxEnableLogViewer")
+        self.chkBoxEnableLogViewer.setGeometry(QRect(43, 161, 611, 27))
+        self.chkBoxEnableLogViewer.setBaseSize(QSize(0, 0))
+        self.cmbBoxInterfaceLanguage = QComboBox(self.grpBox)
+        self.cmbBoxInterfaceLanguage.setObjectName(u"cmbBoxInterfaceLanguage")
+        self.cmbBoxInterfaceLanguage.setGeometry(QRect(221, 46, 431, 29))
+        self.spinBoxFontSize = QSpinBox(self.grpBox)
+        self.spinBoxFontSize.setObjectName(u"spinBoxFontSize")
+        self.spinBoxFontSize.setGeometry(QRect(599, 85, 51, 29))
         self.btnRestoreDefaults = QPushButton(PreferencesDialog)
         self.btnRestoreDefaults.setObjectName(u"btnRestoreDefaults")
-        self.btnRestoreDefaults.setGeometry(QRect(50, 320, 351, 34))
+        self.btnRestoreDefaults.setGeometry(QRect(50, 350, 351, 34))
 
         self.retranslateUi(PreferencesDialog)
         self.btnBox.accepted.connect(PreferencesDialog.accept)
@@ -97,10 +79,12 @@ class Ui_PreferencesDialog(object):
         PreferencesDialog.setWindowTitle(QCoreApplication.translate("PreferencesDialog", u"Preferences", None))
         self.grpBox.setTitle(QCoreApplication.translate("PreferencesDialog", u"Options", None))
         self.lblInterfaceLanguage.setText(QCoreApplication.translate("PreferencesDialog", u"Interface Language:", None))
-        self.lblFontAndSize.setText(QCoreApplication.translate("PreferencesDialog", u"Font & Size:", None))
-        self.chkBoxEnableLogging.setText(QCoreApplication.translate("PreferencesDialog", u"Enable Logging", None))
-        self.chkBoxEnableJobHistory.setText(QCoreApplication.translate("PreferencesDialog", u"Enable jobs history", None))
         self.chkBoxRestoreWindowSize.setText(QCoreApplication.translate("PreferencesDialog", u"Restore original window size", None))
+        self.label.setText("")
+        self.chkBoxEnableLogging.setText(QCoreApplication.translate("PreferencesDialog", u"Enable Logging", None))
+        self.lblFontAndSize.setText(QCoreApplication.translate("PreferencesDialog", u"Font & Size:", None))
+        self.chkBoxEnableJobHistory.setText(QCoreApplication.translate("PreferencesDialog", u"Enable jobs history", None))
+        self.chkBoxEnableLogViewer.setText(QCoreApplication.translate("PreferencesDialog", u"Enable Log Viewer", None))
         self.btnRestoreDefaults.setText(QCoreApplication.translate("PreferencesDialog", u"Restore Defaults", None))
     # retranslateUi
 
