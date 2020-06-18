@@ -8,11 +8,11 @@ from PySide2.QtCore import QFile
 from Ui_PreferencesDialog import Ui_PreferencesDialog
 from Ui_SearchTextDialog import Ui_SearchTextDialog
 
-class MainWindow(QMainWindow):
-    def __init__(self):
-        super(MainWindow, self).__init__()
-        self.ui = Ui_MainWindow()
-        self.ui.setupUi(self)
+#class MainWindow(QMainWindow):
+#    def __init__(self):
+#        super(MainWindow, self).__init__()
+#        self.ui = Ui_MainWindow()
+#        self.ui.setupUi(self)
 
 class PreferencesDialog(QDialog):
     def __init__(self):
@@ -29,7 +29,7 @@ class SearchTextDialog(QDialog):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
-    window = SearchTextDialog()
+    window = PreferencesDialog()
     window.show()
 
     sys.exit(app.exec_())
