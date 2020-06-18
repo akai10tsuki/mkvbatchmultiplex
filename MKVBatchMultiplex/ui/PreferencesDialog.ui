@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>744</width>
-    <height>395</height>
+    <height>430</height>
    </rect>
   </property>
   <property name="font">
@@ -25,7 +25,7 @@
    <property name="geometry">
     <rect>
      <x>460</x>
-     <y>320</y>
+     <y>350</y>
      <width>241</width>
      <height>32</height>
     </rect>
@@ -43,77 +43,145 @@
      <x>30</x>
      <y>40</y>
      <width>681</width>
-     <height>241</height>
+     <height>281</height>
     </rect>
    </property>
    <property name="title">
     <string>Options</string>
    </property>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QLabel" name="lblInterfaceLanguage">
     <property name="geometry">
      <rect>
-      <x>22</x>
-      <y>44</y>
-      <width>641</width>
-      <height>181</height>
+      <x>21</x>
+      <y>46</y>
+      <width>172</width>
+      <height>23</height>
      </rect>
     </property>
-    <layout class="QGridLayout" name="gridLayout" columnstretch="0,6,1">
-     <property name="spacing">
-      <number>10</number>
-     </property>
-     <item row="0" column="0">
-      <widget class="QLabel" name="lblInterfaceLanguage">
-       <property name="text">
-        <string>Interface Language:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1" colspan="2">
-      <widget class="QComboBox" name="cmbBoxInterfaceLanguage"/>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="lblFontAndSize">
-       <property name="text">
-        <string>Font &amp; Size:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QFontComboBox" name="fcmbBoxFontFamily"/>
-     </item>
-     <item row="1" column="2">
-      <widget class="QSpinBox" name="spinBoxFontSize"/>
-     </item>
-     <item row="2" column="0">
-      <widget class="QCheckBox" name="chkBoxEnableLogging">
-       <property name="text">
-        <string>Enable Logging</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0" colspan="2">
-      <widget class="QCheckBox" name="chkBoxEnableJobHistory">
-       <property name="text">
-        <string>Enable jobs history</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0" colspan="2">
-      <widget class="QCheckBox" name="chkBoxRestoreWindowSize">
-       <property name="text">
-        <string>Restore original window size</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <property name="text">
+     <string>Interface Language:</string>
+    </property>
+   </widget>
+   <widget class="QFontComboBox" name="fcmbBoxFontFamily">
+    <property name="geometry">
+     <rect>
+      <x>221</x>
+      <y>85</y>
+      <width>371</width>
+      <height>29</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="chkBoxRestoreWindowSize">
+    <property name="geometry">
+     <rect>
+      <x>21</x>
+      <y>235</y>
+      <width>631</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Restore original window size</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>203</x>
+      <y>46</y>
+      <width>16</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="chkBoxEnableLogging">
+    <property name="geometry">
+     <rect>
+      <x>21</x>
+      <y>124</y>
+      <width>631</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Enable Logging</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblFontAndSize">
+    <property name="geometry">
+     <rect>
+      <x>21</x>
+      <y>85</y>
+      <width>171</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Font &amp; Size:</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="chkBoxEnableJobHistory">
+    <property name="geometry">
+     <rect>
+      <x>21</x>
+      <y>198</y>
+      <width>631</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Enable jobs history</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="chkBoxEnableLogViewer">
+    <property name="geometry">
+     <rect>
+      <x>43</x>
+      <y>161</y>
+      <width>611</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="baseSize">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="text">
+     <string>Enable Log Viewer</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cmbBoxInterfaceLanguage">
+    <property name="geometry">
+     <rect>
+      <x>221</x>
+      <y>46</y>
+      <width>431</width>
+      <height>29</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="spinBoxFontSize">
+    <property name="geometry">
+     <rect>
+      <x>599</x>
+      <y>85</y>
+      <width>51</width>
+      <height>29</height>
+     </rect>
+    </property>
    </widget>
   </widget>
   <widget class="QPushButton" name="btnRestoreDefaults">
    <property name="geometry">
     <rect>
      <x>50</x>
-     <y>320</y>
+     <y>350</y>
      <width>351</width>
      <height>34</height>
     </rect>
