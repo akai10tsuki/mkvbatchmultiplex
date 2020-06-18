@@ -2,9 +2,10 @@
  preferences dialog
 """
 
+import platform
 
-from PySide2.QtCore import QCoreApplication, QObject, Qt, Slot, QLocale
-from PySide2.QtGui import QFont
+from PySide2.QtCore import QObject, Qt, Slot
+from PySide2.QtGui import QFont, QPalette, QColor
 from PySide2.QtWidgets import QDialog, QDialogButtonBox
 
 from vsutillib.pyqt import centerWidget
@@ -14,6 +15,10 @@ from ..ui import Ui_PreferencesDialog
 
 
 class PreferencesDialogWidget(QDialog):
+    """
+    PreferencesDialogWidget change configuration parameters
+    """
+
     def __init__(self, parent):
         super().__init__(parent)
 
@@ -30,7 +35,6 @@ class PreferencesDialogWidget(QDialog):
         self._initHelper()
 
     def _initUI(self):
-
         #
         # Interface Language
         #
@@ -52,9 +56,28 @@ class PreferencesDialogWidget(QDialog):
         #
         # Logging is boolean value
         #
+        isLogging = config.data.get(config.ConfigKey.Logging)
         self.ui.chkBoxEnableLogging.setChecked(
             config.data.get(config.ConfigKey.Logging)
         )
+        #
+        # Enable Log Viewer
+        #
+        self.ui.chkBoxEnableLogViewer.setChecked(
+            config.data.get(config.ConfigKey.LogViewer)
+        )
+        #
+        # Does not follow global palette fully
+        #
+        if platform.system() == "Windows":
+            disabledColor = QColor(127, 127, 127)
+            chkBoxPalette = self.ui.chkBoxEnableLogViewer.palette()
+            chkBoxPalette.setColor(
+                QPalette.Disabled, QPalette.WindowText, disabledColor
+            )
+            self.ui.chkBoxEnableLogViewer.setPalette(chkBoxPalette)
+        if not isLogging:
+            self.ui.chkBoxEnableLogViewer.setEnabled(False)
         #
         # Enable History
         #
@@ -87,6 +110,9 @@ class PreferencesDialogWidget(QDialog):
         self.ui.chkBoxEnableLogging.stateChanged.connect(
             self.__pref.enableLoggingStateChanged
         )
+        self.ui.chkBoxEnableLogViewer.stateChanged.connect(
+            self.__pref.enableLogViewerStateChanged
+        )
         self.ui.chkBoxEnableJobHistory.stateChanged.connect(
             self.__pref.enableJobHistoryChanged
         )
@@ -105,19 +131,20 @@ class PreferencesDialogWidget(QDialog):
         #
         self.ui.btnRestoreDefaults.clicked.connect(self.__pref.restoreDefaults)
 
-    @property
-    def parent(self):
-        return self.__parent
+    # @property
+    # def parent(self):
+    #    return self.__parent
 
-    @parent.setter
-    def parent(self, value):
-        self.__parent = value
+    # @parent.setter
+    # def parent(self, value):
+    #    self.__parent = value
 
     @property
     def preferences(self):
         return self.__pref
 
-    def getPreferences(self, applyChanges=False):
+    def getPreferences(self):
+        """Show dialog to set preferences"""
 
         self._initUI()
         self.preferences.reset()
@@ -163,6 +190,28 @@ class PreferencesDialogWidget(QDialog):
                     config.ConfigKey.Logging, self.preferences.enableLogging
                 )
                 self.parent.enableLogging(self.preferences.enableLogging)
+            #
+            # LogViewer
+            #
+            loggingOn = config.data.get(config.ConfigKey.Logging)
+            if loggingOn:
+                if self.preferences.enableLogViewer is not None:
+                    config.data.set(
+                        config.ConfigKey.LogViewer, self.preferences.enableLogViewer
+                    )
+                    if self.preferences.enableLogViewer:
+                        if self.parent.logViewerWidget.tab < 0:
+                            self.parent.logViewerWidget.unHideTab()
+                            self.parent.logViewerWidget.setAsCurrentTab()
+                    else:
+                        if self.parent.logViewerWidget.tab >= 0:
+                            self.parent.logViewerWidget.hideTab()
+            else:
+                config.data.set(
+                    config.ConfigKey.LogViewer, False
+                )
+                if self.parent.logViewerWidget.tab >= 0:
+                    self.parent.logViewerWidget.hideTab()
             #
             # Job History
             #
@@ -212,6 +261,7 @@ class Preferences(QObject):
     def _initVars(self):
         self.enableJobHistory = None
         self.enableLogging = None
+        self.enableLogViewer = None
         self.font = None
         self.fontSize = None
         self.language = None
@@ -225,7 +275,6 @@ class Preferences(QObject):
     def interfaceLanguageChanged(self, index):
 
         language = self.parent.ui.cmbBoxInterfaceLanguage.itemText(index)
-        # print("Language selected in combo [{}]".format(language))
         if language:
             languageDictionary = config.data.get(config.ConfigKey.InterfaceLanguages)
             key = list(languageDictionary.keys())[
@@ -253,6 +302,14 @@ class Preferences(QObject):
     def enableLoggingStateChanged(self, value):
 
         self.enableLogging = bool(value)
+        if not self.__changedData:
+            self.__changedData = True
+        self.parent.ui.chkBoxEnableLogViewer.setEnabled(self.enableLogging)
+
+    @Slot(int)
+    def enableLogViewerStateChanged(self, value):
+
+        self.enableLogViewer = bool(value)
         if not self.__changedData:
             self.__changedData = True
 
@@ -285,11 +342,12 @@ class Preferences(QObject):
                 self.parent.ui.spinBoxFontSize.setValue(defaultFont.pointSize())
 
     @Slot(bool)
-    def restoreDefaults(self, checked=False):
+    def restoreDefaults(self):
 
         self.parent.ui.chkBoxRestoreWindowSize.setChecked(True)
         self.parent.ui.chkBoxEnableLogging.setChecked(False)
         self.parent.ui.chkBoxEnableJobHistory.setChecked(False)
+        self.parent.ui.chkBoxEnableLogViewer.setChecked(False)
         defaultFont = QFont()
         defaultFont.fromString(config.data.get(config.ConfigKey.SystemFont))
         self.parent.ui.fcmbBoxFontFamily.setCurrentFont(defaultFont.family())
