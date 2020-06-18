@@ -23,7 +23,7 @@ from PySide2.QtWidgets import (
 from vsutillib.pyqt import (
     QOutputTextWidget,
     QPushButtonWidget,
-    runFunctionInThread,
+    qtRunFunctionInThread,
     SvgColor,
 )
 from vsutillib.process import isThreadRunning
@@ -146,7 +146,7 @@ class CommandWidget(TabWidgetExtension, QWidget):
         )
         btnAnalysis = QPushButtonWidget(
             Text.txt0170,
-            function=lambda: runFunctionInThread(
+            function=lambda: qtRunFunctionInThread(
                 runAnalysis,
                 command=self.cmdLine.text(),
                 output=self.output,
@@ -156,7 +156,7 @@ class CommandWidget(TabWidgetExtension, QWidget):
         )
         btnShowCommands = QPushButtonWidget(
             Text.txt0172,
-            function=lambda: runFunctionInThread(
+            function=lambda: qtRunFunctionInThread(
                 showCommands,
                 output=self.output,
                 command=self.cmdLine.text(),
@@ -167,7 +167,7 @@ class CommandWidget(TabWidgetExtension, QWidget):
         )
         btnCheckFiles = QPushButtonWidget(
             Text.txt0174,
-            function=lambda: runFunctionInThread(
+            function=lambda: qtRunFunctionInThread(
                 checkFiles,
                 output=self.output,
                 command=self.cmdLine.text(),
