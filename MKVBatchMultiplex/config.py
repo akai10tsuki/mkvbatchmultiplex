@@ -12,6 +12,7 @@ from PySide2.QtGui import QFont
 
 from vsutillib.files import ConfigurationSettings
 from vsutillib.log import LogRotateFileHandler
+from vsutillib.pyqt import QSignalLogHandler
 
 __VERSION = (2, 0, "0a2")
 
@@ -39,7 +40,7 @@ PROJECTURLS = {
 PYTHONVERSIONS = ">=3.8.1, <3.9"
 QT_VERSION = "PYSIDE2"
 REQUIRED = [
-    "PySide2>=5.14",
+    "PySide2>=5.15",
     "vsutillib.files>=1.5.1",
     "vsutillib.log>=1.5.0",
     "vsutillib.macos>=1.5.0",
@@ -69,6 +70,8 @@ else:
 LOCALE = CWD.joinpath("locale")
 
 data = ConfigurationSettings()  # pylint: disable=invalid-name
+logViewer = QSignalLogHandler()  # pylint: disable=invalid-name
+
 FORCELOG = True
 
 ######################
@@ -114,6 +117,7 @@ class ConfigKey:  # pylint: disable=too-few-public-methods
     JobHistory = "JobHistory"
     JobsTable = "jobs"
     JobID = "JobID"
+    LogViewer = "LogViewer"
     Tab = "Tab"
     TabText = "TabText"
 
@@ -157,6 +161,9 @@ def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None, ap
     if FORCELOG:
         data.set(ConfigKey.Logging, True)
 
+    if data.get(ConfigKey.LogViewer) is None:
+        data.set(ConfigKey.LogViewer, False)
+
     if data.get(ConfigKey.Language) is None:
         data.set(ConfigKey.Language, DEFAULTLANGUAGE)
 
@@ -168,8 +175,10 @@ def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None, ap
     loghandler = LogRotateFileHandler(loggingFile, backupCount=10, encoding="utf-8")
     formatter = logging.Formatter("%(asctime)s %(levelname)-8s %(name)s %(message)s")
     loghandler.setFormatter(formatter)
-    logging.getLogger("").setLevel(logging.DEBUG)
+    logViewer.setFormatter(formatter)
     logging.getLogger("").addHandler(loghandler)
+    logging.getLogger("").addHandler(logViewer)
+    logging.getLogger("").setLevel(logging.DEBUG)
 
     if name is None:
         appName = APPNAME
@@ -300,3 +309,7 @@ def close():
     data.saveToFile()
 
     logging.info("CF0004: App End.")
+
+
+def logTest(msg):
+    print(msg)
