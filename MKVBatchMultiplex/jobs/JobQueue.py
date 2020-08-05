@@ -15,7 +15,7 @@ from time import time
 from PySide2.QtCore import QObject, Slot, Signal
 
 
-from vsutillib.mkv import MKVCommand, MKVCommandParser
+from vsutillib.mkv import MKVCommandParser
 
 from .. import config
 from ..models import TableProxyModel
@@ -87,7 +87,8 @@ class JobInfo:  # pylint: disable=too-many-instance-attributes
         )
 
         if not self.oCommand:
-            self.oCommand = MKVCommandParser(job[JobKey.Command], log=log)
+            command = tableModel.dataset[jobRowNumber, JobKey.Command]
+            self.oCommand = MKVCommandParser(command, log=log)
             if log:
                 MODULELOG.debug(
                     "JBQ0001: Job %s- Bad MKVCommandParser object.", jobRow[JobKey.ID]
@@ -158,7 +159,8 @@ class JobInfoOriginal:  # pylint: disable=too-many-instance-attributes
         )
 
         if not self.oCommand:
-            self.oCommand = MKVCommandParser(job[JobKey.Command], log=log)
+            command = tableModel.dataset[jobRowNumber, JobKey.Command]
+            self.oCommand = MKVCommandParser(command, log=log)
             if log:
                 MODULELOG.debug(
                     "JBQ0001: Job %s- Bad MKVCommandParser object.", jobRow[JobKey.ID]
@@ -352,9 +354,9 @@ class JobQueue(QObject):
         # statusIndex = self.model.index(jobRow, JobKey.Status)
         # commandIndex = self.model.index(jobRow, JobKey.Command)
 
-        fJobIndex = FakeModelIndex(jobRow, JobKey.ID)
-        fStatusIndex = FakeModelIndex(jobRow, JobKey.Status)
-        fCommandIndex = FakeModelIndex(jobRow, JobKey.Command)
+        #fJobIndex = FakeModelIndex(jobRow, JobKey.ID)
+        #fStatusIndex = FakeModelIndex(jobRow, JobKey.Status)
+        #fCommandIndex = FakeModelIndex(jobRow, JobKey.Command)
 
         if not jobID:
             self.model.setData(jobIndex, self.__jobID)
