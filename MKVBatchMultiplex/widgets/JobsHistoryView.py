@@ -246,5 +246,5 @@ class JobsHistoryView(QTableView):
         pass
 
     @Slot(object)
-    def clickClear(index):
+    def clickClear(self, index):
         pass
