@@ -264,10 +264,6 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
                 "Rename the output files ej. Series Name - S01E01.mkv, ...",
             ]
         )
-        if config.data.get(config.ConfigKey.JobHistory):
-            tabsList.append(
-                [self.historyWidget, "Jobs History", "Examine any jobs saved.",]
-            )
         if config.data.get(config.ConfigKey.LogViewer):
             tabsList.append(
                 [
@@ -280,13 +276,16 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
             self.logViewerWidget.tab = -1
             self.logViewerWidget.tabWidget = self.tabs
             self.logViewerWidget.title = "Log Viewer"
-
-        self.tabs.addTabs(tabsList)
-
-        if not config.data.get(config.ConfigKey.JobHistory):
+        if config.data.get(config.ConfigKey.JobHistory):
+            tabsList.append(
+                [self.historyWidget, "Jobs History", "Examine any jobs saved."]
+            )
+        else:
             self.historyWidget.tab = -1
             self.historyWidget.tabWidget = self.tabs
             self.historyWidget.title = "Jobs History"
+
+        self.tabs.addTabs(tabsList)
 
     def _initHelper(self):
         """
