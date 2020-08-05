@@ -370,7 +370,7 @@ def addToDb(database, job, update=False):
             rc = rowid
 
             if rowid > 0:
-                sqlSearchUpdate = sqlJob = """
+                sqlSearchUpdate = """
                     INSERT INTO jobsSearch(rowidKey, id, startTime, command)
                         VALUES(?, ?, ?, ?); """
                 database.sqlExecute(
