@@ -3,6 +3,7 @@ JobsOutputWidget
 """
 
 from PySide2.QtCore import Slot
+from PySide2.QtWidgets import QTextEdit
 
 from vsutillib.pyqt import QOutputTextWidget, TabWidgetExtension
 
@@ -13,7 +14,7 @@ class LogViewerWidget(TabWidgetExtension, QOutputTextWidget):
 
     Args:
         TabWidgetExtension (widget): TabWidget child extensions
-        QOutputTextWidget (widget): QTextEdit subclass use to show output generated
+       QOutputTextWidget (widget): QTextEdit subclass use to show output generated
                                 by running processes
     """
 
@@ -21,8 +22,9 @@ class LogViewerWidget(TabWidgetExtension, QOutputTextWidget):
         super().__init__(parent=parent, tabWidgetChild=self, **kwargs)
 
         self.setReadOnly(True)
+        self.setLineWrapColumnOrWidth(QTextEdit.NoWrap)
 
     @Slot(object)
     def logMessage(self, msg):
 
-        self.insertText(msg + "\n", {"log": False})
+        self.insertTextSignal.emit(msg + "\n", {"log": False})
