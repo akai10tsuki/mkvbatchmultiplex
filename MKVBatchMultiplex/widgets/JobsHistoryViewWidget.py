@@ -126,6 +126,9 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
         btnSelectAll = QPushButtonWidget(
             "Select All", function=self.tableView.selectAll, toolTip="Select all rows"
         )
+        btnPrint = QPushButtonWidget(
+            "Print", function=self.printDataset, toolTip="List Rows"
+        )
         btnShowOutput = QPushButtonWidget(
             "Show Output",
             function=lambda: self.showOutput(_ShowKey.output),
@@ -143,6 +146,7 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
         self.btnGrid.addWidget(btnShowOutput)
         self.btnGrid.addWidget(btnShowOutputErrors)
         self.btnGrid.addStretch()
+        self.btnGrid.addWidget(btnPrint)
         self.btnGrid.addWidget(btnSelectAll)
         self.btnGrid.addWidget(btnClearSelection)
         self.btnGrid.addWidget(btnClearOutput)
@@ -235,6 +239,25 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
             funcFinished=self.parent.progressSpin.stopAnimation,
         )
 
+    # def listRows(self):
+
+    def printDataset(self):
+        """
+        printDataset development debug
+        """
+        # QApplication.setPalette(darkPalette())
+        dataset = self.model.dataset
+
+        for r in range(0, len(dataset)):
+            self.output.insertTextSignal.emit(
+                "Row {} ID {} Status {}\n".format(
+                    r, dataset[r, JobKey.ID], dataset[r, JobKey.Status]
+                ),
+                {},
+            )
+
+        self.output.insertTextSignal.emit("\n", {})
+
     def refresh(self):
 
         jobsDB = SqlJobsTable(config.get(ConfigKey.SystemDB))
@@ -253,6 +276,12 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
 
 
 def fillRows(self, rows):
+    """
+    fillRows fill view rows
+
+    Args:
+        rows (set): set with job information
+    """
 
     rowNumber = 0
     if rows:
