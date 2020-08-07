@@ -17,10 +17,12 @@ Changed
 ~~~~~~~
 
 - configuration now is a dialog for better compatibility with macOS
+- use natural sort when reading directories
 
 Fixed
 ~~~~~
 
+- Fix BUG #1 force escape quotes for mkvmerge executable in Windows
 - dummy progress bar icon function on macOS was not working
 - removing configuration elements not always working
 - spanish locale fixes
