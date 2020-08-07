@@ -15,6 +15,8 @@ import zlib
 from datetime import datetime
 from time import time, sleep
 
+from PySide2.QtWidgets import QSystemTrayIcon
+
 import vsutillib.mkv as mkv
 
 from vsutillib.misc import staticVars, strFormatTimeDelta
@@ -32,7 +34,15 @@ MODULELOG.addHandler(logging.NullHandler())
 
 
 @staticVars(running=False)
-def jobsWorker(jobQueue, output, model, funcProgress, controlQueue, log=False):
+def jobsWorker(
+    jobQueue,
+    output,
+    model,
+    funcProgress,
+    controlQueue,
+    trayIconMessageSignal,
+    log=False,
+):
     """
     jobsWorker execute jobs on queue
 
@@ -134,6 +144,11 @@ def jobsWorker(jobQueue, output, model, funcProgress, controlQueue, log=False):
             msg = "*******************\n"
             msg += "Job ID: {} started at {}.\n\n".format(
                 job.jobRow[JobKey.ID], dt.isoformat()
+            )
+            trayIconMessageSignal.emit(
+                "Information - MKVBatchMultiplex",
+                f"Job ID: {job.jobRow[JobKey.ID]} started.",
+                QSystemTrayIcon.Information,
             )
             output.job.emit(msg, {"color": SvgColor.cyan})
             exitStatus = "ended"
@@ -285,6 +300,18 @@ def jobsWorker(jobQueue, output, model, funcProgress, controlQueue, log=False):
             job.output.append(msg)
             msg += "*******************\n\n\n"
             output.job.emit(msg, {"color": SvgColor.cyan, "appendEnd": True})
+
+            msg = "Job ID: {} {}\nruntime {}"
+            msg = msg.format(
+                job.jobRow[JobKey.ID],
+                exitStatus,
+                strFormatTimeDelta(dtDuration),
+            )
+            trayIconMessageSignal.emit(
+                "Information - MKVBatchMultiplex",
+                msg,
+                QSystemTrayIcon.Information,
+            )
 
             if config.data.get(config.ConfigKey.JobHistory):
                 if updateStatus:
@@ -465,8 +492,9 @@ def displayRunJobs(line, job, output, indexTotal, funcProgress=None):
 
         output.job.emit(line[:-1], {"appendLine": True})
 
-    if (line.find("El multiplexado") == 0) or (line.find("Multiplexing took") == 0):
-        print(f"Count lines = {displayRunJobs.count}")
+    # if (line.find("El multiplexado") == 0) or (line.find("Multiplexing took") == 0):
+    if displayRunJobs.count == 3:
+        # print(f"Count lines = {displayRunJobs.count}")
         displayRunJobs.count = 0
         output.job.emit("\n\n", {})
         job.output.append("\n\n")
