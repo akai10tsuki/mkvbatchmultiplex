@@ -82,7 +82,7 @@ class RunJobs(QObject):
         self.proxyModel = proxyModel
         self.controlQueue = controlQueue
         self.mainWindow = self.parent.parent
-        self.jobsWorker = None
+        self.worker = None
         self.log = log
 
     @property
@@ -162,20 +162,21 @@ class RunJobs(QObject):
         """
 
         if self.jobsqueue and not self.running:
-            self.jobsWorker = ThreadWorker(
+            self.worker = ThreadWorker(
                 jobsWorker,
                 self.jobsqueue,
                 self.output,
                 self.model,
                 self.progress,
                 self.controlQueue,
+                self.parent.parent.trayIconMessageSignal,
                 log=self.log,
                 funcStart=self.start,
                 funcResult=self.result,
                 funcFinished=self.finished,
             )
-            self.jobsWorker.name = config.WORKERTHREADNAME
-            self.jobsWorker.start()
+            self.worker.name = config.WORKERTHREADNAME
+            self.worker.start()
 
             return True
 
