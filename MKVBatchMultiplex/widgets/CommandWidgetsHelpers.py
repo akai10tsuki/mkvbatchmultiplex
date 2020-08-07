@@ -186,8 +186,8 @@ def checkFiles(**kwargs):
         output.command.emit("Cannot generate commands.\n", {LineOutput.AppendEnd: True})
 
     baseTotalFiles = 0
-    for key in oCommand.filesInDirByKey:
-        print(f"Key = {key}")
+    # for key in oCommand.filesInDirByKey:
+    #    print(f"Key = {key}")
 
     for key in oCommand.filesInDirByKey:
 
@@ -248,6 +248,7 @@ class QLineEditWidget(QLineEdit):
         print(self.text())
 
         super().contextMenuEvent(event)
+
 
 class MKVParseKey:
 
