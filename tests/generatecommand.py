@@ -64,31 +64,31 @@ class GenCommandApp(QMainWindow):
                 r"/video-S01E01.mkv' --language 0:und --language 1:spa " + \
                 r"--default-track 1:yes '(' '" + s + \
                 r"/video-S01E01.avi' ')' --language 0:eng --default-track 0:yes '(' '" + s + \
-                r"/Video-S01E01.ass' ')' --track-order 0:0,0:1,1:0"
+                r"/Subs/Video-S01E01.ass' ')' --track-order 0:0,0:1,1:0"
 
         self.cmd1 = mkvmerge + r" " + l + " --output '" + d + \
                 r"/video - S01E02.mkv' --language 0:und --language 1:spa " + \
                 r"--default-track 1:yes '(' '" + s + \
                 r"/video - S01E02.avi' ')' --language 0:eng --default-track 0:yes '(' '" + s + \
-                r"/Video - S01E02.ass' ')' --track-order 0:0,0:1,1:0"
+                r"/Subs/Video - S01E02.ass' ')' --track-order 0:0,0:1,1:0"
 
         self.cmd2 = mkvmerge + r" " + l + " --output '" + d + \
                 r"/video - S01E03.mkv' --language 0:und --language 1:spa " + \
                 r"--default-track 1:yes '(' '" + s + \
                 r"/video - S01E03.avi' ')' --language 0:eng --default-track 0:yes '(' '" + s + \
-                r"/Video - S01E03.ass' ')' --track-order 0:0,0:1,1:0"
+                r"/Subs/Video - S01E03.ass' ')' --track-order 0:0,0:1,1:0"
 
         self.cmd3 = mkvmerge + r" " + l + " --output '" + d + \
                 r"/video'\''S01E05.mkv' --language 0:und --language 1:spa " + \
                 r"--default-track 1:yes '(' '" + s + \
                 r"/video'\''S01E05.avi' ')' --language 0:eng --default-track 0:yes '(' '" + s + \
-                r"/Video'\''S01E05.ass' ')' --track-order 0:0,0:1,1:0"
+                r"/Subs/Video'\''S01E05.ass' ')' --track-order 0:0,0:1,1:0"
 
         self.cmd4 = mkvmerge + r" " + l + " --output " + d + \
                 r"/video-S01E01.mkv --language 0:und --language 1:spa " + \
                 r"--default-track 1:yes '(' " + s + \
                 r"/video-S01E01.avi ')' --language 0:eng --default-track 0:yes '(' " + s + \
-                r"/Video-S01E01.ass ')' --track-order 0:0,0:1,1:0"
+                r"/Subs/Video-S01E01.ass ')' --track-order 0:0,0:1,1:0"
 
 
         self.textWindow = QTextEdit()
