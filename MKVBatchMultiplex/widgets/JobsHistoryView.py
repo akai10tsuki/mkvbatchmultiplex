@@ -208,6 +208,9 @@ class JobsHistoryView(QTableView):
         super(JobsHistoryView, self).resizeEvent(event)
 
     def copyCommand(self):
+        """
+        copyCommand copy selected rows
+        """
 
         selection = self.selectedIndexes()
 
@@ -226,6 +229,9 @@ class JobsHistoryView(QTableView):
         return Qt.CopyAction | Qt.MoveAction
 
     def deleteSelectedRows(self):
+        """
+        deleteSelectedRows delete selected rows
+        """
 
         model = self.proxyModel.sourceModel()
 
@@ -238,9 +244,9 @@ class JobsHistoryView(QTableView):
             modelIndex = self.proxyModel.mapToSource(index)
             row = modelIndex.row()
             rowid = model.dataset.data[row][JobHistoryKey.ID].obj
-            rowid0 = model.dataset[row, JobHistoryKey.ID].obj
-            print(f"data {rowid} dataset {rowid0}")
-            model.removeRow(row)
+            rowid0 = model.dataset[row, JobHistoryKey.ID]
+            print(f"From History View - model call row {row} data row ID {rowid} ID {rowid0}")
+            model.removeRows(row, 1)
 
     def rowsAboutToBeRemoved(self, parent, first, last):
         pass
