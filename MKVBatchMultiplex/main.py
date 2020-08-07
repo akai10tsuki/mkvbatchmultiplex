@@ -18,7 +18,7 @@ import webbrowser
 from collections import deque
 from pathlib import Path
 
-from PySide2.QtCore import QByteArray, Slot
+from PySide2.QtCore import QByteArray, Slot, Signal
 from PySide2.QtGui import QColor, QFont, QIcon, Qt
 from PySide2.QtWidgets import (
     QAction,
@@ -80,6 +80,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
     """Main window of application"""
 
     log = False
+    trayIconMessageSignal = Signal()
 
     def __init__(self, parent=None, palette=None):
         super(MainWindow, self).__init__(parent)
@@ -116,11 +117,14 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         # Must init after show call
         self.progressBar.initTaskbarButton()
 
-        self.trayIcon.showMessage(
-            "Information - MKVBatchMultiplex",
-            "Finished initialization.",
-            QSystemTrayIcon.Information,
-        )
+        # self.trayIcon.showMessage(
+        #    "Information - MKVBatchMultiplex",
+        #    "Finished initialization.",
+        #    QSystemTrayIcon.Information,
+        # )
+
+        # tray Icon message
+        self.trayIconMessageSignal.connect(self.trayIcon.showMessage)
 
     def _initVars(self):
 
@@ -154,6 +158,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
     def _initMenu(self):  # pylint: disable=too-many-statements
 
         menuBar = QMenuBar()
+        # menuBar = self.menuBar()
 
         # File SubMenu
         fileMenu = QMenuWidget(Text.txt0020)
@@ -310,7 +315,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.commandWidget.outputWindow.setReadOnly(True)
         self.jobsOutput.setReadOnly(True)
         self.errorOutput.setReadOnly(True)
-        #self.historyWidget.output.setReadOnly(True)
+        # self.historyWidget.output.setReadOnly(True)
         self.jobsOutput.textChanged.connect(self.commandWidget.resetButtonState)
 
         # setup widgets setLanguage to SetLanguage change signal
@@ -318,7 +323,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.setLanguageWidget.addSlot(self.commandWidget.setLanguage)
         self.setLanguageWidget.addSlot(self.tabs.setLanguage)
         self.setLanguageWidget.addSlot(self.renameWidget.setLanguage)
-        #self.setLanguageWidget.addSlot(self.historyWidget.setLanguage)
+        # self.setLanguageWidget.addSlot(self.historyWidget.setLanguage)
         self.setLanguageWidget.addSlot(self.setPreferences.retranslateUi)
         # connect to tabs widget tab change Signal
         self.tabs.currentChanged.connect(tabChange)
@@ -382,7 +387,8 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
     def setVisible(self, visible):
         """ Override setVisible """
-        self.trayIcon.setMenuEnabled(visible)
+
+        # self.trayIcon.setMenuEnabled(visible)
         super().setVisible(visible)
 
     @Slot(str)
@@ -606,6 +612,7 @@ def mainApp():
         QOutputTextWidget.isDarkMode = True
 
     # win = MainWindow()
+    # win.show()
     MainWindow()
     app.exec_()
     config.close()
