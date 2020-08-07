@@ -352,7 +352,7 @@ class TableModel(QAbstractTableModel):
 
             # delete rows starting from highest index
             # in the range going backwards
-            for row in range(0, rows, -1):
+            for row in range(rows - 1, -1, -1):
                 self.dataset.removeRow(position + row)
 
             self.endRemoveRows()
