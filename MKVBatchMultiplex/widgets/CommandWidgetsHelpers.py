@@ -73,8 +73,7 @@ def showCommands(**kwargs):
     log = kwargs.pop("log", False)
     index = 1
 
-    if oCommand is None:
-        oCommand = mkv.MKVCommandParser(command, log=log)
+    oCommand = mkv.MKVCommandParser(command, log=log)
 
     if output is None:
         return "No output callback function"
@@ -118,8 +117,7 @@ def checkFiles(**kwargs):
     oCommand = kwargs.pop("oCommand", None)
     log = kwargs.pop("log", False)
 
-    if oCommand is None:
-        oCommand = mkv.MKVCommandParser(command, log=log)
+    oCommand = mkv.MKVCommandParser(command, log=log)
 
     if output is None:
         return "No output callback function"
@@ -131,6 +129,7 @@ def checkFiles(**kwargs):
         oCommand.generateCommands()
 
     if oCommand:
+
         verify = mkv.VerifyStructure(log=log)
 
         for index, (_, baseFiles, sourceFiles, destinationFile, _, _, _) in enumerate(
@@ -204,7 +203,7 @@ def checkFiles(**kwargs):
             color = SvgColor.red
 
         output.command.emit(
-            f"Files for key - !{key}! total is {totalFiles}",
+            f"Files for key - {key} total is {totalFiles}",
             {LineOutput.Color: color, LineOutput.AppendEnd: True},
         )
 
