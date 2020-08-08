@@ -14,7 +14,7 @@ from vsutillib.files import ConfigurationSettings
 from vsutillib.log import LogRotateFileHandler
 from vsutillib.pyqt import QSignalLogHandler
 
-__VERSION = (2, 0, "0a2dev3")
+__VERSION = (2, 0, "0b1")
 
 APPNAME = "MKVBatchMultiplex"
 VERSION = ".".join(map(str, __VERSION))
@@ -41,14 +41,14 @@ PYTHONVERSIONS = ">=3.8.1, <3.9"
 QT_VERSION = "PYSIDE2"
 REQUIRED = [
     "PySide2>=5.15",
-    "vsutillib.files>=1.5.1",
-    "vsutillib.log>=1.5.0",
-    "vsutillib.macos>=1.5.0",
-    "vsutillib.media>=1.5.0",
-    "vsutillib.mkv>=1.5.1",
-    "vsutillib.process>=1.5.0",
-    "vsutillib.pyqt>=1.5.1",
-    "vsutillib.sql>=1.5.1",
+    "vsutillib.files>=1.6.0",
+    "vsutillib.log>=1.6.0",
+    "vsutillib.macos>=1.6.0",
+    "vsutillib.media>=1.6.0",
+    "vsutillib.mkv>=1.6.0",
+    "vsutillib.process>=1.6.0",
+    "vsutillib.pyqt>=1.6.0",
+    "vsutillib.sql>=1.6.0",
 ]
 
 # for app
