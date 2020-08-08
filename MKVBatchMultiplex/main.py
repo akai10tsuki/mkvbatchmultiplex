@@ -80,7 +80,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
     """Main window of application"""
 
     log = False
-    trayIconMessageSignal = Signal()
+    trayIconMessageSignal = Signal(str, str, object)
 
     def __init__(self, parent=None, palette=None):
         super(MainWindow, self).__init__(parent)
@@ -388,7 +388,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
     def setVisible(self, visible):
         """ Override setVisible """
 
-        # self.trayIcon.setMenuEnabled(visible)
+        self.trayIcon.setMenuEnabled(visible)
         super().setVisible(visible)
 
     @Slot(str)
