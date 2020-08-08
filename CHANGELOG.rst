@@ -10,7 +10,6 @@ Added
 ~~~~~
 
 - show progress bar on Windows taskbar icon
-- new option to save executed jobs
 - view log on optional tab
 
 Changed
