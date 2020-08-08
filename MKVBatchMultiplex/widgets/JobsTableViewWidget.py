@@ -4,6 +4,13 @@ JobsTableWidget
 
 import logging
 
+try:
+    import cPickle as pickle
+except:
+    import pickle
+import zlib
+
+
 from PySide2.QtCore import QThreadPool, Qt, Slot
 from PySide2.QtWidgets import (
     QWidget,
@@ -13,11 +20,11 @@ from PySide2.QtWidgets import (
     QApplication,
 )
 
-from vsutillib.pyqt import QPushButtonWidget, darkPalette
+from vsutillib.pyqt import QPushButtonWidget, darkPalette, TabWidgetExtension
 from vsutillib.process import isThreadRunning
 
 from .. import config
-from ..jobs import JobStatus, JobKey
+from ..jobs import JobStatus, JobKey, SqlJobsTable, JobsTableKey
 from ..delegates import StatusComboBoxDelegate
 from ..utils import populate, Text, yesNoDialog
 
@@ -27,7 +34,7 @@ MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
 
-class JobsTableViewWidget(QWidget):
+class JobsTableViewWidget(TabWidgetExtension, QWidget):
     """
     JobsTableViewWidget [summary]
 
@@ -40,7 +47,7 @@ class JobsTableViewWidget(QWidget):
     __log = False
 
     def __init__(self, parent, proxyModel, controlQueue, title=None, log=None):
-        super(JobsTableViewWidget, self).__init__(parent)
+        super(JobsTableViewWidget, self).__init__(parent=parent, tabWidgetChild=self)
 
         self.__output = None
         self.__log = None
@@ -85,14 +92,10 @@ class JobsTableViewWidget(QWidget):
             Text.txt0128, function=self.printDataset, toolTip=Text.txt0129,
         )
         btnAbortCurrentJob = QPushButtonWidget(
-            Text.txt0134,
-            function=self.abortCurrentJob,
-            toolTip=Text.txt0135,
+            Text.txt0134, function=self.abortCurrentJob, toolTip=Text.txt0135,
         )
         btnAbortJobs = QPushButtonWidget(
-            Text.txt0136,
-            function=self.abortCurrentJob,
-            toolTip=Text.txt0137,
+            Text.txt0136, function=self.abortCurrentJob, toolTip=Text.txt0137,
         )
 
         self.btnGrid = QHBoxLayout()
@@ -268,7 +271,7 @@ class JobsTableViewWidget(QWidget):
                 while job := self.parent.jobsQueue.pop():
 
                     self.model.setData(job.statusIndex, JobStatus.Waiting)
-            #else:
+            # else:
             #    print("Nothing here")
 
     def setLanguage(self):
@@ -283,8 +286,12 @@ class JobsTableViewWidget(QWidget):
                 widget.setToolTip(_(widget.toolTip))
 
         self.grpBox.setTitle(_(Text.txt0130))
-        self.model.setHeaderData(JobKey.ID, Qt.Horizontal, "  " + _(Text.txt0131) + "  ")
-        self.model.setHeaderData(JobKey.Status, Qt.Horizontal, "  " + _(Text.txt0132) + "  ")
+        self.model.setHeaderData(
+            JobKey.ID, Qt.Horizontal, "  " + _(Text.txt0131) + "  "
+        )
+        self.model.setHeaderData(
+            JobKey.Status, Qt.Horizontal, "  " + _(Text.txt0132) + "  "
+        )
         self.model.setHeaderData(JobKey.Command, Qt.Horizontal, _(Text.txt0133))
 
     def printDataset(self):
@@ -321,9 +328,9 @@ class JobsTableViewWidget(QWidget):
     def jobStartQueueState(self, state):
 
         if state and not isThreadRunning(config.WORKERTHREADNAME):
-            self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(state)
+            self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(True)
         else:
-            self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(state)
+            self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(False)
 
     @Slot(bool)
     def jobStatus(self, running):
@@ -371,3 +378,4 @@ class _Button:
     STARTQUEUE = 2
     ABORTCURRENTJOB = 3
     ABORTJOBS = 4
+    FETCHJOBHISTORY = 6

@@ -3,6 +3,7 @@ CommandWidget helper functions attach to buttons
 """
 
 # pylint: disable=bad-continuation
+import pprint
 
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QKeySequence
@@ -13,12 +14,14 @@ from vsutillib.pyqt import SvgColor, LineOutput, checkColor
 
 from .. import config
 
+
 def runAnalysis(**kwargs):
     """List the source files found"""
 
     output = kwargs.pop("output", None)
     command = kwargs.pop("command", None)
     log = kwargs.pop("log", False)
+    baseTotalFiles = 0
     if command:
         output.command.emit("Analysis of command line:\n", {LineOutput.AppendEnd: True})
         verify = mkv.MKVCommandParser(command, log=log)
@@ -70,8 +73,7 @@ def showCommands(**kwargs):
     log = kwargs.pop("log", False)
     index = 1
 
-    if oCommand is None:
-        oCommand = mkv.MKVCommandParser(command, log=log)
+    oCommand = mkv.MKVCommandParser(command, log=log)
 
     if output is None:
         return "No output callback function"
@@ -115,8 +117,7 @@ def checkFiles(**kwargs):
     oCommand = kwargs.pop("oCommand", None)
     log = kwargs.pop("log", False)
 
-    if oCommand is None:
-        oCommand = mkv.MKVCommandParser(command, log=log)
+    oCommand = mkv.MKVCommandParser(command, log=log)
 
     if output is None:
         return "No output callback function"
@@ -128,6 +129,7 @@ def checkFiles(**kwargs):
         oCommand.generateCommands()
 
     if oCommand:
+
         verify = mkv.VerifyStructure(log=log)
 
         for index, (_, baseFiles, sourceFiles, destinationFile, _, _, _) in enumerate(
@@ -178,11 +180,57 @@ def checkFiles(**kwargs):
 
         output.command.emit("", {LineOutput.AppendEnd: True})
 
+    else:
+
+        output.command.emit("Cannot generate commands.\n", {LineOutput.AppendEnd: True})
+
+    baseTotalFiles = 0
+    # for key in oCommand.filesInDirByKey:
+    #    print(f"Key = {key}")
+
+    for key in oCommand.filesInDirByKey:
+
+        if key == MKVParseKey.title:
+            continue
+
+        if baseTotalFiles == 0:
+            baseTotalFiles = len(oCommand.filesInDirByKey[key])
+        totalFiles = len(oCommand.filesInDirByKey[key])
+
+        color = SvgColor.green
+
+        if baseTotalFiles != totalFiles:
+            color = SvgColor.red
+
+        output.command.emit(
+            f"Files for key - {key} total is {totalFiles}",
+            {LineOutput.Color: color, LineOutput.AppendEnd: True},
+        )
+
+        if baseTotalFiles != totalFiles:
+            color = SvgColor.orange
+
+        if key in oCommand.dirsByKey.keys():
+            output.command.emit(
+                f"Directory: {oCommand.dirsByKey[key]}\n",
+                {LineOutput.Color: color, LineOutput.AppendEnd: True},
+            )
+            for i, oFile in enumerate(oCommand.filesInDirByKey[key]):
+                output.command.emit(
+                    f"{i + 1}. {oFile}",
+                    {LineOutput.Color: color, LineOutput.AppendEnd: True},
+                )
+            output.command.emit(
+                "", {LineOutput.Color: color, LineOutput.AppendEnd: True},
+            )
+    output.command.emit(
+        "", {LineOutput.Color: color, LineOutput.AppendEnd: True},
+    )
+
     return None
 
 
 class QLineEditWidget(QLineEdit):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -199,3 +247,11 @@ class QLineEditWidget(QLineEdit):
         print(self.text())
 
         super().contextMenuEvent(event)
+
+
+class MKVParseKey:
+
+    attachmentFiles = "<ATTACHMENTS>"
+    chaptersFile = "<CHAPTERS>"
+    outputFile = "<OUTPUTFILE>"
+    title = "<TITLE>"

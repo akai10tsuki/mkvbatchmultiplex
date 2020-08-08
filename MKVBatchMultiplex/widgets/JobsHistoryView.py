@@ -1,21 +1,14 @@
 """
-JobsTableView - View to display/manipulate jobs
+JobsHistoryView - View to display/manipulate jobs
 """
 
 # JTV0001
 
-
-import csv
 import logging
 import io
-try:
-    import cPickle as pickle
-except:  # pylint: disable=bare-except
-    import pickle
-import sys
-import zlib
+import csv
 
-from PySide2.QtCore import Qt
+from PySide2.QtCore import Qt, QPersistentModelIndex, QModelIndex, Slot
 
 from PySide2.QtWidgets import (
     QTableView,
@@ -26,18 +19,17 @@ from PySide2.QtWidgets import (
     QHeaderView,
 )
 
-from vsutillib.mkv import MKVCommandParser
+from vsutillib.mkv import MKVCommand, MKVCommandParser
 
-from .. import config
-from ..jobs import JobStatus, JobKey, JobInfo, JobsTableKey, SqlJobsTable
+from ..jobs import JobStatus, JobHistoryKey
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
 
-class JobsTableView(QTableView):
+class JobsHistoryView(QTableView):
     """
-    JobsTableView:
+    JobsHistoryView:
 
     Arguments:
         QTableView {[type]} -- [description]
@@ -50,7 +42,7 @@ class JobsTableView(QTableView):
     __log = False
 
     def __init__(self, parent=None, proxyModel=None, title=None, log=None):
-        super(JobsTableView, self).__init__()
+        super(JobsHistoryView, self).__init__()
 
         self.__log = None  # Instance logging state None = Class state prevails
 
@@ -62,7 +54,9 @@ class JobsTableView(QTableView):
         self.setModel(proxyModel)
         self.sortByColumn(0, Qt.AscendingOrder)
         self.setSortingEnabled(True)
-
+        # self.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.clicked.connect(self.clickClear)
         self._initHelper()
 
     def _initHelper(self):
@@ -114,7 +108,7 @@ class JobsTableView(QTableView):
         if self.__log is not None:
             return self.__log
 
-        return JobsTableView.classLog()
+        return JobsHistoryView.classLog()
 
     @log.setter
     def log(self, value):
@@ -151,18 +145,18 @@ class JobsTableView(QTableView):
             menu.setFont(self.parent.font())
             menu.addAction("Copy")
             menu.addAction("Remove")
-            menu.addAction("Save")
+            menu.addAction("Delete")
 
             if action := menu.exec_(event.globalPos()):
                 result = action.text()
 
                 if result == "Copy":
-                    self.copySelection()
+                    self.copyCommand()
+                if result == "Delete":
+                    self.deleteSelectedRows()
                 elif result == "Remove":
                     self.proxyModel.filterConditions["Remove"].append(row)
                     self.proxyModel.setFilterFixedString("")
-                elif result == "Save":
-                    self.saveSelection()
 
     def contextMenuEventOriginal(self, event):
         """
@@ -181,7 +175,7 @@ class JobsTableView(QTableView):
         contextMenu = QMenu(self)
         menuItems = {}
 
-        for item in ["Copy", "Remove"]:  # Build menu first
+        for item in ["Copy", "Delete", "Remove"]:  # Build menu first
             menuItems[item] = contextMenu.addAction(item)
 
         selection = contextMenu.exec_(event.globalPos())  # Identify the selected item
@@ -191,39 +185,31 @@ class JobsTableView(QTableView):
         elif selection == menuItems["Remove"]:
             self.proxyModel.filterConditions["Remove"].append(row)
             self.proxyModel.setFilterFixedString("")
+        elif selection == menuItems["Delete"]:
+            self.deleteSelectedRows()
 
     def resizeEvent(self, event):
 
         # Adjust the size of rows when font changes
-
         self.resizeRowsToContents()
         self.resizeColumnsToContents()
 
         # Adjust the width of Job Status column is specific to
         # current app
 
-
         header = self.horizontalHeader()
-        #header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
-
+        # header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
 
         width = header.sectionSize(2)
         header.setSectionResizeMode(2, QHeaderView.Interactive)
         header.resizeSection(2, width)
-
-
         header.setFont(self.parent.font())
 
-        super(JobsTableView, self).resizeEvent(event)
+        super(JobsHistoryView, self).resizeEvent(event)
 
-    def copySelection(self):
+    def copyCommand(self):
         """
-        This function copies the selected cells in a table view, accounting for
-        filters and rows as well as non-continuous selection ranges. The format
-        of copied values can be pasted into Excel retaining the original
-        organization.
-
-        Adapted from code provided by ekhumoro on StackOverflow
+        copyCommand copy selected rows
         """
 
         selection = self.selectedIndexes()
@@ -231,135 +217,40 @@ class JobsTableView(QTableView):
         if selection:
             rows = [index.row() for index in selection]
             columns = [index.column() for index in selection]
-            rowCount = max(rows) - min(rows) + 1
-            colCount = max(columns) - min(columns) + 1
-            table = [[""] * colCount for _ in range(rowCount)]
-
-            for index in selection:
-                row = index.row() - min(rows)
-                column = index.column() - min(columns)
-                table[row][column] = index.data()
-
-            stream = io.StringIO()
-            csv.writer(stream, delimiter="\t").writerows(table)
-            QApplication.clipboard().setText(stream.getvalue())
-
-    def saveSelection(self):
-
-        model = self.proxyModel.sourceModel()
-
-        selection = self.selectedIndexes()
-
-        if selection:
-            for index in selection:
-                modelIndex = self.proxyModel.mapToSource(index)
-                jobRow = modelIndex.row()
-
-                job = JobInfo(
-                    jobRow,
-                    model.dataset[jobRow,],
-                    model,
-                    log=False,
-                )
-
-                print(job.jobRow[JobKey.ID])
-                print(job.oCommand.command)
-
-            #for row in rows:
+            if len(rows) == 4:
+                model = self.proxyModel.sourceModel()
+                row = rows[3]
+                column = columns[3]
+                command = model.dataset.data[row][column].cell
+                QApplication.clipboard().setText(command)
 
     def supportedDropActions(self):  # pylint: disable=no-self-use
 
         return Qt.CopyAction | Qt.MoveAction
 
-    def dropEvent(self, event):
+    def deleteSelectedRows(self):
+        """
+        deleteSelectedRows delete selected rows
+        """
 
-        data = event.mimeData()
-        command = data.text()
-        self._addCommand(command)
+        model = self.proxyModel.sourceModel()
 
-    def _addCommand(self, command):
+        proxyIndexList = []
+        for i in self.selectionModel().selectedRows():
+            index = QPersistentModelIndex(i)
+            proxyIndexList.append(index)
 
-        oCommand = MKVCommandParser(command)
+        for index in proxyIndexList:
+            modelIndex = self.proxyModel.mapToSource(index)
+            row = modelIndex.row()
+            rowid = model.dataset.data[row][JobHistoryKey.ID].obj
+            rowid0 = model.dataset[row, JobHistoryKey.ID]
+            print(f"From History View - model call row {row} data row ID {rowid} ID {rowid0}")
+            model.removeRows(row, 1)
 
-        if oCommand:
-            tableModel = self.proxyModel.sourceModel()
-            totalJobs = tableModel.rowCount()
-            data = [["", ""], [JobStatus.Waiting, "Status code"], [command, command]]
-            tableModel.insertRows(totalJobs, 1, data=data)
+    def rowsAboutToBeRemoved(self, parent, first, last):
+        pass
 
-
-def addToDb(job, update=False):
-    """
-    addToDb add the job to the history database
-
-    Args:
-        database (SqlJobsTable): history database
-        job (JobInfo): running job information
-        update (bool, optional): update is true if record should exits.
-            Defaults to False.
-
-    Returns:
-        int: rowid if insert successful. 0 otherwise.
-    """
-
-    #
-    # Always open to start saving in mid of worker operating
-    #
-    database = SqlJobsTable(config.data.get(config.ConfigKey.SystemDB))
-
-
-    # Compress job information:
-    # compressed = zlib.compress(cPickle.dumps(obj))
-
-    # Get it back:
-    # obj = cPickle.loads(zlib.decompress(compressed))
-
-    # Key ID, startTime
-    #
-
-    bSimulateRun = config.data.get(config.ConfigKey.SimulateRun)
-    rc = 0
-
-    if not bSimulateRun:
-        cmpJob = zlib.compress(pickle.dumps(job))
-        if not update:
-            rowid = database.insert(
-                job.jobRow[JobKey.ID],
-                job.date.isoformat(),
-                job.addTime,
-                job.startTime,
-                job.endTime,
-                cmpJob,
-                job.oCommand.command,
-                "Saved",
-                "Save Info",
-                1,
-                0,
-            )
-            rc = rowid
-
-            if rowid > 0:
-                sqlSearchUpdate = """
-                    INSERT INTO jobsSearch(rowidKey, id, startTime, command)
-                        VALUES(?, ?, ?, ?); """
-                database.sqlExecute(
-                    sqlSearchUpdate,
-                    rowid,
-                    job.jobRow[JobKey.ID],
-                    job.startTime,
-                    job.oCommand.command,
-                )
-            if rowid == 0:
-                print("error", database.error)
-                sys.exit()
-        else:
-            # jobsDB.update(449, (JobsTableKey.startTime, ), 80)
-            database.update(
-                job.jobRow[JobKey.ID],
-                (JobsTableKey.startTime, JobsTableKey.endTime, JobsTableKey.job),
-                job.startTime,
-                job.endTime,
-                cmpJob,
-            )
-
-    return rc
+    @Slot(object)
+    def clickClear(self, index):
+        pass

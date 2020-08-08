@@ -24,6 +24,7 @@ Header:
 
 # pylint: disable=too-few-public-methods
 
+import itertools
 
 class HeaderAttributeKey:
 
@@ -36,9 +37,9 @@ class HeaderAttributeKey:
 
 class DataKey:
 
-    Data = 0
+    Cell = 0
     ToolTip = 1
-    OCommand = 2
+    Obj = 2
 
 
 class HeaderInfo:
@@ -57,9 +58,9 @@ class DataItem:
     Data item information
     """
 
-    data = None
+    cell = None
     toolTip = None
-    oCommand = None
+    obj = None
 
 
 class Index:
@@ -88,6 +89,8 @@ class Index:
 class TableData:
     """
     Class to represent data in a table with columns headers
+
+    data[x][y] = DataItem
 
     A header is a list of the form:
         [str, dict]
@@ -155,11 +158,11 @@ class TableData:
                 currentRow = self.data[row]
 
                 for r in currentRow:
-                    returnRow.append(r.data)
+                    returnRow.append(r.cell)
 
                 return returnRow
 
-            return self.data[row][col].data
+            return self.data[row][col].cell
 
         raise TypeError("Invalid index type")
 
@@ -214,11 +217,11 @@ class TableData:
             column = index.column()
 
             if isinstance(value, DataItem):
-                self.data[row][column].data = value.data
+                self.data[row][column].cell = value.cell
                 self.data[row][column].toolTip = value.toolTip
-                self.data[row][column].oCommand = value.oCommand
+                self.data[row][column].obj = value.obj
             else:
-                self.data[row][column].data = value
+                self.data[row][column].cell = value
 
             return True
 
@@ -253,25 +256,33 @@ class TableData:
         """
 
         if row is not None:
-            emptyRow = [DataItem(), DataItem(), DataItem()]
+            totalColumns = len(self.headerName)
+            emptyRow = []
+            for _ in itertools.repeat(None, totalColumns):
+                rowItem = DataItem()
+                emptyRow.append(rowItem)
+
             self.data.insert(position, emptyRow)
 
             for column, value in enumerate(row):
                 if isinstance(value, list):
                     newItem = DataItem()
-                    newItem.data = value[DataKey.Data]
+                    newItem.cell = value[DataKey.Cell]
                     newItem.toolTip = value[DataKey.ToolTip]
-                    newItem.oCommand = value[DataKey.OCommand]
+                    newItem.obj = value[DataKey.Obj]
                     index = Index(position, column)
                     self.setData(index, newItem)
                 else:
                     if value is not None:
                         raise ValueError("Item at index {} is invalid".format(column))
         else:
-            emptyRow = ["", "", ""]
+            totalColumns = len(self.headerName)
+            emptyRow = []
+            for _ in itertools.repeat(None, totalColumns):
+                emptyRow.append("")
             self.data.insert(position, emptyRow)
 
-    def deleteRow(self, index):
+    def removeRow(self, index):
         """
         Delete a data row
 
@@ -315,9 +326,9 @@ class TableData:
             for r in self.data:
                 r.insert(position, DataItem())
         else:
-            for i, r in enumerate(self.data):
+            for _, r in enumerate(self.data):
                 element = DataItem()
-                element.data = columnData[0]
+                element.cell = columnData[0]
                 r.insert(position, columnData[1])
 
     def deleteColumn(self, index):

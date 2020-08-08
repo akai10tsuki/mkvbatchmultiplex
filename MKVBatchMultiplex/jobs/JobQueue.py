@@ -9,12 +9,13 @@ import copy
 import logging
 
 from collections import deque
-
+from datetime import datetime
+from time import time
 
 from PySide2.QtCore import QObject, Slot, Signal
 
 
-from vsutillib.mkv import MKVCommand, MKVCommandParser
+from vsutillib.mkv import MKVCommandParser
 
 from .. import config
 from ..models import TableProxyModel
@@ -24,6 +25,29 @@ from .RunJobs import RunJobs
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
+
+
+class FakeModelIndex:
+    """
+    Dummy QModelIndex
+
+    Returns:
+        Index: Dummy QModelIndex
+    """
+
+    def __init__(self, row, column):
+
+        self._row = row
+        self._column = column
+
+    def row(self):
+        return self._row
+
+    def column(self):
+        return self._column
+
+    def isValid(self):
+        return True
 
 
 class JobInfo:  # pylint: disable=too-many-instance-attributes
@@ -39,27 +63,124 @@ class JobInfo:  # pylint: disable=too-many-instance-attributes
     """
 
     def __init__(
-        self, index, job, tableModel, errors=None, output=None, log=False,
+        self,
+        jobRowNumber,
+        jobRow,
+        tableModel,
+        errors=None,
+        output=None,
+        log=False,
     ):
 
-        self.jobIndex = index[JobKey.ID]
-        self.statusIndex = index[JobKey.Status]
-        self.commandIndex = index[JobKey.Command]
-        self.job = job
-        self.command = job[JobKey.Command]
+        self.__jobRow = []
+
+        self.jobRowNumber = jobRowNumber
+
+        #self.jobIndex = index[JobKey.ID]
+        #self.statusIndex = index[JobKey.Status]
+        #self.commandIndex = index[JobKey.Command]
+
+        self.jobRow = jobRow
+        #self.command = jobRow[JobKey.Command]
         self.oCommand = copy.deepcopy(
-            tableModel.dataset.data[self.commandIndex.row()][
-                self.commandIndex.column()
-            ].oCommand
+            tableModel.dataset.data[jobRowNumber][JobKey.Command].obj
         )
 
         if not self.oCommand:
-            # self.oCommand = MKVCommand(job[JobKey.Command], log=log)
-            self.oCommand = MKVCommandParser(job[JobKey.Command], log=log)
+            command = tableModel.dataset[jobRowNumber, JobKey.Command]
+            self.oCommand = MKVCommandParser(command, log=log)
+            if log:
+                MODULELOG.debug(
+                    "JBQ0001: Job %s- Bad MKVCommandParser object.", jobRow[JobKey.ID]
+                )
 
+        self.date = datetime.today()
+        self.addTime = time()
+        self.startTime = None
+        self.endTime = None
         self.errors = [] if errors is None else errors
         self.output = [] if output is None else output
 
+
+    @property
+    def jobRow(self):
+        return self.__jobRow
+
+    @jobRow.setter
+    def jobRow(self, value):
+
+        if isinstance(value, list):
+            self.__jobRow = []
+            for cell in value:
+                self.__jobRow.append(cell)
+
+    @property
+    def status(self):
+        return self.jobRow[JobKey.Status]
+
+    @status.setter
+    def status(self, value):
+        if isinstance(value, str):
+            self.jobRow[JobKey.Status] = value
+
+
+class JobInfoOriginal:  # pylint: disable=too-many-instance-attributes
+    """
+    JobInfo Information for a job
+
+    Args:
+        status (str, optional): job status. Defaults to "".
+        index ([type], optional): index on job table. Defaults to None.
+        job (list, optional): row on job table. Defaults to None.
+        errors (list, optional): errors on job execution. Defaults to None.
+        output (list, optional): job output. Defaults to None.
+    """
+
+    def __init__(
+        self,
+        jobRowNumber,
+        jobRow,
+        tableModel,
+        errors=None,
+        output=None,
+        log=False,
+    ):
+
+        self.jobRowNumber = jobRowNumber
+
+        #self.jobIndex = index[JobKey.ID]
+        #self.statusIndex = index[JobKey.Status]
+        #self.commandIndex = index[JobKey.Command]
+
+        self.jobRow = jobRow
+        #self.command = jobRow[JobKey.Command]
+        self.oCommand = copy.deepcopy(
+            tableModel.dataset.data[jobRowNumber][JobKey.Command].obj
+        )
+
+        if not self.oCommand:
+            command = tableModel.dataset[jobRowNumber, JobKey.Command]
+            self.oCommand = MKVCommandParser(command, log=log)
+            if log:
+                MODULELOG.debug(
+                    "JBQ0001: Job %s- Bad MKVCommandParser object.", jobRow[JobKey.ID]
+                )
+
+        self.date = datetime.today()
+        self.addTime = time()
+        self.startTime = None
+        self.endTime = None
+        self.errors = [] if errors is None else errors
+        self.output = [] if output is None else output
+
+    @property
+    def status(self):
+        return self.jobRow[JobKey.Status]
+
+    @status.setter
+    def status(self, value):
+        if isinstance(value, str):
+            self.jobRow[JobKey.Status] = value
 
 class JobQueue(QObject):
     """
@@ -202,7 +323,8 @@ class JobQueue(QObject):
     @Slot(object, str)
     def statusUpdate(self, job, status):
 
-        self.model.setData(job.statusIndex, status)
+        index = self.model.index(job.jobRowNumber, JobKey.Status)
+        self.model.setData(index, status)
 
     def append(self, jobRow):
         """
@@ -227,24 +349,38 @@ class JobQueue(QObject):
             return False
 
         jobID = self.model.dataset[jobRow,][JobKey.ID]
+
         jobIndex = self.model.index(jobRow, JobKey.ID)
-        statusIndex = self.model.index(jobRow, JobKey.Status)
-        commandIndex = self.model.index(jobRow, JobKey.Command)
+        # statusIndex = self.model.index(jobRow, JobKey.Status)
+        # commandIndex = self.model.index(jobRow, JobKey.Command)
+
+        #fJobIndex = FakeModelIndex(jobRow, JobKey.ID)
+        #fStatusIndex = FakeModelIndex(jobRow, JobKey.Status)
+        #fCommandIndex = FakeModelIndex(jobRow, JobKey.Command)
 
         if not jobID:
             self.model.setData(jobIndex, self.__jobID)
             self.__jobID += 1
-            config.data.set("JobID", self.__jobID)
+            config.data.set(config.ConfigKey.JobID, self.__jobID)
+
+        #newJob = JobInfo(
+        #    jobRow,
+        #    [fJobIndex, fStatusIndex, fCommandIndex],
+        #    self.model.dataset[jobRow,],
+        #    self.model,
+        #    log=self.log,
+        #)
 
         newJob = JobInfo(
-            [jobIndex, statusIndex, commandIndex],
+            jobRow,
             self.model.dataset[jobRow,],
             self.model,
             log=self.log,
         )
-        self._workQueue.append(newJob)
-        self.model.setData(statusIndex, JobStatus.Queue)
 
+        self._workQueue.append(newJob)
+        index = self.model.index(jobRow, JobKey.Status)
+        self.model.setData(index, JobStatus.Queue)
         if self._workQueue:
             self.addQueueItemSignal.emit()
             return True
@@ -322,7 +458,8 @@ class JobQueue(QObject):
         self.runJobs.log = self.log
 
         if JobQueue.__firstRun:
-            self.parent.jobsOutput.setCurrentIndexSignal.emit()
+            #self.parent.jobsOutput.setCurrentIndexSignal.emit()
+            self.parent.jobsOutput.setAsCurrentTab()
             JobQueue.__firstRun = False
 
         self.runJobs.run()

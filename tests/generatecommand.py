@@ -21,71 +21,6 @@ from PySide2.QtWidgets import (
 import vsutillib.mkv as mkv
 
 
-
-#def findFile(element, dirPath=None):
-#    """find file in the path"""
-
-#    if dirPath is None:
-#        dirPath = os.getenv('PATH')
-
-#    dirs = dirPath.split(os.pathsep)
-
-#    for dirname in dirs:
-#        candidate = Path(PurePath(dirname).joinpath(element))
-#        if candidate.is_file():
-#            return candidate
-
-#    return None
-
-
-#def getMKVMerge():
-#    """Looks for mkvmerge executable in the system"""
-
-    # /Applications/MKVToolNix-29.0.0.app/Contents/MacOS/mkvmerge
-#    currentOS = platform.system()
-
-#    if currentOS == "Darwin":
-#        lstTest = glob.glob("/Applications/MKVToolNix*")
-#        if lstTest:
-#            f = lstTest[0] + "/Contents/MacOS/mkvmerge"
-#            mkvmerge = Path(f)
-#            if mkvmerge.is_file():
-#                return mkvmerge
-
-#    elif currentOS == "Windows":
-        #ProgramFiles=C:\Program Files
-        #ProgramFiles(x86)=C:\Program Files (x86)
-
-#        defPrograms64 = os.environ.get('ProgramFiles')
-#        defPrograms32 = os.environ.get('ProgramFiles(x86)')
-
-#        dirs = []
-#        if defPrograms64 is not None:
-#            dirs.append(defPrograms64)
-
-#        if defPrograms32 is not None:
-#            dirs.append(defPrograms32)
-
-        # search 64 bits
-#        for d in dirs:
-#            search = sorted(Path(d).rglob("mkvmerge.exe"))
-#            if search:
-#                mkvmerge = Path(search[0])
-#                if mkvmerge.is_file():
-#                    return mkvmerge
-
-#    elif currentOS == "Linux":
-
-#        search = findFile("mkvmerge")
-
-#        if search is not None:
-#            mkvmerge = Path(search)
-#            if mkvmerge.is_file():
-#                return mkvmerge
-
-#    return None
-
-
 def checkForQuote(file):
     """add quotes if find spaces in file name"""
 
@@ -117,7 +52,6 @@ class GenCommandApp(QMainWindow):
         else:
             l = "--ui-language en_US"
 
-
         p = os.path.dirname(os.path.realpath(__file__))
         p = os.path.realpath(p)
         d = p + "/NewFiles"
@@ -130,31 +64,31 @@ class GenCommandApp(QMainWindow):
                 r"/video-S01E01.mkv' --language 0:und --language 1:spa " + \
                 r"--default-track 1:yes '(' '" + s + \
                 r"/video-S01E01.avi' ')' --language 0:eng --default-track 0:yes '(' '" + s + \
-                r"/Video-S01E01.ass' ')' --track-order 0:0,0:1,1:0"
+                r"/Subs/Video-S01E01.ass' ')' --track-order 0:0,0:1,1:0"
 
         self.cmd1 = mkvmerge + r" " + l + " --output '" + d + \
                 r"/video - S01E02.mkv' --language 0:und --language 1:spa " + \
                 r"--default-track 1:yes '(' '" + s + \
                 r"/video - S01E02.avi' ')' --language 0:eng --default-track 0:yes '(' '" + s + \
-                r"/Video - S01E02.ass' ')' --track-order 0:0,0:1,1:0"
+                r"/Subs/Video - S01E02.ass' ')' --track-order 0:0,0:1,1:0"
 
         self.cmd2 = mkvmerge + r" " + l + " --output '" + d + \
                 r"/video - S01E03.mkv' --language 0:und --language 1:spa " + \
                 r"--default-track 1:yes '(' '" + s + \
                 r"/video - S01E03.avi' ')' --language 0:eng --default-track 0:yes '(' '" + s + \
-                r"/Video - S01E03.ass' ')' --track-order 0:0,0:1,1:0"
+                r"/Subs/Video - S01E03.ass' ')' --track-order 0:0,0:1,1:0"
 
         self.cmd3 = mkvmerge + r" " + l + " --output '" + d + \
                 r"/video'\''S01E05.mkv' --language 0:und --language 1:spa " + \
                 r"--default-track 1:yes '(' '" + s + \
                 r"/video'\''S01E05.avi' ')' --language 0:eng --default-track 0:yes '(' '" + s + \
-                r"/Video'\''S01E05.ass' ')' --track-order 0:0,0:1,1:0"
+                r"/Subs/Video'\''S01E05.ass' ')' --track-order 0:0,0:1,1:0"
 
         self.cmd4 = mkvmerge + r" " + l + " --output " + d + \
                 r"/video-S01E01.mkv --language 0:und --language 1:spa " + \
                 r"--default-track 1:yes '(' " + s + \
                 r"/video-S01E01.avi ')' --language 0:eng --default-track 0:yes '(' " + s + \
-                r"/Video-S01E01.ass ')' --track-order 0:0,0:1,1:0"
+                r"/Subs/Video-S01E01.ass ')' --track-order 0:0,0:1,1:0"
 
 
         self.textWindow = QTextEdit()

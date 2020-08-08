@@ -212,18 +212,19 @@ class TableModel(QAbstractTableModel):
             column = index.column()
 
             if role in [Qt.DisplayRole, Qt.EditRole]:
-                if self.dataset.data[row][column].data != "":
+                if self.dataset.data[row][column].cell != "":
                     return self.dataset.headers[column].attribute["CastFunction"](
-                        self.dataset.data[row][column].data
+                        self.dataset.data[row][column].cell
                     )
 
             elif role == Qt.ToolTipRole:
                 toolTip = None
 
-                if column == JOBCOMMAND:
-                    toolTip = self.dataset.data[row][column].toolTip
+                # if column == JOBCOMMAND:
+                toolTip = self.dataset.data[row][column].toolTip
 
-                return toolTip
+                if toolTip:
+                    return toolTip
 
             elif role == Qt.TextAlignmentRole:
                 if self.dataset.headers[column].attribute["Alignment"] == "right":
@@ -337,6 +338,26 @@ class TableModel(QAbstractTableModel):
             return True
 
         return False
+
+    def removeRows(self, position, rows, parent=QModelIndex()):
+
+        if position < 0:
+            return False
+
+        rowCount = self.rowCount()
+
+        if position <= rowCount:
+            self.beginRemoveRows(parent, position, position + rows - 1)
+            # del self.dataset[position:rows + 1] verify
+
+            # delete rows starting from highest index
+            # in the range going backwards
+            for row in range(rows - 1, -1, -1):
+                self.dataset.removeRow(position + row)
+
+            self.endRemoveRows()
+
+        return True
 
     #
     # Enable Drag and Drop
