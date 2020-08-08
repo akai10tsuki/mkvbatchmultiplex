@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>744</width>
-    <height>495</height>
+    <height>430</height>
    </rect>
   </property>
   <property name="font">
@@ -25,7 +25,7 @@
    <property name="geometry">
     <rect>
      <x>460</x>
-     <y>390</y>
+     <y>350</y>
      <width>241</width>
      <height>32</height>
     </rect>
@@ -43,7 +43,7 @@
      <x>30</x>
      <y>40</y>
      <width>681</width>
-     <height>321</height>
+     <height>281</height>
     </rect>
    </property>
    <property name="title">
@@ -53,7 +53,7 @@
     <property name="geometry">
      <rect>
       <x>21</x>
-      <y>42</y>
+      <y>46</y>
       <width>172</width>
       <height>23</height>
      </rect>
@@ -65,9 +65,9 @@
    <widget class="QFontComboBox" name="fcmbBoxFontFamily">
     <property name="geometry">
      <rect>
-      <x>199</x>
-      <y>82</y>
-      <width>381</width>
+      <x>221</x>
+      <y>85</y>
+      <width>371</width>
       <height>29</height>
      </rect>
     </property>
@@ -76,8 +76,8 @@
     <property name="geometry">
      <rect>
       <x>21</x>
-      <y>274</y>
-      <width>641</width>
+      <y>235</y>
+      <width>631</width>
       <height>27</height>
      </rect>
     </property>
@@ -102,8 +102,8 @@
     <property name="geometry">
      <rect>
       <x>21</x>
-      <y>122</y>
-      <width>641</width>
+      <y>124</y>
+      <width>631</width>
       <height>27</height>
      </rect>
     </property>
@@ -115,8 +115,8 @@
     <property name="geometry">
      <rect>
       <x>21</x>
-      <y>82</y>
-      <width>102</width>
+      <y>85</y>
+      <width>171</width>
       <height>23</height>
      </rect>
     </property>
@@ -129,7 +129,7 @@
      <rect>
       <x>21</x>
       <y>198</y>
-      <width>641</width>
+      <width>631</width>
       <height>27</height>
      </rect>
     </property>
@@ -140,8 +140,8 @@
    <widget class="QCheckBox" name="chkBoxEnableLogViewer">
     <property name="geometry">
      <rect>
-      <x>45</x>
-      <y>160</y>
+      <x>43</x>
+      <y>161</y>
       <width>611</width>
       <height>27</height>
      </rect>
@@ -153,15 +153,15 @@
      </size>
     </property>
     <property name="text">
-     <string>Enable log viewer</string>
+     <string>Enable Log Viewer</string>
     </property>
    </widget>
    <widget class="QComboBox" name="cmbBoxInterfaceLanguage">
     <property name="geometry">
      <rect>
-      <x>199</x>
-      <y>42</y>
-      <width>461</width>
+      <x>221</x>
+      <y>46</y>
+      <width>431</width>
       <height>29</height>
      </rect>
     </property>
@@ -169,30 +169,11 @@
    <widget class="QSpinBox" name="spinBoxFontSize">
     <property name="geometry">
      <rect>
-      <x>590</x>
-      <y>82</y>
-      <width>71</width>
+      <x>599</x>
+      <y>85</y>
+      <width>51</width>
       <height>29</height>
      </rect>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="chkBoxAutoSaveJobHistory">
-    <property name="geometry">
-     <rect>
-      <x>45</x>
-      <y>236</y>
-      <width>611</width>
-      <height>27</height>
-     </rect>
-    </property>
-    <property name="baseSize">
-     <size>
-      <width>0</width>
-      <height>0</height>
-     </size>
-    </property>
-    <property name="text">
-     <string>Automatically save jobs</string>
     </property>
    </widget>
   </widget>
@@ -200,7 +181,7 @@
    <property name="geometry">
     <rect>
      <x>50</x>
-     <y>390</y>
+     <y>350</y>
      <width>351</width>
      <height>34</height>
     </rect>
