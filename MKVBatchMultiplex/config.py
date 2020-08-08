@@ -14,7 +14,7 @@ from vsutillib.files import ConfigurationSettings
 from vsutillib.log import LogRotateFileHandler
 from vsutillib.pyqt import QSignalLogHandler
 
-__VERSION = (2, 0, "0a2dev2")
+__VERSION = (2, 0, "0a2dev3")
 
 APPNAME = "MKVBatchMultiplex"
 VERSION = ".".join(map(str, __VERSION))
@@ -211,8 +211,10 @@ def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None, ap
 
     # Don't Release for now manually activated
     # <ConfigSetting id="JobHistory" type="bool">True</ConfigSetting>
-    # if data.get(ConfigKey.JobHistory) is None:
+    #if data.get(ConfigKey.JobHistory) is None:
     #    data.set(ConfigKey.JobHistory, False)
+    #for key in data.configDictionary:
+    #    print(f"Key {key}")
 
 
 def setDefaultFont(app):
