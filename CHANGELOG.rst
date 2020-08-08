@@ -11,7 +11,7 @@ Added
 
 - show progress bar on Windows taskbar icon
 - new option to save executed jobs
-- read past jobs on Jobs History table, display run output and any errors
+- view log on optional tab
 
 Changed
 ~~~~~~~
@@ -23,13 +23,13 @@ Fixed
 ~~~~~
 
 - Fix BUG #1 force escape quotes for mkvmerge executable in Windows
+- Fix BUG #3 title of first episode propagating to all episodes
 - dummy progress bar icon function on macOS was not working
 - removing configuration elements not always working
 - spanish locale fixes
 
 2.0.0a1 - 2010-12-5
 -------------------
-
 
 - First release version 2.0
 - Re-write of MKVBatchMultiplex
