@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-(Unreleased)
+2.0.0b1 - 2020-8-8
 ------------
 
 
@@ -10,7 +10,6 @@ Added
 ~~~~~
 
 - show progress bar on Windows taskbar icon
-- new option to save executed jobs
 - view log on optional tab
 
 Changed
@@ -28,7 +27,7 @@ Fixed
 - removing configuration elements not always working
 - spanish locale fixes
 
-2.0.0a1 - 2010-12-5
+2.0.0a1 - 2019-12-5
 -------------------
 
 - First release version 2.0

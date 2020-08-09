@@ -54,6 +54,8 @@ Dependencies
     * Python_ 3.8.1
         - PySide2_ 5.14 or greater
         - pymediainfo_ 4.2.1 or greater
+    * lxml_ 4.5.2 or greater
+    * natsort_ 7.0.1 or greater
     * MediaInfo_ tested with versions 17.10->18.12
     * MKVToolNix_ tested with versions 17.00->46.0.0
 
@@ -103,3 +105,5 @@ See https://mkvbatchmultiplex.readthedocs.io for more information.
 .. _MediaInfo: https://mediaarea.net/en/MediaInfo
 .. _AVI: https://docs.microsoft.com/en-us/windows/win32/directshow/avi-file-format/
 .. _SRT: https://matroska.org/technical/specs/subtitles/srt.html
+.. _lxml: https://lxml.de/
+.. _natsort: https://github.com/SethMMorton/natsort
