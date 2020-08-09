@@ -19,7 +19,8 @@ from PySide2.QtWidgets import (
     QHeaderView,
 )
 
-from vsutillib.mkv import MKVCommand, MKVCommandParser
+#from vsutillib.mkv import MKVCommand, MKVCommandParser
+from vsutillib.mkv import MKVCommandParser
 
 from ..jobs import JobStatus, JobHistoryKey
 
