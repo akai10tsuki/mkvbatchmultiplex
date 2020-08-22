@@ -1,10 +1,21 @@
 Changelog
 =========
 
+2.0.0 - 2000-8-22
+-----------------
+
+Changed
+~~~~~~~
+
+- locale updates
+
+Fixed
+~~~~~
+
+- python wheel distribution not working
 
 2.0.0b1 - 2020-8-8
-------------
-
+------------------
 
 Added
 ~~~~~

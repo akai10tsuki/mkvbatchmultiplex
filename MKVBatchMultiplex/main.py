@@ -274,7 +274,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
                 [
                     self.logViewerWidget,
                     "Log Viewer",
-                    "Messages registered in current running log.",
+                    "Messages registered in current running log",
                 ]
             )
         else:
