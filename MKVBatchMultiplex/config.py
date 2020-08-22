@@ -27,11 +27,11 @@ COPYRIGHT = "2018-2020, Efrain Vergara"
 LICENSE = "MIT"
 DESCRIPTION = "A mkv media batch multiplex."
 ENTRYPOINTS = {
-    "console_scripts": ["mkvbatchmultiplex=mkvbatchmultiplex:mainApp",],
+    "console_scripts": ["mkvbatchmultiplex=MKVBatchMultiplex:mainApp",],
 }
 KEYWORDS = "mkv multimedia video mkvtoolnix plex"
 NAME = APPNAME.lower()
-PACKAGES = [NAME]
+PACKAGES = [APPNAME]
 URL = "https://github.com/akai10tsuki/mkvbatchmultiplex"
 PROJECTURLS = {
     "Bug Reports": "https://github.com/akai10tsuki/mkvbatchmultiplex/issues",

@@ -3,7 +3,7 @@ include LICENSE.txt
 include README.rst
 
 graft docs
-graft fileRename
+graft MKVBatchMultiplex
 
 prune docs/_build
 
