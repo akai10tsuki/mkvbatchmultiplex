@@ -34,7 +34,7 @@ from vsutillib.pyqt import (
     messageBox,
     TabWidgetExtension,
 )
-from vsutillib.mkv import MKVCommand, MKVCommandParser
+from vsutillib.mkv import MKVCommandParser
 
 from .. import config
 from ..jobs import JobStatus
