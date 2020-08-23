@@ -81,9 +81,10 @@ class PreferencesDialogWidget(QDialog):
         #
         # Enable History
         #
-        self.ui.chkBoxEnableJobHistory.setChecked(
-            config.data.get(config.ConfigKey.JobHistory)
-        )
+        if config.data.get(config.ConfigKey.JobHistory) is not None:
+            self.ui.chkBoxEnableJobHistory.setChecked(
+                config.data.get(config.ConfigKey.JobHistory)
+            )
         #
         # Restore Windows Size
         #
@@ -113,9 +114,13 @@ class PreferencesDialogWidget(QDialog):
         self.ui.chkBoxEnableLogViewer.stateChanged.connect(
             self.__pref.enableLogViewerStateChanged
         )
-        self.ui.chkBoxEnableJobHistory.stateChanged.connect(
-            self.__pref.enableJobHistoryChanged
-        )
+        #
+        # Job History
+        #
+        if config.data.get(config.ConfigKey.JobHistory) is not None:
+            self.ui.chkBoxEnableJobHistory.stateChanged.connect(
+                self.__pref.enableJobHistoryChanged
+            )
         #
         # Window size
         #
@@ -156,6 +161,7 @@ class PreferencesDialogWidget(QDialog):
         return rc
 
     def applyChanges(self):
+        """Activate changes selected on Preferences Dialog"""
 
         if self.preferences:
             #
@@ -215,17 +221,18 @@ class PreferencesDialogWidget(QDialog):
             #
             # Job History
             #
-            if self.preferences.enableJobHistory is not None:
-                config.data.set(
-                    config.ConfigKey.JobHistory, self.preferences.enableJobHistory
-                )
-                if self.preferences.enableJobHistory:
-                    if self.parent.historyWidget.tab < 0:
-                        self.parent.historyWidget.unHideTab()
-                        self.parent.historyWidget.setAsCurrentTab()
-                else:
-                    if self.parent.historyWidget.tab >= 0:
-                        self.parent.historyWidget.hideTab()
+            if config.data.get(config.ConfigKey.JobHistory) is not None:
+                if self.preferences.enableJobHistory is not None:
+                    config.data.set(
+                        config.ConfigKey.JobHistory, self.preferences.enableJobHistory
+                    )
+                    if self.preferences.enableJobHistory:
+                        if self.parent.historyWidget.tab < 0:
+                            self.parent.historyWidget.unHideTab()
+                            self.parent.historyWidget.setAsCurrentTab()
+                    else:
+                        if self.parent.historyWidget.tab >= 0:
+                            self.parent.historyWidget.hideTab()
             #
             # Restore window size
             #
@@ -346,7 +353,8 @@ class Preferences(QObject):
 
         self.parent.ui.chkBoxRestoreWindowSize.setChecked(True)
         self.parent.ui.chkBoxEnableLogging.setChecked(False)
-        self.parent.ui.chkBoxEnableJobHistory.setChecked(False)
+        if config.data.get(config.ConfigKey.JobHistory) is not None:
+            self.parent.ui.chkBoxEnableJobHistory.setChecked(False)
         self.parent.ui.chkBoxEnableLogViewer.setChecked(False)
         defaultFont = QFont()
         defaultFont.fromString(config.data.get(config.ConfigKey.SystemFont))

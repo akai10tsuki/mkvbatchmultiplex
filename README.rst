@@ -52,10 +52,10 @@ Dependencies
 ************
 
     * Python_ 3.8.1
-        - PySide2_ 5.14 or greater
+        - lxml_ 4.5.2 or greater
+        - natsort_ 7.0.1 or greater
         - pymediainfo_ 4.2.1 or greater
-    * lxml_ 4.5.2 or greater
-    * natsort_ 7.0.1 or greater
+        - PySide2_ 5.14 or greater
     * MediaInfo_ tested with versions 17.10->18.12
     * MKVToolNix_ tested with versions 17.00->46.0.0
 
@@ -85,7 +85,7 @@ Roadmap
 
 This is just the base for the project.  The roadmap is:
 
-    * Work on rename module to fetch some metadata from internet
+    * Work on rename module to fetch metadata
     * Work on the Spanish interface translation
     * Easier installation for linux
 
