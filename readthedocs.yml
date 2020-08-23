@@ -15,5 +15,3 @@ formats: all
 # build your docs
 python:
   version: 3.8
-  install:
-    - requirements: docs/requirements.txt
