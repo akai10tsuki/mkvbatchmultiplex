@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PreferencesDialog</class>
+ <widget class="QDialog" name="PreferencesDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>744</width>
+    <height>430</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>14</pointsize>
+   </font>
+  </property>
+  <property name="contextMenuPolicy">
+   <enum>Qt::DefaultContextMenu</enum>
+  </property>
+  <property name="windowTitle">
+   <string>Preferences</string>
+  </property>
+  <widget class="QDialogButtonBox" name="btnBox">
+   <property name="geometry">
+    <rect>
+     <x>460</x>
+     <y>350</y>
+     <width>241</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="grpBox">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>40</y>
+     <width>681</width>
+     <height>281</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Options</string>
+   </property>
+   <widget class="QLabel" name="lblInterfaceLanguage">
+    <property name="geometry">
+     <rect>
+      <x>21</x>
+      <y>46</y>
+      <width>172</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Interface Language:</string>
+    </property>
+   </widget>
+   <widget class="QFontComboBox" name="fcmbBoxFontFamily">
+    <property name="geometry">
+     <rect>
+      <x>221</x>
+      <y>85</y>
+      <width>371</width>
+      <height>29</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="chkBoxRestoreWindowSize">
+    <property name="geometry">
+     <rect>
+      <x>21</x>
+      <y>235</y>
+      <width>631</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Restore original window size</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>203</x>
+      <y>46</y>
+      <width>16</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="chkBoxEnableLogging">
+    <property name="geometry">
+     <rect>
+      <x>21</x>
+      <y>124</y>
+      <width>631</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Enable Logging</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblFontAndSize">
+    <property name="geometry">
+     <rect>
+      <x>21</x>
+      <y>85</y>
+      <width>171</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Font &amp; Size:</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="chkBoxEnableLogViewer">
+    <property name="geometry">
+     <rect>
+      <x>43</x>
+      <y>161</y>
+      <width>611</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="baseSize">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="text">
+     <string>Enable Log Viewer</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cmbBoxInterfaceLanguage">
+    <property name="geometry">
+     <rect>
+      <x>221</x>
+      <y>46</y>
+      <width>431</width>
+      <height>29</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="spinBoxFontSize">
+    <property name="geometry">
+     <rect>
+      <x>599</x>
+      <y>85</y>
+      <width>51</width>
+      <height>29</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QPushButton" name="btnRestoreDefaults">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>350</y>
+     <width>351</width>
+     <height>34</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Restore Defaults</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>btnBox</sender>
+   <signal>accepted()</signal>
+   <receiver>PreferencesDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnBox</sender>
+   <signal>rejected()</signal>
+   <receiver>PreferencesDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
