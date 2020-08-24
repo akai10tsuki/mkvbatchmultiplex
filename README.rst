@@ -10,8 +10,8 @@ mkvbatchmultiplex: MKVMERGE batch multiplexing
 .. image:: https://img.shields.io/pypi/pyversions/mkvbatchmultiplex.svg
   :target: https://pypi.org/project/mkvbatchmultiplex
 
-.. |Contributor Covenant| image:: https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg
-  :target: https://github.com/akai10tsuki/mkvbatchmultiplex/blob/dev/CODE_OF_CONDUCT.md
+.. image:: https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg
+  :target: CODE_OF_CONDUCT.md
 
 This project went into a rewrite for version 2.  Rename module was added to
 help maintain output file names Plex_ friendly.
@@ -53,13 +53,15 @@ locale files.  On the source directory execute:
 Dependencies
 ************
 
-    * Python_ 3.8.1
-        - lxml_ 4.5.2 or greater
-        - natsort_ 7.0.1 or greater
-        - pymediainfo_ 4.2.1 or greater
-        - PySide2_ 5.14 or greater
-    * MediaInfo_ tested with versions 17.10->18.12
-    * MKVToolNix_ tested with versions 17.00->46.0.0
+  * Python_ 3.8.1
+
+    - lxml_ 4.5.2 or greater
+    - natsort_ 7.0.1 or greater
+    - pymediainfo_ 4.2.1 or greater
+    - PySide2_ 5.14 or greater
+
+  * MediaInfo_ tested with versions 17.10->20.08
+  * MKVToolNix_ tested with versions 17.00->49.0.0
 
 For now is a python package it can be installed:
 
