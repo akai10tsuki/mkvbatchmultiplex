@@ -10,6 +10,8 @@ mkvbatchmultiplex: MKVMERGE batch multiplexing
 .. image:: https://img.shields.io/pypi/pyversions/mkvbatchmultiplex.svg
   :target: https://pypi.org/project/mkvbatchmultiplex
 
+.. |Contributor Covenant| image:: https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg
+  :target: code_of_conduct.md
 
 This project went into a rewrite for version 2.  Rename module was added to
 help maintain output file names Plex_ friendly.
