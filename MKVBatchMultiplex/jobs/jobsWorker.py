@@ -303,14 +303,10 @@ def jobsWorker(
 
             msg = "Job ID: {} {}\nruntime {}"
             msg = msg.format(
-                job.jobRow[JobKey.ID],
-                exitStatus,
-                strFormatTimeDelta(dtDuration),
+                job.jobRow[JobKey.ID], exitStatus, strFormatTimeDelta(dtDuration),
             )
             trayIconMessageSignal.emit(
-                "Information - MKVBatchMultiplex",
-                msg,
-                QSystemTrayIcon.Information,
+                "Information - MKVBatchMultiplex", msg, QSystemTrayIcon.Information,
             )
 
             if config.data.get(config.ConfigKey.JobHistory):
@@ -494,7 +490,8 @@ def displayRunJobs(line, job, output, indexTotal, funcProgress=None):
 
     # if (line.find("El multiplexado") == 0) or (line.find("Multiplexing took") == 0):
     if displayRunJobs.count == 3:
-        # print(f"Count lines = {displayRunJobs.count}")
         displayRunJobs.count = 0
+        displayRunJobs.printPercent = False
+        displayRunJobs.counting = False
         output.job.emit("\n\n", {})
         job.output.append("\n\n")
