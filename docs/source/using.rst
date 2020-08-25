@@ -214,6 +214,9 @@ Tabs
   When the job fails use  the buttons for troubleshooting to see if the problem
   is revealed.  If still cannot find the problem post an issue to get help.
 
+  Before adding the job to the queue you have the option to push **<Rename>** to
+  go to the **Rename** tab and rename the output files.
+
 * **Jobs**
 
   Displays a table with the jobs added for current session.
