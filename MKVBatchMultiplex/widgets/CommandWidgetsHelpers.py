@@ -16,7 +16,6 @@ def runAnalysis(**kwargs):
     output = kwargs.pop("output", None)
     command = kwargs.pop("command", None)
     log = kwargs.pop("log", False)
-    baseTotalFiles = 0
     if command:
         output.command.emit("Analysis of command line:\n", {LineOutput.AppendEnd: True})
         verify = mkv.MKVCommandParser(command, log=log)
