@@ -108,7 +108,7 @@ class CommandWidget(TabWidgetExtension, QWidget):
         )
         btnRename = QPushButtonWidget(
             Text.txt0182,
-            function=self.parent.renameWidget.setCurrentIndexSignal.emit,
+            function=self.parent.renameWidget.setAsCurrentTab,
             toolTip=Text.txt0183,
         )
         btnAddQueue = QPushButtonWidget(
