@@ -2,17 +2,12 @@
 CommandWidget helper functions attach to buttons
 """
 
-# pylint: disable=bad-continuation
-import pprint
 
 from PySide2.QtCore import Qt
-from PySide2.QtGui import QKeySequence
-from PySide2.QtWidgets import QLineEdit
 
 import vsutillib.mkv as mkv
-from vsutillib.pyqt import SvgColor, LineOutput, checkColor
-
-from .. import config
+from vsutillib.files import DisplayPath
+from vsutillib.pyqt import SvgColor, LineOutput
 
 
 def runAnalysis(**kwargs):
@@ -100,7 +95,7 @@ def showCommands(**kwargs):
             index += 1
     else:
         output.command.emit(
-            "MCW0008: Error in command construction {}\n".format(oCommand.error),
+            "MCW0008: Error in command construction.\n",
             {LineOutput.Color: Qt.red, LineOutput.AppendEnd: True},
         )
 
@@ -215,11 +210,21 @@ def checkFiles(**kwargs):
                 f"Directory: {oCommand.dirsByKey[key]}\n",
                 {LineOutput.Color: color, LineOutput.AppendEnd: True},
             )
-            for i, oFile in enumerate(oCommand.filesInDirByKey[key]):
+            dirTree = DisplayPath.makeTree(
+                oCommand.dirsByKey[key], fileList=oCommand.filesInDirByKey[key]
+            )
+            for child in dirTree:
                 output.command.emit(
-                    f"{i + 1}. {oFile}",
+                    f"{child.displayable()}",
                     {LineOutput.Color: color, LineOutput.AppendEnd: True},
                 )
+
+            #for i, oFile in enumerate(oCommand.filesInDirByKey[key]):
+            #    output.command.emit(
+            #        f"{i + 1}. {oFile}",
+            #        {LineOutput.Color: color, LineOutput.AppendEnd: True},
+            #    )
+
             output.command.emit(
                 "", {LineOutput.Color: color, LineOutput.AppendEnd: True},
             )
@@ -230,23 +235,24 @@ def checkFiles(**kwargs):
     return None
 
 
-class QLineEditWidget(QLineEdit):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def keyPressEvent(self, event):
-        if event.matches(QKeySequence.Paste):
-            print("Ctrl-V Paste Filter")
-
-        super().keyPressEvent(event)
-
-    def contextMenuEvent(self, event):
-
-        print(str(event))
-
-        print(self.text())
-
-        super().contextMenuEvent(event)
+# class QLineEditWidget(QLineEdit):
+#
+#    def __init__(self, *args, **kwargs):
+#        super().__init__(*args, **kwargs)
+#
+#    def keyPressEvent(self, event):
+#        if event.matches(QKeySequence.Paste):
+#            print("Ctrl-V Paste Filter")
+#
+#        super().keyPressEvent(event)
+#
+#    def contextMenuEvent(self, event):
+#
+#        print(str(event))
+#
+#        print(self.text())
+#
+#        super().contextMenuEvent(event)
 
 
 class MKVParseKey:
