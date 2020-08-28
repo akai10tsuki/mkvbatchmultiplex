@@ -7,6 +7,7 @@
    installation
    gettingstarted
    using
+   contributing
    LICENSE
    acknowledgements
    CHANGELOG
