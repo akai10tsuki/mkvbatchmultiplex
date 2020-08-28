@@ -20,6 +20,7 @@ sys.path.insert(0, os.path.abspath("../.."))
 from MKVBatchMultiplex import config
 
 html_show_sourcelink = False
+autodoc_mock_imports = ["vsutillib"]
 
 # pylint: skip-file
 
