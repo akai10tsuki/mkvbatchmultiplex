@@ -71,13 +71,13 @@ Write bug reports with detail, background, and sample code
 Use a Consistent Coding Style
 #############################
 
-The code is formatted using `black`_.  For linting pylint_ is used.
+The code is formatted using `black`_ and for linting pylint_ is used.
 
 License
 #######
 
 By contributing, you agree that your contributions will be licensed under its
-MIT License.
+`MIT License`_.
 
 References
 #############

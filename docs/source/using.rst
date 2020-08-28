@@ -377,13 +377,17 @@ Tabs
     Here is an example where the name contains the series name and the episode
     number only.
 
-    The regular expression is: (\\[.*\\]\\W*|)(.*?)(\\W*-|)\\W*(\\d+).*
+    The regular expression is:::
 
-    The substitution string is: \\2 - S01E\\4
+    (\\[.*\\]\\W*|)(.*?)(\\W*-|)\\W*(\\d+).*
+
+    The substitution string is:::
+
+    \\2 - S01E\\4
 
     For regular expressions the order is not important the episode number is
     taken from the name.  Also missing episodes won't affect the rename of the
-    files.  What the regular expression is doing is creating 4 groups:
+    files.  What the regular expression is doing is creating 4 groups:::
 
       1. (\\[.*\\]\\W*|) - this will match the group name if Analysis
       2. (.*?) - this will match the series name
