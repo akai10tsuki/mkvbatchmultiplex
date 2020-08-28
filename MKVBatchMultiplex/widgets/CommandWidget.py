@@ -417,6 +417,7 @@ class CommandWidget(TabWidgetExtension, QWidget):
 
         totalJobs = self.model.rowCount()
         command = self.cmdLine.text()
+        # [cell value, tooltip, obj]
         data = [
             ["", "", None],
             [status, "Status code", None],

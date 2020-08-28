@@ -251,7 +251,7 @@ class TableData:
         Insert a data row
 
         Arguments:
-            index (int) -- row number where to insert the data
+            position (int) -- row number where to insert the data
             row (list) -- list with row data
         """
 
