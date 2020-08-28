@@ -517,9 +517,8 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         Set application language the scheme permits runtime changes
 
         Keyword Arguments:
-            language {str} -- language selected (default: {"en"})
-            menuItem {QMenuWidget} -- menu object making the call for
-                checkmark update
+            language (str) -- language selected (default: {"en"})
+            menuItem (QMenuWidget) -- menu object making the call for checkmark update
         """
 
         if language is None:
