@@ -218,40 +218,26 @@ def checkFiles(**kwargs):
                     {LineOutput.Color: color, LineOutput.AppendEnd: True},
                 )
 
-            #for i, oFile in enumerate(oCommand.filesInDirByKey[key]):
-            #    output.command.emit(
-            #        f"{i + 1}. {oFile}",
-            #        {LineOutput.Color: color, LineOutput.AppendEnd: True},
-            #    )
-
             output.command.emit(
                 "", {LineOutput.Color: color, LineOutput.AppendEnd: True},
             )
+
+    output.command.emit(
+        f"Files in destination directory: {oCommand.dirsByKey[MKVParseKey.outputFile]}\n",
+        {LineOutput.Color: color, LineOutput.AppendEnd: True},
+    )
+    dirTree = DisplayPath.makeTree(oCommand.dirsByKey[MKVParseKey.outputFile])
+    for child in dirTree:
+        output.command.emit(
+            f"{child.displayable()}",
+            {LineOutput.Color: color, LineOutput.AppendEnd: True},
+        )
+
     output.command.emit(
         "", {LineOutput.Color: color, LineOutput.AppendEnd: True},
     )
 
     return None
-
-
-# class QLineEditWidget(QLineEdit):
-#
-#    def __init__(self, *args, **kwargs):
-#        super().__init__(*args, **kwargs)
-#
-#    def keyPressEvent(self, event):
-#        if event.matches(QKeySequence.Paste):
-#            print("Ctrl-V Paste Filter")
-#
-#        super().keyPressEvent(event)
-#
-#    def contextMenuEvent(self, event):
-#
-#        print(str(event))
-#
-#        print(self.text())
-#
-#        super().contextMenuEvent(event)
 
 
 class MKVParseKey:
