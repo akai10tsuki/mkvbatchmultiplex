@@ -67,15 +67,7 @@ Dependencies
   * MediaInfo_ tested with versions 17.10->20.08
   * MKVToolNix_ tested with versions 17.00->49.0.0
 
-For now is a python package it can be installed:
-
-::
-
-    pip install mkvbatchmultiplex
-    or download the source
-
-
-macOS 10.14 Dark theme MKVToolNix has to be version 30.0.0+
+In macOS 10.14 Dark theme MKVToolNix has to be version 30.0.0+ to use it.
 
 Usage
 =====
@@ -113,8 +105,6 @@ See https://mkvbatchmultiplex.readthedocs.io for more information.
 .. _MKVToolNix: https://mkvtoolnix.download/
 .. _Matroska: https://www.matroska.org/
 .. _MediaInfo: https://mediaarea.net/en/MediaInfo
-.. _AVI: https://docs.microsoft.com/en-us/windows/win32/directshow/avi-file-format/
-.. _SRT: https://matroska.org/technical/specs/subtitles/srt.html
 .. _lxml: https://lxml.de/
 .. _natsort: https://github.com/SethMMorton/natsort
 .. _wiki: https://github.com/akai10tsuki/mkvbatchmultiplex/wiki
