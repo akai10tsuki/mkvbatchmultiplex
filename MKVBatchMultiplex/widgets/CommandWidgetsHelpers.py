@@ -2,17 +2,12 @@
 CommandWidget helper functions attach to buttons
 """
 
-# pylint: disable=bad-continuation
-import pprint
 
 from PySide2.QtCore import Qt
-from PySide2.QtGui import QKeySequence
-from PySide2.QtWidgets import QLineEdit
 
 import vsutillib.mkv as mkv
-from vsutillib.pyqt import SvgColor, LineOutput, checkColor
-
-from .. import config
+from vsutillib.files import DisplayPath
+from vsutillib.pyqt import SvgColor, LineOutput
 
 
 def runAnalysis(**kwargs):
@@ -21,7 +16,6 @@ def runAnalysis(**kwargs):
     output = kwargs.pop("output", None)
     command = kwargs.pop("command", None)
     log = kwargs.pop("log", False)
-    baseTotalFiles = 0
     if command:
         output.command.emit("Analysis of command line:\n", {LineOutput.AppendEnd: True})
         verify = mkv.MKVCommandParser(command, log=log)
@@ -100,7 +94,7 @@ def showCommands(**kwargs):
             index += 1
     else:
         output.command.emit(
-            "MCW0008: Error in command construction {}\n".format(oCommand.error),
+            "MCW0008: Error in command construction.\n",
             {LineOutput.Color: Qt.red, LineOutput.AppendEnd: True},
         )
 
@@ -215,38 +209,35 @@ def checkFiles(**kwargs):
                 f"Directory: {oCommand.dirsByKey[key]}\n",
                 {LineOutput.Color: color, LineOutput.AppendEnd: True},
             )
-            for i, oFile in enumerate(oCommand.filesInDirByKey[key]):
+            dirTree = DisplayPath.makeTree(
+                oCommand.dirsByKey[key], fileList=oCommand.filesInDirByKey[key]
+            )
+            for child in dirTree:
                 output.command.emit(
-                    f"{i + 1}. {oFile}",
+                    f"{child.displayable()}",
                     {LineOutput.Color: color, LineOutput.AppendEnd: True},
                 )
+
             output.command.emit(
                 "", {LineOutput.Color: color, LineOutput.AppendEnd: True},
             )
+
+    output.command.emit(
+        f"Files in destination directory: {oCommand.dirsByKey[MKVParseKey.outputFile]}\n",
+        {LineOutput.Color: color, LineOutput.AppendEnd: True},
+    )
+    dirTree = DisplayPath.makeTree(oCommand.dirsByKey[MKVParseKey.outputFile])
+    for child in dirTree:
+        output.command.emit(
+            f"{child.displayable()}",
+            {LineOutput.Color: color, LineOutput.AppendEnd: True},
+        )
+
     output.command.emit(
         "", {LineOutput.Color: color, LineOutput.AppendEnd: True},
     )
 
     return None
-
-
-class QLineEditWidget(QLineEdit):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def keyPressEvent(self, event):
-        if event.matches(QKeySequence.Paste):
-            print("Ctrl-V Paste Filter")
-
-        super().keyPressEvent(event)
-
-    def contextMenuEvent(self, event):
-
-        print(str(event))
-
-        print(self.text())
-
-        super().contextMenuEvent(event)
 
 
 class MKVParseKey:

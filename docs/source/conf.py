@@ -16,21 +16,11 @@ import os
 import sys
 from pathlib import Path
 
-# from unittest.mock import MagicMock
-
-# MOCK_MODULES = ['PySide2', 'PySide2.QtCore', 'PySide2.QtGui', 'PySide2.QtWidgets', 'pymediainfo']
-
-# class Mock(MagicMock):
-#    @classmethod
-#    def __getattr__(cls, name):
-#        return MagicMock()
-
-# sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
-
 sys.path.insert(0, os.path.abspath("../.."))
 from MKVBatchMultiplex import config
 
 html_show_sourcelink = False
+autodoc_mock_imports = ["vsutillib"]
 
 # pylint: skip-file
 
@@ -41,9 +31,8 @@ copyright = "2018-2020, Efrain Vergara"
 author = "Efrain Vergara"
 
 # The short X.Y version
-version = "2.0"
+version = "2.0.0"
 # The full version, including alpha/beta/rc tags
-# release = '0.5.3a3.dev1'
 release = config.VERSION
 
 

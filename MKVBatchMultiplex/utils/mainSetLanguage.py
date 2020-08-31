@@ -21,7 +21,7 @@ def setLanguageMenus(menuActions):
         t = m.menu()
 
         if isinstance(t, QMenuWidget):
-            t.setTitle(_(t.originaltitle))
+            t.setTitle(t.titlePrefix + _(t.originaltitle) + t.titleSuffix)
 
         for a in t.actions():
             if a.isSeparator():
@@ -41,7 +41,7 @@ def setLanguageMenus(menuActions):
                         a.setStatusTip(_(a.tooltip))
 
                 if a.text is not None:
-                    a.setText(_(a.originaltext))
+                    a.setText(a.textPrefix + _(a.originaltext) + a.textSuffix)
 
             elif isinstance(a, QMenuWidget):
                 a.setTitle(_(a.originaltitle))

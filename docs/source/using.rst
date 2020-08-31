@@ -14,10 +14,12 @@ Requirements
 ============
 
 In order for mkvbatchmultiplex to work as intended there are certain
-conditions in the structure of the files in the source directories.
-This has to be this way because we are working with group of files
-not one file.  Also is a batch process there should not be any user
-input requested when working of a job.
+conditions in the structure of the files in the source directories
+that need to be met. This has to be this way because we are working
+with group of files not one file.  Also is a batch process there should
+not be any user input requested when working of a job. For the job
+to succeed the corresponding file have to be equal in the internal
+structure tracks have to be in the same order and same type.
 
 Structure for directories:
 
@@ -25,8 +27,8 @@ Structure for directories:
       The program will read the directory taking information form the
       template so it will apply instruction to the same type of file.
 
-    * The files have to be consistent that is the same number of tracks
-      of the same type and order.  Files found different from template
+    * The files have to be consistent that's to say the same number of tracks,
+      same type and order.  Files found different from template
       will not be processed.
 
     * If more than one file are involved in the operation there have to
@@ -109,12 +111,17 @@ no file will be overwritten.
 Settings
 ~~~~~~~~
 
-.. figure:: images/mkvbatchmultiplex-settings.png
+.. figure:: images/mkvbatchmultiplex-preferences.png
   :align: center
 
   Settings.
 
 The available settings:
+
+  - Interface Language:
+
+    - English
+    - Español
 
   - Enable logging.  If enable logging is set the log will be saved on:
 
@@ -122,12 +129,21 @@ The available settings:
 
     with a rotation of 10 log files.
 
+    - Enable log viewer. If enabled there will be a tab where the log can be
+      seen as the program runs.
+
   - Font & Size. Change the font use by the interface.
 
   - Interface Language.  Change the language use by the interface.  English and
     Spanish are available.
 
   - Restore Defaults.  Restore default settings.
+
+
+.. figure:: images/mkvbatchmultiplex-logviewer.png
+  :align: center
+
+  Log viewer.
 
 Tabs
 ~~~~
@@ -152,6 +168,7 @@ Tabs
 
     Paste command line from system Clipboard is expected to be from
     a copy to clipboard from MKVToolnix.
+
   - Add Command
 
     Add the command to the jobs table with a **Waiting** status
@@ -187,6 +204,18 @@ Tabs
 
     Clear contents of all output windows
 
+  When a command is entered it will be check for it to see if it is in the
+  format the application can handle.  A message **Command looks ok.** does not
+  necessarily means it will work.  There are other checks that are done when
+  the job is executed.  For example the number of input files does not match
+  this will fail the entire job.  This is done like this because the operation
+  is time consuming and the GUI will seems to be frozen.  When some files don't
+  meet criteria those   files won't be processed but the ones that match will.
+  When the job fails use  the buttons for troubleshooting to see if the problem
+  is revealed.  If still cannot find the problem post an issue to get help.
+
+  Before adding the job to the queue you have the option to push **<Rename>** to
+  go to the **Rename** tab and rename the output files.
 
 * **Jobs**
 
@@ -348,13 +377,17 @@ Tabs
     Here is an example where the name contains the series name and the episode
     number only.
 
-    The regular expression is: (\\[.*\\]\\W*|)(.*?)(\\W*-|)\\W*(\\d+).*
+    The regular expression is:::
 
-    The substitution string is: \\2 - S01E\\4
+    (\\[.*\\]\\W*|)(.*?)(\\W*-|)\\W*(\\d+).*
+
+    The substitution string is:::
+
+    \\2 - S01E\\4
 
     For regular expressions the order is not important the episode number is
     taken from the name.  Also missing episodes won't affect the rename of the
-    files.  What the regular expression is doing is creating 4 groups:
+    files.  What the regular expression is doing is creating 4 groups:::
 
       1. (\\[.*\\]\\W*|) - this will match the group name if Analysis
       2. (.*?) - this will match the series name

@@ -10,6 +10,12 @@ mkvbatchmultiplex: MKVMERGE batch multiplexing
 .. image:: https://img.shields.io/pypi/pyversions/mkvbatchmultiplex.svg
   :target: https://pypi.org/project/mkvbatchmultiplex
 
+.. image:: https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg
+  :target: CODE_OF_CONDUCT.md
+
+.. image:: https://readthedocs.org/projects/mkvbatchmultiplex/badge/?version=latest
+  :target: https://mkvbatchmultiplex.readthedocs.io/en/latest/?badge=latest
+  :alt: Documentation Status
 
 This project went into a rewrite for version 2.  Rename module was added to
 help maintain output file names Plex_ friendly.
@@ -51,23 +57,17 @@ locale files.  On the source directory execute:
 Dependencies
 ************
 
-    * Python_ 3.8.1
-        - PySide2_ 5.14 or greater
-        - pymediainfo_ 4.2.1 or greater
-    * lxml_ 4.5.2 or greater
-    * natsort_ 7.0.1 or greater
-    * MediaInfo_ tested with versions 17.10->18.12
-    * MKVToolNix_ tested with versions 17.00->46.0.0
+  * Python_ 3.8.1
 
-For now is a python package it can be installed:
+    - lxml_ 4.5.2 or greater
+    - natsort_ 7.0.1 or greater
+    - pymediainfo_ 4.2.1 or greater
+    - PySide2_ 5.14 or greater
 
-::
+  * MediaInfo_ tested with versions 17.10->20.08
+  * MKVToolNix_ tested with versions 17.00->49.0.0
 
-    pip install mkvbatchmultiplex
-    or download the source
-
-
-macOS 10.14 Dark theme MKVToolNix has to be version 30.0.0+
+In macOS 10.14 Dark theme MKVToolNix has to be version 30.0.0+ to use it.
 
 Usage
 =====
@@ -80,12 +80,14 @@ file make any operations needed copy command to clipboard:
 Paste command on mkvbatchmultiplex push Process button and wait.
 Remember to select and output directory.
 
+Step by step examples are in the github repository wiki_.
+
 Roadmap
 =======
 
 This is just the base for the project.  The roadmap is:
 
-    * Work on rename module to fetch some metadata from internet
+    * Work on rename module to fetch metadata
     * Work on the Spanish interface translation
     * Easier installation for linux
 
@@ -103,7 +105,6 @@ See https://mkvbatchmultiplex.readthedocs.io for more information.
 .. _MKVToolNix: https://mkvtoolnix.download/
 .. _Matroska: https://www.matroska.org/
 .. _MediaInfo: https://mediaarea.net/en/MediaInfo
-.. _AVI: https://docs.microsoft.com/en-us/windows/win32/directshow/avi-file-format/
-.. _SRT: https://matroska.org/technical/specs/subtitles/srt.html
 .. _lxml: https://lxml.de/
 .. _natsort: https://github.com/SethMMorton/natsort
+.. _wiki: https://github.com/akai10tsuki/mkvbatchmultiplex/wiki

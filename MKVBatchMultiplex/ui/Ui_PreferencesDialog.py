@@ -51,9 +51,6 @@ class Ui_PreferencesDialog(object):
         self.lblFontAndSize = QLabel(self.grpBox)
         self.lblFontAndSize.setObjectName(u"lblFontAndSize")
         self.lblFontAndSize.setGeometry(QRect(21, 85, 171, 23))
-        self.chkBoxEnableJobHistory = QCheckBox(self.grpBox)
-        self.chkBoxEnableJobHistory.setObjectName(u"chkBoxEnableJobHistory")
-        self.chkBoxEnableJobHistory.setGeometry(QRect(21, 198, 631, 27))
         self.chkBoxEnableLogViewer = QCheckBox(self.grpBox)
         self.chkBoxEnableLogViewer.setObjectName(u"chkBoxEnableLogViewer")
         self.chkBoxEnableLogViewer.setGeometry(QRect(43, 161, 611, 27))
@@ -83,7 +80,6 @@ class Ui_PreferencesDialog(object):
         self.label.setText("")
         self.chkBoxEnableLogging.setText(QCoreApplication.translate("PreferencesDialog", u"Enable Logging", None))
         self.lblFontAndSize.setText(QCoreApplication.translate("PreferencesDialog", u"Font & Size:", None))
-        self.chkBoxEnableJobHistory.setText(QCoreApplication.translate("PreferencesDialog", u"Enable jobs history", None))
         self.chkBoxEnableLogViewer.setText(QCoreApplication.translate("PreferencesDialog", u"Enable Log Viewer", None))
         self.btnRestoreDefaults.setText(QCoreApplication.translate("PreferencesDialog", u"Restore Defaults", None))
     # retranslateUi

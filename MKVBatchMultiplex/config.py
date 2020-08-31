@@ -14,7 +14,7 @@ from vsutillib.files import ConfigurationSettings
 from vsutillib.log import LogRotateFileHandler
 from vsutillib.pyqt import QSignalLogHandler
 
-__VERSION = (2, 0, "0b1")
+__VERSION = (2, 0, "0")
 
 APPNAME = "MKVBatchMultiplex"
 VERSION = ".".join(map(str, __VERSION))
@@ -27,11 +27,11 @@ COPYRIGHT = "2018-2020, Efrain Vergara"
 LICENSE = "MIT"
 DESCRIPTION = "A mkv media batch multiplex."
 ENTRYPOINTS = {
-    "console_scripts": ["mkvbatchmultiplex=mkvbatchmultiplex:mainApp",],
+    "console_scripts": ["mkvbatchmultiplex=MKVBatchMultiplex:mainApp",],
 }
 KEYWORDS = "mkv multimedia video mkvtoolnix plex"
 NAME = APPNAME.lower()
-PACKAGES = [NAME]
+PACKAGES = [APPNAME]
 URL = "https://github.com/akai10tsuki/mkvbatchmultiplex"
 PROJECTURLS = {
     "Bug Reports": "https://github.com/akai10tsuki/mkvbatchmultiplex/issues",
@@ -40,15 +40,15 @@ PROJECTURLS = {
 PYTHONVERSIONS = ">=3.8.1, <3.9"
 QT_VERSION = "PYSIDE2"
 REQUIRED = [
-    "PySide2>=5.15",
-    "vsutillib.files>=1.6.0",
-    "vsutillib.log>=1.6.0",
-    "vsutillib.macos>=1.6.0",
-    "vsutillib.media>=1.6.0",
-    "vsutillib.mkv>=1.6.0",
-    "vsutillib.process>=1.6.0",
-    "vsutillib.pyqt>=1.6.0",
-    "vsutillib.sql>=1.6.0",
+    "PySide2>=5.14",
+    "vsutillib-files>=1.6.0",
+    "vsutillib-log>=1.6.0",
+    "vsutillib-macos>=1.6.0",
+    "vsutillib-media>=1.6.1",
+    "vsutillib-mkv>=1.6.1",
+    "vsutillib-process>=1.6.0",
+    "vsutillib-pyqt>=1.6.1",
+    "vsutillib-sql>=1.6.0",
 ]
 
 # for app
@@ -259,9 +259,6 @@ def setRegEx():
         r"(\[.*\]\W*|)(?P<name>.*?)(\W*-|)\W*(?P<episode>\d+)(\W*-\W*)(?P<title>.*?)((\W*\[.*|\W*\(.*))",
         r"(\[.*\]\W*|)(?P<name>.*?)(\W*-|)\W*(?P<episode>\d+)(\w*|)(\W*-\W*)(?P<title>.*?)((\W*\[.*|\W*\(.*))",
         r"(\[.*\]\W*|)(?P<name>.*?)(\W*-|)\W*(?P<episode>\d+)(\w*|)(\W*-|)(?P<title>.*).*",
-    ]
-
-    newRegEx = [
         r"([[(].*?[])]\W*|)(.*?)(\W*-\W*)(\d+).*",
         r"([[(].*?[])]\W*|)(.*?)(\W*-\W*|\W*-|\W*|)(\d+).*",
         r"([[(].*?[])]\W*|)(.*?)(\W*-\W*|\W*-|\W*|)(\d+)(\W*-\W*|\W*-|\W*|)(.*)",
@@ -270,6 +267,17 @@ def setRegEx():
         r"([[(].*?[])]\W*|)(?P<name>.*?)(\W*-\W*|\W*-|\W*|)(?P<episode>\d+).*",
         r"([[(].*?[])]\W*|)(?P<name>.*?)(\W*-\W*|\W*-|\W*|)(?P<episode>\d+)(\W*-\W*|\W*-|\W*|)(?P<title>.*)",
         r"([[(].*?[])]\W*|)(?P<name>.*?)(\W*-\W*|\W*-|\W*|)(?P<episode>\d+)(\W*-\W*|\W*-|\W*|)(?P<title>.*?)(\W*[([].*)",
+    ]
+
+    newRegEx = [
+        r"([([].*?[])]\W*|)(.*?)(\W*-\W*)(\d+).*",
+        r"([([].*?[])]\W*|)(.*?)(\W*-\W*|\W*-|\W*|)(\d+).*",
+        r"([([].*?[])]\W*|)(.*?)(\W*-\W*|\W*-|\W*|)(\d+)(\W*-\W*|\W*-|\W*|)(.*)",
+        r"([([].*?[])]\W*|)(.*?)(\W*-\W*|\W*-|\W*|)(\d+)(\W*-\W*|\W*-|\W*|)(.*?)(\W*[([].*)",
+        r"([([].*?[])]\W*|)(?P<name>.*?)(\W*-\W*)(?P<episode>\d+).*",
+        r"([([].*?[])]\W*|)(?P<name>.*?)(\W*-\W*|\W*-|\W*|)(?P<episode>\d+).*",
+        r"([([].*?[])]\W*|)(?P<name>.*?)(\W*-\W*|\W*-|\W*|)(?P<episode>\d+)(\W*-\W*|\W*-|\W*|)(?P<title>.*)",
+        r"([([].*?[])]\W*|)(?P<name>.*?)(\W*-\W*|\W*-|\W*|)(?P<episode>\d+)(\W*-\W*|\W*-|\W*|)(?P<title>.*?)(\W*[([].*)",
     ]
 
     newSubString = [

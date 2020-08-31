@@ -2,8 +2,8 @@
 Class to represent data in a table with headers
 
 Header:
-    header {str} - header ID
-    attribute {dict}  -
+    header (str} - header ID
+    attribute (dict}  -
         "Type": type of element in cell
         "CastFunction": function to cast cell to element type
         "Label": label header for the column
@@ -191,7 +191,7 @@ class TableData:
         Add header information
 
         Keyword Arguments:
-            header {list} -- list containing the a header (default: {None})
+            header (list) -- list containing the a header (default: {None})
         """
 
         if header is not None:
@@ -207,7 +207,7 @@ class TableData:
         Insert row at the end of the data table
 
         Keyword Arguments:
-            dataItem {list} -- list containing a data row (default: {None})
+            dataItem (list) -- list containing a data row (default: {None})
         """
 
         if (value is not None) and index.isValid():
@@ -232,7 +232,7 @@ class TableData:
         Insert row at the end of the data table
 
         Keyword Arguments:
-            dataItem {list} -- list containing a data row (default: {None})
+            dataItem (list) -- list containing a data row (default: {None})
         """
 
         if (value is not None) and index.isValid():
@@ -251,8 +251,8 @@ class TableData:
         Insert a data row
 
         Arguments:
-            index {int} -- row number where to insert the data
-            row {list} -- list with row data
+            position (int) -- row number where to insert the data
+            row (list) -- list with row data
         """
 
         if row is not None:
@@ -287,7 +287,7 @@ class TableData:
         Delete a data row
 
         Arguments:
-            index {int} -- row number to delete 0 based
+            index (int) -- row number to delete 0 based
 
         Returns:
             list -- row deleted
@@ -301,8 +301,9 @@ class TableData:
         Insert a data column
 
         Arguments:
-            index {int} -- row number where to insert the data
-            row {list} -- list with row data
+            position (int) -- column number where to insert the data
+            columnHeader (str) -- header for column to be inserted
+            columnData (list) -- data to insert in column cells
         """
 
         if columnHeader is None:
@@ -336,7 +337,7 @@ class TableData:
         Delete a column from the table
 
         Arguments:
-            index {int} -- column to delete
+            index (int) -- column to delete
 
         Returns:
             list -- list containing the header ID, header attributes and data rows deleted

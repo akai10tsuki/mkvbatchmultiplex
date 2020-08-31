@@ -189,7 +189,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         menuBar.addMenu(fileMenu)
 
         # Help Menu
-        actHelpContents = QActionWidget(Text.txt0061 + "...", self)
+        actHelpContents = QActionWidget(Text.txt0061, self, textSuffix="...")
         actHelpContents.triggered.connect(lambda: _help(self.appDirectory, 0))
         actHelpUsing = QActionWidget(Text.txt0062, self)
         actHelpUsing.triggered.connect(lambda: _help(self.appDirectory, 1))
@@ -274,7 +274,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
                 [
                     self.logViewerWidget,
                     "Log Viewer",
-                    "Messages registered in current running log.",
+                    "Messages registered in current running log",
                 ]
             )
         else:
@@ -517,9 +517,8 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         Set application language the scheme permits runtime changes
 
         Keyword Arguments:
-            language {str} -- language selected (default: {"en"})
-            menuItem {QMenuWidget} -- menu object making the call for
-                checkmark update
+            language (str) -- language selected (default: {"en"})
+            menuItem (QMenuWidget) -- menu object making the call for checkmark update
         """
 
         if language is None:
@@ -611,8 +610,6 @@ def mainApp():
         config.data.set(config.ConfigKey.DarkMode, True)
         QOutputTextWidget.isDarkMode = True
 
-    # win = MainWindow()
-    # win.show()
     MainWindow()
     app.exec_()
     config.close()

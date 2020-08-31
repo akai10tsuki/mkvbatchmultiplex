@@ -119,9 +119,7 @@ class RenameWidget(pyqt.TabWidgetExtension, QWidget):
             self.outputRenameResultsSignal
         )
         btnApplyRename = pyqt.QPushButtonWidget(
-            Text.txt0208,
-            function=self._applyRename,
-            toolTip=Text.txt0209,
+            Text.txt0208, function=self._applyRename, toolTip=Text.txt0209,
         )
         btnApplyRename.setEnabled(False)
         btnUndoRename = pyqt.QPushButtonWidget(
@@ -167,7 +165,7 @@ class RenameWidget(pyqt.TabWidgetExtension, QWidget):
 
         maxCount = config.data.get(Key.MaxRegExCount)
         # local signals
-        #self.setCurrentIndexSignal.connect(self._setCurrentIndex)
+        # self.setCurrentIndexSignal.connect(self._setCurrentIndex)
         self.setFilesSignal.connect(self.setFiles)
         self.textRegEx.cmdLine.currentTextChanged.connect(self._updateRegEx)
         self.textSubString.cmdLine.currentTextChanged.connect(self._updateRegEx)
@@ -216,27 +214,6 @@ class RenameWidget(pyqt.TabWidgetExtension, QWidget):
         """set instance log variable"""
         if isinstance(value, bool) or value is None:
             self.__log = value
-
-    #@property
-    #def tab(self):
-    #    return self.__tab
-
-    #@tab.setter
-    #def tab(self, value):
-    #    self.__tab = value
-
-    #@property
-    #def tabWidget(self):
-    #    return self.__tabWidget
-
-    #@tabWidget.setter
-    #def tabWidget(self, value):
-    #    self.__tabWidget = value
-
-    #@Slot()
-    #def _setCurrentIndex(self):
-    #    if self.tabWidget:
-    #        self.tabWidget.setCurrentIndex(self.tab)
 
     @property
     def output(self):

@@ -2,8 +2,6 @@
 class CommandWidget
 """
 
-# pylint: disable=bad-continuation
-
 import logging
 import time
 
@@ -34,7 +32,9 @@ from vsutillib.pyqt import (
     messageBox,
     TabWidgetExtension,
 )
-from vsutillib.mkv import MKVCommand, MKVCommandParser
+
+# from vsutillib.mkv import MKVCommand, MKVCommandParser
+from vsutillib.mkv import MKVCommandParser
 
 from .. import config
 from ..jobs import JobStatus
@@ -56,31 +56,6 @@ class CommandWidget(TabWidgetExtension, QWidget):
     cliButtonsSateSignal = Signal(bool)
     cliValidateSignal = Signal(bool)
     resetSignal = Signal()
-
-    @classmethod
-    def classLog(cls, setLogging=None):
-        """
-        get/set logging at class level
-        every class instance will log
-        unless overwritten
-
-        Args:
-            setLogging (bool):
-                - True class will log
-                - False turn off logging
-                - None returns current Value
-
-        Returns:
-            bool:
-
-            returns the current value set
-        """
-
-        if setLogging is not None:
-            if isinstance(setLogging, bool):
-                cls.__log = setLogging
-
-        return cls.__log
 
     def __init__(self, parent=None, proxyModel=None, controlQueue=None, log=None):
         super(CommandWidget, self).__init__(parent=parent, tabWidgetChild=self)
@@ -133,7 +108,7 @@ class CommandWidget(TabWidgetExtension, QWidget):
         )
         btnRename = QPushButtonWidget(
             Text.txt0182,
-            function=self.parent.renameWidget.setCurrentIndexSignal.emit,
+            function=self.parent.renameWidget.setAsCurrentTab,
             toolTip=Text.txt0183,
         )
         btnAddQueue = QPushButtonWidget(
@@ -254,10 +229,38 @@ class CommandWidget(TabWidgetExtension, QWidget):
         # Job Queue related
         self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(False)
 
+        # Job Added to Queue
+        self.parent.jobsQueue.addQueueItemSignal.connect(self.printJobIDAdded)
+
         #
         # Misc
         #
         self.cmdLine.setClearButtonEnabled(True)  # button at end of line to clear it
+
+    @classmethod
+    def classLog(cls, setLogging=None):
+        """
+        get/set logging at class level
+        every class instance will log
+        unless overwritten
+
+        Args:
+            setLogging (bool):
+                - True class will log
+                - False turn off logging
+                - None returns current Value
+
+        Returns:
+            bool:
+
+            returns the current value set
+        """
+
+        if setLogging is not None:
+            if isinstance(setLogging, bool):
+                cls.__log = setLogging
+
+        return cls.__log
 
     @property
     def log(self):
@@ -284,22 +287,6 @@ class CommandWidget(TabWidgetExtension, QWidget):
             # No variable used so for now use class log
             ValidateCommand.classLog(value)
             self.outputWindow.log = value
-
-    #@property
-    #def tab(self):
-    #    return self.__tab
-
-    #@tab.setter
-    #def tab(self, value):
-    #    self.__tab = value
-
-    #@property
-    #def tabWidget(self):
-    #    return self.__tabWidget
-
-    #@tabWidget.setter
-    #def tabWidget(self, value):
-    #    self.__tabWidget = value
 
     @property
     def output(self):
@@ -373,6 +360,7 @@ class CommandWidget(TabWidgetExtension, QWidget):
 
     @Slot(bool)
     def updateObjCommnad(self, valid):
+        """Update the command object"""
 
         if valid:
             self.oCommand.command = self.cmdLine.text()
@@ -429,6 +417,7 @@ class CommandWidget(TabWidgetExtension, QWidget):
 
         totalJobs = self.model.rowCount()
         command = self.cmdLine.text()
+        # [cell value, tooltip, obj]
         data = [
             ["", "", None],
             [status, "Status code", None],
@@ -436,6 +425,14 @@ class CommandWidget(TabWidgetExtension, QWidget):
         ]
         self.model.insertRows(totalJobs, 1, data=data)
         self.cmdLine.clear()
+
+    def printJobIDAdded(self, index):
+
+        jobID = self.model.dataset[index.row(), index.column()]
+
+        self.output.command.emit(
+            f"Job: {jobID} added to Queue...\n", {LineOutput.AppendEnd: True}
+        )
 
     def pasteClipboard(self):
         """Paste clipboard to command QLineEdit"""
