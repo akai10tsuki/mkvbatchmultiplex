@@ -19,7 +19,7 @@ from collections import deque
 from pathlib import Path
 
 from PySide2.QtCore import QByteArray, Slot, Signal
-from PySide2.QtGui import QColor, QFont, QIcon, Qt
+from PySide2.QtGui import QColor, QFont, QIcon, Qt, QPixmap
 from PySide2.QtWidgets import (
     QAction,
     QApplication,
@@ -35,6 +35,7 @@ from PySide2.QtWidgets import (
 )
 
 import vsutillib.media as media
+#from . import icons
 
 from vsutillib.pyqt import (
     centerWidget,
@@ -65,6 +66,7 @@ from .widgets import (
     RenameWidget,
 )
 from .utils import (
+    icons,
     Text,
     OutputWindows,
     Progress,
@@ -94,7 +96,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         # Widow Title self.appDirectory on _initVars()
         self.setWindowTitle(config.APPNAME + ": " + config.DESCRIPTION)
         self.setWindowIcon(
-            QIcon(str(self.appDirectory.parent) + "/images/Itsue256x256.png")
+            QIcon(QPixmap(":/images/Itsue256x256.png"))
         )
 
         # Setup User Interface
