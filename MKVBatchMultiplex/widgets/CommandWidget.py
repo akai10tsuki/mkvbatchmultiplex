@@ -365,9 +365,6 @@ class CommandWidget(TabWidgetExtension, QWidget):
         if valid:
             self.oCommand.command = self.cmdLine.text()
             if self.rename is not None:
-                # Have to wait for MKVCommandParser finish reading files
-                # while isThreadRunning("MKVPARSING"):
-                #    time.sleep(0.5)
                 self.rename.setFilesSignal.emit(self.oCommand)
                 self.rename.applyFileRenameSignal.connect(self.applyRename)
         else:
