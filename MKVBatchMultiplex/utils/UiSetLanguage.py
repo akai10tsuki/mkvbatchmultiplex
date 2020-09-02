@@ -5,19 +5,28 @@ UiSetLanguage
 
 """
 
+#from PySide2.QtCore import (
+#    QByteArray,
+#    QCoreApplication,
+#    QLibraryInfo,
+#    QLocale,
+#    QSize,
+#    QTranslator,
+#    Slot,
+#)
+
 from PySide2.QtCore import (
-    QByteArray,
     QCoreApplication,
     QLibraryInfo,
-    QLocale,
-    QSize,
     QTranslator,
-    Slot,
 )
 
 from .. import config
 
 class UiSetLanguage:
+    """
+    class to set the language for PySide2 ui dialogs
+    """
 
     def __init__(self, parent):
 
@@ -46,6 +55,15 @@ class UiSetLanguage:
         self.loadedTranslations = []
 
     def setLanguage(self, language):
+        """
+        setLanguage set the language locale
+
+        Args:
+            language (str): desired language for now ("en", "es")
+
+        Returns:
+            bool: True if everything is ok, False otherwise.
+        """
 
         self.__errorFound = False
 

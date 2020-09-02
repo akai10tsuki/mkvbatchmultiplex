@@ -59,7 +59,7 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0083 = S_("Confirm restore ...")
     txt0084 = S_("Restore default settings")
 
-    txt0085 = S_("Jobs: {0:3d} Current: {1:3d} File: {2:3d} of {3:3d} Errors: {4:3d}")
+    txt0085 = S_("Jobs: {0:3d} - Current: {1:3d} - File: {2:3d} of {3:3d} - Errors: {4:3d}")
     txt0086 = S_("Job identification number")
     txt0087 = S_("Application code for the job status")
     txt0088 = S_("Command generated for MKVMERGE by MKVToolNix")
@@ -151,8 +151,20 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0213 = S_("Clear names start over")
     txt0214 = S_("Invalid regex")
 
+
+    # JobHistoryWidget
+    txt0240 = S_("Date")
+    txt0241 = S_("Jobs History")
+    txt0242 = S_("Fetch History")
+    txt0243 = S_("Search")
+    txt0244 = S_("Show Output")
+    txt0245 = S_("Show Errors")
+    txt0246 = S_("Print")
+    txt0247 = S_("Select All")
+    txt0248 = S_("Clear Selection")
+
+
     """
-    txt0169 = S_()
     txt0169 = S_()
     txt0169 = S_()
     txt0169 = S_()
