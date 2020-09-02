@@ -1,6 +1,17 @@
 Changelog
 =========
 
+(Unreleased)
+
+Added
+~~~~~
+
+Changed
+~~~~~~~
+
+Fixed
+~~~~~
+
 2.0.0 - 2000-8-23
 -----------------
 
@@ -8,11 +19,14 @@ Changed
 ~~~~~~~
 
 - locale updates
+- Check Files displays files read from the source directory.  Also the contents
+  of the destination directory for debug purposes.
 
 Fixed
 ~~~~~
 
 - python wheel distribution not working
+- system tray icon not showing on macOS
 
 2.0.0b1 - 2020-8-8
 ------------------
