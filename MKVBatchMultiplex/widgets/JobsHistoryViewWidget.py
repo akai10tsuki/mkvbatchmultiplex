@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 # from pprint import pprint
 from time import sleep
 
-from PySide2.QtCore import Slot
+from PySide2.QtCore import Qt, Slot
 from PySide2.QtWidgets import (
     QWidget,
     QHBoxLayout,
@@ -179,14 +179,17 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
                 widget.setText("  " + _(widget.originalText) + "  ")
                 widget.setToolTip(_(widget.toolTip))
 
-        # self.grpBox.setTitle(_(Text.txt0130))
-        # self.model.setHeaderData(
-        #    JobKey.ID, Qt.Horizontal, "  " + _(Text.txt0131) + "  "
-        # )
-        # self.model.setHeaderData(
-        #    JobKey.Status, Qt.Horizontal, "  " + _(Text.txt0132) + "  "
-        # )
-        # self.model.setHeaderData(JobKey.Command, Qt.Horizontal, _(Text.txt0133))
+        self.grpBox.setTitle(_(Text.txt0130))
+        self.model.setHeaderData(
+            _JobHKey.ID, Qt.Horizontal, "  " + _(Text.txt0131) + "  "
+        )
+        self.model.setHeaderData(
+            _JobHKey.Date, Qt.Horizontal, " " + _(Text.txt0240) + " "
+        )
+        self.model.setHeaderData(
+            _JobHKey.Status, Qt.Horizontal, "  " + _(Text.txt0132) + "  "
+        )
+        self.model.setHeaderData(_JobHKey.Command, Qt.Horizontal, _(Text.txt0133))
 
     def clearOutputWindow(self):
         """
@@ -461,3 +464,11 @@ class _ShowKey:
 class _Button:
 
     FETCHJOBHISTORY = 0
+
+
+class _JobHKey:
+
+    ID = 0
+    Date = 1
+    Status = 2
+    Command = 3

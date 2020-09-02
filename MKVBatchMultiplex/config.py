@@ -211,8 +211,8 @@ def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None, ap
 
     # Don't Release for now manually activated
     # <ConfigSetting id="JobHistory" type="bool">True</ConfigSetting>
-    #if data.get(ConfigKey.JobHistory) is None:
-    #    data.set(ConfigKey.JobHistory, False)
+    if data.get(ConfigKey.JobHistory) is None:
+        data.set(ConfigKey.JobHistory, False)
     #for key in data.configDictionary:
     #    print(f"Key {key}")
 
