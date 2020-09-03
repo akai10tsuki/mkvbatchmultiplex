@@ -46,13 +46,12 @@ from ..jobs import (
     JobKey,
     SqlJobsTable,
     JobsTableKey,
-    JobQueue,
 )
 from ..dataset import TableData, tableHistoryHeaders
 
 # from ..delegates import StatusComboBoxDelegate
 from ..models import TableModel, TableProxyModel
-from ..utils import Text, yesNoDialog
+from ..utils import Text
 
 from .JobsHistoryView import JobsHistoryView
 from .SearchTextDialogWidget import SearchTextDialogWidget
@@ -145,6 +144,7 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
         self.btnGrid.addWidget(btnSearchText)
         self.btnGrid.addWidget(btnShowOutput)
         self.btnGrid.addWidget(btnShowOutputErrors)
+        self.btnGrid.addWidget(btnRefresh)
         self.btnGrid.addStretch()
         self.btnGrid.addWidget(btnPrint)
         self.btnGrid.addWidget(btnSelectAll)
@@ -199,9 +199,7 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
         self.output.clear()
 
     def fetchJobHistory(self):
-
-        # while self.model.rowCount() > 0:
-        #    element = self.model.removeRow(0)
+        """Get the log records from database"""
 
         jobsDB = SqlJobsTable(config.get(ConfigKey.SystemDB))
 
@@ -216,6 +214,7 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
         jobsDB.close()
 
     def searchText(self):
+        """Do full text search"""
 
         jobsDB = SqlJobsTable(config.get(ConfigKey.SystemDB))
 
@@ -225,7 +224,6 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
                 totalRows = self.model.rowCount()
                 if totalRows > 0:
                     self.model.removeRows(0, totalRows)
-                    # element = self.model.removeRow(0)
                 fillRows(self, rows)
 
         jobsDB.close()
@@ -256,12 +254,13 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
                 "Row {} ID {} Status {}\n".format(
                     r, dataset[r, JobKey.ID], dataset[r, JobKey.Status]
                 ),
-                {},
+                {"log": False},
             )
 
-        self.output.insertTextSignal.emit("\n", {})
+        self.output.insertTextSignal.emit("\n", {"log": False})
 
     def refresh(self):
+        """Refresh jobs records"""
 
         jobsDB = SqlJobsTable(config.get(ConfigKey.SystemDB))
 
@@ -317,6 +316,7 @@ def fillRows(self, rows):
 
 
 def stats(job):
+    """Display stats format"""
 
     totalFiles = len(job.oCommand)
     totalErrors = len(job.errors)
@@ -358,6 +358,10 @@ def stats(job):
 
 
 def showOutputLines(**kwargs):
+    """
+    showOutputLines - List the output line for the job try to mimic the output
+    as when it ran. Not that easy many functions write the output.
+    """
 
     tableView = kwargs.pop(_ShowKey.tableView, None)
     proxyModel = kwargs.pop(_ShowKey.proxyModel, None)
@@ -393,6 +397,7 @@ def showOutputLines(**kwargs):
 
             regPercentEx = re.compile(r":\W*(\d+)%$")
             # The file 'file name' has been opened for writing.
+            # TODO: how to doit without locale dependency
             regOutputFileEx = re.compile(r"file (.*?) has")
             indexes = tableView.selectedIndexes()
 
@@ -402,7 +407,7 @@ def showOutputLines(**kwargs):
                     n = int(m.group(1))
                     if n < 100:
                         continue
-                if f := regOutputFileEx.search(line):
+                if f := regOutputFileEx.search(line): # pylint: disable=unused-variable
                     processedFiles += 1
                 output.insertTextSignal.emit(line, {"log": False})
                 # The signals are generated to fast and the History window
@@ -421,11 +426,12 @@ def showOutputLines(**kwargs):
                 )
 
                 output.insertTextSignal.emit(
-                    msg, {"color": SvgColor.red, "appendEnd": True}
+                    msg, {"color": SvgColor.red, "appendEnd": True, "log": False}
                 )
 
                 # msg = "\nDestination File: {}\n\n".format(destinationFile)
-                # output.error.emit(msg, {"color": SvgColor.red, "appendEnd": True})
+                # output.error.emit(msg,
+                #     {"color": SvgColor.red, "appendEnd": True, "log": False})
 
                 for i, m in enumerate(analysis):
                     if i == 0:
@@ -439,16 +445,20 @@ def showOutputLines(**kwargs):
                                 if searchIndex >= 0:
                                     color = SvgColor.tomato
                                     findSource = False
-                            output.insertTextSignal.emit(line + "\n", {"color": color})
+                            output.insertTextSignal.emit(
+                                line + "\n", {"color": color, "log": False}
+                            )
                             sleep(0.000001)
                     else:
-                        output.insertTextSignal.emit(m, {"color": SvgColor.red})
+                        output.insertTextSignal.emit(
+                            m, {"color": SvgColor.red, "log": False}
+                        )
 
                 msg = "Error Job ID: {} ---------------------\n\n".format(
                     job.jobRow[JobKey.ID]
                 )
                 output.insertTextSignal.emit(
-                    msg, {"color": SvgColor.red, "appendEnd": True}
+                    msg, {"color": SvgColor.red, "appendEnd": True, "log": False}
                 )
 
 

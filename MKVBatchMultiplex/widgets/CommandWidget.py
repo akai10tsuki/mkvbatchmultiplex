@@ -3,9 +3,9 @@ class CommandWidget
 """
 
 import logging
-import time
+#import time
 
-from PySide2.QtCore import Qt, Signal, Slot
+from PySide2.QtCore import Signal, Slot
 from PySide2.QtGui import QColor, QPalette
 from PySide2.QtWidgets import (
     QApplication,
@@ -13,16 +13,13 @@ from PySide2.QtWidgets import (
     QGridLayout,
     QGroupBox,
     QFormLayout,
-    QFrame,
     QLineEdit,
-    QMessageBox,
 )
 
 from vsutillib.pyqt import (
     QOutputTextWidget,
     QPushButtonWidget,
     qtRunFunctionInThread,
-    SvgColor,
 )
 from vsutillib.process import isThreadRunning
 from vsutillib.pyqt import (

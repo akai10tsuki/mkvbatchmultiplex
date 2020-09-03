@@ -2,8 +2,6 @@
 Search records with specified text in the command
 """
 
-import copy
-import itertools
 
 from PySide2.QtCore import QObject, Qt, Slot
 from PySide2.QtWidgets import QDialog, QDialogButtonBox
@@ -12,6 +10,8 @@ from ..ui import Ui_SearchTextDialog
 
 
 class SearchTextDialogWidget(QDialog):
+    """Search for records with the specified text in dialog"""
+
     def __init__(self, parent):
         super().__init__(parent)
 
@@ -61,6 +61,12 @@ class SearchTextDialogWidget(QDialog):
         self.ui.retranslateUi(self)
 
     def searchText(self, database):
+        """
+        searchText search for text in the records of the database
+
+        Returns:
+            object: sqlite3 database to be searched
+        """
 
         self._initVars()
         self.database = database
@@ -83,6 +89,8 @@ class SearchTextDialogWidget(QDialog):
 
 
 class Search(QObject):
+    """ search for text in records """
+
     def __init__(self, parent):
         super().__init__(parent)
 
@@ -96,6 +104,12 @@ class Search(QObject):
 
     @Slot(bool)
     def searchForRecords(self, checked=False):
+        """
+        searchForRecords Search for records that match
+
+        Args:
+            checked (bool, optional): May be unused. Defaults to False.
+        """
 
         fullTextExp = self.parent.ui.leSearchText.text()
         msg = ""
