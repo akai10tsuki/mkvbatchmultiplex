@@ -46,8 +46,11 @@ class QSystemTrayIconWidget(QSystemTrayIcon):
         self.restoreAction = QAction("Restore", self.parent)
         self.restoreAction.triggered.connect(self.parent.showNormal)
 
-        self.quitAction = QAction("Quit", self.parent)
-        self.quitAction.triggered.connect(QApplication.quit)
+        self.closeAction = QAction("Quit", self.parent)
+        self.closeAction.triggered.connect(self.parent.close)
+
+        self.abortAction = QAction("Abort", self.parent)
+        self.abortAction.triggered.connect(QApplication.quit)
 
     def _trayIconCreate(self, icon):
 
@@ -59,7 +62,9 @@ class QSystemTrayIconWidget(QSystemTrayIcon):
             trayIconMenu.addAction(self.maximizeAction)
             trayIconMenu.addAction(self.restoreAction)
             trayIconMenu.addSeparator()
-            trayIconMenu.addAction(self.quitAction)
+            trayIconMenu.addAction(self.closeAction)
+            trayIconMenu.addSeparator()
+            trayIconMenu.addAction(self.abortAction)
 
             if platform.system() == "Windows":
                 style = QtWidgets.QStyleFactory.create("windowsvista")

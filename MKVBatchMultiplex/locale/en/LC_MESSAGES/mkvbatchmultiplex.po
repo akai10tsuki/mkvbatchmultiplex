@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  \n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-08-22 09:40-0400\n"
+"POT-Creation-Date: 2020-09-02 12:57-0400\n"
 "PO-Revision-Date: 2020-01-24 23:59-0500\n"
 "Last-Translator: \n"
 "Language: en_US\n"
@@ -139,7 +139,7 @@ msgid "Restore default settings"
 msgstr ""
 
 #: MKVBatchMultiplex/utils/text.py:62
-msgid "Jobs: {0:3d} Current: {1:3d} File: {2:3d} of {3:3d} Errors: {4:3d}"
+msgid "Jobs: {0:3d} | Current: {1:3d} | File: {2:3d} of {3:3d} | Errors: {4:3d}"
 msgstr ""
 
 #: MKVBatchMultiplex/utils/text.py:63
@@ -426,6 +426,42 @@ msgstr ""
 msgid "Invalid regex"
 msgstr ""
 
+#: MKVBatchMultiplex/utils/text.py:156
+msgid "Date"
+msgstr ""
+
+#: MKVBatchMultiplex/utils/text.py:157
+msgid "Jobs History"
+msgstr ""
+
+#: MKVBatchMultiplex/utils/text.py:158
+msgid "Fetch History"
+msgstr ""
+
+#: MKVBatchMultiplex/utils/text.py:159
+msgid "Search"
+msgstr ""
+
+#: MKVBatchMultiplex/utils/text.py:160
+msgid "Show Output"
+msgstr ""
+
+#: MKVBatchMultiplex/utils/text.py:161
+msgid "Show Errors"
+msgstr ""
+
+#: MKVBatchMultiplex/utils/text.py:162
+msgid "Print"
+msgstr ""
+
+#: MKVBatchMultiplex/utils/text.py:163
+msgid "Select All"
+msgstr ""
+
+#: MKVBatchMultiplex/utils/text.py:164
+msgid "Clear Selection"
+msgstr ""
+
 #~ msgid "Restore"
 #~ msgstr ""
 
@@ -460,5 +496,8 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "Messages registered in current running log."
+#~ msgstr ""
+
+#~ msgid "Jobs: {0:3d} Current: {1:3d} File: {2:3d} of {3:3d} Errors: {4:3d}"
 #~ msgstr ""
 
