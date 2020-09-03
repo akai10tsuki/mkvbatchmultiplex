@@ -14,7 +14,7 @@ from vsutillib.files import ConfigurationSettings
 from vsutillib.log import LogRotateFileHandler
 from vsutillib.pyqt import QSignalLogHandler
 
-__VERSION = (2, 0, "0")
+__VERSION = (2, 0, "0.hotfix1")
 
 APPNAME = "MKVBatchMultiplex"
 VERSION = ".".join(map(str, __VERSION))
@@ -43,7 +43,7 @@ REQUIRED = [
     "PySide2>=5.14",
     "vsutillib-files>=1.6.0",
     "vsutillib-log>=1.6.0",
-    "vsutillib-macos>=1.6.0",
+    "vsutillib-macos>=1.6.1",
     "vsutillib-media>=1.6.1",
     "vsutillib-mkv>=1.6.1",
     "vsutillib-process>=1.6.0",
@@ -211,8 +211,8 @@ def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None, ap
 
     # Don't Release for now manually activated
     # <ConfigSetting id="JobHistory" type="bool">True</ConfigSetting>
-    if data.get(ConfigKey.JobHistory) is None:
-        data.set(ConfigKey.JobHistory, False)
+    #if data.get(ConfigKey.JobHistory) is None:
+    #    data.set(ConfigKey.JobHistory, False)
     #for key in data.configDictionary:
     #    print(f"Key {key}")
 
