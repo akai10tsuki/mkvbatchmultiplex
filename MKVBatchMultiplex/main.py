@@ -19,7 +19,7 @@ from collections import deque
 from pathlib import Path
 
 from PySide2.QtCore import QByteArray, Slot, Signal
-from PySide2.QtGui import QColor, QFont, QIcon, Qt
+from PySide2.QtGui import QColor, QFont, QIcon, Qt, QPixmap
 from PySide2.QtWidgets import (
     QAction,
     QApplication,
@@ -35,6 +35,7 @@ from PySide2.QtWidgets import (
 )
 
 import vsutillib.media as media
+#from . import icons
 
 from vsutillib.pyqt import (
     centerWidget,
@@ -65,6 +66,7 @@ from .widgets import (
     RenameWidget,
 )
 from .utils import (
+    icons,
     Text,
     OutputWindows,
     Progress,
@@ -94,7 +96,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         # Widow Title self.appDirectory on _initVars()
         self.setWindowTitle(config.APPNAME + ": " + config.DESCRIPTION)
         self.setWindowIcon(
-            QIcon(str(self.appDirectory.parent) + "/images/Itsue256x256.png")
+            QIcon(QPixmap(":/images/Itsue256x256.png"))
         )
 
         # Setup User Interface
@@ -117,12 +119,6 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         # Must init after show call
         self.progressBar.initTaskbarButton()
 
-        # self.trayIcon.showMessage(
-        #    "Information - MKVBatchMultiplex",
-        #    "Finished initialization.",
-        #    QSystemTrayIcon.Information,
-        # )
-
         # tray Icon message
         self.trayIconMessageSignal.connect(self.trayIcon.showMessage)
 
@@ -139,20 +135,26 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
         self.controlQueue = deque()
         self.jobsQueue = JobQueue(self, controlQueue=self.controlQueue)
+
+        # Language Setup
         self.setLanguageWidget = SetLanguage()
         self.uiSetLanguage = UiSetLanguage(self)
+
+        # Progress information setup
         self.progressBar = DualProgressBar(self, align=Qt.Horizontal)
         self.jobsLabel = QFormatLabel(Text.txt0085, init=[0, 0, 0, 0, 0],)
         self.progress = Progress(self, self.progressBar, self.jobsLabel)
+        self.jobsQueue.progress = self.progress
+        self.progressSpin = QProgressIndicator(self)
 
+        # Model view
         headers = tableHeaders()
         self.tableData = TableData(headerList=headers, dataList=[])
         self.model = JobsTableModel(self.tableData, self.jobsQueue)
         self.proxyModel = TableProxyModel(self.model)
         self.jobsQueue.proxyModel = self.proxyModel
-        self.jobsQueue.progress = self.progress
 
-        self.progressSpin = QProgressIndicator(self)
+        # Preferences menu
         self.setPreferences = PreferencesDialogWidget(self)
 
     def _initMenu(self):  # pylint: disable=too-many-statements
@@ -231,6 +233,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.historyWidget.tableView.sortByColumn(0, Qt.DescendingOrder)
         self.logViewerWidget = LogViewerWidget()
 
+        # Setup tabs in TabWidget
         self.tabs = TabWidget(self)
 
         tabsList = []
@@ -315,7 +318,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.commandWidget.outputWindow.setReadOnly(True)
         self.jobsOutput.setReadOnly(True)
         self.errorOutput.setReadOnly(True)
-        # self.historyWidget.output.setReadOnly(True)
+        self.historyWidget.output.setReadOnly(True)
         self.jobsOutput.textChanged.connect(self.commandWidget.resetButtonState)
 
         # setup widgets setLanguage to SetLanguage change signal
@@ -323,7 +326,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.setLanguageWidget.addSlot(self.commandWidget.setLanguage)
         self.setLanguageWidget.addSlot(self.tabs.setLanguage)
         self.setLanguageWidget.addSlot(self.renameWidget.setLanguage)
-        # self.setLanguageWidget.addSlot(self.historyWidget.setLanguage)
+        self.setLanguageWidget.addSlot(self.historyWidget.setLanguage)
         self.setLanguageWidget.addSlot(self.setPreferences.retranslateUi)
         # connect to tabs widget tab change Signal
         self.tabs.currentChanged.connect(tabChange)
