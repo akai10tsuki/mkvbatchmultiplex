@@ -7,6 +7,8 @@
    installation
    gettingstarted
    using
+   CHANGELOG
+   CONTRIBUTING
+   CODE_OF_CONDUCT
    LICENSE
    acknowledgements
-   CHANGELOG

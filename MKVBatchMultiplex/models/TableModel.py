@@ -161,7 +161,6 @@ class TableModel(QAbstractTableModel):
         """
 
         if role == Qt.DisplayRole:
-
             if orientation == Qt.Horizontal:
                 return self.dataset[section]
 
@@ -178,9 +177,7 @@ class TableModel(QAbstractTableModel):
                 pass
 
         elif role == Qt.TextAlignmentRole:
-
             if orientation == Qt.Horizontal:
-
                 alignment = self.dataset.headers[section].attribute["Alignment"]
 
                 if alignment == "right":
@@ -192,7 +189,6 @@ class TableModel(QAbstractTableModel):
                 return Qt.AlignCenter
 
         elif role == Qt.InitialSortOrderRole:
-
             if orientation == Qt.Horizontal:
                 return Qt.AscendingOrder
 
@@ -212,31 +208,31 @@ class TableModel(QAbstractTableModel):
         """
 
         if index.isValid():
-
             row = index.row()
             column = index.column()
 
             if role in [Qt.DisplayRole, Qt.EditRole]:
-
-                if self.dataset.data[row][column].data != "":
+                if self.dataset.data[row][column].cell != "":
                     return self.dataset.headers[column].attribute["CastFunction"](
-                        self.dataset.data[row][column].data
+                        self.dataset.data[row][column].cell
                     )
 
             elif role == Qt.ToolTipRole:
                 toolTip = None
 
-                if column == JOBCOMMAND:
-                    toolTip = self.dataset.data[row][column].toolTip
+                # if column == JOBCOMMAND:
+                toolTip = self.dataset.data[row][column].toolTip
 
-                return toolTip
+                if toolTip:
+                    return toolTip
 
             elif role == Qt.TextAlignmentRole:
-
                 if self.dataset.headers[column].attribute["Alignment"] == "right":
                     return Qt.AlignRight
+
                 if self.dataset.headers[column].attribute["Alignment"] == "center":
                     return Qt.AlignCenter
+
                 return Qt.AlignLeft
 
         return None
@@ -271,7 +267,6 @@ class TableModel(QAbstractTableModel):
         """
 
         if role == Qt.EditRole:
-
             self.dataset.setData(index, value)
             self.dataChanged.emit(index, index)
 
@@ -325,7 +320,6 @@ class TableModel(QAbstractTableModel):
         dataCount = 0 if data is None else len(data)
 
         if position <= rowCount:
-
             self.beginInsertRows(index, position, position + rows - 1)
 
             for row in range(0, rows):
@@ -344,6 +338,26 @@ class TableModel(QAbstractTableModel):
             return True
 
         return False
+
+    def removeRows(self, position, rows, parent=QModelIndex()):
+
+        if position < 0:
+            return False
+
+        rowCount = self.rowCount()
+
+        if position <= rowCount:
+            self.beginRemoveRows(parent, position, position + rows - 1)
+            # del self.dataset[position:rows + 1] verify
+
+            # delete rows starting from highest index
+            # in the range going backwards
+            for row in range(rows - 1, -1, -1):
+                self.dataset.removeRow(position + row)
+
+            self.endRemoveRows()
+
+        return True
 
     #
     # Enable Drag and Drop
@@ -378,6 +392,7 @@ class TableProxyModel(QSortFilterProxyModel):
         """
 
         super().__init__()
+
         self.setSourceModel(model)
         # Can be changed, added to and used for filterAcceptsRow filtering
         self.filterConditions = {"Remove": []}

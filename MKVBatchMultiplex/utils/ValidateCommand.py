@@ -19,7 +19,8 @@ class ValidateCommand(QValidator):
     Args:
         parent (QWidget): parent widget
         resultSignal (Signal): Signal(bool) emitted when result found
-        log (bool, optional): True do logging other value don't log. Defaults to None.
+        log (bool, optional): True do logging other value don't log.
+                              Defaults to None.
     """
 
     __log = False
@@ -87,20 +88,25 @@ class ValidateCommand(QValidator):
     def validate(self, inputStr, pos):
         """Check regex in VerifyMKVCommand"""
 
-        verify = mkv.VerifyMKVCommand(inputStr, log=self.log)
+        strTmp = inputStr
+
+        if strTmp.find(r'^""') >= 0:
+            strTmp = strTmp.strip()[1:-1].replace(r'""', r'"')
+
+        verify = mkv.VerifyMKVCommand(strTmp, log=self.log)
 
         if verify:
 
             self.resultSignal.emit(True)
 
             if self.log:
-                MODULELOG.debug("MCW0002: Command Ok: [%s]", inputStr)
+                MODULELOG.debug("MCW0002: Command Ok: [%s]", strTmp)
 
         else:
 
             self.resultSignal.emit(False)
 
             if self.log:
-                MODULELOG.debug("MCW0003: Command not Ok: [%s]", inputStr)
+                MODULELOG.debug("MCW0003: Command not Ok: [%s]", strTmp)
 
-        return (QValidator.Acceptable, inputStr, pos)
+        return (QValidator.Acceptable, strTmp, pos)

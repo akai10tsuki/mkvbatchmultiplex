@@ -4,9 +4,16 @@ JobsTableView - View to display/manipulate jobs
 
 # JTV0001
 
+
+import csv
 import logging
 import io
-import csv
+try:
+    import cPickle as pickle
+except:  # pylint: disable=bare-except
+    import pickle
+import sys
+import zlib
 
 from PySide2.QtCore import Qt
 
@@ -19,9 +26,10 @@ from PySide2.QtWidgets import (
     QHeaderView,
 )
 
-from vsutillib.mkv import MKVCommand
+from vsutillib.mkv import MKVCommandParser
 
-from ..jobs import JobStatus
+from .. import config
+from ..jobs import JobStatus, JobKey, JobInfo, JobsTableKey, SqlJobsTable
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -41,19 +49,21 @@ class JobsTableView(QTableView):
     # Class logging state
     __log = False
 
-    def __init__(self, parent=None, model=None, title=None, log=None):
+    def __init__(self, parent=None, proxyModel=None, title=None, log=None):
         super(JobsTableView, self).__init__()
 
-        self.parent = parent
-        self.model = model
-        self.viewTitle = title
         self.__log = None  # Instance logging state None = Class state prevails
 
-        self._initHelper()
-        self.setModel(model)
+        self.parent = parent
+        self.proxyModel = proxyModel
+        self.viewTitle = title
+        self.log = log
+
+        self.setModel(proxyModel)
+        self.sortByColumn(0, Qt.AscendingOrder)
         self.setSortingEnabled(True)
 
-        self.log = log
+        self._initHelper()
 
     def _initHelper(self):
 
@@ -63,7 +73,6 @@ class JobsTableView(QTableView):
         # self.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.setAlternatingRowColors(True)
         self.setWordWrap(False)
-
         self.setAcceptDrops(True)
 
     @classmethod
@@ -101,6 +110,7 @@ class JobsTableView(QTableView):
 
             True if logging is enable False otherwise
         """
+
         if self.__log is not None:
             return self.__log
 
@@ -109,21 +119,23 @@ class JobsTableView(QTableView):
     @log.setter
     def log(self, value):
         """set instance log variable"""
+
         if isinstance(value, bool) or value is None:
             self.__log = value
 
     def setVisibleColumns(self, columnsToInclude=None):
         """
-        Hides columns so that only those specified in the columnsToInclude list are shown
+        Hides columns so that only those specified in the columnsToInclude list
+        are shown
 
-        :param columnsToInclude: list of str, items must be column names as defined in the
-            underlying TableModel
+        :param columnsToInclude: list of str, items must be column names as
+            defined in the underlying TableModel
         """
 
         if columnsToInclude is None:
             columnsToInclude = []
 
-        for i, column in enumerate(self.model.sourceModel().columns):
+        for i, column in enumerate(self.proxyModel.sourceModel().columns):
             hide = column not in columnsToInclude
             self.setColumnHidden(i, hide)
 
@@ -131,25 +143,26 @@ class JobsTableView(QTableView):
         """Context Menu"""
 
         row = self.rowAt(event.pos().y())
-        totalRows = self.model.rowCount()
+        totalRows = self.proxyModel.rowCount()
 
         if 0 <= row < totalRows:
 
             menu = QMenu()
-
+            menu.setFont(self.parent.font())
             menu.addAction("Copy")
             menu.addAction("Remove")
+            menu.addAction("Save")
 
             if action := menu.exec_(event.globalPos()):
-
                 result = action.text()
 
                 if result == "Copy":
                     self.copySelection()
-
                 elif result == "Remove":
-                    self.model.filterConditions["Remove"].append(row)
-                    self.model.setFilterFixedString("")
+                    self.proxyModel.filterConditions["Remove"].append(row)
+                    self.proxyModel.setFilterFixedString("")
+                elif result == "Save":
+                    self.saveSelection()
 
     def contextMenuEventOriginal(self, event):
         """
@@ -164,7 +177,7 @@ class JobsTableView(QTableView):
         """
 
         index = self.indexAt(event.pos())
-        row = self.model.mapToSource(index).row()
+        row = self.proxyModel.mapToSource(index).row()
         contextMenu = QMenu(self)
         menuItems = {}
 
@@ -175,24 +188,29 @@ class JobsTableView(QTableView):
 
         if selection == menuItems["Copy"]:  # Specify what happens for each item
             self.copySelection()
-
         elif selection == menuItems["Remove"]:
-            self.model.filterConditions["Remove"].append(row)
-            self.model.setFilterFixedString("")
+            self.proxyModel.filterConditions["Remove"].append(row)
+            self.proxyModel.setFilterFixedString("")
 
     def resizeEvent(self, event):
 
         # Adjust the size of rows when font changes
+
         self.resizeRowsToContents()
         self.resizeColumnsToContents()
 
         # Adjust the width of Job Status column is specific to
         # current app
+
+
         header = self.horizontalHeader()
-        header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
-        # width = header.sectionSize(2)
-        # header.setSectionResizeMode(2, QHeaderView.Interactive)
-        # header.resizeSection(2, width)
+        #header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
+
+
+        width = header.sectionSize(2)
+        header.setSectionResizeMode(2, QHeaderView.Interactive)
+        header.resizeSection(2, width)
+
 
         header.setFont(self.parent.font())
 
@@ -200,9 +218,10 @@ class JobsTableView(QTableView):
 
     def copySelection(self):
         """
-        This function copies the selected cells in a table view, accounting for filters and rows as
-        well as non-continuous selection ranges. The format of copied values can be pasted into
-        Excel retaining the original organization.
+        This function copies the selected cells in a table view, accounting for
+        filters and rows as well as non-continuous selection ranges. The format
+        of copied values can be pasted into Excel retaining the original
+        organization.
 
         Adapted from code provided by ekhumoro on StackOverflow
         """
@@ -210,7 +229,6 @@ class JobsTableView(QTableView):
         selection = self.selectedIndexes()
 
         if selection:
-
             rows = [index.row() for index in selection]
             columns = [index.column() for index in selection]
             rowCount = max(rows) - min(rows) + 1
@@ -226,7 +244,30 @@ class JobsTableView(QTableView):
             csv.writer(stream, delimiter="\t").writerows(table)
             QApplication.clipboard().setText(stream.getvalue())
 
-    def supportedDropActions(self): # pylint: disable=no-self-use
+    def saveSelection(self):
+
+        model = self.proxyModel.sourceModel()
+
+        selection = self.selectedIndexes()
+
+        if selection:
+            for index in selection:
+                modelIndex = self.proxyModel.mapToSource(index)
+                jobRow = modelIndex.row()
+
+                job = JobInfo(
+                    jobRow,
+                    model.dataset[jobRow,],
+                    model,
+                    log=False,
+                )
+
+                print(job.jobRow[JobKey.ID])
+                print(job.oCommand.command)
+
+            #for row in rows:
+
+    def supportedDropActions(self):  # pylint: disable=no-self-use
 
         return Qt.CopyAction | Qt.MoveAction
 
@@ -234,14 +275,91 @@ class JobsTableView(QTableView):
 
         data = event.mimeData()
         command = data.text()
-
         self._addCommand(command)
 
     def _addCommand(self, command):
 
-        oCommand = MKVCommand(command)
+        oCommand = MKVCommandParser(command)
+
         if oCommand:
-            tableModel = self.model.sourceModel()
+            tableModel = self.proxyModel.sourceModel()
             totalJobs = tableModel.rowCount()
             data = [["", ""], [JobStatus.Waiting, "Status code"], [command, command]]
             tableModel.insertRows(totalJobs, 1, data=data)
+
+
+def addToDb(job, update=False):
+    """
+    addToDb add the job to the history database
+
+    Args:
+        database (SqlJobsTable): history database
+        job (JobInfo): running job information
+        update (bool, optional): update is true if record should exits.
+            Defaults to False.
+
+    Returns:
+        int: rowid if insert successful. 0 otherwise.
+    """
+
+    #
+    # Always open to start saving in mid of worker operating
+    #
+    database = SqlJobsTable(config.data.get(config.ConfigKey.SystemDB))
+
+
+    # Compress job information:
+    # compressed = zlib.compress(cPickle.dumps(obj))
+
+    # Get it back:
+    # obj = cPickle.loads(zlib.decompress(compressed))
+
+    # Key ID, startTime
+    #
+
+    bSimulateRun = config.data.get(config.ConfigKey.SimulateRun)
+    rc = 0
+
+    if not bSimulateRun:
+        cmpJob = zlib.compress(pickle.dumps(job))
+        if not update:
+            rowid = database.insert(
+                job.jobRow[JobKey.ID],
+                job.date.isoformat(),
+                job.addTime,
+                job.startTime,
+                job.endTime,
+                cmpJob,
+                job.oCommand.command,
+                "Saved",
+                "Save Info",
+                1,
+                0,
+            )
+            rc = rowid
+
+            if rowid > 0:
+                sqlSearchUpdate = """
+                    INSERT INTO jobsSearch(rowidKey, id, startTime, command)
+                        VALUES(?, ?, ?, ?); """
+                database.sqlExecute(
+                    sqlSearchUpdate,
+                    rowid,
+                    job.jobRow[JobKey.ID],
+                    job.startTime,
+                    job.oCommand.command,
+                )
+            if rowid == 0:
+                print("error", database.error)
+                sys.exit()
+        else:
+            # jobsDB.update(449, (JobsTableKey.startTime, ), 80)
+            database.update(
+                job.jobRow[JobKey.ID],
+                (JobsTableKey.startTime, JobsTableKey.endTime, JobsTableKey.job),
+                job.startTime,
+                job.endTime,
+                cmpJob,
+            )
+
+    return rc

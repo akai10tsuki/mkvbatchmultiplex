@@ -2,8 +2,8 @@
 Class to represent data in a table with headers
 
 Header:
-    header {str} - header ID
-    attribute {dict}  -
+    header (str} - header ID
+    attribute (dict}  -
         "Type": type of element in cell
         "CastFunction": function to cast cell to element type
         "Label": label header for the column
@@ -24,6 +24,7 @@ Header:
 
 # pylint: disable=too-few-public-methods
 
+import itertools
 
 class HeaderAttributeKey:
 
@@ -36,8 +37,9 @@ class HeaderAttributeKey:
 
 class DataKey:
 
-    Data = 0
+    Cell = 0
     ToolTip = 1
+    Obj = 2
 
 
 class HeaderInfo:
@@ -56,8 +58,9 @@ class DataItem:
     Data item information
     """
 
-    data = None
+    cell = None
     toolTip = None
+    obj = None
 
 
 class Index:
@@ -74,21 +77,20 @@ class Index:
         self._column = column
 
     def row(self):
-
         return self._row
 
     def column(self):
-
         return self._column
 
     def isValid(self):
-
         return True
 
 
 class TableData:
     """
     Class to represent data in a table with columns headers
+
+    data[x][y] = DataItem
 
     A header is a list of the form:
         [str, dict]
@@ -142,7 +144,6 @@ class TableData:
             return self.headers[index].attribute["Label"]
 
         if isinstance(index, tuple):
-
             col = None
 
             if len(index) == 1:
@@ -153,15 +154,15 @@ class TableData:
                 raise IndexError("Bad index format: {}".format(index))
 
             if col is None:
-
                 returnRow = []
                 currentRow = self.data[row]
+
                 for r in currentRow:
-                    returnRow.append(r.data)
+                    returnRow.append(r.cell)
 
                 return returnRow
 
-            return self.data[row][col].data
+            return self.data[row][col].cell
 
         raise TypeError("Invalid index type")
 
@@ -172,19 +173,13 @@ class TableData:
 
         elif isinstance(index, tuple):
             # Only update members of the data table no headers
-
-            print("Bad Bad")
-
             if len(index) == 2:
-
                 row, col = index
             else:
                 raise IndexError("Bad index format: {}".format(index))
 
             index = Index(row, col)  # Simulate index
-
             self.setData(index, value)
-
         else:
             raise TypeError("Invalid index type")
 
@@ -196,18 +191,15 @@ class TableData:
         Add header information
 
         Keyword Arguments:
-            header {list} -- list containing the a header (default: {None})
+            header (list) -- list containing the a header (default: {None})
         """
 
         if header is not None:
-
-            self.headerName.append(header[0])
-
             oHeader = HeaderInfo()
             oHeader.header = header[0]
             oHeader.attribute = header[1]
             oHeader.headerList = header
-
+            self.headerName.append(header[0])
             self.headers.append(oHeader)
 
     def setData(self, index, value):
@@ -215,7 +207,7 @@ class TableData:
         Insert row at the end of the data table
 
         Keyword Arguments:
-            dataItem {list} -- list containing a data row (default: {None})
+            dataItem (list) -- list containing a data row (default: {None})
         """
 
         if (value is not None) and index.isValid():
@@ -223,11 +215,14 @@ class TableData:
             # better for logging purposes
             row = index.row()
             column = index.column()
+
             if isinstance(value, DataItem):
-                self.data[row][column].data = value.data
+                self.data[row][column].cell = value.cell
                 self.data[row][column].toolTip = value.toolTip
+                self.data[row][column].obj = value.obj
             else:
-                self.data[row][column].data = value
+                self.data[row][column].cell = value
+
             return True
 
         return False
@@ -237,7 +232,7 @@ class TableData:
         Insert row at the end of the data table
 
         Keyword Arguments:
-            dataItem {list} -- list containing a data row (default: {None})
+            dataItem (list) -- list containing a data row (default: {None})
         """
 
         if (value is not None) and index.isValid():
@@ -246,6 +241,7 @@ class TableData:
             row = index.row()
             column = index.column()
             self.data[row][column].toolTip = value
+
             return True
 
         return False
@@ -255,38 +251,43 @@ class TableData:
         Insert a data row
 
         Arguments:
-            index {int} -- row number where to insert the data
-            row {list} -- list with row data
+            position (int) -- row number where to insert the data
+            row (list) -- list with row data
         """
 
         if row is not None:
-
-            emptyRow = [DataItem(), DataItem(), DataItem()]
+            totalColumns = len(self.headerName)
+            emptyRow = []
+            for _ in itertools.repeat(None, totalColumns):
+                rowItem = DataItem()
+                emptyRow.append(rowItem)
 
             self.data.insert(position, emptyRow)
 
             for column, value in enumerate(row):
                 if isinstance(value, list):
                     newItem = DataItem()
-                    newItem.data = value[DataKey.Data]
+                    newItem.cell = value[DataKey.Cell]
                     newItem.toolTip = value[DataKey.ToolTip]
+                    newItem.obj = value[DataKey.Obj]
                     index = Index(position, column)
                     self.setData(index, newItem)
                 else:
                     if value is not None:
                         raise ValueError("Item at index {} is invalid".format(column))
         else:
-
-            emptyRow = ["", "", ""]
-
+            totalColumns = len(self.headerName)
+            emptyRow = []
+            for _ in itertools.repeat(None, totalColumns):
+                emptyRow.append("")
             self.data.insert(position, emptyRow)
 
-    def deleteRow(self, index):
+    def removeRow(self, index):
         """
         Delete a data row
 
         Arguments:
-            index {int} -- row number to delete 0 based
+            index (int) -- row number to delete 0 based
 
         Returns:
             list -- row deleted
@@ -300,42 +301,35 @@ class TableData:
         Insert a data column
 
         Arguments:
-            index {int} -- row number where to insert the data
-            row {list} -- list with row data
+            position (int) -- column number where to insert the data
+            columnHeader (str) -- header for column to be inserted
+            columnData (list) -- data to insert in column cells
         """
 
         if columnHeader is None:
             self.headers.insert(position, HeaderInfo())
             self.headerName.insert(position, "")
-
         else:
-
             if isinstance(columnHeader, list):
-
                 oHeader = HeaderInfo()
                 oHeader.header = columnHeader[0]
                 oHeader.attribute = columnHeader[1]
                 oHeader.headerList = columnHeader
-
                 self.headers.insert(position, oHeader)
                 self.headerName.insert(position, oHeader.header)
-
             elif isinstance(columnHeader, HeaderInfo):
-
                 self.headers.insert(position, columnHeader)
                 self.headers.insert(position, columnHeader.header)
-
             else:
-
                 raise TypeError("Invalid column header type.")
 
         if columnData is None:
             for r in self.data:
                 r.insert(position, DataItem())
         else:
-            for i, r in enumerate(self.data):
+            for _, r in enumerate(self.data):
                 element = DataItem()
-                element.data = columnData[0]
+                element.cell = columnData[0]
                 r.insert(position, columnData[1])
 
     def deleteColumn(self, index):
@@ -343,7 +337,7 @@ class TableData:
         Delete a column from the table
 
         Arguments:
-            index {int} -- column to delete
+            index (int) -- column to delete
 
         Returns:
             list -- list containing the header ID, header attributes and data rows deleted

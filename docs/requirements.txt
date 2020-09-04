@@ -1,0 +1,6 @@
+babel==2.8.0
+natsort==7.0.1
+pymediainfo==4.2.1
+PySide2==5.15.0
+shiboken2==5.15.0
+vsutillib==1.6.3

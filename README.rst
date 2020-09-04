@@ -10,13 +10,15 @@ mkvbatchmultiplex: MKVMERGE batch multiplexing
 .. image:: https://img.shields.io/pypi/pyversions/mkvbatchmultiplex.svg
   :target: https://pypi.org/project/mkvbatchmultiplex
 
+.. image:: https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg
+  :target: CODE_OF_CONDUCT.md
 
-**Working on full re-write for version 2.0.0**
+.. image:: https://readthedocs.org/projects/mkvbatchmultiplex/badge/?version=latest
+  :target: https://mkvbatchmultiplex.readthedocs.io/en/latest/?badge=latest
+  :alt: Documentation Status
 
-This project started out of the need to multiplex a library of many video
-series using AVI_ container and SRT_ for subtitles to be maintained in a Media
-Server. And as the saying goes search for something to use did not find
-anything that met my requirements so program it myself.
+This project went into a rewrite for version 2.  Rename module was added to
+help maintain output file names Plex_ friendly.
 
 Description
 ===========
@@ -45,25 +47,27 @@ Made light testing on ubuntu and macOS 10.14 Mojave and ubuntu 18.04.
 On macOS MKVToolNix must be version 30.0.0 or higher if working with
 Dark Theme.
 
+If working with the source to execute the application first create the
+locale files.  On the source directory execute:
+
+.. code:: bash
+
+    python setup.py generate_catalog
+
 Dependencies
 ************
 
-    * Python_ 3.8
+  * Python_ 3.8.1
 
-        - PySide2_ 5.12 or greater
-        - pymediainfo_ 4.0 or greater
-    * MediaInfo_ tested with versions 17.10->18.12
-    * MKVToolNix_ tested with versions 17.00->42.0.0
+    - lxml_ 4.5.2 or greater
+    - natsort_ 7.0.1 or greater
+    - pymediainfo_ 4.2.1 or greater
+    - PySide2_ 5.14 or greater
 
-For now is a python package it can be installed:
+  * MediaInfo_ tested with versions 17.10->20.08
+  * MKVToolNix_ tested with versions 17.00->49.0.0
 
-::
-
-    pip install mkvbatchmultiplex
-    or download the source
-
-
-macOS 10.14 Dark theme MKVToolNix has to be version 30.0.0+
+In macOS 10.14 Dark theme MKVToolNix has to be version 30.0.0+ to use it.
 
 Usage
 =====
@@ -76,28 +80,31 @@ file make any operations needed copy command to clipboard:
 Paste command on mkvbatchmultiplex push Process button and wait.
 Remember to select and output directory.
 
+Step by step examples are in the github repository wiki_.
+
 Roadmap
 =======
 
 This is just the base for the project.  The roadmap is:
 
-    * Work on a stable release.
-    * Easier installation for different operating systems
-    * Documentation
-    * Work on job queue management
+    * Work on rename module to fetch metadata
+    * Work on the Spanish interface translation
+    * Easier installation for linux
 
-The application works for me as is. If the the program generates any interest
-any further changes and additions will **also** depend on user base needs.
+If the the program generates any interest any further changes and additions
+will **also** depend on user base needs.
 
 See https://mkvbatchmultiplex.readthedocs.io for more information.
 
 .. Hyperlinks.
 
+.. _Plex: https://www.plex.tv/
 .. _pymediainfo: https://pypi.org/project/pymediainfo/
 .. _PySide2: https://wiki.qt.io/Qt_for_Python
 .. _Python: https://www.python.org/downloads/
 .. _MKVToolNix: https://mkvtoolnix.download/
 .. _Matroska: https://www.matroska.org/
 .. _MediaInfo: https://mediaarea.net/en/MediaInfo
-.. _AVI: https://docs.microsoft.com/en-us/windows/win32/directshow/avi-file-format/
-.. _SRT: https://matroska.org/technical/specs/subtitles/srt.html
+.. _lxml: https://lxml.de/
+.. _natsort: https://github.com/SethMMorton/natsort
+.. _wiki: https://github.com/akai10tsuki/mkvbatchmultiplex/wiki

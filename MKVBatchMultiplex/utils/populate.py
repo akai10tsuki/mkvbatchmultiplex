@@ -26,8 +26,8 @@ def testData():
 
     data = [
         [
-            [1, ""],
-            [JobStatus.AddToQueue, "Status code"],
+            [1, "", None],
+            [JobStatus.AddToQueue, "Status code", None],
             [
                 (
                     r"'C:/Program Files/MKVToolNix\mkvmerge.exe' --ui-language en --output "
@@ -54,11 +54,12 @@ def testData():
                     r"Motomeru no wa Machigatteiru Darou ka - 01 [BD][1080p-FLAC][8B5184BF].mkv' "
                     r"')' --track-order 0:0,0:1,0:2"
                 ),
+                None,
             ],
         ],
         [
-            [2, ""],
-            [JobStatus.Waiting, "Status code"],
+            [2, "", None],
+            [JobStatus.Waiting, "Status code", None],
             [
                 (
                     r"'C:/Program Files/MKVToolNix\mkvmerge.exe' --ui-language en --output "
@@ -86,11 +87,12 @@ def testData():
                     r"Motomeru no wa Machigatteiru Darou ka - 01 [BD][1080p-FLAC][8B5184BF].mkv' "
                     r"')' --track-order 0:0,0:1,0:2"
                 ),
+                None,
             ],
         ],
         [
-            [3, ""],
-            [JobStatus.AbortJobError, ""],
+            [3, "", None],
+            [JobStatus.AbortJobError, "", None],
             [
                 (
                     r"'C:/Program Files/MKVToolNix\mkvmerge.exe' --ui-language en --output "
@@ -118,11 +120,12 @@ def testData():
                     r"Motomeru no wa Machigatteiru Darou ka - 01 [BD][1080p-FLAC][8B5184BF].mkv' "
                     r"')' --track-order 0:0,0:1,0:2"
                 ),
+                None,
             ],
         ],
         [
-            [4, ""],
-            [JobStatus.Done, "Status code"],
+            [4, "", None],
+            [JobStatus.Done, "Status code", None],
             [
                 (
                     r"'C:/Program Files/MKVToolNix\mkvmerge.exe' --ui-language en --output "
@@ -150,11 +153,12 @@ def testData():
                     r"Motomeru no wa Machigatteiru Darou ka - 01 [BD][1080p-FLAC][8B5184BF].mkv' "
                     r"')' --track-order 0:0,0:1,0:2"
                 ),
+                None,
             ],
         ],
         [
-            [5, ""],
-            [JobStatus.Aborted, ""],
+            [5, "", None],
+            [JobStatus.Aborted, "", None],
             [
                 (
                     r"'C:/Program Files/MKVToolNix\mkvmerge.exe' --ui-language en --output "
@@ -182,6 +186,7 @@ def testData():
                     r"Motomeru no wa Machigatteiru Darou ka - 01 [BD][1080p-FLAC][8B5184BF].mkv' "
                     r"')' --track-order 0:0,0:1,0:2"
                 ),
+                None,
             ],
         ],
     ]

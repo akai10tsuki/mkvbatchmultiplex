@@ -6,6 +6,7 @@
 
 import io
 import os
+import pathlib
 import shutil
 
 from pathlib import Path
@@ -15,7 +16,7 @@ from babel.messages import frontend as babel
 from MKVBatchMultiplex import config
 
 
-ROOT = os.path.abspath(os.path.dirname(__file__))
+ROOT = pathlib.Path(__file__).parent.resolve()
 
 
 def removeTmpDirs():
@@ -54,7 +55,7 @@ setup(
     classifiers=[  # Optional
         # Trove classifiers
         # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 5 - Production/Stable",
         "Environment :: MacOS X",
         "Environment :: Win32 (MS Windows)",
         "Environment :: X11 Applications :: Qt",
@@ -78,6 +79,7 @@ setup(
         "Programming Language :: Python :: Implementation :: CPython",
     ],
     keywords=config.KEYWORDS,  # Optional
+    #package_dir={'': config.PACKAGES}, # Optional
     packages=config.PACKAGES,  # Required
     install_requires=config.REQUIRED,  # Optional
     python_requires=config.PYTHONVERSIONS,
