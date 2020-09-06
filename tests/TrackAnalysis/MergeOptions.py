@@ -1,6 +1,10 @@
 """Identify mkvmerge options"""
 
+
 class MergeOptions:
+    """
+     mkvmerge supported global and track options
+    """
 
     globalOptions = {
         "--verbose": [False, False],
@@ -76,7 +80,18 @@ class MergeOptions:
 
         pass
 
-    def hasParameter(self, option):
+    @staticmethod
+    def hasParameter(option):
+        """
+        hasParameter determines if mkvmerge option has a parameter
+
+        Args:
+            option (str): mkvmerge option
+
+        Returns:
+            bool|None: returns True if option has parameter False if no.  Returns
+                None if option not supported
+        """
 
         rc = MergeOptions.globalOptions.get(option)
 
@@ -90,7 +105,18 @@ class MergeOptions:
 
         return None
 
-    def hasTrackID(self, option):
+    @staticmethod
+    def hasTrackID(option):
+        """
+        hasTrackID determines if mkvmerge option has a track ID in parameter
+
+        Args:
+            option (str): mkvmerge option
+
+        Returns:
+            bool|None: returns True if option has track False if no.  Returns
+                None if option not supported
+        """
 
         rc = MergeOptions.globalOptions.get(option)
 
@@ -104,7 +130,18 @@ class MergeOptions:
 
         return None
 
-    def isTrackOption(self, option):
+    @staticmethod
+    def isTrackOption(option):
+        """
+        isTrackOptions determines if mkvmerge option is used for tracks
+
+        Args:
+            option (str): mkvmerge option
+
+        Returns:
+            bool|None: returns True if option is used for tracks False if no.
+                Returns None if option not supported
+        """
 
         rc = MergeOptions.tackOptions.get(option)
 

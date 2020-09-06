@@ -71,10 +71,10 @@ class MediaFileInfo:
                     except:  # pylint: disable=bare-except
                         pass
                     self.title = self.title.strip()
-                self.totalTracksByType["Video"] = int(track.count_of_video_streams)
-                self.totalTracksByType["Audio"] = int(track.count_of_audio_streams)
-                self.totalTracksByType["Text"] = int(track.count_of_text_streams)
-                self.attachments = track.attachments.split(" / ")
+                self.totalTracksByType["Video"] = 0 if track.count_of_video_streams is None else int(track.count_of_video_streams)
+                self.totalTracksByType["Audio"] = 0 if track.count_of_audio_streams is None else int(track.count_of_audio_streams)
+                self.totalTracksByType["Text"] = 0 if track.count_of_text_streams is None else int(track.count_of_text_streams)
+                self.attachments = "" if track.attachments is None else track.attachments.split(" / ")
             if track.track_type == "Menu":
                 self.menu = track
             if track.track_type in ("Video", "Audio", "Text"):

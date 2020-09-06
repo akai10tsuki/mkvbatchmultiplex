@@ -102,6 +102,7 @@ class SourceFile:
             if match := reOptionsEx.search(self.__fullMatchString):
                 self.options = match.group(1)
                 self.trackOptions.options = self.options
+                self.trackOptions.fileOrder = self.fileOrder
             else:
                 self.__errorFound = True
             if match := reSourcesEx.search(self.__fullMatchString):
