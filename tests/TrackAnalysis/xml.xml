@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MediaInfo xmlns="https://mediaarea.net/mediainfo"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://mediaarea.net/mediainfo https://mediaarea.net/mediainfo/mediainfo_2_0.xsd" version="2.0">
+    <creatingLibrary version="20.03" url="https://mediaarea.net/MediaInfo">MediaInfoLib</creatingLibrary>
+    <media ref="E:\Example\TestMedia\Example 07\Source\Arte - 01 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mkv">
+        <track type="General">
+            <UniqueID>0</UniqueID>
+            <VideoCount>1</VideoCount>
+            <AudioCount>4</AudioCount>
+            <TextCount>7</TextCount>
+            <MenuCount>1</MenuCount>
+            <FileExtension>mkv</FileExtension>
+            <Format>Matroska</Format>
+            <Format_Version>4</Format_Version>
+            <FileSize>1316521289</FileSize>
+            <Duration>1423.850</Duration>
+            <OverallBitRate_Mode>VBR</OverallBitRate_Mode>
+            <OverallBitRate>7396966</OverallBitRate>
+            <FrameRate>23.976</FrameRate>
+            <FrameCount>34138</FrameCount>
+            <IsStreamable>Yes</IsStreamable>
+            <File_Created_Date>UTC 2020-08-17 13:16:03.472</File_Created_Date>
+            <File_Created_Date_Local>2020-08-17 09:16:03.472</File_Created_Date_Local>
+            <File_Modified_Date>UTC 2020-08-17 14:00:53.365</File_Modified_Date>
+            <File_Modified_Date_Local>2020-08-17 10:00:53.365</File_Modified_Date_Local>
+            <Encoded_Application>no_variable_data</Encoded_Application>
+            <Encoded_Library>no_variable_data</Encoded_Library>
+            <extra>
+                <Attachments>19081.ttf / AllodsWest.ttf / ariblk.ttf / ariblk_0.ttf / Bahij_Muna-Black.ttf / BD_Cartoon_Shout.ttf / Cartoon Toy Turbo Bold.otf / CasualContactMF.ttf / Comix Loud.ttf / fofbb_ital.otf / FrizQuadrataC.otf / GandhiSans-Bold.otf / GandhiSans-BoldItalic.otf / GE_Dinar_One_Medium.otf / GillSansNova-Book.ttf / Hayah.otf / HeyComic-w1wez.ttf / HTOWERT.TTF / HZHandwrite.ttf / IwaOMinPro-Bd-Fate.ttf / IwaOMinPro-Eb.otf / MyFairCody.otf / OpenSans-Semibold.ttf / second breakfast.ttf / Staccato.ttf</Attachments>
+            </extra>
+        </track>
+        <track type="Video">
+            <StreamOrder>0</StreamOrder>
+            <ID>1</ID>
+            <UniqueID>1</UniqueID>
+            <Format>HEVC</Format>
+            <Format_Profile>Main 10</Format_Profile>
+            <Format_Level>4</Format_Level>
+            <Format_Tier>Main</Format_Tier>
+            <CodecID>V_MPEGH/ISO/HEVC</CodecID>
+            <Duration>1423.841</Duration>
+            <Width>1920</Width>
+            <Height>1080</Height>
+            <Sampled_Width>1920</Sampled_Width>
+            <Sampled_Height>1080</Sampled_Height>
+            <PixelAspectRatio>1.000</PixelAspectRatio>
+            <DisplayAspectRatio>1.778</DisplayAspectRatio>
+            <FrameRate_Mode>CFR</FrameRate_Mode>
+            <FrameRate>23.976</FrameRate>
+            <FrameCount>34138</FrameCount>
+            <ColorSpace>YUV</ColorSpace>
+            <ChromaSubsampling>4:2:0</ChromaSubsampling>
+            <BitDepth>10</BitDepth>
+            <Delay>0.000</Delay>
+            <Encoded_Library>x265 - 3.3+4-30eb4de83092:[Windows][GCC 7.1.0][64 bit] 10bit</Encoded_Library>
+            <Encoded_Library_Name>x265</Encoded_Library_Name>
+            <Encoded_Library_Version>3.3+4-30eb4de83092:[Windows][GCC 7.1.0][64 bit] 10bit</Encoded_Library_Version>
+            <Encoded_Library_Settings>cpuid=1176575 / frame-threads=5 / wpp / no-pmode / pme / no-psnr / no-ssim / log-level=2 / input-csp=1 / input-res=1920x1080 / interlace=0 / total-frames=0 / level-idc=0 / high-tier=1 / uhd-bd=0 / ref=3 / no-allow-non-conformance / no-repeat-headers / annexb / no-aud / no-hrd / info / hash=0 / no-temporal-layers / no-open-gop / min-keyint=4 / keyint=250 / gop-lookahead=0 / bframes=4 / b-adapt=2 / b-pyramid / bframe-bias=0 / rc-lookahead=20 / lookahead-slices=6 / scenecut=40 / hist-scenecut=0 / radl=0 / no-splice / no-intra-refresh / ctu=64 / min-cu-size=8 / rect / amp / max-tu-size=32 / tu-inter-depth=4 / tu-intra-depth=4 / limit-tu=0 / rdoq-level=0 / dynamic-rd=0.00 / no-ssim-rd / signhide / no-tskip / nr-intra=0 / nr-inter=0 / no-constrained-intra / strong-intra-smoothing / max-merge=5 / limit-refs=3 / no-limit-modes / me=3 / subme=7 / merange=57 / temporal-mvp / no-frame-dup / no-hme / weightp / no-weightb / no-analyze-src-pics / deblock=0:0 / sao / no-sao-non-deblock / rd=3 / selective-sao=4 / no-early-skip / rskip / no-fast-intra / no-tskip-fast / no-cu-lossless / no-b-intra / no-splitrd-skip / rdpenalty=0 / psy-rd=2.00 / psy-rdoq=0.00 / no-rd-refine / no-lossless / cbqpoffs=0 / crqpoffs=0 / rc=crf / crf=12.5 / qcomp=0.60 / qpstep=4 / stats-write=0 / stats-read=0 / ipratio=1.40 / pbratio=1.30 / aq-mode=1 / aq-strength=1.00 / cutree / zone-count=0 / no-strict-cbr / qg-size=32 / no-rc-grain / qpmax=69 / qpmin=0 / no-const-vbv / sar=1 / overscan=0 / videoformat=5 / range=0 / colorprim=1 / transfer=1 / colormatrix=1 / chromaloc=0 / display-window=0 / cll=0,0 / min-luma=0 / max-luma=1023 / log2-max-poc-lsb=8 / vui-timing-info / vui-hrd-info / slices=1 / no-opt-qp-pps / no-opt-ref-list-length-pps / no-multi-pass-opt-rps / scenecut-bias=0.05 / hist-threshold=0.01 / no-opt-cu-delta-qp / no-aq-motion / no-hdr10 / no-hdr10-opt / no-dhdr10-opt / no-idr-recovery-sei / analysis-reuse-level=0 / analysis-save-reuse-level=0 / analysis-load-reuse-level=0 / scale-factor=0 / refine-intra=0 / refine-inter=0 / refine-mv=1 / refine-ctu-distortion=0 / no-limit-sao / ctu-info=0 / no-lowpass-dct / refine-analysis-type=0 / copy-pic=1 / max-ausize-factor=1.0 / no-dynamic-refine / no-single-sei / no-hevc-aq / no-svt / no-field / qp-adaptation-range=1.00 / no-scenecut-aware-qpconformance-window-offsets / right=0 / bottom=0</Encoded_Library_Settings>
+            <Default>Yes</Default>
+            <Forced>No</Forced>
+            <colour_description_present>Yes</colour_description_present>
+            <colour_description_present_Source>Container / Stream</colour_description_present_Source>
+            <colour_range>Limited</colour_range>
+            <colour_range_Source>Stream</colour_range_Source>
+            <colour_primaries>BT.709</colour_primaries>
+            <colour_primaries_Source>Container / Stream</colour_primaries_Source>
+            <transfer_characteristics>BT.709</transfer_characteristics>
+            <transfer_characteristics_Source>Container / Stream</transfer_characteristics_Source>
+            <matrix_coefficients>BT.709</matrix_coefficients>
+            <matrix_coefficients_Source>Container / Stream</matrix_coefficients_Source>
+            <extra>
+                <Duration_Source>General_Duration</Duration_Source>
+            </extra>
+        </track>
+        <track type="Audio" typeorder="1">
+            <StreamOrder>1</StreamOrder>
+            <ID>2</ID>
+            <UniqueID>2</UniqueID>
+            <Format>AAC</Format>
+            <Format_AdditionalFeatures>LC</Format_AdditionalFeatures>
+            <CodecID>A_AAC-2</CodecID>
+            <Duration>1423.850</Duration>
+            <Channels>2</Channels>
+            <ChannelPositions>Front: L R</ChannelPositions>
+            <ChannelLayout>L R</ChannelLayout>
+            <SamplesPerFrame>1024</SamplesPerFrame>
+            <SamplingRate>48000</SamplingRate>
+            <SamplingCount>68344800</SamplingCount>
+            <FrameRate>46.875</FrameRate>
+            <Compression_Mode>Lossy</Compression_Mode>
+            <Delay>0.000</Delay>
+            <Delay_Source>Container</Delay_Source>
+            <Title>AniLibria.tv</Title>
+            <Language>ru</Language>
+            <Default>Yes</Default>
+            <Forced>No</Forced>
+            <extra>
+                <Duration_Source>General_Duration</Duration_Source>
+            </extra>
+        </track>
+        <track type="Audio" typeorder="2">
+            <StreamOrder>2</StreamOrder>
+            <ID>3</ID>
+            <UniqueID>3</UniqueID>
+            <Format>AAC</Format>
+            <Format_AdditionalFeatures>LC</Format_AdditionalFeatures>
+            <CodecID>A_AAC-2</CodecID>
+            <Duration>1423.850</Duration>
+            <Channels>2</Channels>
+            <ChannelPositions>Front: L R</ChannelPositions>
+            <ChannelLayout>L R</ChannelLayout>
+            <SamplesPerFrame>1024</SamplesPerFrame>
+            <SamplingRate>48000</SamplingRate>
+            <SamplingCount>68344800</SamplingCount>
+            <FrameRate>46.875</FrameRate>
+            <Compression_Mode>Lossy</Compression_Mode>
+            <Delay>0.000</Delay>
+            <Delay_Source>Container</Delay_Source>
+            <Title>Wakanim.tv</Title>
+            <Language>ru</Language>
+            <Default>No</Default>
+            <Forced>No</Forced>
+            <extra>
+                <Duration_Source>General_Duration</Duration_Source>
+            </extra>
+        </track>
+        <track type="Audio" typeorder="3">
+            <StreamOrder>3</StreamOrder>
+            <ID>4</ID>
+            <UniqueID>4</UniqueID>
+            <Format>FLAC</Format>
+            <CodecID>A_FLAC</CodecID>
+            <Duration>1423.850</Duration>
+            <BitRate_Mode>VBR</BitRate_Mode>
+            <Channels>2</Channels>
+            <ChannelPositions>Front: L R</ChannelPositions>
+            <ChannelLayout>L R</ChannelLayout>
+            <SamplingRate>48000</SamplingRate>
+            <SamplingCount>68344800</SamplingCount>
+            <BitDepth>16</BitDepth>
+            <Compression_Mode>Lossless</Compression_Mode>
+            <Delay>0.000</Delay>
+            <Delay_Source>Container</Delay_Source>
+            <Encoded_Library>reference libFLAC 1.3.3 20190804</Encoded_Library>
+            <Encoded_Library_Name>libFLAC</Encoded_Library_Name>
+            <Encoded_Library_Version>1.3.3</Encoded_Library_Version>
+            <Encoded_Library_Date>UTC 2019-08-04</Encoded_Library_Date>
+            <Language>ja</Language>
+            <Default>No</Default>
+            <Forced>No</Forced>
+            <extra>
+                <Duration_Source>General_Duration</Duration_Source>
+            </extra>
+        </track>
+        <track type="Audio" typeorder="4">
+            <StreamOrder>4</StreamOrder>
+            <ID>5</ID>
+            <UniqueID>5</UniqueID>
+            <Format>FLAC</Format>
+            <CodecID>A_FLAC</CodecID>
+            <Duration>1423.850</Duration>
+            <BitRate_Mode>VBR</BitRate_Mode>
+            <Channels>2</Channels>
+            <ChannelPositions>Front: L R</ChannelPositions>
+            <ChannelLayout>L R</ChannelLayout>
+            <SamplingRate>48000</SamplingRate>
+            <SamplingCount>68344800</SamplingCount>
+            <BitDepth>16</BitDepth>
+            <Compression_Mode>Lossless</Compression_Mode>
+            <Delay>0.000</Delay>
+            <Delay_Source>Container</Delay_Source>
+            <Title>comments</Title>
+            <Encoded_Library>reference libFLAC 1.3.3 20190804</Encoded_Library>
+            <Encoded_Library_Name>libFLAC</Encoded_Library_Name>
+            <Encoded_Library_Version>1.3.3</Encoded_Library_Version>
+            <Encoded_Library_Date>UTC 2019-08-04</Encoded_Library_Date>
+            <Language>ja</Language>
+            <Default>No</Default>
+            <Forced>No</Forced>
+            <extra>
+                <Duration_Source>General_Duration</Duration_Source>
+            </extra>
+        </track>
+        <track type="Text" typeorder="1">
+            <ID>6</ID>
+            <UniqueID>6</UniqueID>
+            <Format>ASS</Format>
+            <CodecID>S_TEXT/ASS</CodecID>
+            <Compression_Mode>Lossless</Compression_Mode>
+            <Title>надписи</Title>
+            <Language>ru</Language>
+            <Default>Yes</Default>
+            <Forced>No</Forced>
+        </track>
+        <track type="Text" typeorder="2">
+            <ID>7</ID>
+            <UniqueID>7</UniqueID>
+            <Format>ASS</Format>
+            <CodecID>S_TEXT/ASS</CodecID>
+            <Compression_Mode>Lossless</Compression_Mode>
+            <Title>AniLibria.tv</Title>
+            <Language>ru</Language>
+            <Default>No</Default>
+            <Forced>No</Forced>
+        </track>
+        <track type="Text" typeorder="3">
+            <ID>8</ID>
+            <UniqueID>8</UniqueID>
+            <Format>ASS</Format>
+            <CodecID>S_TEXT/ASS</CodecID>
+            <Compression_Mode>Lossless</Compression_Mode>
+            <Title>Yakusub Studio</Title>
+            <Language>ru</Language>
+            <Default>No</Default>
+            <Forced>No</Forced>
+        </track>
+        <track type="Text" typeorder="4">
+            <ID>9</ID>
+            <UniqueID>9</UniqueID>
+            <Format>ASS</Format>
+            <CodecID>S_TEXT/ASS</CodecID>
+            <Compression_Mode>Lossless</Compression_Mode>
+            <Title>Wakanim.tv dehardsub Arisaka</Title>
+            <Language>fr</Language>
+            <Default>No</Default>
+            <Forced>No</Forced>
+        </track>
+        <track type="Text" typeorder="5">
+            <ID>10</ID>
+            <UniqueID>10</UniqueID>
+            <Format>ASS</Format>
+            <CodecID>S_TEXT/ASS</CodecID>
+            <Compression_Mode>Lossless</Compression_Mode>
+            <Title>Athbul-Khayal</Title>
+            <Language>ar</Language>
+            <Default>No</Default>
+            <Forced>No</Forced>
+        </track>
+        <track type="Text" typeorder="6">
+            <ID>11</ID>
+            <UniqueID>11</UniqueID>
+            <Format>ASS</Format>
+            <CodecID>S_TEXT/ASS</CodecID>
+            <Compression_Mode>Lossless</Compression_Mode>
+            <Title>ShowY</Title>
+            <Language>en</Language>
+            <Default>No</Default>
+            <Forced>No</Forced>
+        </track>
+        <track type="Text" typeorder="7">
+            <ID>12</ID>
+            <UniqueID>12</UniqueID>
+            <Format>ASS</Format>
+            <CodecID>S_TEXT/ASS</CodecID>
+            <Compression_Mode>Lossless</Compression_Mode>
+            <Title>Funimation</Title>
+            <Language>en</Language>
+            <Default>No</Default>
+            <Forced>No</Forced>
+        </track>
+        <track type="Menu">
+            <extra>
+                <_00_00_00_000>en:1</_00_00_00_000>
+                <_00_00_45_045>en:опенинг</_00_00_45_045>
+                <_00_02_15_010>en:3</_00_02_15_010>
+                <_00_10_58_992>en:4</_00_10_58_992>
+                <_00_21_54_980>en:эндинг</_00_21_54_980>
+                <_00_23_24_987>en:6</_00_23_24_987>
+            </extra>
+        </track>
+    </media>
+</MediaInfo>
