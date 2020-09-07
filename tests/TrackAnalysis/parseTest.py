@@ -22,16 +22,19 @@ import pymediainfo
 
 # from natsort import natsorted, ns
 
-# from vsutillib.media import MediaFileInfo
+from vsutillib.media import MediaFileInfo
+from vsutillib.mkv import MergeOptions, TrackOptions, MKVCommandParser, generateCommand
+
 # from vsutillib.misc import XLate
 
 
-from mkvcommandparser import MKVCommandParser
-from TrackOptions import TrackOptions
+# from mkvcommandparser import MKVCommandParser
+# from TrackOptions import TrackOptions
 from verifystructure import VerifyStructure
 from iso639 import iso639
-from MergeOptions import MergeOptions
-from MediaFileInfo import MediaFileInfo
+
+# from MergeOptions import MergeOptions
+# from MediaFileInfo import MediaFileInfo
 from findSimilarTrack import findSimilarTrack
 
 
@@ -163,19 +166,18 @@ def test():
     trackOptions = oCommand.oBaseFiles[0].trackOptions
     mediaInfo = oCommand.oBaseFiles[0].mediaFileInfo
 
-
-    #print(trackOptions.strIOptions)
+    # print(trackOptions.strIOptions)
     print(trackOptions.parsedIOptions)
     print(trackOptions.optionsByTrack())
-    #template = oCommand.commandTemplates[0]
-    #trackOptions.translation = {"9": "10", "10": "11"}
-    #print(f"Track Order {oCommand.cliTrackOrder}")
-    #print(f"Template: {template}")
-    #print(
+    # template = oCommand.commandTemplates[0]
+    # trackOptions.translation = {"9": "10", "10": "11"}
+    # print(f"Track Order {oCommand.cliTrackOrder}")
+    # print(f"Template: {template}")
+    # print(
     #    f"Translation: {trackOptions.translation} "
     #    f"Order Translation: {trackOptions.orderTranslation}"
-    #)
-    #print(f"Shell Command: {oCommand.shellCommands[0]}")
+    # )
+    # print(f"Shell Command: {oCommand.shellCommands[0]}")
 
     return
 
