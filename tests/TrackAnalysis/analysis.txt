@@ -1,0 +1,159 @@
+'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en --output 'E:\Example\Series Title (2017)\Season 01\Episode - S01E03 (1).mkv'
+
+Source 0
+
+Track 0 - video - und
+Track 1 - audio - jpn
+Track 2 - sub - eng
+
+--language 0:und --default-track 0:yes --display-dimensions 0:1280x720 --language 1:jpn --default-track 1:yes --sub-charset 2:UTF-8 --language 2:eng '(' 'E:\Example\Series Title (2017)\Season 01\Episode - S01E03.mkv' ')'
+
+Source 1
+
+Track 0 - video - und
+Track 1 - audio - jpn
+Track 2 - sub - ita
+
+--no-audio --no-video --sub-charset 2:UTF-8 --language 2:ita --track-name 2:Italian --default-track 2:yes '(' 'E:\Example\Series Title (2017)\New Sub\Episode (Italian Subs) - S01E03.mkv' ')'
+
+--track-order 0:0,0:1,1:2,0:2
+
+
+mkvmerge [global options] {-o out} [options1] {file1} [[options2] {file2}] [@options-file.json]
+
+global options
+
+--verbose
+--quiet
+--output
+--webm
+--title
+--default-language
+
+Segment Global options
+
+--segmentinfo
+--segment-uid
+
+Chapter and Tag handling global options
+
+--chapter-language
+--chapter-sync
+--chapter-charset
+--generate-chapters
+--generate-chapters-name-template
+--cue-chapter-name-format
+--chapters file-name
+--global-tags file-name
+
+General output control
+
+--track-order
+--cluster length
+
+No parameters
+--no-cues
+--clusters-in-meta-seek
+--no-date
+--disable-lacing
+--enable-durations
+--disable-track-statistics-tags
+--timestamp-scale factor
+
+File Splitting, linking, appending and concatenation
+
+--split
+
+No parameters
+--link
+
+--link-to-previous
+--link-to-next
+--append-mode
+--append-to
+
+Attachments
+
+--attachment-description
+--attachment-mime-type
+--attachment-name
+--attach-file file-name, --attach-file-once file-name
+
+Options for each input file
+
+--audio-tracks n,m,...
+
+--video-tracks n,m,...
+
+--subtitle-tracks n,m,...
+
+--button-tracks n,m, ...
+
+--track-tags n,m, ...
+
+--attachments n[all|first],m...
+
+--no-audio
+--no-video
+--no-subtitles
+--no-buttons
+--no-track-tags
+--no-chapters
+--no-attachments
+--no-global-tags
+
+--chapter-charset
+--chapter-language
+--sync
+--cues
+--default-track
+--force-track
+--blockadd
+--track-name
+--language
+--tags
+--aac-is-sbr
+--reduce-to-core
+--remove-dialog-normalization-gain
+--timestamps
+--default-duration
+--fix-bitstream-timing-information
+--nalu-size-length
+--compression
+
+Video track only
+
+--fourcc
+--display-dimensions
+--aspect-ratio
+--aspect-ratio-factor
+--cropping
+--color-matrix
+--colour-bits-per-channel
+--chroma-subsample
+--cb-subsample
+--chroma-siting
+--colour-range
+--colour-transfer-characteristics
+
+Text track only
+
+--sub-charset
+
+--identify
+--identification-format
+
+
+SourceFile
+
+SourceFiles
+
+MKVCommandParse
+
+oFiles = list of cli source Files
+
+oSourceFiles:
+    oSourceFiles.sourceFiles = list of source files in cli
+    oSourceFiles.sourceFiles[N] = list of list(Path(source file read number N), ...)
+commandTemplate = template of command line
+commandTemplates = list with a command template per source files

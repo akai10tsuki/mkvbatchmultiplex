@@ -1,0 +1,549 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Mediainfo version="20.03">
+    <File>
+        <track type="General">
+            <Count>332</Count>
+            <Count_of_stream_of_this_kind>1</Count_of_stream_of_this_kind>
+            <Kind_of_stream>General</Kind_of_stream>
+            <Kind_of_stream>General</Kind_of_stream>
+            <Stream_identifier>0</Stream_identifier>
+            <Unique_ID>0</Unique_ID>
+            <Unique_ID>0 (0x0)</Unique_ID>
+            <Count_of_video_streams>1</Count_of_video_streams>
+            <Count_of_audio_streams>3</Count_of_audio_streams>
+            <Count_of_text_streams>7</Count_of_text_streams>
+            <Count_of_menu_streams>1</Count_of_menu_streams>
+            <Video_Format_List>HEVC</Video_Format_List>
+            <Video_Format_WithHint_List>HEVC</Video_Format_WithHint_List>
+            <Codecs_Video>HEVC</Codecs_Video>
+            <Audio_Format_List>AAC LC / AAC LC / FLAC</Audio_Format_List>
+            <Audio_Format_WithHint_List>AAC LC / AAC LC / FLAC</Audio_Format_WithHint_List>
+            <Audio_codecs>AAC LC / AAC LC / FLAC</Audio_codecs>
+            <Audio_Language_List>Russian / Russian / Japanese</Audio_Language_List>
+            <Text_Format_List>ASS / ASS / ASS / ASS / ASS / ASS / ASS</Text_Format_List>
+            <Text_Format_WithHint_List>ASS / ASS / ASS / ASS / ASS / ASS / ASS</Text_Format_WithHint_List>
+            <Text_codecs>ASS / ASS / ASS / ASS / ASS / ASS / ASS</Text_codecs>
+            <Text_Language_List>Russian / Russian / Russian / French / Arabic / English / English</Text_Language_List>
+            <Complete_name>E:\Example\TestMedia\Example 07\Source\Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mkv</Complete_name>
+            <Folder_name>E:\Example\TestMedia\Example 07\Source</Folder_name>
+            <File_name_extension>Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mkv</File_name_extension>
+            <File_name>Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng)</File_name>
+            <File_extension>mkv</File_extension>
+            <Format>Matroska</Format>
+            <Format>Matroska</Format>
+            <Format_Url>https://matroska.org/downloads/windows.html</Format_Url>
+            <Format_Extensions_usually_used>mkv mk3d mka mks</Format_Extensions_usually_used>
+            <Commercial_name>Matroska</Commercial_name>
+            <Format_version>Version 4</Format_version>
+            <File_size>1271025232</File_size>
+            <File_size>1.18 GiB</File_size>
+            <File_size>1 GiB</File_size>
+            <File_size>1.2 GiB</File_size>
+            <File_size>1.18 GiB</File_size>
+            <File_size>1.184 GiB</File_size>
+            <Duration>1423850</Duration>
+            <Duration>23 min 43 s</Duration>
+            <Duration>23 min 43 s 850 ms</Duration>
+            <Duration>23 min 43 s</Duration>
+            <Duration>00:23:43.850</Duration>
+            <Duration>00:23:44;04</Duration>
+            <Duration>00:23:43.850 (00:23:44;04)</Duration>
+            <Overall_bit_rate_mode>VBR</Overall_bit_rate_mode>
+            <Overall_bit_rate_mode>Variable</Overall_bit_rate_mode>
+            <Overall_bit_rate>7141343</Overall_bit_rate>
+            <Overall_bit_rate>7 141 kb/s</Overall_bit_rate>
+            <Frame_rate>23.976</Frame_rate>
+            <Frame_rate>23.976 FPS</Frame_rate>
+            <Frame_count>34138</Frame_count>
+            <IsStreamable>Yes</IsStreamable>
+            <File_creation_date>UTC 2020-08-17 13:14:50.910</File_creation_date>
+            <File_creation_date__local_>2020-08-17 09:14:50.910</File_creation_date__local_>
+            <File_last_modification_date>UTC 2020-08-17 14:18:59.360</File_last_modification_date>
+            <File_last_modification_date__local_>2020-08-17 10:18:59.360</File_last_modification_date__local_>
+            <Writing_application>no_variable_data</Writing_application>
+            <Writing_application>no_variable_data</Writing_application>
+            <Writing_library>no_variable_data</Writing_library>
+            <Writing_library>no_variable_data</Writing_library>
+            <Attachments>19081.ttf / AllodsWest.ttf / ariblk.ttf / ariblk_0.ttf / Bahij_Muna-Black.ttf / BD_Cartoon_Shout.ttf / Cartoon Toy Turbo Bold.otf / CasualContactMF.ttf / Comix Loud.ttf / fofbb_ital.otf / FrizQuadrataC.otf / GandhiSans-Bold.otf / GandhiSans-BoldItalic.otf / GE_Dinar_One_Medium.otf / GillSansNova-Book.ttf / Hayah.otf / HeyComic-w1wez.ttf / HTOWERT.TTF / HZHandwrite.ttf / IwaOMinPro-Bd-Fate.ttf / IwaOMinPro-Eb.otf / MyFairCody.otf / OpenSans-Semibold.ttf / second breakfast.ttf / Staccato.ttf</Attachments>
+        </track>
+        <track type="Video">
+            <Count>379</Count>
+            <Count_of_stream_of_this_kind>1</Count_of_stream_of_this_kind>
+            <Kind_of_stream>Video</Kind_of_stream>
+            <Kind_of_stream>Video</Kind_of_stream>
+            <Stream_identifier>0</Stream_identifier>
+            <StreamOrder>0</StreamOrder>
+            <ID>1</ID>
+            <ID>1</ID>
+            <Unique_ID>1</Unique_ID>
+            <Format>HEVC</Format>
+            <Format>HEVC</Format>
+            <Format_Info>High Efficiency Video Coding</Format_Info>
+            <Format_Url>http://www.itu.int</Format_Url>
+            <Commercial_name>HEVC</Commercial_name>
+            <Format_profile>Main 10@L4@Main</Format_profile>
+            <Internet_media_type>video/H265</Internet_media_type>
+            <Codec_ID>V_MPEGH/ISO/HEVC</Codec_ID>
+            <Duration>1423841</Duration>
+            <Duration>23 min 43 s</Duration>
+            <Duration>23 min 43 s 841 ms</Duration>
+            <Duration>23 min 43 s</Duration>
+            <Duration>00:23:43.841</Duration>
+            <Duration>00:23:44;04</Duration>
+            <Duration>00:23:43.841 (00:23:44;04)</Duration>
+            <Width>1920</Width>
+            <Width>1 920 pixels</Width>
+            <Height>1080</Height>
+            <Height>1 080 pixels</Height>
+            <Sampled_Width>1920</Sampled_Width>
+            <Sampled_Height>1080</Sampled_Height>
+            <Pixel_aspect_ratio>1.000</Pixel_aspect_ratio>
+            <Display_aspect_ratio>1.778</Display_aspect_ratio>
+            <Display_aspect_ratio>16:9</Display_aspect_ratio>
+            <Frame_rate_mode>CFR</Frame_rate_mode>
+            <Frame_rate_mode>Constant</Frame_rate_mode>
+            <Frame_rate>23.976</Frame_rate>
+            <Frame_rate>23.976 (24000/1001) FPS</Frame_rate>
+            <FrameRate_Num>24000</FrameRate_Num>
+            <FrameRate_Den>1001</FrameRate_Den>
+            <Frame_count>34138</Frame_count>
+            <Color_space>YUV</Color_space>
+            <Chroma_subsampling>4:2:0</Chroma_subsampling>
+            <Chroma_subsampling>4:2:0</Chroma_subsampling>
+            <Bit_depth>10</Bit_depth>
+            <Bit_depth>10 bits</Bit_depth>
+            <Delay>0</Delay>
+            <Delay>00:00:00.000</Delay>
+            <Delay__origin>Container</Delay__origin>
+            <Delay__origin>Container</Delay__origin>
+            <Writing_library>x265 - 3.3+4-30eb4de83092:[Windows][GCC 7.1.0][64 bit] 10bit</Writing_library>
+            <Writing_library>x265 3.3+4-30eb4de83092:[Windows][GCC 7.1.0][64 bit] 10bit</Writing_library>
+            <Encoded_Library_Name>x265</Encoded_Library_Name>
+            <Encoded_Library_Version>3.3+4-30eb4de83092:[Windows][GCC 7.1.0][64 bit] 10bit</Encoded_Library_Version>
+            <Encoding_settings>cpuid=1176575 / frame-threads=5 / wpp / no-pmode / pme / no-psnr / no-ssim / log-level=2 / input-csp=1 / input-res=1920x1080 / interlace=0 / total-frames=0 / level-idc=0 / high-tier=1 / uhd-bd=0 / ref=3 / no-allow-non-conformance / no-repeat-headers / annexb / no-aud / no-hrd / info / hash=0 / no-temporal-layers / no-open-gop / min-keyint=4 / keyint=250 / gop-lookahead=0 / bframes=4 / b-adapt=2 / b-pyramid / bframe-bias=0 / rc-lookahead=20 / lookahead-slices=6 / scenecut=40 / hist-scenecut=0 / radl=0 / no-splice / no-intra-refresh / ctu=64 / min-cu-size=8 / rect / amp / max-tu-size=32 / tu-inter-depth=4 / tu-intra-depth=4 / limit-tu=0 / rdoq-level=0 / dynamic-rd=0.00 / no-ssim-rd / signhide / no-tskip / nr-intra=0 / nr-inter=0 / no-constrained-intra / strong-intra-smoothing / max-merge=5 / limit-refs=3 / no-limit-modes / me=3 / subme=7 / merange=57 / temporal-mvp / no-frame-dup / no-hme / weightp / no-weightb / no-analyze-src-pics / deblock=0:0 / sao / no-sao-non-deblock / rd=3 / selective-sao=4 / no-early-skip / rskip / no-fast-intra / no-tskip-fast / no-cu-lossless / no-b-intra / no-splitrd-skip / rdpenalty=0 / psy-rd=2.00 / psy-rdoq=0.00 / no-rd-refine / no-lossless / cbqpoffs=0 / crqpoffs=0 / rc=crf / crf=12.5 / qcomp=0.60 / qpstep=4 / stats-write=0 / stats-read=0 / ipratio=1.40 / pbratio=1.30 / aq-mode=1 / aq-strength=1.00 / cutree / zone-count=0 / no-strict-cbr / qg-size=32 / no-rc-grain / qpmax=69 / qpmin=0 / no-const-vbv / sar=1 / overscan=0 / videoformat=5 / range=0 / colorprim=1 / transfer=1 / colormatrix=1 / chromaloc=0 / display-window=0 / cll=0,0 / min-luma=0 / max-luma=1023 / log2-max-poc-lsb=8 / vui-timing-info / vui-hrd-info / slices=1 / no-opt-qp-pps / no-opt-ref-list-length-pps / no-multi-pass-opt-rps / scenecut-bias=0.05 / hist-threshold=0.01 / no-opt-cu-delta-qp / no-aq-motion / no-hdr10 / no-hdr10-opt / no-dhdr10-opt / no-idr-recovery-sei / analysis-reuse-level=0 / analysis-save-reuse-level=0 / analysis-load-reuse-level=0 / scale-factor=0 / refine-intra=0 / refine-inter=0 / refine-mv=1 / refine-ctu-distortion=0 / no-limit-sao / ctu-info=0 / no-lowpass-dct / refine-analysis-type=0 / copy-pic=1 / max-ausize-factor=1.0 / no-dynamic-refine / no-single-sei / no-hevc-aq / no-svt / no-field / qp-adaptation-range=1.00 / no-scenecut-aware-qpconformance-window-offsets / right=0 / bottom=0</Encoding_settings>
+            <Default>Yes</Default>
+            <Default>Yes</Default>
+            <Forced>No</Forced>
+            <Forced>No</Forced>
+            <colour_description_present>Yes</colour_description_present>
+            <colour_description_present_Source>Container / Stream</colour_description_present_Source>
+            <Color_range>Limited</Color_range>
+            <colour_range_Source>Stream</colour_range_Source>
+            <Color_primaries>BT.709</Color_primaries>
+            <colour_primaries_Source>Container / Stream</colour_primaries_Source>
+            <Transfer_characteristics>BT.709</Transfer_characteristics>
+            <transfer_characteristics_Source>Container / Stream</transfer_characteristics_Source>
+            <Matrix_coefficients>BT.709</Matrix_coefficients>
+            <matrix_coefficients_Source>Container / Stream</matrix_coefficients_Source>
+            <FrameCount_Source>General_Duration</FrameCount_Source>
+            <Duration_Source>General_Duration</Duration_Source>
+        </track>
+        <track type="Audio" typeorder="1">
+            <Count>282</Count>
+            <Count_of_stream_of_this_kind>3</Count_of_stream_of_this_kind>
+            <Kind_of_stream>Audio</Kind_of_stream>
+            <Kind_of_stream>Audio</Kind_of_stream>
+            <Stream_identifier>0</Stream_identifier>
+            <Stream_identifier>1</Stream_identifier>
+            <StreamOrder>1</StreamOrder>
+            <ID>2</ID>
+            <ID>2</ID>
+            <Unique_ID>2</Unique_ID>
+            <Format>AAC</Format>
+            <Format>AAC LC</Format>
+            <Format_Info>Advanced Audio Codec Low Complexity</Format_Info>
+            <Commercial_name>AAC</Commercial_name>
+            <Format_AdditionalFeatures>LC</Format_AdditionalFeatures>
+            <Codec_ID>A_AAC-2</Codec_ID>
+            <Duration>1423850</Duration>
+            <Duration>23 min 43 s</Duration>
+            <Duration>23 min 43 s 850 ms</Duration>
+            <Duration>23 min 43 s</Duration>
+            <Duration>00:23:43.850</Duration>
+            <Duration>00:23:43.850</Duration>
+            <Channel_s_>2</Channel_s_>
+            <Channel_s_>2 channels</Channel_s_>
+            <Channel_positions>Front: L R</Channel_positions>
+            <Channel_positions>2/0/0</Channel_positions>
+            <Channel_layout>L R</Channel_layout>
+            <Samples_per_frame>1024</Samples_per_frame>
+            <Sampling_rate>48000</Sampling_rate>
+            <Sampling_rate>48.0 kHz</Sampling_rate>
+            <Samples_count>68344800</Samples_count>
+            <Frame_rate>46.875</Frame_rate>
+            <Frame_rate>46.875 FPS (1024 SPF)</Frame_rate>
+            <Compression_mode>Lossy</Compression_mode>
+            <Compression_mode>Lossy</Compression_mode>
+            <Delay>0</Delay>
+            <Delay>00:00:00.000</Delay>
+            <Delay__origin>Container</Delay__origin>
+            <Delay__origin>Container</Delay__origin>
+            <Delay_relative_to_video>0</Delay_relative_to_video>
+            <Delay_relative_to_video>00:00:00.000</Delay_relative_to_video>
+            <Title>AniLibria.tv</Title>
+            <Language>ru</Language>
+            <Language>Russian</Language>
+            <Language>Russian</Language>
+            <Language>ru</Language>
+            <Language>rus</Language>
+            <Language>ru</Language>
+            <Default>Yes</Default>
+            <Default>Yes</Default>
+            <Forced>No</Forced>
+            <Forced>No</Forced>
+            <SamplingCount_Source>General_Duration</SamplingCount_Source>
+            <Duration_Source>General_Duration</Duration_Source>
+        </track>
+        <track type="Audio" typeorder="2">
+            <Count>282</Count>
+            <Count_of_stream_of_this_kind>3</Count_of_stream_of_this_kind>
+            <Kind_of_stream>Audio</Kind_of_stream>
+            <Kind_of_stream>Audio</Kind_of_stream>
+            <Stream_identifier>1</Stream_identifier>
+            <Stream_identifier>2</Stream_identifier>
+            <StreamOrder>2</StreamOrder>
+            <ID>3</ID>
+            <ID>3</ID>
+            <Unique_ID>3</Unique_ID>
+            <Format>AAC</Format>
+            <Format>AAC LC</Format>
+            <Format_Info>Advanced Audio Codec Low Complexity</Format_Info>
+            <Commercial_name>AAC</Commercial_name>
+            <Format_AdditionalFeatures>LC</Format_AdditionalFeatures>
+            <Codec_ID>A_AAC-2</Codec_ID>
+            <Duration>1423850</Duration>
+            <Duration>23 min 43 s</Duration>
+            <Duration>23 min 43 s 850 ms</Duration>
+            <Duration>23 min 43 s</Duration>
+            <Duration>00:23:43.850</Duration>
+            <Duration>00:23:43.850</Duration>
+            <Channel_s_>2</Channel_s_>
+            <Channel_s_>2 channels</Channel_s_>
+            <Channel_positions>Front: L R</Channel_positions>
+            <Channel_positions>2/0/0</Channel_positions>
+            <Channel_layout>L R</Channel_layout>
+            <Samples_per_frame>1024</Samples_per_frame>
+            <Sampling_rate>48000</Sampling_rate>
+            <Sampling_rate>48.0 kHz</Sampling_rate>
+            <Samples_count>68344800</Samples_count>
+            <Frame_rate>46.875</Frame_rate>
+            <Frame_rate>46.875 FPS (1024 SPF)</Frame_rate>
+            <Compression_mode>Lossy</Compression_mode>
+            <Compression_mode>Lossy</Compression_mode>
+            <Delay>0</Delay>
+            <Delay>00:00:00.000</Delay>
+            <Delay__origin>Container</Delay__origin>
+            <Delay__origin>Container</Delay__origin>
+            <Delay_relative_to_video>0</Delay_relative_to_video>
+            <Delay_relative_to_video>00:00:00.000</Delay_relative_to_video>
+            <Title>Wakanim.tv</Title>
+            <Language>ru</Language>
+            <Language>Russian</Language>
+            <Language>Russian</Language>
+            <Language>ru</Language>
+            <Language>rus</Language>
+            <Language>ru</Language>
+            <Default>No</Default>
+            <Default>No</Default>
+            <Forced>No</Forced>
+            <Forced>No</Forced>
+            <SamplingCount_Source>General_Duration</SamplingCount_Source>
+            <Duration_Source>General_Duration</Duration_Source>
+        </track>
+        <track type="Audio" typeorder="3">
+            <Count>282</Count>
+            <Count_of_stream_of_this_kind>3</Count_of_stream_of_this_kind>
+            <Kind_of_stream>Audio</Kind_of_stream>
+            <Kind_of_stream>Audio</Kind_of_stream>
+            <Stream_identifier>2</Stream_identifier>
+            <Stream_identifier>3</Stream_identifier>
+            <StreamOrder>3</StreamOrder>
+            <ID>4</ID>
+            <ID>4</ID>
+            <Unique_ID>4</Unique_ID>
+            <Format>FLAC</Format>
+            <Format>FLAC</Format>
+            <Format_Info>Free Lossless Audio Codec</Format_Info>
+            <Format_Url>https://xiph.org/flac/</Format_Url>
+            <Commercial_name>FLAC</Commercial_name>
+            <Internet_media_type>audio/x-flac</Internet_media_type>
+            <Codec_ID>A_FLAC</Codec_ID>
+            <Codec_ID_Url>https://xiph.org/flac</Codec_ID_Url>
+            <Duration>1423850</Duration>
+            <Duration>23 min 43 s</Duration>
+            <Duration>23 min 43 s 850 ms</Duration>
+            <Duration>23 min 43 s</Duration>
+            <Duration>00:23:43.850</Duration>
+            <Duration>00:23:43.850</Duration>
+            <Bit_rate_mode>VBR</Bit_rate_mode>
+            <Bit_rate_mode>Variable</Bit_rate_mode>
+            <Channel_s_>2</Channel_s_>
+            <Channel_s_>2 channels</Channel_s_>
+            <Channel_positions>Front: L R</Channel_positions>
+            <Channel_positions>2/0/0</Channel_positions>
+            <Channel_layout>L R</Channel_layout>
+            <Sampling_rate>48000</Sampling_rate>
+            <Sampling_rate>48.0 kHz</Sampling_rate>
+            <Samples_count>68344800</Samples_count>
+            <Bit_depth>16</Bit_depth>
+            <Bit_depth>16 bits</Bit_depth>
+            <Compression_mode>Lossless</Compression_mode>
+            <Compression_mode>Lossless</Compression_mode>
+            <Delay>0</Delay>
+            <Delay>00:00:00.000</Delay>
+            <Delay__origin>Container</Delay__origin>
+            <Delay__origin>Container</Delay__origin>
+            <Delay_relative_to_video>0</Delay_relative_to_video>
+            <Delay_relative_to_video>00:00:00.000</Delay_relative_to_video>
+            <Writing_library>reference libFLAC 1.3.3 20190804</Writing_library>
+            <Writing_library>libFLAC 1.3.3 (UTC 2019-08-04)</Writing_library>
+            <Encoded_Library_Name>libFLAC</Encoded_Library_Name>
+            <Encoded_Library_Version>1.3.3</Encoded_Library_Version>
+            <Encoded_Library_Date>UTC 2019-08-04</Encoded_Library_Date>
+            <Language>ja</Language>
+            <Language>Japanese</Language>
+            <Language>Japanese</Language>
+            <Language>ja</Language>
+            <Language>jpn</Language>
+            <Language>ja</Language>
+            <Default>No</Default>
+            <Default>No</Default>
+            <Forced>No</Forced>
+            <Forced>No</Forced>
+            <SamplingCount_Source>General_Duration</SamplingCount_Source>
+            <Duration_Source>General_Duration</Duration_Source>
+        </track>
+        <track type="Text" typeorder="1">
+            <Count>238</Count>
+            <Count_of_stream_of_this_kind>7</Count_of_stream_of_this_kind>
+            <Kind_of_stream>Text</Kind_of_stream>
+            <Kind_of_stream>Text</Kind_of_stream>
+            <Stream_identifier>0</Stream_identifier>
+            <Stream_identifier>1</Stream_identifier>
+            <StreamOrder>4</StreamOrder>
+            <ID>5</ID>
+            <ID>5</ID>
+            <Unique_ID>5</Unique_ID>
+            <Format>ASS</Format>
+            <Format>ASS</Format>
+            <Format_Url>http://ffdshow.sourceforge.net/tikiwiki/tiki-index.php?page=Getting+ffdshow</Format_Url>
+            <Commercial_name>ASS</Commercial_name>
+            <Codec_ID>S_TEXT/ASS</Codec_ID>
+            <Codec_ID_Info>Advanced Sub Station Alpha</Codec_ID_Info>
+            <Compression_mode>Lossless</Compression_mode>
+            <Compression_mode>Lossless</Compression_mode>
+            <Title>надписи</Title>
+            <Language>ru</Language>
+            <Language>Russian</Language>
+            <Language>Russian</Language>
+            <Language>ru</Language>
+            <Language>rus</Language>
+            <Language>ru</Language>
+            <Default>Yes</Default>
+            <Default>Yes</Default>
+            <Forced>No</Forced>
+            <Forced>No</Forced>
+        </track>
+        <track type="Text" typeorder="2">
+            <Count>238</Count>
+            <Count_of_stream_of_this_kind>7</Count_of_stream_of_this_kind>
+            <Kind_of_stream>Text</Kind_of_stream>
+            <Kind_of_stream>Text</Kind_of_stream>
+            <Stream_identifier>1</Stream_identifier>
+            <Stream_identifier>2</Stream_identifier>
+            <StreamOrder>5</StreamOrder>
+            <ID>6</ID>
+            <ID>6</ID>
+            <Unique_ID>6</Unique_ID>
+            <Format>ASS</Format>
+            <Format>ASS</Format>
+            <Format_Url>http://ffdshow.sourceforge.net/tikiwiki/tiki-index.php?page=Getting+ffdshow</Format_Url>
+            <Commercial_name>ASS</Commercial_name>
+            <Codec_ID>S_TEXT/ASS</Codec_ID>
+            <Codec_ID_Info>Advanced Sub Station Alpha</Codec_ID_Info>
+            <Compression_mode>Lossless</Compression_mode>
+            <Compression_mode>Lossless</Compression_mode>
+            <Title>AniLibria.tv</Title>
+            <Language>ru</Language>
+            <Language>Russian</Language>
+            <Language>Russian</Language>
+            <Language>ru</Language>
+            <Language>rus</Language>
+            <Language>ru</Language>
+            <Default>No</Default>
+            <Default>No</Default>
+            <Forced>No</Forced>
+            <Forced>No</Forced>
+        </track>
+        <track type="Text" typeorder="3">
+            <Count>238</Count>
+            <Count_of_stream_of_this_kind>7</Count_of_stream_of_this_kind>
+            <Kind_of_stream>Text</Kind_of_stream>
+            <Kind_of_stream>Text</Kind_of_stream>
+            <Stream_identifier>2</Stream_identifier>
+            <Stream_identifier>3</Stream_identifier>
+            <StreamOrder>6</StreamOrder>
+            <ID>7</ID>
+            <ID>7</ID>
+            <Unique_ID>7</Unique_ID>
+            <Format>ASS</Format>
+            <Format>ASS</Format>
+            <Format_Url>http://ffdshow.sourceforge.net/tikiwiki/tiki-index.php?page=Getting+ffdshow</Format_Url>
+            <Commercial_name>ASS</Commercial_name>
+            <Codec_ID>S_TEXT/ASS</Codec_ID>
+            <Codec_ID_Info>Advanced Sub Station Alpha</Codec_ID_Info>
+            <Compression_mode>Lossless</Compression_mode>
+            <Compression_mode>Lossless</Compression_mode>
+            <Title>Yakusub Studio</Title>
+            <Language>ru</Language>
+            <Language>Russian</Language>
+            <Language>Russian</Language>
+            <Language>ru</Language>
+            <Language>rus</Language>
+            <Language>ru</Language>
+            <Default>No</Default>
+            <Default>No</Default>
+            <Forced>No</Forced>
+            <Forced>No</Forced>
+        </track>
+        <track type="Text" typeorder="4">
+            <Count>238</Count>
+            <Count_of_stream_of_this_kind>7</Count_of_stream_of_this_kind>
+            <Kind_of_stream>Text</Kind_of_stream>
+            <Kind_of_stream>Text</Kind_of_stream>
+            <Stream_identifier>3</Stream_identifier>
+            <Stream_identifier>4</Stream_identifier>
+            <StreamOrder>7</StreamOrder>
+            <ID>8</ID>
+            <ID>8</ID>
+            <Unique_ID>8</Unique_ID>
+            <Format>ASS</Format>
+            <Format>ASS</Format>
+            <Format_Url>http://ffdshow.sourceforge.net/tikiwiki/tiki-index.php?page=Getting+ffdshow</Format_Url>
+            <Commercial_name>ASS</Commercial_name>
+            <Codec_ID>S_TEXT/ASS</Codec_ID>
+            <Codec_ID_Info>Advanced Sub Station Alpha</Codec_ID_Info>
+            <Compression_mode>Lossless</Compression_mode>
+            <Compression_mode>Lossless</Compression_mode>
+            <Title>Wakanim.tv dehardsub Arisaka</Title>
+            <Language>fr</Language>
+            <Language>French</Language>
+            <Language>French</Language>
+            <Language>fr</Language>
+            <Language>fra</Language>
+            <Language>fr</Language>
+            <Default>No</Default>
+            <Default>No</Default>
+            <Forced>No</Forced>
+            <Forced>No</Forced>
+        </track>
+        <track type="Text" typeorder="5">
+            <Count>238</Count>
+            <Count_of_stream_of_this_kind>7</Count_of_stream_of_this_kind>
+            <Kind_of_stream>Text</Kind_of_stream>
+            <Kind_of_stream>Text</Kind_of_stream>
+            <Stream_identifier>4</Stream_identifier>
+            <Stream_identifier>5</Stream_identifier>
+            <StreamOrder>8</StreamOrder>
+            <ID>9</ID>
+            <ID>9</ID>
+            <Unique_ID>9</Unique_ID>
+            <Format>ASS</Format>
+            <Format>ASS</Format>
+            <Format_Url>http://ffdshow.sourceforge.net/tikiwiki/tiki-index.php?page=Getting+ffdshow</Format_Url>
+            <Commercial_name>ASS</Commercial_name>
+            <Codec_ID>S_TEXT/ASS</Codec_ID>
+            <Codec_ID_Info>Advanced Sub Station Alpha</Codec_ID_Info>
+            <Compression_mode>Lossless</Compression_mode>
+            <Compression_mode>Lossless</Compression_mode>
+            <Title>Athbul-Khayal</Title>
+            <Language>ar</Language>
+            <Language>Arabic</Language>
+            <Language>Arabic</Language>
+            <Language>ar</Language>
+            <Language>ara</Language>
+            <Language>ar</Language>
+            <Default>No</Default>
+            <Default>No</Default>
+            <Forced>No</Forced>
+            <Forced>No</Forced>
+        </track>
+        <track type="Text" typeorder="6">
+            <Count>238</Count>
+            <Count_of_stream_of_this_kind>7</Count_of_stream_of_this_kind>
+            <Kind_of_stream>Text</Kind_of_stream>
+            <Kind_of_stream>Text</Kind_of_stream>
+            <Stream_identifier>5</Stream_identifier>
+            <Stream_identifier>6</Stream_identifier>
+            <StreamOrder>9</StreamOrder>
+            <ID>10</ID>
+            <ID>10</ID>
+            <Unique_ID>10</Unique_ID>
+            <Format>ASS</Format>
+            <Format>ASS</Format>
+            <Format_Url>http://ffdshow.sourceforge.net/tikiwiki/tiki-index.php?page=Getting+ffdshow</Format_Url>
+            <Commercial_name>ASS</Commercial_name>
+            <Codec_ID>S_TEXT/ASS</Codec_ID>
+            <Codec_ID_Info>Advanced Sub Station Alpha</Codec_ID_Info>
+            <Compression_mode>Lossless</Compression_mode>
+            <Compression_mode>Lossless</Compression_mode>
+            <Title>ShowY</Title>
+            <Language>en</Language>
+            <Language>English</Language>
+            <Language>English</Language>
+            <Language>en</Language>
+            <Language>eng</Language>
+            <Language>en</Language>
+            <Default>No</Default>
+            <Default>No</Default>
+            <Forced>No</Forced>
+            <Forced>No</Forced>
+        </track>
+        <track type="Text" typeorder="7">
+            <Count>238</Count>
+            <Count_of_stream_of_this_kind>7</Count_of_stream_of_this_kind>
+            <Kind_of_stream>Text</Kind_of_stream>
+            <Kind_of_stream>Text</Kind_of_stream>
+            <Stream_identifier>6</Stream_identifier>
+            <Stream_identifier>7</Stream_identifier>
+            <StreamOrder>10</StreamOrder>
+            <ID>11</ID>
+            <ID>11</ID>
+            <Unique_ID>11</Unique_ID>
+            <Format>ASS</Format>
+            <Format>ASS</Format>
+            <Format_Url>http://ffdshow.sourceforge.net/tikiwiki/tiki-index.php?page=Getting+ffdshow</Format_Url>
+            <Commercial_name>ASS</Commercial_name>
+            <Codec_ID>S_TEXT/ASS</Codec_ID>
+            <Codec_ID_Info>Advanced Sub Station Alpha</Codec_ID_Info>
+            <Compression_mode>Lossless</Compression_mode>
+            <Compression_mode>Lossless</Compression_mode>
+            <Title>Funimation</Title>
+            <Language>en</Language>
+            <Language>English</Language>
+            <Language>English</Language>
+            <Language>en</Language>
+            <Language>eng</Language>
+            <Language>en</Language>
+            <Default>No</Default>
+            <Default>No</Default>
+            <Forced>No</Forced>
+            <Forced>No</Forced>
+        </track>
+        <track type="Menu">
+            <Count>100</Count>
+            <Count_of_stream_of_this_kind>1</Count_of_stream_of_this_kind>
+            <Kind_of_stream>Menu</Kind_of_stream>
+            <Kind_of_stream>Menu</Kind_of_stream>
+            <Stream_identifier>0</Stream_identifier>
+            <Chapters_Pos_Begin>94</Chapters_Pos_Begin>
+            <Chapters_Pos_End>100</Chapters_Pos_End>
+            <_00_00_00000>en:1</_00_00_00000>
+            <_00_01_18996>en:опенинг</_00_01_18996>
+            <_00_02_49044>en:3</_00_02_49044>
+            <_00_09_25064>en:4</_00_09_25064>
+            <_00_21_55022>en:эндинг</_00_21_55022>
+            <_00_23_25029>en:6</_00_23_25029>
+        </track>
+    </File>
+</Mediainfo>
