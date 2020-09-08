@@ -23,82 +23,27 @@ import pymediainfo
 # from natsort import natsorted, ns
 
 from vsutillib.media import MediaFileInfo
-from vsutillib.mkv import MergeOptions, TrackOptions, MKVCommandParser, generateCommand
+from vsutillib.mkv import (
+    MergeOptions,
+    TrackOptions,
+    MKVCommandParser,
+    generateCommand,
+)
 
-# from vsutillib.misc import XLate
+
+from vsutillib.misc import XLate, iso639
 
 
 # from mkvcommandparser import MKVCommandParser
 # from TrackOptions import TrackOptions
-from verifystructure import VerifyStructure
-from iso639 import iso639
+from IVerifyStructure import IVerifyStructure
+#from iso639 import iso639
 
 # from MergeOptions import MergeOptions
 # from MediaFileInfo import MediaFileInfo
 from findSimilarTrack import findSimilarTrack
 
-
-class TracksOrder:
-    """
-     TracksOrder
-    """
-
-    def __init__(self, trackOrder):
-
-        self.__trackOrder = trackOrder
-        self.__index = 0
-        self.__aOrder = []
-        self._split()
-
-    def __getitem__(self, index):
-        return self.__aOrder[index]
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        if self.__index >= len(self.__aOrder):
-            self.__index = 0
-            raise StopIteration
-        else:
-            self.__index += 1
-            return self.__getitem__(self.__index - 1)
-
-    def _split(self):
-        self.__aOrder = self.__trackOrder.split(",")
-
-    @property
-    def aOrder(self):
-        return self.__aOrder
-
-    @property
-    def order(self):
-        return self.__trackOrder
-
-
-class IVerifyStructure(VerifyStructure):
-    """
-    IVerifyStructure VerifyStructure sub class do verification by index on
-    MKVCommandParser object
-
-    Args:
-        oCommand (object): MKVCommandParser object
-        index (int): index to verify
-    """
-
-    def __init__(self, oCommand=None, index=None):
-        super().__init__()
-
-        if oCommand is not None:
-            if index is not None:
-                self.verifyStructure(oCommand, index)
-
-    def verifyStructure(self, oCommand, index):
-        baseFiles = oCommand.baseFiles
-        sourceFiles = oCommand.oSourceFiles[index]
-
-        super().verifyStructure(baseFiles, sourceFiles)
-
+from TracksOrder import TracksOrder
 
 def test():
     """
@@ -157,21 +102,22 @@ def test():
     # opts.translation = {'2': '3'}
     # print(f"Options {opts.strOptions()}")
 
-    # colorama.init()
+    colorama.init()
 
-    verify = IVerifyStructure()
+    iVerify = IVerifyStructure()
     oCommand = MKVCommandParser()
     oCommand.command = cmd
     mOptions = MergeOptions()
     trackOptions = oCommand.oBaseFiles[0].trackOptions
     mediaInfo = oCommand.oBaseFiles[0].mediaFileInfo
+    tracksOrder = oCommand.cliTracksOrder
 
     # print(trackOptions.strIOptions)
-    print(trackOptions.parsedIOptions)
-    print(trackOptions.optionsByTrack())
+    #print(trackOptions.parsedIOptions)
+    #print(trackOptions.optionsByTrack())
     # template = oCommand.commandTemplates[0]
     # trackOptions.translation = {"9": "10", "10": "11"}
-    # print(f"Track Order {oCommand.cliTrackOrder}")
+    # print(f"Track Order {oCommand.cliTracksOrder}")
     # print(f"Template: {template}")
     # print(
     #    f"Translation: {trackOptions.translation} "
@@ -179,7 +125,6 @@ def test():
     # )
     # print(f"Shell Command: {oCommand.shellCommands[0]}")
 
-    return
 
     # trkOptions = TrackOptions()
     # trkOptions.options = "--no-global-tags " + trackOptions.options
@@ -191,49 +136,56 @@ def test():
     # print(f"  Original: {trackOptions.options}")
     # print(f"Translated: {trackOptions.strOptions()}")
 
-    return
+    print()
 
-    # for index, aF in enumerate(oCommand.oSourceFiles):
-    #    verify.verifyStructure(oCommand, index)
-    #    if not verify:
-    #        print("Not Ok")
-    #        for baseIndex, oBaseFile in enumerate(oCommand.oBaseFiles):
+    hasToGenerateCommands = False
 
-    #            baseFileInfo = oBaseFile.mediaFileInfo
-    #            sourceFileInfo = MediaFileInfo(oCommand.oSourceFiles[index][baseIndex])
+    for index, sourceFiles in enumerate(oCommand.oSourceFiles):
+        iVerify.verifyStructure(oCommand, index)
+        if not iVerify:
+            tracksOrder = oCommand.cliTracksOrder
 
-    #            translate = {}
-    #            for track in oBaseFile.trackOptions.tracks:
-    #                i = int(track)
-    #                trackBase = baseFileInfo[i]
-    #                trackSource = sourceFileInfo[i]
-    #                if trackBase != trackSource:
-    #                    print("Bad one.")
-    #                    print(
-    #                        f"  Track on Base: {trackBase.streamorder:2}: Type Order {trackBase.typeOrder} {trackBase.trackType} {trackBase.codec} {trackBase.language} {trackBase.title} ({trackBase.format})"
-    #                    )
-    #                    print(
-    #                        f"Track on Source: {trackSource.streamorder:2}: Type Order {trackSource.typeOrder} {trackSource.trackType} {trackSource.codec} {trackSource.language} {trackSource.title} ({trackSource.format})"
-    #                    )
-    #                    trackSimilar, score = findSimilarTrack(
-    #                        sourceFileInfo, trackBase
-    #                    )
+            print(f"{Fore.GREEN}Index {index} of {sourceFiles[0]} not Ok{Style.RESET_ALL}")
 
-    #                    if trackSimilar >= 0:
-    #                        translate[track] = str(trackSimilar)
-    #                        trackSource = sourceFileInfo[trackSimilar]
-    #                        print(
-    #                            f"  Track Similar: {trackSource.streamorder:2}: Type Order {trackSource.typeOrder} {trackSource.trackType} {trackSource.codec} {trackSource.language} {trackSource.title} ({trackSource.format})\n"
-    #                        )
-    #                        print(f"track ID {trackSimilar} {score}")
-    #           if translate:
+            for baseIndex, oBaseFile in enumerate(oCommand.oBaseFiles):
 
-    #                print(f"For index {index} found translagion.")
-    #                trackOpts = copy.deepcopy(trackOptions)
-    #                print(trackOpts.strOptions())
-    #                trackOpts.translation = translate
-    #                print(trackOpts.strOptions())
-    #                return
+                baseFileInfo = oBaseFile.mediaFileInfo
+                sourceFileInfo = MediaFileInfo(sourceFiles[baseIndex])
+
+                translate = {}
+                for track in oBaseFile.trackOptions.tracks:
+                    i = int(track)
+                    trackBase = baseFileInfo[i]
+                    trackSource = sourceFileInfo[i]
+                    if trackBase != trackSource:
+                        trackSimilar, score = findSimilarTrack(
+                            sourceFileInfo, trackBase
+                        )
+
+                        if trackSimilar >= 0:
+                            translate[track] = str(trackSimilar)
+                            trackSource = sourceFileInfo[trackSimilar]
+                if translate:
+
+                    if not hasToGenerateCommands:
+                        hasToGenerateCommands = True
+                    template = oCommand.commandTemplates[index]
+
+                    trackOpts = copy.deepcopy(trackOptions)
+                    trackOpts.translation = translate
+                    newTemplate = template.replace(
+                        trackOpts.options, trackOpts.strOptions(), 1
+                    )
+                    oCommand.commandTemplates[index] = newTemplate
+
+
+
+    if hasToGenerateCommands:
+        oCommand.generateCommands()
+
+        for cmd in oCommand.shellCommands:
+            print(cmd)
+
 
     # print(f"        Order: {oCommand.oBaseFiles[0].fileOrder}")
     # print(f"       Tracks: {trackOptions.tracks}")
@@ -295,42 +247,6 @@ def test():
     # for t in mediaInfo:
     #    print(t)
 
-    # Separates optins exactly
-    shellOptions = shlex.split(oCommand.oBaseFiles[0].options)
-
-    trackOpts = []
-    for index, option in enumerate(shellOptions):
-        if mOptions.isTrackOption(option):
-            parameter = (
-                None if not mOptions.hasParameter(option) else shellOptions[index + 1]
-            )
-            trackOpts.append([option, index, parameter])
-
-    currentTrack = ""
-
-    reTrackID = re.compile(r"(\d+):(.*?)$")
-
-    sTracks = []
-    index = -1
-
-    for opt in trackOpts:
-
-        if mOptions.hasTrackID(opt[0]):
-            if match := reTrackID.match(opt[2]):
-                if currentTrack != match.group(1):
-                    currentTrack = match.group(1)
-                    index += 1
-                    sTracks.append("")
-                sTracks[index] += opt[0] + " " + opt[2]
-        else:
-            if currentTrack != "g":
-                currentTrack = "g"
-                index += 1
-                sTracks.append("")
-            if mOptions.hasParameter(opt[0]):
-                sTracks[index] += opt[0] + " " + opt[2]
-            else:
-                sTracks[index] += opt[0] + " "
 
     # for trk in sTracks:
     #    print(f"{trk}")
