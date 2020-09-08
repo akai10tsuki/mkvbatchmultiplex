@@ -51,24 +51,24 @@ def test():
     """
     test summary
     """
-    cmd0 = r"'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en --output 'E:\Example\Series Title (2017)\Season 01\Episode - S01E03 (1).mkv' --language 0:und --default-track 0:yes --display-dimensions 0:1280x720 --language 1:jpn --default-track 1:yes --sub-charset 2:UTF-8 --language 2:eng '(' 'E:\Example\Series Title (2017)\Season 01\Episode - S01E03.mkv' ')' --no-audio --no-video --sub-charset 2:UTF-8 --language 2:ita --track-name 2:Italian --default-track 2:yes '(' 'E:\Example\Series Title (2017)\New Sub\Episode (Italian Subs) - S01E03.mkv' ')' --title 'Episode 01' --track-order 0:0,0:1,1:2,0:2"
-    cmd1 = r"'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en --output 'E:\Example\TestMedia\Example 07\Arte (2020)\Season 01\Arte - 01 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng) (1).mkv' --audio-tracks 3 --subtitle-tracks 10,11 --language 0:und --default-track 0:yes --display-dimensions 0:1920x1080 --language 3:jpn --default-track 3:yes --sub-charset 10:UTF-8 --language 10:eng --track-name 10:ShowY --default-track 10:yes --sub-charset 11:UTF-8 --language 11:eng --track-name 11:Funimation '(' 'E:\Example\TestMedia\Example 07\Source\Arte - 01 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mkv' ')' --track-order 0:0,0:3,0:10,0:11"
-    cmd2 = r"'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en --output 'E:\Example\TestMedia\Example 07\Arte (2020)\Season 01\Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng) (1).mkv' --audio-tracks 3 --subtitle-tracks 9,10 --language 0:und --default-track 0:yes --display-dimensions 0:1920x1080 --language 3:jpn --default-track 3:yes --sub-charset 9:UTF-8 --language 9:eng --track-name 9:ShowY --default-track 9:yes --sub-charset 10:UTF-8 --language 10:eng --track-name 10:Funimation '(' 'E:\Example\TestMedia\Example 07\Source\Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mkv' ')' --track-order 0:0,0:3,0:9,0:10"
-    cmd = r"'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en --output 'E:\Example\TestMedia\Example 07\Arte (2020)\Season 01\Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng) (1).mkv' --audio-tracks 3 --subtitle-tracks 9,10 --language 0:und --default-track 0:yes --display-dimensions 0:1920x1080 --language 3:jpn --default-track 3:yes --sub-charset 9:UTF-8 --language 9:eng --track-name '9:ShowY \/'\' --default-track 9:yes --sub-charset 10:UTF-8 --language 10:eng --track-name 10:Funimation '(' 'E:\Example\TestMedia\Example 07\Source\Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mkv' ')' --track-order 0:0,0:3,0:9,0:10"
-    cmd3 = r"'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en --output 'E:\Example\TestMedia\Example 07\Arte (2020)\Season 01\Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng) (1).mkv' --audio-tracks 3 --subtitle-tracks 8,9,10 --language 0:und --default-track 0:yes --display-dimensions 0:1920x1080 --language 3:jpn --default-track 3:yes --sub-charset 8:UTF-8 --language 8:ara --track-name 8:Athbul-Khayal --sub-charset 9:UTF-8 --language 9:eng --track-name '9:ShowY Translation' --default-track 9:yes --sub-charset 10:UTF-8 --language 10:eng --track-name 10:Funimation '(' 'E:\Example\TestMedia\Example 07\Source\Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mkv' ')' --track-order 0:0,0:3,0:8,0:9,0:10"
-    cmd4 = r"'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en --output 'E:\Example\TestMedia\Example 05\Season 01\Show Title - S01E01 (1).mkv' --language 0:und --default-track 0:yes --display-dimensions 0:640x360 --language 1:jpn --default-track 1:yes '(' 'E:\Example\TestMedia\Example 05\Video\Show Title - S01E01.mkv' ')' --language 0:eng '(' 'E:\Example\TestMedia\Example 05\Subs\Show Title - S01E01.ENG.ass' ')' --attachment-name Font01.otf --attachment-mime-type application/vnd.ms-opentype --attach-file 'E:\Example\TestMedia\Example 05\Attachments\Show Title - S01E01\Font01.otf' --attachment-name Font02.otf --attachment-mime-type application/vnd.ms-opentype --attach-file 'E:\Example\TestMedia\Example 05\Attachments\Show Title - S01E01\Font02.otf' --attachment-name Font03.ttf --attachment-mime-type application/x-truetype-font --attach-file 'E:\Example\TestMedia\Example 05\Attachments\Show Title - S01E01\Font03.ttf' --attachment-name Font04.ttf --attachment-mime-type application/x-truetype-font --attach-file 'E:\Example\TestMedia\Example 05\Attachments\Show Title - S01E01\Font04.ttf' --chapter-language und --chapters 'E:\Example\TestMedia\Example 05\Chapters\Show Title - S01E01 - Chapters.xml' --track-order 0:0,0:1,1:0"
+    cmd0 = r"'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en --output 'J:\Example\Series Title (2017)\Season 01\Episode - S01E03 (1).mkv' --language 0:und --default-track 0:yes --display-dimensions 0:1280x720 --language 1:jpn --default-track 1:yes --sub-charset 2:UTF-8 --language 2:eng '(' 'J:\Example\Series Title (2017)\Season 01\Episode - S01E03.mkv' ')' --no-audio --no-video --sub-charset 2:UTF-8 --language 2:ita --track-name 2:Italian --default-track 2:yes '(' 'J:\Example\Series Title (2017)\New Sub\Episode (Italian Subs) - S01E03.mkv' ')' --title 'Episode 01' --track-order 0:0,0:1,1:2,0:2"
+    cmd1 = r"'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en --output 'J:\Example\TestMedia\Example 07\Arte (2020)\Season 01\Arte - 01 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng) (1).mkv' --audio-tracks 3 --subtitle-tracks 10,11 --language 0:und --default-track 0:yes --display-dimensions 0:1920x1080 --language 3:jpn --default-track 3:yes --sub-charset 10:UTF-8 --language 10:eng --track-name 10:ShowY --default-track 10:yes --sub-charset 11:UTF-8 --language 11:eng --track-name 11:Funimation '(' 'J:\Example\TestMedia\Example 07\Source\Arte - 01 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mkv' ')' --track-order 0:0,0:3,0:10,0:11"
+    cmd2 = r"'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en --output 'J:\Example\TestMedia\Example 07\Arte (2020)\Season 01\Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng) (1).mkv' --audio-tracks 3 --subtitle-tracks 9,10 --language 0:und --default-track 0:yes --display-dimensions 0:1920x1080 --language 3:jpn --default-track 3:yes --sub-charset 9:UTF-8 --language 9:eng --track-name 9:ShowY --default-track 9:yes --sub-charset 10:UTF-8 --language 10:eng --track-name 10:Funimation '(' 'J:\Example\TestMedia\Example 07\Source\Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mkv' ')' --track-order 0:0,0:3,0:9,0:10"
+    cmd = r"'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en --output 'J:\Example\TestMedia\Example 07\Arte (2020)\Season 01\Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng) (1).mkv' --audio-tracks 3 --subtitle-tracks 9,10 --language 0:und --default-track 0:yes --display-dimensions 0:1920x1080 --language 3:jpn --default-track 3:yes --sub-charset 9:UTF-8 --language 9:eng --track-name '9:ShowY \/'\' --default-track 9:yes --sub-charset 10:UTF-8 --language 10:eng --track-name 10:Funimation '(' 'J:\Example\TestMedia\Example 07\Source\Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mkv' ')' --track-order 0:0,0:3,0:9,0:10"
+    cmd3 = r"'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en --output 'J:\Example\TestMedia\Example 07\Arte (2020)\Season 01\Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng) (1).mkv' --audio-tracks 3 --subtitle-tracks 8,9,10 --language 0:und --default-track 0:yes --display-dimensions 0:1920x1080 --language 3:jpn --default-track 3:yes --sub-charset 8:UTF-8 --language 8:ara --track-name 8:Athbul-Khayal --sub-charset 9:UTF-8 --language 9:eng --track-name '9:ShowY Translation' --default-track 9:yes --sub-charset 10:UTF-8 --language 10:eng --track-name 10:Funimation '(' 'J:\Example\TestMedia\Example 07\Source\Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mkv' ')' --track-order 0:0,0:3,0:8,0:9,0:10"
+    cmd4 = r"'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en --output 'J:\Example\TestMedia\Example 05\Season 01\Show Title - S01E01 (1).mkv' --language 0:und --default-track 0:yes --display-dimensions 0:640x360 --language 1:jpn --default-track 1:yes '(' 'J:\Example\TestMedia\Example 05\Video\Show Title - S01E01.mkv' ')' --language 0:eng '(' 'J:\Example\TestMedia\Example 05\Subs\Show Title - S01E01.ENG.ass' ')' --attachment-name Font01.otf --attachment-mime-type application/vnd.ms-opentype --attach-file 'J:\Example\TestMedia\Example 05\Attachments\Show Title - S01E01\Font01.otf' --attachment-name Font02.otf --attachment-mime-type application/vnd.ms-opentype --attach-file 'J:\Example\TestMedia\Example 05\Attachments\Show Title - S01E01\Font02.otf' --attachment-name Font03.ttf --attachment-mime-type application/x-truetype-font --attach-file 'J:\Example\TestMedia\Example 05\Attachments\Show Title - S01E01\Font03.ttf' --attachment-name Font04.ttf --attachment-mime-type application/x-truetype-font --attach-file 'J:\Example\TestMedia\Example 05\Attachments\Show Title - S01E01\Font04.ttf' --chapter-language und --chapters 'J:\Example\TestMedia\Example 05\Chapters\Show Title - S01E01 - Chapters.xml' --track-order 0:0,0:1,1:0"
     option = r"--language 0:und --default-track 0:yes --display-dimensions 0:1280x720 --language 1:jpn --default-track 1:yes --sub-charset 2:UTF-8 --language 2:eng"
     option2 = r"--no-audio --no-video --sub-charset 2:UTF-8 --language 2:ita --track-name 2:Italian --default-track 2:yes"
 
     """
     'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en
-    --output 'E:\Example\TestMedia\Example 07\Arte (2020)\Season 01\Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng) (1).mkv'
+    --output 'J:\Example\TestMedia\Example 07\Arte (2020)\Season 01\Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng) (1).mkv'
     --audio-tracks 3 --subtitle-tracks 9,10
     --language 0:und --default-track 0:yes --display-dimensions 0:1920x1080
     --language 3:jpn --default-track 3:yes
     --sub-charset 9:UTF-8 --language 9:eng --track-name 9:ShowY --default-track 9:yes
     --sub-charset 10:UTF-8 --language 10:eng --track-name 10:Funimation
-    '(' 'E:\Example\TestMedia\Example 07\Source\Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mkv' ')' --track-order 0:0,0:3,0:9,0:10"
+    '(' 'J:\Example\TestMedia\Example 07\Source\Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mkv' ')' --track-order 0:0,0:3,0:9,0:10"
 
     --audio-tracks 3 --subtitle-tracks 9,10
     --language 0:und --default-track 0:yes --display-dimensions 0:1920x1080
@@ -109,9 +109,9 @@ def test():
     iVerify = IVerifyStructure()
     oCommand = MKVCommandParser()
     oCommand.command = cmd
-    mOptions = MergeOptions()
-    trackOptions = oCommand.oBaseFiles[0].trackOptions
-    mediaInfo = oCommand.oBaseFiles[0].mediaFileInfo
+    # mOptions = MergeOptions()
+    # trackOptions = oCommand.oBaseFiles[0].trackOptions
+    # mediaInfo = oCommand.oBaseFiles[0].mediaFileInfo
 
 
     # print(trackOptions.strIOptions)
@@ -149,6 +149,8 @@ def test():
 
             rc = adjustSources(oCommand, index)
 
+            if not hasToGenerateCommands and rc:
+                hasToGenerateCommands = True
 
     if hasToGenerateCommands:
         oCommand.generateCommands()
@@ -210,7 +212,7 @@ def test():
     #    )
 
     # f = Path("./json.json").open(mode="wb")
-    # xml = pymediainfo.MediaInfo.parse(r'E:\Example\TestMedia\Example 07\Source\Arte - 01 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mkv', output="JSON")
+    # xml = pymediainfo.MediaInfo.parse(r'J:\Example\TestMedia\Example 07\Source\Arte - 01 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mkv', output="JSON")
     # f.write(xml.encode())
     # f.close()
 
