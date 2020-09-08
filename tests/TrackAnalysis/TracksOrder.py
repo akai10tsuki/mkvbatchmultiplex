@@ -64,6 +64,19 @@ class TracksOrder:
     def translation(self, value):
         if isinstance(value, dict):
             self.__translation = value
+            print("Proper Update.")
+
+    def strOrder(self):
+
+        strTmp = ""
+        for track in self.aOrder:
+            trk = self.translation.get(track, track)
+            if not strTmp:
+                strTmp += trk
+            else:
+                strTmp += "," + trk
+
+        return strTmp
 
     def translationUpdate(self, value):
         if isinstance(value, dict):

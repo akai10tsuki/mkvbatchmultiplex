@@ -45,6 +45,8 @@ from findSimilarTrack import findSimilarTrack
 
 from TracksOrder import TracksOrder
 
+from adjustSources import adjustSources
+
 def test():
     """
     test summary
@@ -110,7 +112,7 @@ def test():
     mOptions = MergeOptions()
     trackOptions = oCommand.oBaseFiles[0].trackOptions
     mediaInfo = oCommand.oBaseFiles[0].mediaFileInfo
-    tracksOrder = oCommand.cliTracksOrder
+
 
     # print(trackOptions.strIOptions)
     #print(trackOptions.parsedIOptions)
@@ -143,41 +145,9 @@ def test():
     for index, sourceFiles in enumerate(oCommand.oSourceFiles):
         iVerify.verifyStructure(oCommand, index)
         if not iVerify:
-            tracksOrder = oCommand.cliTracksOrder
-
             print(f"{Fore.GREEN}Index {index} of {sourceFiles[0]} not Ok{Style.RESET_ALL}")
 
-            for baseIndex, oBaseFile in enumerate(oCommand.oBaseFiles):
-
-                baseFileInfo = oBaseFile.mediaFileInfo
-                sourceFileInfo = MediaFileInfo(sourceFiles[baseIndex])
-
-                translate = {}
-                for track in oBaseFile.trackOptions.tracks:
-                    i = int(track)
-                    trackBase = baseFileInfo[i]
-                    trackSource = sourceFileInfo[i]
-                    if trackBase != trackSource:
-                        trackSimilar, score = findSimilarTrack(
-                            sourceFileInfo, trackBase
-                        )
-
-                        if trackSimilar >= 0:
-                            translate[track] = str(trackSimilar)
-                            trackSource = sourceFileInfo[trackSimilar]
-                if translate:
-
-                    if not hasToGenerateCommands:
-                        hasToGenerateCommands = True
-                    template = oCommand.commandTemplates[index]
-
-                    trackOpts = copy.deepcopy(trackOptions)
-                    trackOpts.translation = translate
-                    newTemplate = template.replace(
-                        trackOpts.options, trackOpts.strOptions(), 1
-                    )
-                    oCommand.commandTemplates[index] = newTemplate
-
+            rc = adjustSources(oCommand, index)
 
 
     if hasToGenerateCommands:
