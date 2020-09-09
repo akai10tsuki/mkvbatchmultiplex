@@ -6,6 +6,8 @@ Changelog
 Added
 ~~~~~
 
+- New algorithm will try to find a track that best matches the base file
+
 Changed
 ~~~~~~~
 
