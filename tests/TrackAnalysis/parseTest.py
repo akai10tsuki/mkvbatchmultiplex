@@ -22,17 +22,18 @@ import pymediainfo
 
 # from natsort import natsorted, ns
 
-from vsutillib.media import MediaFileInfo
+from vsutillib.media import MediaFileInfo, findSimilarTrack
 from vsutillib.mkv import (
+    adjustSources,
     MergeOptions,
     TrackOptions,
+    TracksOrder,
     MKVCommandParser,
     generateCommand,
 )
 
 
 from vsutillib.misc import XLate, iso639
-
 
 # from mkvcommandparser import MKVCommandParser
 # from TrackOptions import TrackOptions
@@ -41,11 +42,11 @@ from IVerifyStructure import IVerifyStructure
 
 # from MergeOptions import MergeOptions
 # from MediaFileInfo import MediaFileInfo
-from findSimilarTrack import findSimilarTrack
+#from findSimilarTrack import findSimilarTrack
 
-from TracksOrder import TracksOrder
+#from TracksOrder import TracksOrder
 
-from adjustSources import adjustSources
+#from adjustSources import adjustSources
 
 def test():
     """
@@ -57,6 +58,7 @@ def test():
     cmd2 = r"'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en --output 'J:\Example\TestMedia\Example 07\Arte (2020)\Season 01\Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng) (1).mkv' --audio-tracks 3 --subtitle-tracks 9,10 --language 0:und --default-track 0:yes --display-dimensions 0:1920x1080 --language 3:jpn --default-track 3:yes --sub-charset 9:UTF-8 --language 9:eng --track-name '9:ShowY \/'\' --default-track 9:yes --sub-charset 10:UTF-8 --language 10:eng --track-name 10:Funimation '(' 'J:\Example\TestMedia\Example 07\Source\Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mkv' ')' --track-order 0:0,0:3,0:9,0:10"
     cmd3 = r"'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en --output 'J:\Example\TestMedia\Example 07\Arte (2020)\Season 01\Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng) (1).mkv' --audio-tracks 3 --subtitle-tracks 8,9,10 --language 0:und --default-track 0:yes --display-dimensions 0:1920x1080 --language 3:jpn --default-track 3:yes --sub-charset 8:UTF-8 --language 8:ara --track-name 8:Athbul-Khayal --sub-charset 9:UTF-8 --language 9:eng --track-name '9:ShowY Translation' --default-track 9:yes --sub-charset 10:UTF-8 --language 10:eng --track-name 10:Funimation '(' 'J:\Example\TestMedia\Example 07\Source\Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mkv' ')' --track-order 0:0,0:3,0:8,0:9,0:10"
     cmd4 = r"'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en --output 'J:\Example\TestMedia\Example 05\Season 01\Show Title - S01E01 (1).mkv' --language 0:und --default-track 0:yes --display-dimensions 0:640x360 --language 1:jpn --default-track 1:yes '(' 'J:\Example\TestMedia\Example 05\Video\Show Title - S01E01.mkv' ')' --language 0:eng '(' 'J:\Example\TestMedia\Example 05\Subs\Show Title - S01E01.ENG.ass' ')' --attachment-name Font01.otf --attachment-mime-type application/vnd.ms-opentype --attach-file 'J:\Example\TestMedia\Example 05\Attachments\Show Title - S01E01\Font01.otf' --attachment-name Font02.otf --attachment-mime-type application/vnd.ms-opentype --attach-file 'J:\Example\TestMedia\Example 05\Attachments\Show Title - S01E01\Font02.otf' --attachment-name Font03.ttf --attachment-mime-type application/x-truetype-font --attach-file 'J:\Example\TestMedia\Example 05\Attachments\Show Title - S01E01\Font03.ttf' --attachment-name Font04.ttf --attachment-mime-type application/x-truetype-font --attach-file 'J:\Example\TestMedia\Example 05\Attachments\Show Title - S01E01\Font04.ttf' --chapter-language und --chapters 'J:\Example\TestMedia\Example 05\Chapters\Show Title - S01E01 - Chapters.xml' --track-order 0:0,0:1,1:0"
+    cmd5  = r"'C:\Program Files\MKVToolNix\mkvmerge.exe' --ui-language en --output 'C:\Projects\Python\PySide\mkvbatchmultiplex\tests/NewFiles/Show Title - S01E01.mkv' --language 0:und --language 1:jpn '(' 'C:\Projects\Python\PySide\mkvbatchmultiplex\tests/MediaFiles/avi/Show Title - S01E01.avi' ')' --language 0:eng '(' 'C:\Projects\Python\PySide\mkvbatchmultiplex\tests/MediaFiles/Subs/ass/ENG/Show Title - S01E01.ENG.ass' ')' --track-order 0:0,0:1,1:0"
     option = r"--language 0:und --default-track 0:yes --display-dimensions 0:1280x720 --language 1:jpn --default-track 1:yes --sub-charset 2:UTF-8 --language 2:eng"
     option2 = r"--no-audio --no-video --sub-charset 2:UTF-8 --language 2:ita --track-name 2:Italian --default-track 2:yes"
 
@@ -150,8 +152,10 @@ def test():
             rc = adjustSources(oCommand, index)
 
             if rc:
-                strCommand, shellCommand = oCommand.generateCommandByIndex(index, update=True)
-                print(shellCommand)
+                _, shellCommand = oCommand.generateCommandByIndex(index, update=True)
+                print(f"New command:\n{shellCommand}\n")
+            else:
+                print(f"Adjustment failed.")
 
             if not hasToGenerateCommands and rc:
                 hasToGenerateCommands = True
