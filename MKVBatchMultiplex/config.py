@@ -14,7 +14,7 @@ from vsutillib.files import ConfigurationSettings
 from vsutillib.log import LogRotateFileHandler
 from vsutillib.pyqt import QSignalLogHandler
 
-__VERSION = (2, 0, "2")
+__VERSION = (2, 1, "0dev1")
 
 APPNAME = "MKVBatchMultiplex"
 VERSION = ".".join(map(str, __VERSION))
@@ -41,15 +41,18 @@ PYTHONVERSIONS = ">=3.8.1, <3.9"
 QT_VERSION = "PYSIDE2"
 REQUIRED = [
     "PySide2>=5.14",
-    "vsutillib-files>=1.6.0",
+    "vsutillib-files>=1.6.5",
     "vsutillib-log>=1.6.0",
-    "vsutillib-macos>=1.6.1",
     "vsutillib-media>=1.6.1",
-    "vsutillib-mkv>=1.6.1",
+    "vsutillib-mkv>=1.6.5",
     "vsutillib-process>=1.6.0",
     "vsutillib-pyqt>=1.6.1",
     "vsutillib-sql>=1.6.0",
 ]
+
+#REQUIRED = [
+#    "vsutillib-macos>=1.6.1", # pulls process
+#]
 
 # for app
 __version__ = VERSION
@@ -114,6 +117,7 @@ class ConfigKey:  # pylint: disable=too-few-public-methods
     # App Specific
     #
 
+    Algorithm = "Algorithm"
     JobHistory = "JobHistory"
     JobsTable = "jobs"
     JobID = "JobID"
@@ -211,8 +215,12 @@ def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None, ap
 
     # Don't Release for now manually activated
     # <ConfigSetting id="JobHistory" type="bool">True</ConfigSetting>
-    #if data.get(ConfigKey.JobHistory) is None:
-    #    data.set(ConfigKey.JobHistory, False)
+    if data.get(ConfigKey.JobHistory) is None:
+        data.set(ConfigKey.JobHistory, False)
+
+    if data.get(ConfigKey.Algorithm) is None:
+        data.set(ConfigKey.Algorithm, "1") # Original
+
     #for key in data.configDictionary:
     #    print(f"Key {key}")
 
