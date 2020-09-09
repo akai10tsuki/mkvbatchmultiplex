@@ -14,7 +14,8 @@ from vsutillib.pyqt import SvgColor
 from .. import config
 from ..models import TableProxyModel
 
-from .jobsWorker import jobsWorker
+#from .jobsWorker import jobsWorker
+from .jobsWorkerNew import jobsWorker
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
