@@ -20,6 +20,7 @@ from PySide2.QtWidgets import QSystemTrayIcon
 import vsutillib.mkv as mkv
 
 from vsutillib.misc import staticVars, strFormatTimeDelta
+from vsutillib.mkv import adjustSources
 from vsutillib.process import RunCommand
 from vsutillib.pyqt import SvgColor
 
@@ -213,7 +214,49 @@ def jobsWorker(
                     msg = msg.format(cmd, baseFiles, sourceFiles, destinationFile)
                     MODULELOG.debug("RJB0006: %s", msg)
 
-                if verify:
+                #
+                # New Algorithm
+                #
+                runJob = bool(verify)
+                if config.data.get(config.ConfigKey.Algorithm) == "1":
+                    if not verify:
+                        rc = adjustSources(job.oCommand, index)
+
+                        runJob = rc
+
+                        if rc:
+                            _, shellCommand = job.oCommand.generateCommandByIndex(
+                                index, update=True
+                            )
+                            originalCmd = cmd
+                            cmd = shellCommand
+                            msg = (
+                                f"Warning command adjusted:\n\n"
+                                f"Original: {originalCmd}\n"
+                                f"     New: {cmd}\n"
+                            )
+                            if log:
+                                MODULELOG.warning("RJB0011: %s", msg)
+                        else:
+                            msg = (
+                                f"Warning command failed adjustment:\n"
+                                f"Command: {cmd}\n"
+                            )
+                        output.job.emit(
+                            msg, {"color": SvgColor.yellowgreen, "appendEnd": True}
+                        )
+                        output.error.emit(
+                            msg, {"color": SvgColor.yellowgreen, "appendEnd": True}
+                        )
+                        if rc:
+                            if log:
+                                MODULELOG.warning("RJB0011: %s", msg)
+                        else:
+                            if log:
+                                MODULELOG.warning("RJB0012: %s", msg)
+
+
+                if runJob:
                     ###
                     # Execute cmd
                     ###
@@ -244,10 +287,9 @@ def jobsWorker(
                         job.jobRow[JobKey.ID]
                     )
                     output.error.emit(msg, {"color": SvgColor.red, "appendEnd": True})
-                    msg = "Destination File: {}\n\n".format(destinationFile)
+                    msg = "Destination File: {}\nFailed adjustment\n\n".format(destinationFile)
                     job.output.append(msg)
                     output.job.emit(msg, {"color": SvgColor.red, "appendEnd": True})
-                    # output.error.emit(msg, {"color": SvgColor.red, "appendEnd": True})
 
                     for i, m in enumerate(verify.analysis):
                         if i == 0:
