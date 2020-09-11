@@ -50,9 +50,9 @@ REQUIRED = [
     "vsutillib-sql>=1.6.0",
 ]
 
-#REQUIRED = [
+# REQUIRED = [
 #    "vsutillib-macos>=1.6.1", # pulls process
-#]
+# ]
 
 # for app
 __version__ = VERSION
@@ -213,16 +213,11 @@ def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None, ap
     if data.get(Key.MaxRegExCount) is None:
         data.set(Key.MaxRegExCount, 20)
 
-    # Don't Release for now manually activated
-    # <ConfigSetting id="JobHistory" type="bool">True</ConfigSetting>
     if data.get(ConfigKey.JobHistory) is None:
         data.set(ConfigKey.JobHistory, False)
 
     if data.get(ConfigKey.Algorithm) is None:
-        data.set(ConfigKey.Algorithm, "1") # Original
-
-    #for key in data.configDictionary:
-    #    print(f"Key {key}")
+        data.set(ConfigKey.Algorithm, "1")  # Original
 
 
 def setDefaultFont(app):
