@@ -1,5 +1,7 @@
 """Find Similar Track"""
 
+from .. import config
+
 def findSimilarTrack(oBaseFile, sourceFile, track):
     """
     findSimilarTrack find a track similar to track in sourceFile
@@ -75,5 +77,8 @@ def similarTrack(baseTrack, testTrack, baseFile):
 
     if baseTrack.title == testTrack.title:
         points += 5
+
+    if config.data.get(config.ConfigKey.Algorithm) == 2:
+        pass
 
     return points
