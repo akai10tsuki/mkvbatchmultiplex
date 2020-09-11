@@ -220,7 +220,7 @@ def jobsWorker(
                 runJob = bool(verify)
                 if config.data.get(config.ConfigKey.Algorithm) == "1":
                     if not verify:
-                        rc = adjustSources(job.oCommand, index)
+                        rc, confidence = adjustSources(job.oCommand, index)
 
                         runJob = rc
 
@@ -231,7 +231,7 @@ def jobsWorker(
                             originalCmd = cmd
                             cmd = shellCommand
                             msg = (
-                                f"Warning command adjusted:\n\n"
+                                f"Warning command adjusted - confidence {confidence}:\n\n"
                                 f"Original: {originalCmd}\n"
                                 f"     New: {cmd}\n"
                             )
@@ -254,7 +254,6 @@ def jobsWorker(
                         else:
                             if log:
                                 MODULELOG.warning("RJB0012: %s", msg)
-
 
                 if runJob:
                     ###
@@ -287,7 +286,9 @@ def jobsWorker(
                         job.jobRow[JobKey.ID]
                     )
                     output.error.emit(msg, {"color": SvgColor.red, "appendEnd": True})
-                    msg = "Destination File: {}\nFailed adjustment\n\n".format(destinationFile)
+                    msg = "Destination File: {}\nFailed adjustment\n\n".format(
+                        destinationFile
+                    )
                     job.output.append(msg)
                     output.job.emit(msg, {"color": SvgColor.red, "appendEnd": True})
 
