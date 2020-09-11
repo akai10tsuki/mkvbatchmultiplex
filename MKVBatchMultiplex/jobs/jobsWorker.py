@@ -20,11 +20,11 @@ from PySide2.QtWidgets import QSystemTrayIcon
 import vsutillib.mkv as mkv
 
 from vsutillib.misc import staticVars, strFormatTimeDelta
-from vsutillib.mkv import adjustSources
 from vsutillib.process import RunCommand
 from vsutillib.pyqt import SvgColor
 
 from .. import config
+from ..utils import adjustSources
 
 from .jobKeys import JobStatus, JobKey, JobsTableKey
 from .SqlJobsTable import SqlJobsTable

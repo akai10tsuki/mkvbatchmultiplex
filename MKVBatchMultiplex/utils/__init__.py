@@ -4,6 +4,8 @@ utils package imports
 # UT0008
 
 
+from .adjustSources import adjustSources
+from .findSimilarTrack import findSimilarTrack
 from .mainSetLanguage import setLanguageMenus
 from .OutputWindows import OutputWindows
 from .populate import populate
