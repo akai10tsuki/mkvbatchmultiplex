@@ -3,6 +3,13 @@
 mkvbatchmultiplex: MKVMERGE batch multiplexing
 **********************************************
 
+.. |ss| raw:: html
+
+    <strike>
+
+.. |se| raw:: html
+
+    </strike>
 
 .. image:: https://img.shields.io/pypi/v/mkvbatchmultiplex.svg
   :target: https://pypi.org/project/mkvbatchmultiplex
@@ -19,6 +26,8 @@ mkvbatchmultiplex: MKVMERGE batch multiplexing
 
 This project went into a rewrite for version 2.  Rename module was added to
 help maintain output file names Plex_ friendly.
+
+**New algorithm will try to solve some mismatched in file structure.**
 
 Description
 ===========
@@ -89,7 +98,7 @@ This is just the base for the project.  The roadmap is:
 
     * Work on rename module to fetch metadata
     * Work on the Spanish interface translation
-    * Easier installation for linux
+    * |ss| Easier installation for linux |se|
 
 If the the program generates any interest any further changes and additions
 will **also** depend on user base needs.

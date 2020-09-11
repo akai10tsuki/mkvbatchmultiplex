@@ -6,7 +6,7 @@ Changelog
 Added
 ~~~~~
 
-- New algorithm will try to find a track that best matches the base file
+- New algorithm will try to find the tracks that best matches the base file
 
 Changed
 ~~~~~~~
