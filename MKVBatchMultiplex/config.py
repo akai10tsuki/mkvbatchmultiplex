@@ -217,7 +217,7 @@ def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None, ap
         data.set(ConfigKey.JobHistory, False)
 
     if data.get(ConfigKey.Algorithm) is None:
-        data.set(ConfigKey.Algorithm, "1")  # Original
+        data.set(ConfigKey.Algorithm, 1)  # Original
 
 
 def setDefaultFont(app):
