@@ -9,8 +9,6 @@ from .findSimilarTrack import findSimilarTrack
 from .mainSetLanguage import setLanguageMenus
 from .OutputWindows import OutputWindows
 from .populate import populate
-from .preferences import preferences, SetPreferences
-from .PreferencesDialogUI import PreferencesDialogUI
 from .progress import Progress
 from .QSystemTrayIconWidget import QSystemTrayIconWidget
 from .SetLanguage import SetLanguage
