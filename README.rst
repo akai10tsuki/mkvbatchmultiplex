@@ -82,14 +82,22 @@ Usage
 =====
 
 It assumed you have working knowledge of using MKVToolNix.  Select a
-file make any operations needed copy command to clipboard:
+file make any operations needed copy command to clipboard. Remember to
+select and output directory:
 
     *Multiplexer->Show command line*
 
-Paste command on mkvbatchmultiplex push Process button and wait.
-Remember to select and output directory.
+Paste command on mkvbatchmultiplex push <Add Queue> is there are no more jobs
+push <Start Worker> button and wait.
 
 Step by step examples are in the github repository wiki_.
+
+When the worker is processing a job before starting to work on a set of files
+the structure will be checked. If the structure in the pasted in the pasted
+command the the files are processed.  If it doesn't match the program will
+check track by track and for tracks that don't match and a best match for the
+characteristics needed will be searched. With a successful the track will be
+substituted with the match.
 
 Roadmap
 =======

@@ -14,6 +14,8 @@ Changed
 Fixed
 ~~~~~
 
+- Don't count bad structure match on unused tracks
+
 2.0.0 - 2000-8-23
 -----------------
 
