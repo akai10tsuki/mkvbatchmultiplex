@@ -36,6 +36,7 @@ def adjustSources(oCommand, index):
         translate = {}
         usedTrack = []
         savedScore = (-1)
+        foundBadTrack = False
 
         for track in oBaseFile.trackOptions.tracks:
             i = int(track)
@@ -48,7 +49,15 @@ def adjustSources(oCommand, index):
                 trackSource = sourceFileInfo[i]
             else:
                 trackSource = dummyTrack
+            # Testing
+            #print(
+            #    f"Index {baseIndex} baseTrack   {str(trackBase)}\n"
+            #    f"Index {baseIndex} trackSource {str(trackSource)}\n"
+            #)
             if trackBase != trackSource:
+                if not foundBadTrack:
+                    foundBadTrack = True
+                print("Adjust called find similar.")
                 trackSimilar, score = findSimilarTrack(
                     oBaseFile,
                     sourceFileInfo,
@@ -87,6 +96,8 @@ def adjustSources(oCommand, index):
             elif savedScore < 8:
                 confidence = "Medium"
 
+        if not foundBadTrack:
+            rc = True
 
     if tracksOrderTranslation:
         tracksOrder.translation = tracksOrderTranslation
