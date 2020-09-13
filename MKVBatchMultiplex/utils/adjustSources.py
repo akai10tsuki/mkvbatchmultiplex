@@ -7,7 +7,9 @@ import copy
 from vsutillib.media import MediaFileInfo, MediaTrackInfo
 from vsutillib.mkv import TracksOrder
 
+from .. import config
 from .findSimilarTrack import findSimilarTrack
+
 
 def adjustSources(oCommand, index):
     """
@@ -35,7 +37,7 @@ def adjustSources(oCommand, index):
         trackOptions = oBaseFile.trackOptions
         translate = {}
         usedTrack = []
-        savedScore = (-1)
+        savedScore = -1
         foundBadTrack = False
 
         for track in oBaseFile.trackOptions.tracks:
@@ -50,36 +52,48 @@ def adjustSources(oCommand, index):
             else:
                 trackSource = dummyTrack
             # Testing
-            #print(
-            #    f"Index {baseIndex} baseTrack   {str(trackBase)}\n"
-            #    f"Index {baseIndex} trackSource {str(trackSource)}\n"
-            #)
             if trackBase != trackSource:
                 if not foundBadTrack:
                     foundBadTrack = True
-                print("Adjust called find similar.")
+                #print(
+                #    f"Index {baseIndex} baseTrack   {str(trackBase)}\n"
+                #    f"Index {baseIndex} trackSource {str(trackSource)}\n"
+                #)
                 trackSimilar, score = findSimilarTrack(
-                    oBaseFile,
-                    sourceFileInfo,
-                    trackBase
+                    oBaseFile, sourceFileInfo, trackBase, usedTrack
                 )
-                print(f"Score = {score}")
                 if trackSimilar >= 0:
+                    #print(f"Score = {score}")
+                    #print(
+                    #    f"Index {baseIndex} baseTrack   {str(trackBase)}\n"
+                    #    f"Index {baseIndex} trackSource {str(sourceFileInfo[trackSimilar])}\n"
+                    #)
+                    #print(f"Found track {trackSimilar} used tracks {usedTrack}")
                     if trackSimilar not in usedTrack:
                         usedTrack.append(trackSimilar)
                         translate[track] = str(trackSimilar)
-                        trackSource = sourceFileInfo[trackSimilar]
+                        #trackSource = sourceFileInfo[trackSimilar]
                         if savedScore > 0:
                             if score < savedScore:
                                 savedScore = score
                         else:
                             savedScore = score
                     else:
+                        print("Not suppose to show..")
+                        if config.data.get(config.ConfigKey.Algorithm) == 2:
+                            translate[track] = str(200 + i) # mkvmerge will ignore track
+                        else:
+                            translate = {}
+                            break
+                else:
+                    if config.data.get(config.ConfigKey.Algorithm) == 2:
+                        translate[track] = str(200 + i) # mkvmerge will ignore track
+                    else:
                         translate = {}
                         break
-                else:
-                    translate = {}
-                    break
+            else:
+                if track not in usedTrack:
+                    usedTrack.append(i)
 
         if translate:
             if not rc:
@@ -97,6 +111,8 @@ def adjustSources(oCommand, index):
                 confidence = "Medium"
 
         if not foundBadTrack:
+            # No needed tracks failed match.
+            # Nothing to do go ahead with command.
             rc = True
 
     if tracksOrderTranslation:

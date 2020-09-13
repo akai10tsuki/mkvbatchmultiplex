@@ -2,7 +2,8 @@
 
 from .. import config
 
-def findSimilarTrack(oBaseFile, sourceFile, track):
+
+def findSimilarTrack(oBaseFile, sourceFile, track, usedTracks):
     """
     findSimilarTrack find a track similar to track in sourceFile
 
@@ -12,17 +13,18 @@ def findSimilarTrack(oBaseFile, sourceFile, track):
     """
 
     basePoints = 0
-    trackOrder = (-1)
+    trackOrder = -1
 
     for trk in sourceFile:
-        p = similarTrack(track, trk, oBaseFile)
+        p = similarTrack(track, trk, oBaseFile, usedTracks)
         if p > basePoints:
             basePoints = p
             trackOrder = trk.streamOrder
 
     return trackOrder, basePoints
 
-def similarTrack(baseTrack, testTrack, baseFile):
+
+def similarTrack(baseTrack, testTrack, baseFile, usedTracks):
     """
     similarTrack find similarities and assign points
 
@@ -38,6 +40,9 @@ def similarTrack(baseTrack, testTrack, baseFile):
 
     points = 0
 
+    if testTrack.streamOrder in usedTracks:
+        return 0
+
     if baseTrack.trackType != testTrack.trackType:
         return 0
 
@@ -46,9 +51,12 @@ def similarTrack(baseTrack, testTrack, baseFile):
     if baseTrack.language != testTrack.language:
         return 0
 
-    need = bTrkOpts.needTracksByTypeLanguage[baseTrack.trackType][baseTrack.language]
-    if need > baseTrack.tracksLanguageOfThisKind:
-        return 0
+    if config.data.get(config.ConfigKey.Algorithm) == 1:
+        need = bTrkOpts.needTracksByTypeLanguage[baseTrack.trackType][
+            baseTrack.language
+        ]
+        if need > testTrack.tracksLanguageOfThisKind:
+            return 0
 
     points += 1
 
