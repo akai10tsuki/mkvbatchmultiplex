@@ -6,7 +6,25 @@ Changelog
 Added
 ~~~~~
 
-- New algorithm will try to find the tracks that best matches the base file
+- New algorithms:
+
+  - **Algorithm 0** current behavior the resulting file will have the same
+    structure as the destination file on the command line.  Any difference in
+    structure of the files the command will not execute.  The resulting file is
+    very likely to be the expected result as specified on the command line.
+    Random checks  will be sufficient.
+  - **Algorithm 1** will try to find the tracks that best matches the base file
+    and adjust the command accordingly. Any track not used in the command will
+    be ignored. If no suitable track found no command will execute. Resulting
+    file structure if the save as in the command line but is not as likely to be
+    the desired file as in Algorithm 0.  Flagged files should be checked.
+  - **Algorithm 2** if Algorithm 1 fails tracks without match will be ignored
+    and and the command still will execute.  The resulting file will not be like
+    the destination file in the original command.  It may even be unusable.  Any
+    flagged has to be check to see if is usable.
+
+- Synchronized scroll in Rename tab (**Original Names:** with **Rename to:**
+  text boxes)
 
 Changed
 ~~~~~~~
@@ -14,7 +32,7 @@ Changed
 Fixed
 ~~~~~
 
-- Don't count bad structure match on unused tracks
+- Don't count bad structure match for unused tracks
 
 2.0.0 - 2000-8-23
 -----------------
