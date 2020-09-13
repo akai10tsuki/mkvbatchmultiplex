@@ -176,6 +176,14 @@ class RenameWidget(pyqt.TabWidgetExtension, QWidget):
         self.textSubString.cmdLine.itemsChangeSignal.connect(
             lambda: self.saveItems(Key.SubString)
         )
+
+        self.textOriginalNames.textBox.verticalScrollBar().valueChanged.connect(
+            self.scrollRenameChanged
+        )
+        self.textRenameResults.textBox.verticalScrollBar().valueChanged.connect(
+            self.scrollResultsChanged
+        )
+
         if maxCount is not None:
             self.textRegEx.cmdLine.setMaxCount(maxCount)
             self.textSubString.cmdLine.setMaxCount(maxCount)
@@ -223,6 +231,68 @@ class RenameWidget(pyqt.TabWidgetExtension, QWidget):
     def output(self, value):
         self.__output = value
 
+    @Slot()
+    def saveItems(self, comboType):
+        """
+        saveItems of ComboLineEdit use in widget
+
+        Args:
+            comboType (str): key indicating witch ComboListEdit
+                             to save to config
+        """
+
+        if comboType == Key.RegEx:
+            if self.textRegEx.cmdLine.count() > 0:
+                items = []
+                for i in range(0, self.textRegEx.cmdLine.count()):
+                    items.append(self.textRegEx.cmdLine.itemText(i))
+                config.data.set(Key.RegEx, items)
+        if comboType == Key.SubString:
+            if self.textRegEx.cmdLine.count():
+                items = []
+                for i in range(0, self.textSubString.cmdLine.count()):
+                    items.append(self.textSubString.cmdLine.itemText(i))
+                config.data.set(Key.SubString, items)
+
+    @Slot(object)
+    def setFiles(self, objCommand):
+        """
+        setFile setup file names to work with
+
+        Args:
+            objCommand (MKVCommand): MKVCommand object containing the files
+                                     to rename
+        """
+
+        self.textOriginalNames.textBox.clear()
+        self.textRenameResults.textBox.clear()
+        for f in objCommand.destinationFiles:
+            # show files
+            self.outputOriginalFilesSignal.emit(str(f.name) + "\n", {})
+            # save files
+            self._outputFileNames.append(f)
+
+    @Slot(int)
+    def scrollRenameChanged(self, value):
+        self.textRenameResults.textBox.verticalScrollBar().valueChanged.disconnect(
+            self.scrollResultsChanged
+        )
+        self.textRenameResults.textBox.verticalScrollBar().setValue(value)
+        self.textRenameResults.textBox.verticalScrollBar().valueChanged.connect(
+            self.scrollResultsChanged
+        )
+
+    @Slot(int)
+    def scrollResultsChanged(self, value):
+        self.textOriginalNames.textBox.verticalScrollBar().valueChanged.disconnect(
+            self.scrollRenameChanged
+        )
+        self.textOriginalNames.textBox.verticalScrollBar().setValue(value)
+        self.textOriginalNames.textBox.verticalScrollBar().valueChanged.connect(
+            self.scrollRenameChanged
+        )
+
+
     def clear(self):
         """
         clear reset widget working variables and widgets
@@ -265,47 +335,6 @@ class RenameWidget(pyqt.TabWidgetExtension, QWidget):
             w.lblText.setText(_(w.label) + ":")
             w.textBox.setToolTip(_(w.toolTip))
             w.repaint()
-
-    @Slot()
-    def saveItems(self, comboType):
-        """
-        saveItems of ComboLineEdit use in widget
-
-        Args:
-            comboType (str): key indicating witch ComboListEdit
-                             to save to config
-        """
-
-        if comboType == Key.RegEx:
-            if self.textRegEx.cmdLine.count() > 0:
-                items = []
-                for i in range(0, self.textRegEx.cmdLine.count()):
-                    items.append(self.textRegEx.cmdLine.itemText(i))
-                config.data.set(Key.RegEx, items)
-        if comboType == Key.SubString:
-            if self.textRegEx.cmdLine.count():
-                items = []
-                for i in range(0, self.textSubString.cmdLine.count()):
-                    items.append(self.textSubString.cmdLine.itemText(i))
-                config.data.set(Key.SubString, items)
-
-    @Slot(object)
-    def setFiles(self, objCommand):
-        """
-        setFile setup file names to work with
-
-        Args:
-            objCommand (MKVCommand): MKVCommand object containing the files
-                                     to rename
-        """
-
-        self.textOriginalNames.textBox.clear()
-        self.textRenameResults.textBox.clear()
-        for f in objCommand.destinationFiles:
-            # show files
-            self.outputOriginalFilesSignal.emit(str(f.name) + "\n", {})
-            # save files
-            self._outputFileNames.append(f)
 
     def _setFilesDropped(self, filesDropped):
 
