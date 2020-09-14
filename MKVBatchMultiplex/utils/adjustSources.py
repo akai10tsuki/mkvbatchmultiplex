@@ -115,7 +115,7 @@ def adjustSources(oCommand, index):
             # Nothing to do go ahead with command.
             rc = True
 
-    if tracksOrderTranslation:
+    if tracksOrderTranslation and oCommand.cliTracksOrder:
         tracksOrder.translation = tracksOrderTranslation
         oCommand.tracksOrder[index] = tracksOrder.strOrder()
 
