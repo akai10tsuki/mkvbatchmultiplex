@@ -55,19 +55,19 @@ def adjustSources(oCommand, index):
             if trackBase != trackSource:
                 if not foundBadTrack:
                     foundBadTrack = True
-                #print(
-                #    f"Index {baseIndex} baseTrack   {str(trackBase)}\n"
-                #    f"Index {baseIndex} trackSource {str(trackSource)}\n"
-                #)
+                print(
+                    f"Index {baseIndex} baseTrack   {str(trackBase)}\n"
+                    f"Index {baseIndex} trackSource {str(trackSource)}\n"
+                )
                 trackSimilar, score = findSimilarTrack(
                     oBaseFile, sourceFileInfo, trackBase, usedTrack
                 )
                 if trackSimilar >= 0:
-                    #print(f"Score = {score}")
-                    #print(
-                    #    f"Index {baseIndex} baseTrack   {str(trackBase)}\n"
-                    #    f"Index {baseIndex} trackSource {str(sourceFileInfo[trackSimilar])}\n"
-                    #)
+                    print(f"Score = {score}")
+                    print(
+                        f"Index {baseIndex} baseTrack   {str(trackBase)}\n"
+                        f"Index {baseIndex} trackSource {str(sourceFileInfo[trackSimilar])}\n"
+                    )
                     #print(f"Found track {trackSimilar} used tracks {usedTrack}")
                     if trackSimilar not in usedTrack:
                         usedTrack.append(trackSimilar)

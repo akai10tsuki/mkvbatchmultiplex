@@ -13,10 +13,13 @@ from pathlib import Path
 
 from vsutillib.mkv import (
     IVerifyStructure,
+    MKVCommandParser,
 )
 
 from GetTracks import GetTracks
-from MKVCommandParser import MKVCommandParser
+#from MKVCommandParser import MKVCommandParser
+
+from vsutillib.macos import isMacDarkMode
 
 from MKVBatchMultiplex.utils import adjustSources
 from MKVBatchMultiplex import config
@@ -33,7 +36,8 @@ def test():
     cmd6 = r"'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en --output 'J:\Example\TestMedia\Example 07\Arte (2020)\Season 01\Arte - 01 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng) (1).mkv' --audio-tracks 3,4 --subtitle-tracks 5,6,7 --language 0:und --default-track 0:yes --display-dimensions 0:1920x1080 --language 3:jpn --default-track 3:yes --language 4:jpn --track-name 4:comments --sub-charset 5:UTF-8 --language 5:rus --track-name 5:надписи --sub-charset 6:UTF-8 --language 6:rus --track-name 6:AniLibria.tv --sub-charset 7:UTF-8 --language 7:rus --track-name '7:Yakusub Studio' '(' 'J:\Example\TestMedia\Example 07\Source\Arte - 01 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mkv' ')' --track-order 0:0,0:3,0:4,0:5,0:6,0:7"
     cmd7 = r"'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en --output 'J:\Example\TestMedia\Example 07\Arte (2020)\Arte - 01 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mks' --no-audio --no-video --subtitle-tracks 10,11 --no-chapters --sub-charset 10:UTF-8 --language 10:eng --track-name 10:ShowY --sub-charset 11:UTF-8 --language 11:eng --track-name 11:Funimation '(' 'J:\Example\TestMedia\Example 07\Source\Arte - 01 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mkv' ')' --track-order 0:10,0:11"
     cmd8 = r"'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en --output 'J:\Example\TestMedia\Example 07\Arte (2020)\Arte - 01 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mks' --no-audio --no-video --subtitle-tracks 10 --no-chapters --sub-charset 10:UTF-8 --language 10:eng --track-name 10:ShowY '(' 'J:\Example\TestMedia\Example 07\Source\Arte - 01 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mkv' ')'"
-    cmd = r"/Applications/MKVToolNix-50.0.0.app/Contents/MacOS/mkvmerge --ui-language en_US --output '/Volumes/Plex-Media 2 T/Example/TestMedia/Example 07/Arte (2020)/Season 01/Arte - 01 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mks' --no-audio --no-video --subtitle-tracks 10 --no-chapters --sub-charset 10:UTF-8 --language 10:en --track-name 10:ShowY '(' '/Volumes/Plex-Media 2 T/Example/TestMedia/Example 07/Source/Arte - 01 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mkv' ')'"
+    cmd9 = r"/Applications/MKVToolNix-50.0.0.app/Contents/MacOS/mkvmerge --ui-language en_US --output '/Volumes/Plex-Media 2 T/Example/TestMedia/Example 07/Arte (2020)/Season 01/Arte - 01 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mks' --no-audio --no-video --subtitle-tracks 10 --no-chapters --sub-charset 10:UTF-8 --language 10:en --track-name 10:ShowY '(' '/Volumes/Plex-Media 2 T/Example/TestMedia/Example 07/Source/Arte - 01 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mkv' ')'"
+    cmd = r"/Applications/MKVToolNix-50.0.0.app/Contents/MacOS/mkvmerge --ui-language en_US --output '/Volumes/Plex-Media 2 T/Example/TestMedia/Example 07/Arte (2020)/Season 01/Arte - 01 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mks' --no-audio --no-video --subtitle-tracks 10,11 --no-chapters --sub-charset 10:UTF-8 --language 10:en --track-name 10:ShowY --sub-charset 11:UTF-8 --language 11:en --track-name 11:Funimation '(' '/Volumes/Plex-Media 2 T/Example/TestMedia/Example 07/Source/Arte - 01 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mkv' ')' --track-order 0:10,0:11"
 
     #f = Path("./ass.xml").open(mode="wb")
     #xml = pymediainfo.MediaInfo.parse(r'J:\Example\TestMedia\Example 05\Subs\Show Title - S01E01.ENG.ass', output="OLDXML")
@@ -49,6 +53,11 @@ def test():
     #    print(o.strip())
 
     #return
+
+    if isMacDarkMode():
+        print("Yes")
+    else:
+        print("No")
 
     colorama.init()
 
@@ -69,7 +78,7 @@ def test():
 
     hasToGenerateCommands = False
 
-    config.data.set(config.ConfigKey.Algorithm, 2)
+    config.data.set(config.ConfigKey.Algorithm, 1)
 
     for index, sourceFiles in enumerate(oCommand.oSourceFiles):
         iVerify.verifyStructure(oCommand, index)
