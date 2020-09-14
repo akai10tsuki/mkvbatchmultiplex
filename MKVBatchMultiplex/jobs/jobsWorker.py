@@ -55,6 +55,7 @@ def jobsWorker(
         str: Dummy  return value
     """
 
+    print("Worker called.")
     #
     # Always open to start saving in mid of worker operating
     #
@@ -70,6 +71,7 @@ def jobsWorker(
     currentJob = 0
     indexTotal = [0, 0]
     verify = mkv.VerifyStructure(log=log)
+    iVerify = mkv.IVerifyStructure()
     totalErrors = funcProgress.lbl[4]
     abortAll = False
     bSimulateRun = config.data.get(config.ConfigKey.SimulateRun)
@@ -173,6 +175,8 @@ def jobsWorker(
                 #
                 status = model.dataset[statusIndex.row(), statusIndex.column()]
 
+                print(f"Working index {index}")
+
                 ###
                 # Check controlQueue
                 ###
@@ -206,6 +210,8 @@ def jobsWorker(
 
                 verify.verifyStructure(baseFiles, sourceFiles, destinationFile)
 
+                iVerify.verifyStructure(job.oCommand, index)
+
                 if log:
                     msg = (
                         "Command: {}  Base Files: {} "
@@ -217,14 +223,22 @@ def jobsWorker(
                 #
                 # New Algorithm
                 #
-                runJob = bool(verify)
+                runJob = bool(iVerify)
+
+                print(f"Run Jub = {runJob}")
+
+                print(f"Algorithm {config.data.get(config.ConfigKey.Algorithm)}")
+
                 if config.data.get(config.ConfigKey.Algorithm) == 1:
-                    if not verify:
+                    print("Algorithm 1")
+                    if not iVerify:
                         rc, confidence = adjustSources(job.oCommand, index)
 
                         runJob = rc
 
+                        print(f"Found track = {rc}")
                         if rc:
+                            print("Regenerate command")
                             _, shellCommand = job.oCommand.generateCommandByIndex(
                                 index, update=True
                             )
