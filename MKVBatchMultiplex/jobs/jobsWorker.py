@@ -55,7 +55,6 @@ def jobsWorker(
         str: Dummy  return value
     """
 
-    print("Worker called.")
     #
     # Always open to start saving in mid of worker operating
     #
@@ -175,8 +174,6 @@ def jobsWorker(
                 #
                 status = model.dataset[statusIndex.row(), statusIndex.column()]
 
-                print(f"Working index {index}")
-
                 ###
                 # Check controlQueue
                 ###
@@ -225,20 +222,13 @@ def jobsWorker(
                 #
                 runJob = bool(iVerify)
 
-                print(f"Run Jub = {runJob}")
-
-                print(f"Algorithm {config.data.get(config.ConfigKey.Algorithm)}")
-
                 if config.data.get(config.ConfigKey.Algorithm) == 1:
-                    print("Algorithm 1")
                     if not iVerify:
                         rc, confidence = adjustSources(job.oCommand, index)
 
                         runJob = rc
 
-                        print(f"Found track = {rc}")
                         if rc:
-                            print("Regenerate command")
                             _, shellCommand = job.oCommand.generateCommandByIndex(
                                 index, update=True
                             )
@@ -282,6 +272,8 @@ def jobsWorker(
 
                     if log:
                         MODULELOG.debug("RJB0007: Structure checks ok")
+
+                    msg = f"bSimulateRun = {bSimulateRun}"
 
                     if bSimulateRun:
                         dummyRunCommand(funcProgress, indexTotal, controlQueue)
