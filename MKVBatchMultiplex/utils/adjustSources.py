@@ -113,6 +113,7 @@ def adjustSources(oCommand, index):
         if not foundBadTrack:
             # No needed tracks failed match.
             # Nothing to do go ahead with command.
+            confidence = "High - Needed track(s) matched."
             rc = True
 
     if tracksOrderTranslation and oCommand.cliTracksOrder:
