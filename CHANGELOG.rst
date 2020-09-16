@@ -6,6 +6,18 @@ Changelog
 Added
 ~~~~~
 
+Changed
+~~~~~~~
+
+Fixed
+~~~~~
+
+2.1.0a1.dev1 - 2020-16-9
+------------------------
+
+Added
+~~~~~
+
 - New algorithms:
 
   - **Algorithm 0** current behavior the resulting file will have the same
@@ -25,6 +37,10 @@ Added
 
 - Synchronized scroll in Rename tab (**Original Names:** with **Rename to:**
   text boxes)
+
+- Add support for one track file multiplexing,  this is usually done for
+  subtitles (mks) files. The program will accept commands with only one track
+  one source.  The destination file will have correct extension mkv, mka or mks.
 
 Changed
 ~~~~~~~
