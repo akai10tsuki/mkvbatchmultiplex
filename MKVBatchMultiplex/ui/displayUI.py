@@ -3,7 +3,8 @@
 """
 
 import sys
-from PySide2.QtWidgets import QApplication, QDialog, QMainWindow
+
+from PySide2.QtWidgets import QApplication, QDialog
 from Ui_PreferencesDialog import Ui_PreferencesDialog
 from Ui_SearchTextDialog import Ui_SearchTextDialog
 
