@@ -14,7 +14,7 @@ from vsutillib.files import ConfigurationSettings
 from vsutillib.log import LogRotateFileHandler
 from vsutillib.pyqt import QSignalLogHandler
 
-__VERSION = (2, 1, "0b1", "dev1")
+__VERSION = (2, 1, "0b1", "dev2")
 
 APPNAME = "MKVBatchMultiplex"
 VERSION = ".".join(map(str, __VERSION))
