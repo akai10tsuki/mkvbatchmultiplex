@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>744</width>
-    <height>495</height>
+    <height>507</height>
    </rect>
   </property>
   <property name="font">
@@ -25,7 +25,7 @@
    <property name="geometry">
     <rect>
      <x>460</x>
-     <y>390</y>
+     <y>430</y>
      <width>241</width>
      <height>32</height>
     </rect>
@@ -43,11 +43,11 @@
      <x>30</x>
      <y>40</y>
      <width>681</width>
-     <height>321</height>
+     <height>361</height>
     </rect>
    </property>
    <property name="title">
-    <string>Options</string>
+    <string/>
    </property>
    <widget class="QLabel" name="lblInterfaceLanguage">
     <property name="geometry">
@@ -195,12 +195,80 @@
      <string>Automatically save jobs</string>
     </property>
    </widget>
+   <widget class="QFrame" name="frame">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>310</y>
+      <width>621</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <widget class="QLabel" name="lblAlgorithm">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>0</y>
+       <width>121</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Algorithm:</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="rbZero">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>0</y>
+       <width>41</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>0</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="rbOne">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>0</y>
+       <width>41</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>1</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="rbTwo">
+     <property name="geometry">
+      <rect>
+       <x>230</x>
+       <y>0</y>
+       <width>41</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>2</string>
+     </property>
+    </widget>
+   </widget>
   </widget>
   <widget class="QPushButton" name="btnRestoreDefaults">
    <property name="geometry">
     <rect>
      <x>50</x>
-     <y>390</y>
+     <y>430</y>
      <width>351</width>
      <height>34</height>
     </rect>
