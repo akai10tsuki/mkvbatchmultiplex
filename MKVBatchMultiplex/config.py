@@ -14,7 +14,7 @@ from vsutillib.files import ConfigurationSettings
 from vsutillib.log import LogRotateFileHandler
 from vsutillib.pyqt import QSignalLogHandler
 
-__VERSION = (2, 1, 0, "dev1")
+__VERSION = (2, 1, "0b1", "dev1")
 
 APPNAME = "MKVBatchMultiplex"
 VERSION = ".".join(map(str, __VERSION))
@@ -83,6 +83,7 @@ FORCELOG = True
 
 WORKERTHREADNAME = "jobsWorker"
 SYSTEMDATABASE = "itsue.db"
+ALGORITHMDEFAULT = 1
 
 #######################
 #######################
