@@ -44,7 +44,7 @@ def adjustSources(oCommand, index):
             i = int(track)
             if len(baseFileInfo) <= 0:
                 # source file with no tracks
-                return False
+                return False, "Low"
             trackBase = baseFileInfo[i]
             if i < len(sourceFileInfo):
                 # source less tracks than base
@@ -119,5 +119,7 @@ def adjustSources(oCommand, index):
     if tracksOrderTranslation and oCommand.cliTracksOrder:
         tracksOrder.translation = tracksOrderTranslation
         oCommand.tracksOrder[index] = tracksOrder.strOrder()
+
+    print(f"rc = {rc}, confidence = {confidence}")
 
     return rc, confidence
