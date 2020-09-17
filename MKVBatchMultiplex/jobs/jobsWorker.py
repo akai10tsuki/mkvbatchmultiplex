@@ -222,7 +222,7 @@ def jobsWorker(
                 #
                 runJob = bool(iVerify)
 
-                if config.data.get(config.ConfigKey.Algorithm) == 1:
+                if config.data.get(config.ConfigKey.Algorithm) >= 1:
                     if not iVerify:
                         rc, confidence = adjustSources(job.oCommand, index)
 
