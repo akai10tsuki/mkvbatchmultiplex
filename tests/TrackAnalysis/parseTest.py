@@ -29,9 +29,9 @@ def test():
     test summary
     """
     # Example 07 Arte
-    cmd = r"'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en --output 'J:\Example\TestMedia\Example 07\Arte (2020)\Season 01\Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng) (1).mkv' --audio-tracks 3 --subtitle-tracks 8,9 --language 0:und --default-track 0:yes --display-dimensions 0:1920x1080 --language 3:ja --default-track 3:yes --sub-charset 8:UTF-8 --language 8:en --track-name 8:ShowY --default-track 8:yes --sub-charset 9:UTF-8 --language 9:en --track-name 9:Funimation '(' 'J:\Example\TestMedia\Example 07\Source\Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mkv' ')' --track-order 0:0,0:3,0:8,0:9"
+    cmd1 = r"'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en --output 'J:\Example\TestMedia\Example 07\Arte (2020)\Season 01\Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng) (1).mkv' --audio-tracks 3 --subtitle-tracks 8,9 --language 0:und --default-track 0:yes --display-dimensions 0:1920x1080 --language 3:ja --default-track 3:yes --sub-charset 8:UTF-8 --language 8:en --track-name 8:ShowY --default-track 8:yes --sub-charset 9:UTF-8 --language 9:en --track-name 9:Funimation '(' 'J:\Example\TestMedia\Example 07\Source\Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mkv' ')' --track-order 0:0,0:3,0:8,0:9"
     # Example 06 Key the Metal Idol
-    cmd = r"'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en --output 'J:\Example\TestMedia\Example 06\Season 01 New\[Koten_Gars] Key The Metal Idol OVA - 01 [DVD][Hi10][480p][AC3+FLAC] [9A65FECD] (1).mkv' --language 0:ja --track-name '0:Episode 01 - Startup' --default-track 0:yes --display-dimensions 0:708x531 --language 1:en --track-name '1:AC3 2.0 [R1 Discotek DVD]' --language 2:ja --track-name '2:LPCM 2.0 [R2J DVD]' --default-track 2:yes --sub-charset 3:UTF-8 --language 3:en --track-name 3:Signs --default-track 3:yes --sub-charset 4:UTF-8 --language 4:en --track-name 4:Dialogue '(' 'J:\Example\TestMedia\Example 06\Season 01\[Koten_Gars] Key The Metal Idol OVA - 01 [DVD][Hi10][480p][AC3+FLAC] [9A65FECD].mkv' ')' --title 'Key the Metal Idol Episode 01 - Startup' --track-order 0:0,0:2,0:1,0:4,0:3"
+    cmd = r"'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en --output 'J:\Example\TestMedia\Example 06\Season 01 New\[Koten_Gars] Key The Metal Idol OVA - 01 [DVD][Hi10][480p][AC3+FLAC] [9A65FECD] (1).mkv' --language 0:ja --track-name '0:Episode 01 - Startup' --default-track 0:yes --display-dimensions 0:708x531 --language 1:en --track-name '1:AC3 2.0 [R1 Discotek-DVD]' --language 2:ja --track-name '2:LPCM 2.0 [R2J DVD]' --default-track 2:yes --sub-charset 3:UTF-8 --language 3:en --track-name 3:Signs --default-track 3:yes --sub-charset 4:UTF-8 --language 4:en --track-name 4:Dialogue '(' 'J:\Example\TestMedia\Example 06\Season 01\[Koten_Gars] Key The Metal Idol OVA - 01 [DVD][Hi10][480p][AC3+FLAC] [9A65FECD].mkv' ')' --title 'Key the Metal Idol Episode 01 - Startup' --track-order 0:0,0:2,0:1,0:4,0:3"
 
     # Example 07 Arte MacOS
     cmd9 = r"/Applications/MKVToolNix-50.0.0.app/Contents/MacOS/mkvmerge --ui-language en_US --output '/Volumes/Plex-Media 2 T/Example/TestMedia/Example 07/Arte (2020)/Season 01/Arte - 01 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mks' --no-audio --no-video --subtitle-tracks 10 --no-chapters --sub-charset 10:UTF-8 --language 10:en --track-name 10:ShowY '(' '/Volumes/Plex-Media 2 T/Example/TestMedia/Example 07/Source/Arte - 01 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mkv' ')'"
@@ -64,7 +64,8 @@ def test():
     for key in trackOptions.trackNames:
         print(f"Track {key} title {trackOptions.trackNames[key][1]}")
         print(f"Media {key} title {mediaInfo[int(key)].title}")
-        print(f"Are they equal? {mediaInfo[int(key)].title == trackOptions.trackNames[key][1]}\n")
+        print(f"Are they equal? {mediaInfo[int(key)].title == trackOptions.trackNames[key][1]}")
+        print(f"Track {key} Modified: {trackOptions.trackTitleEdited[key]}\n")
     return
 
     hasToGenerateCommands = False
