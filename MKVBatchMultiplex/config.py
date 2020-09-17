@@ -6,6 +6,7 @@ mkvbatchmultiplex config file
 import logging
 import os
 import sys
+
 from pathlib import Path
 
 from PySide2.QtGui import QFont
