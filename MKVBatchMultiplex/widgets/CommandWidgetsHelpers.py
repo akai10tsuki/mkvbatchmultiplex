@@ -163,12 +163,20 @@ def checkFiles(**kwargs):
                         )
                     else:
                         output.command.emit(
-                            str(i) + ". " + m.strip(),
+                            str(i) + " - " + m.strip(),
                             {
                                 LineOutput.Color: SvgColor.red,
                                 LineOutput.AppendEnd: True,
                             },
                         )
+
+                #output.command.emit(
+                #    "HERE: " + str(verify.unmatched),
+                #    {
+                #        LineOutput.Color: SvgColor.red,
+                #        LineOutput.AppendEnd: True,
+                #    },
+                #)
 
                 output.command.emit("", {LineOutput.AppendEnd: True})
 
