@@ -9,6 +9,13 @@ Added
 Changed
 ~~~~~~~
 
+- **Algorithm 1** changed when comparing tracks for substitution and
+  **only one** track is needed.  If for a particular type (Video, Audio, Text)
+  only one track exits if the language in the comparison has one as
+  undetermined the track will be selected. This occurrence is quite common
+  on the target cases trying to solve.  This of course is valid for
+  **Algorithm 2**.
+
 Fixed
 ~~~~~
 
