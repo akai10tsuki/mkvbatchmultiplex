@@ -36,7 +36,7 @@ def adjustSources(oCommand, index):
         sourceFileInfo = MediaFileInfo(sourceFiles[baseIndex])
         trackOptions = oBaseFile.trackOptions
         translate = {}
-        usedTrack = []
+        usedTracks = []
         savedScore = -1
         foundBadTrack = False
 
@@ -60,7 +60,7 @@ def adjustSources(oCommand, index):
                 #    f"Index {baseIndex} trackSource {str(trackSource)}\n"
                 #)
                 trackSimilar, score = findSimilarTrack(
-                    oBaseFile, sourceFileInfo, trackBase, usedTrack
+                    oBaseFile, sourceFileInfo, trackBase, usedTracks
                 )
                 if trackSimilar >= 0:
                     #print(f"Score = {score}")
@@ -68,9 +68,9 @@ def adjustSources(oCommand, index):
                     #    f"Index {baseIndex} baseTrack   {str(trackBase)}\n"
                     #    f"Index {baseIndex} trackSource {str(sourceFileInfo[trackSimilar])}\n"
                     #)
-                    #print(f"Found track {trackSimilar} used tracks {usedTrack}")
-                    if trackSimilar not in usedTrack:
-                        usedTrack.append(trackSimilar)
+                    #print(f"Found track {trackSimilar} used tracks {usedTracks}")
+                    if trackSimilar not in usedTracks:
+                        usedTracks.append(trackSimilar)
                         translate[track] = str(trackSimilar)
                         #trackSource = sourceFileInfo[trackSimilar]
                         if savedScore > 0:
@@ -92,8 +92,8 @@ def adjustSources(oCommand, index):
                         translate = {}
                         break
             else:
-                if track not in usedTrack:
-                    usedTrack.append(i)
+                if track not in usedTracks:
+                    usedTracks.append(i)
 
         if translate:
             if not rc:
@@ -119,7 +119,5 @@ def adjustSources(oCommand, index):
     if tracksOrderTranslation and oCommand.cliTracksOrder:
         tracksOrder.translation = tracksOrderTranslation
         oCommand.tracksOrder[index] = tracksOrder.strOrder()
-
-    print(f"rc = {rc}, confidence = {confidence}")
 
     return rc, confidence

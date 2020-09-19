@@ -49,6 +49,19 @@ def similarTrack(baseTrack, testTrack, baseFile, usedTracks):
     points += 1
 
     if baseTrack.language != testTrack.language:
+        if config.data.get(config.ConfigKey.Algorithm) >= 1:
+            need = bTrkOpts.needTracksByTypeLanguage[baseTrack.trackType][
+                baseTrack.language
+            ]
+            thisTypeTotal = bTrkOpts.needTracksByTypeLanguage[baseTrack.trackType][
+                "all"
+            ]
+            if need == 1 and thisTypeTotal == 1:
+                # Need one track have only one track and
+                # one of the track language is undetermined
+                if baseTrack.language is None or testTrack.language is None:
+                    points += 1
+                    return points
         return 0
 
     if config.data.get(config.ConfigKey.Algorithm) == 1:
