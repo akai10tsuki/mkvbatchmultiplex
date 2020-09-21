@@ -40,65 +40,61 @@ def similarTrack(baseTrack, testTrack, baseFile, usedTracks):
 
     points = 0
 
+    # track already used
     if testTrack.streamOrder in usedTracks:
         return 0
 
+    # is not the same type
     if baseTrack.trackType != testTrack.trackType:
         return 0
 
     points += 1
 
+    # how many tracks of this type and language I need
+    need = bTrkOpts.needTracksByTypeLanguage[baseTrack.trackType][
+        baseTrack.language
+    ]
+    # is not the same language
     if baseTrack.language != testTrack.language:
-        if config.data.get(config.ConfigKey.Algorithm) >= 1:
-            need = bTrkOpts.needTracksByTypeLanguage[baseTrack.trackType][
-                baseTrack.language
-            ]
-            thisTypeTotal = bTrkOpts.needTracksByTypeLanguage[baseTrack.trackType][
-                "all"
-            ]
-            if need == 1 and thisTypeTotal == 1:
-                # Need one track have only one track and
-                # one of the track language is undetermined
-                if baseTrack.language is None or testTrack.language is None:
-                    points += 1
-                    return points
+        thisTypeTotal = bTrkOpts.needTracksByTypeLanguage[baseTrack.trackType][
+            "all"
+        ]
+        if need == 1 and thisTypeTotal == 1:
+            # Need one track have only one track and
+            # one of the track language is undetermined
+            if baseTrack.language is None or testTrack.language is None:
+                points += 1
+                return points
         return 0
 
     if config.data.get(config.ConfigKey.Algorithm) == 1:
-        need = bTrkOpts.needTracksByTypeLanguage[baseTrack.trackType][
-            baseTrack.language
-        ]
+        # need more than available
         if need > testTrack.tracksLanguageOfThisKind:
             return 0
 
     points += 1
 
+    # is same position by type
     if baseTrack.typeOrder == testTrack.typeOrder:
         points += 1
-    else:
-        # have to check
-        # how many tracks of this type on base and source
-        # one on base and one on source +1
-        # one on base and more then one on source
-        #     title is equal to source +5
-        #     title differ +0
-        # more than one on base one on source
-        #     more selected than available +0
-        #     title is equal to source +5
-        pass
 
+    # if in same position by type and language
     if baseTrack.typeLanguageOrder == testTrack.typeLanguageOrder:
         points += 1
 
+    # is same codec (this is almost always none)
     if baseTrack.codec == testTrack.codec:
         points += 1
 
+    # is same format
     if baseTrack.format == testTrack.format:
         points += 1
 
+    # title is equal to source +5
     if baseTrack.title == testTrack.title:
         points += 5
 
+    # special conditions for algorithm 2 None for now
     if config.data.get(config.ConfigKey.Algorithm) == 2:
         pass
 
