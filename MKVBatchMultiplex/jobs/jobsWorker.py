@@ -225,9 +225,7 @@ def jobsWorker(
                 if config.data.get(config.ConfigKey.Algorithm) >= 1:
                     if not iVerify:
                         rc, confidence = adjustSources(job.oCommand, index)
-
                         runJob = rc
-
                         if rc:
                             _, shellCommand = job.oCommand.generateCommandByIndex(
                                 index, update=True
@@ -258,7 +256,6 @@ def jobsWorker(
                         else:
                             if log:
                                 MODULELOG.warning("RJB0012: %s", msg)
-
                 if runJob:
                     ###
                     # Execute cmd
@@ -273,21 +270,17 @@ def jobsWorker(
                     if log:
                         MODULELOG.debug("RJB0007: Structure checks ok")
 
-                    msg = f"bSimulateRun = {bSimulateRun}"
-
                     if bSimulateRun:
                         dummyRunCommand(funcProgress, indexTotal, controlQueue)
                     else:
                         # TODO: queue to control execution of running job inside
-                        # the RunCommand
+                        # the RunCommand test current configuration
                         cli.command = cmd
                         cli.run()
-
                 else:
                     job.errors.append(verify.analysis)
                     totalErrors += 1
                     funcProgress.lblSetValue.emit(4, totalErrors)
-
                     msg = "Error Job ID: {} ---------------------\n\n".format(
                         job.jobRow[JobKey.ID]
                     )
@@ -297,7 +290,6 @@ def jobsWorker(
                     )
                     job.output.append(msg)
                     output.job.emit(msg, {"color": SvgColor.red, "appendEnd": True})
-
                     for i, m in enumerate(verify.analysis):
                         if i == 0:
                             lines = m.split("\n")
@@ -317,29 +309,22 @@ def jobsWorker(
                             output.job.emit(m, {"color": SvgColor.red})
                             job.output.append(m + "\n")
                             output.error.emit(m, {"color": SvgColor.red})
-
                     job.output.append("\n")
                     # output.job.emit("", {"appendEnd": True})
                     msg = "Error Job ID: {} ---------------------\n\n".format(
                         job.jobRow[JobKey.ID]
                     )
                     output.error.emit(msg, {"color": SvgColor.red, "appendEnd": True})
-
                     if log:
                         MODULELOG.error("RJB0008: Structure check failed")
-
                 indexTotal[1] += 100
                 indexTotal[0] += 1
-
                 # End for loop for jobs in job.oCommand
 
             job.endTime = time()
-
             dtStart = datetime.fromtimestamp(job.startTime)
             dtEnd = datetime.fromtimestamp(job.endTime)
-
             dtDuration = dtEnd - dtStart
-
             msg = "Job ID: {} {} - date {} - running time {}.\n".format(
                 job.jobRow[JobKey.ID],
                 exitStatus,
@@ -349,7 +334,6 @@ def jobsWorker(
             job.output.append(msg)
             msg += "*******************\n\n\n"
             output.job.emit(msg, {"color": SvgColor.cyan, "appendEnd": True})
-
             msg = "Job ID: {} {}\nruntime {}"
             msg = msg.format(
                 job.jobRow[JobKey.ID], exitStatus, strFormatTimeDelta(dtDuration),
@@ -357,18 +341,14 @@ def jobsWorker(
             trayIconMessageSignal.emit(
                 "Information - MKVBatchMultiplex", msg, QSystemTrayIcon.Information,
             )
-
             if config.data.get(config.ConfigKey.JobHistory):
                 if updateStatus:
                     job.jobRow[JobKey.Status] = JobStatus.Done
                 addToDb(jobsDB, job, update=True)
-
             if updateStatus:
                 jobQueue.statusUpdateSignal.emit(job, JobStatus.Done)
-
             if log:
                 MODULELOG.debug("RJB0009: Job ID: %s finished.", job.jobRow[JobKey.ID])
-
         else:
             totalErrors += 1
             funcProgress.lblSetValue.emit(4, totalErrors)
@@ -376,19 +356,15 @@ def jobsWorker(
             msg = msg.format(job.jobRow[JobKey.ID], job.oCommand.command)
             output.error.emit(msg, {"color": SvgColor.red})
             jobQueue.statusUpdateSignal.emit(job, JobStatus.Error)
-
             if log:
                 MODULELOG.debug(
                     "RJB0010: Job ID: %s cannot execute command: %s.",
                     job.jobRow[JobKey.ID],
                     job.oCommand.command,
                 )
-
     jobsDB.close()
-
     for index in range(4):
         funcProgress.lblSetValue.emit(index, 0)
-
     funcProgress.pbSetMaximum.emit(100, 100)
     funcProgress.pbSetValues.emit(0, 100)
     funcProgress.pbReset.emit()
