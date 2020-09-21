@@ -44,11 +44,11 @@ REQUIRED = [
     "PySide2>=5.14",
     "vsutillib-files>=1.6.5",
     "vsutillib-log>=1.6.0",
-    "vsutillib-media>=1.6.1",
+    "vsutillib-media>=1.6.2",
     "vsutillib-mkv>=1.6.5",
-    "vsutillib-process>=1.6.0",
-    "vsutillib-pyqt>=1.6.1",
-    "vsutillib-sql>=1.6.0",
+    "vsutillib-process>=1.6.5",
+    "vsutillib-pyqt>=1.6.2",
+    "vsutillib-sql>=1.6.5",
 ]
 
 # REQUIRED = [
