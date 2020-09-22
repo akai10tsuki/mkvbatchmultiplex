@@ -232,6 +232,8 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.errorOutputWidget = JobsOutputErrorsWidget(self)
         #self.historyWidget = JobsHistoryViewWidget(groupTitle="Jobs Table")
         #self.historyWidget.tableView.sortByColumn(0, Qt.DescendingOrder)
+        self.historyWidget = JobsHistoryViewWidget(self, groupTitle="Jobs Table")
+        self.historyWidget.tableView.sortByColumn(0, Qt.DescendingOrder)
         self.logViewerWidget = LogViewerWidget()
 
         # Setup tabs for TabWidget
@@ -293,6 +295,14 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         #    self.historyWidget.tab = -1
         #    self.historyWidget.tabWidget = self.tabs
         #    self.historyWidget.title = "Jobs History"
+        if config.data.get(config.ConfigKey.JobHistory):
+            tabsList.append(
+                [self.historyWidget, "Jobs History", "Examine any jobs saved."]
+            )
+        else:
+            self.historyWidget.tab = -1
+            self.historyWidget.tabWidget = self.tabs
+            self.historyWidget.title = "Jobs History"
 
         self.tabs.addTabs(tabsList)
 
@@ -321,6 +331,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.jobsOutputWidget.setReadOnly(True)
         self.errorOutputWidget.setReadOnly(True)
         #self.historyWidget.output.setReadOnly(True)
+        self.historyWidget.output.setReadOnly(True)
         self.jobsOutputWidget.textChanged.connect(self.commandWidget.resetButtonState)
 
         # Give commandWidget access to renameWidget
@@ -332,6 +343,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.setLanguageWidget.addSlot(self.tabs.setLanguage)
         self.setLanguageWidget.addSlot(self.renameWidget.setLanguage)
         #self.setLanguageWidget.addSlot(self.historyWidget.setLanguage)
+        self.setLanguageWidget.addSlot(self.historyWidget.setLanguage)
         self.setLanguageWidget.addSlot(self.setPreferences.retranslateUi)
 
         # connect to tabs widget tab change Signal

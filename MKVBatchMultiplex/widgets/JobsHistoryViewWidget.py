@@ -36,7 +36,7 @@ from vsutillib.pyqt import (
 # from vsutillib.process import isThreadRunning
 from vsutillib.misc import strFormatTimeDelta
 
-# from vsutillib.mkv import MKVParseKey
+# from vsutillib.mkv import MKVCommandParser as mkv
 
 from ..config import data as config
 from ..config import ConfigKey
