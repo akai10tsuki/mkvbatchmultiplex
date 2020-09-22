@@ -462,6 +462,7 @@ def showOutputLines(**kwargs):
                 )
 
 
+        jobsDB.close()
 class _ShowKey:
 
     tableView = "tableView"

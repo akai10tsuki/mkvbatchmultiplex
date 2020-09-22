@@ -22,7 +22,9 @@ from PySide2.QtWidgets import (
 #from vsutillib.mkv import MKVCommand, MKVCommandParser
 from vsutillib.mkv import MKVCommandParser
 
-from ..jobs import JobStatus, JobHistoryKey
+from ..jobs import JobHistoryKey, SqlJobsTable, removeFromDb
+
+from .. import config
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -234,6 +236,8 @@ class JobsHistoryView(QTableView):
         deleteSelectedRows delete selected rows
         """
 
+        jobsDB = SqlJobsTable(config.data.get(config.ConfigKey.SystemDB))
+
         model = self.proxyModel.sourceModel()
 
         proxyIndexList = []
@@ -247,7 +251,11 @@ class JobsHistoryView(QTableView):
             rowid = model.dataset.data[row][JobHistoryKey.ID].obj
             rowid0 = model.dataset[row, JobHistoryKey.ID]
             print(f"From History View - model call row {row} data row ID {rowid} ID {rowid0}")
+            removeFromDb(jobsDB, rowid, rowid0)
+
             model.removeRows(row, 1)
+
+        jobsDB.close()
 
     def rowsAboutToBeRemoved(self, parent, first, last):
         pass
