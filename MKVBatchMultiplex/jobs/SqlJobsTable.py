@@ -167,8 +167,12 @@ class SqlJobsTable(SqlDb):
         if isinstance(jobID, int):
             sqlDeleteJob = "DELETE FROM jobs WHERE id = ?;"
             cursor = self.sqlExecute(sqlDeleteJob, jobID)
-            # if cursor is not None:
-            #    self.connection.commit()
+            if cursor is not None:
+                self.connection.commit()
+            sqlDeleteJob = "DELETE FROM jobsSearch WHERE id = ?;"
+            cursor0 = self.sqlExecute(sqlDeleteJob, jobID)
+            if cursor0 is not None:
+                self.connection.commit()
 
         return cursor
 
