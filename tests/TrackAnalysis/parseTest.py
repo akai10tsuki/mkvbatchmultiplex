@@ -28,6 +28,8 @@ def test():
     """
     test summary
     """
+    cmdt = r"'C:\Program Files\MKVToolNix\mkvmerge.exe' --ui-language en --output 'C:\Projects\Python\PySide\mkvbatchmultiplex\tests/NewFiles/Show Title - S01E01.mkv' --language 0:und --language 1:jpn '(' 'C:\Projects\Python\PySide\mkvbatchmultiplex\tests/MediaFiles/avi/Show Title - S01E01.avi' ')' --language 0:eng '(' 'C:\Projects\Python\PySide\mkvbatchmultiplex\tests/MediaFiles/Subs/ass/ENG/Show Title - S01E01.ENG.ass' ')' --track-order 0:0,0:1,1:0"
+
     # Example 07 Arte
     cmd1 = r"'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en --output 'J:\Example\TestMedia\Example 07\Arte (2020)\Season 01\Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng) (1).mkv' --audio-tracks 3 --subtitle-tracks 8,9 --language 0:und --default-track 0:yes --display-dimensions 0:1920x1080 --language 3:ja --default-track 3:yes --sub-charset 8:UTF-8 --language 8:en --track-name 8:ShowY --default-track 8:yes --sub-charset 9:UTF-8 --language 9:en --track-name 9:Funimation '(' 'J:\Example\TestMedia\Example 07\Source\Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mkv' ')' --track-order 0:0,0:3,0:8,0:9"
     # Example 06 Key the Metal Idol
