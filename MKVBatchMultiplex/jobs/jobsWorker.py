@@ -39,7 +39,7 @@ MODULELOG.addHandler(logging.NullHandler())
 def jobsWorker(
     jobQueue,
     output,
-    model,
+    proxyModel,
     funcProgress,
     controlQueue,
     trayIconMessageSignal,
@@ -75,6 +75,7 @@ def jobsWorker(
     totalErrors = funcProgress.lbl[4]
     abortAll = False
     bSimulateRun = config.data.get(config.ConfigKey.SimulateRun)
+    model = proxyModel.sourceModel()
 
     while job := jobQueue.popLeft():
 
@@ -113,16 +114,22 @@ def jobsWorker(
         funcProgress.lblSetValue.emit(3, totalFiles)
         indexTotal[0] = 0
 
-        # Check Job Status for Skip
+        ##
+        # BUG #7
         #
-        # sourceIndex = job.statusIndex
-        status = model.dataset[statusIndex.row(), statusIndex.column()]
+        # Jobs still execute after been removed from list
+        # verify if row is in remove filter
+        ##
+        removed = bool(statusIndex.row() in proxyModel.filterConditions["Remove"])
+        if removed:
+            jobQueue.statusUpdateSignal.emit(job, JobStatus.Removed)
+            continue
 
+        # Check Job Status for Skip
+        status = model.dataset[statusIndex.row(), statusIndex.column()]
         if status == JobStatus.Skip:
             jobQueue.statusUpdateSignal.emit(job, JobStatus.Skipped)
             continue
-        #
-        # Check Job Status for Skip
 
         jobQueue.statusUpdateSignal.emit(job, JobStatus.Running)
         cli = RunCommand(

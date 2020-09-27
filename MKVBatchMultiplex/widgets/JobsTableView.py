@@ -30,6 +30,7 @@ from vsutillib.mkv import MKVCommandParser
 
 from .. import config
 from ..jobs import JobStatus, JobKey, JobInfo, JobsTableKey, SqlJobsTable
+from ..utils import Text, yesNoDialog
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -56,6 +57,7 @@ class JobsTableView(QTableView):
 
         self.parent = parent
         self.proxyModel = proxyModel
+        self.model = proxyModel.sourceModel()
         self.viewTitle = title
         self.log = log
 
@@ -159,8 +161,17 @@ class JobsTableView(QTableView):
                 if result == "Copy":
                     self.copySelection()
                 elif result == "Remove":
-                    self.proxyModel.filterConditions["Remove"].append(row)
-                    self.proxyModel.setFilterFixedString("")
+                    ##
+                    # BUG #7
+                    #
+                    # Jobs still execute after been removed from list
+                    # validate before remove
+                    ##
+                    jobID = self.model.dataset[row, JobKey.ID]
+                    remove = removeJob(self, jobID)
+                    if remove:
+                        self.proxyModel.filterConditions["Remove"].append(row)
+                        self.proxyModel.setFilterFixedString("")
                 elif result == "Save":
                     self.saveSelection()
 
@@ -287,6 +298,24 @@ class JobsTableView(QTableView):
             data = [["", ""], [JobStatus.Waiting, "Status code"], [command, command]]
             tableModel.insertRows(totalJobs, 1, data=data)
 
+
+##
+# BUG #7
+#
+# Jobs still execute after been removed from list
+##
+def removeJob(self, jobID):
+
+    language = config.data.get(config.ConfigKey.Language)
+    bAnswer = False
+    title = _(Text.txt0138) + ": " + str(jobID)
+    leadQuestionMark = "¿" if language == "es" else ""
+
+    msg = leadQuestionMark + _(Text.txt0139) + "?"
+
+    bAnswer = yesNoDialog(self, msg, title)
+
+    return bAnswer
 
 def addToDb(job, update=False):
     """

@@ -167,7 +167,7 @@ class RunJobs(QObject):
                 jobsWorker,
                 self.jobsqueue,
                 self.output,
-                self.model,
+                self.proxyModel,
                 self.progress,
                 self.controlQueue,
                 self.parent.parent.trayIconMessageSignal,
