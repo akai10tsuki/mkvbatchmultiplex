@@ -19,6 +19,8 @@ Changed
 Fixed
 ~~~~~
 
+- Fix BUG #7 "Remove" in context menu on Jobs Table was not working
+
 2.1.0a1.dev1 - 2020-16-9
 ------------------------
 
