@@ -87,6 +87,8 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0135 = S_("Abort running job and continue with next in Queue")
     txt0136 = S_("Abort Jobs")
     txt0137 = S_("Abort running job and put jobs in Queue in Waiting status")
+    txt0138 = S_("Remove Job")
+    txt0139 = S_("Remove job from list")
 
     # TabsWidget
     # 140
