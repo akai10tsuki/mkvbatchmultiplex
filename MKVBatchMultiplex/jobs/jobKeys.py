@@ -65,6 +65,8 @@ class JobStatus:
     DoneWithError = "DoneWithError"
     Error = "Error"
     Queue = "Queue"
+    Remove = "Remove"
+    Removed = "Removed"
     Running = "Running"
     Skip = "Skip"
     Skipped = "Skipped"
