@@ -232,7 +232,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.errorOutputWidget = JobsOutputErrorsWidget(self)
         #self.historyWidget = JobsHistoryViewWidget(groupTitle="Jobs Table")
         #self.historyWidget.tableView.sortByColumn(0, Qt.DescendingOrder)
-        self.historyWidget = JobsHistoryViewWidget(self, groupTitle="Jobs Table")
+        self.historyWidget = JobsHistoryViewWidget(groupTitle="Jobs Table")
         self.historyWidget.tableView.sortByColumn(0, Qt.DescendingOrder)
         self.logViewerWidget = LogViewerWidget()
 
