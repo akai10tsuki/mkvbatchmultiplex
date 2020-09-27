@@ -44,7 +44,7 @@ REQUIRED = [
     "PySide2>=5.14",
     "vsutillib-files>=1.6.5",
     "vsutillib-log>=1.6.0",
-    "vsutillib-media>=1.6.2",
+    "vsutillib-media>=1.6.5",
     "vsutillib-mkv>=1.6.5",
     "vsutillib-process>=1.6.5",
     "vsutillib-pyqt>=1.6.2",
@@ -216,6 +216,8 @@ def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None, ap
         data.set(Key.MaxRegExCount, 20)
 
     if data.get(ConfigKey.JobHistory) is None:
+        data.set(ConfigKey.JobHistory, False)
+    else:
         data.set(ConfigKey.JobHistory, False)
 
     if data.get(ConfigKey.Algorithm) is None:
