@@ -82,6 +82,10 @@ class PreferencesDialogWidget(QDialog):
         #
         # Enable History
         #
+        # Temporalily disable History
+        #
+        self.ui.chkBoxEnableJobHistory.setEnabled(False)
+        self.ui.chkBoxAutoSaveJobHistory.setEnabled(False)
         if config.data.get(config.ConfigKey.JobHistory) is not None:
             self.ui.chkBoxEnableJobHistory.setChecked(
                 config.data.get(config.ConfigKey.JobHistory)
