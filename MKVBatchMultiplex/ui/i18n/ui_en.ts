@@ -87,4 +87,22 @@
         <translation></translation>
     </message>
 </context>
+<context>
+    <name>projectInfo</name>
+    <message>
+        <location filename="ProjectInfo.ui" line="47"/>
+        <source>Name</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="ProjectInfo.ui" line="70"/>
+        <source>Description</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="ProjectInfo.ui" line="19"/>
+        <source>Project Information</source>
+        <translation></translation>
+    </message>
+</context>
 </TS>
