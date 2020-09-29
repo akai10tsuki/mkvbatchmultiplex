@@ -121,6 +121,7 @@ class ConfigKey:  # pylint: disable=too-few-public-methods
 
     Algorithm = "Algorithm"
     JobHistory = "JobHistory"
+    JobsAutoSave = "JobsAutoSave"
     JobsTable = "jobs"
     JobID = "JobID"
     LogViewer = "LogViewer"
@@ -217,13 +218,12 @@ def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None, ap
 
     if data.get(ConfigKey.JobHistory) is None:
         data.set(ConfigKey.JobHistory, False)
-    else:
-        data.set(ConfigKey.JobHistory, False)
+
+    if data.get(ConfigKey.JobsAutoSave) is None:
+        data.set(ConfigKey.JobsAutoSave, False)
 
     if data.get(ConfigKey.Algorithm) is None:
-        data.set(ConfigKey.Algorithm, 1)  # Original
-
-    #data.set(ConfigKey.Algorithm, 1)  # Original
+        data.set(ConfigKey.Algorithm, 1)
 
 def setDefaultFont(app):
     """save and set default font point size"""
