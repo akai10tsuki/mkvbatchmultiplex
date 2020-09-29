@@ -146,18 +146,18 @@ class JobsHistoryView(QTableView):
 
             menu = QMenu()
             menu.setFont(self.parent.font())
-            menu.addAction("Copy")
-            menu.addAction("Remove")
-            menu.addAction("Delete")
+            menu.addAction(_("Copy"))
+            menu.addAction(_("Remove"))
+            menu.addAction(_("Delete"))
 
             if action := menu.exec_(event.globalPos()):
                 result = action.text()
 
-                if result == "Copy":
+                if result == _("Copy"):
                     self.copyCommand()
-                if result == "Delete":
+                if result == _("Delete"):
                     self.deleteSelectedRows()
-                elif result == "Remove":
+                elif result == _("Remove"):
                     self.proxyModel.filterConditions["Remove"].append(row)
                     self.proxyModel.setFilterFixedString("")
 

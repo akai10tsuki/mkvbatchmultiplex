@@ -397,7 +397,7 @@ def showOutputLines(**kwargs):
 
             regPercentEx = re.compile(r":\W*(\d+)%$")
             # The file 'file name' has been opened for writing.
-            # TODO: how to doit without locale dependency
+            # TODO: how to do it without locale dependency
             regOutputFileEx = re.compile(r"file (.*?) has")
             indexes = tableView.selectedIndexes()
 
