@@ -2,6 +2,8 @@
 Text strings used in the application
 """
 
+# 90001 - Overflow
+
 
 class Text:  # pylint: disable=too-few-public-methods
     """
@@ -89,6 +91,11 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0137 = S_("Abort running job and put jobs in Queue in Waiting status")
     txt0138 = S_("Remove Job")
     txt0139 = S_("Remove job from list")
+    txt9000 = S_("Remove selected jobs")
+    txt9001 = S_("Copy")
+    txt9002 = S_("Remove")
+    txt9003 = S_("Delete")
+    txt9004 = S_("Save")
 
     # TabsWidget
     # 140
@@ -155,6 +162,7 @@ class Text:  # pylint: disable=too-few-public-methods
 
 
     # JobHistoryWidget
+    # 240
     txt0240 = S_("Date")
     txt0241 = S_("Jobs History")
     txt0242 = S_("Fetch History")
