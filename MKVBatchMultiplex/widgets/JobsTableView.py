@@ -8,6 +8,7 @@ JobsTableView - View to display/manipulate jobs
 import csv
 import logging
 import io
+
 try:
     import cPickle as pickle
 except:  # pylint: disable=bare-except
@@ -31,6 +32,7 @@ from vsutillib.mkv import MKVCommandParser
 from .. import config
 from ..jobs import JobStatus, JobKey, JobInfo, JobsTableKey, SqlJobsTable
 from ..utils import Text, yesNoDialog
+from .ProjectInfoDialog import ProjectInfoDialogWidget
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -64,7 +66,7 @@ class JobsTableView(QTableView):
         self.setModel(proxyModel)
         self.sortByColumn(0, Qt.AscendingOrder)
         self.setSortingEnabled(True)
-
+        self.infoDialog = ProjectInfoDialogWidget(self)
         self._initHelper()
 
     def _initHelper(self):
@@ -151,28 +153,24 @@ class JobsTableView(QTableView):
 
             menu = QMenu()
             menu.setFont(self.parent.font())
-            menu.addAction("Copy")
-            menu.addAction("Remove")
-            menu.addAction("Save")
+            menu.addAction(_("Copy"))
+            menu.addAction(_("Remove"))
+            menu.addAction(_("Save"))
 
             if action := menu.exec_(event.globalPos()):
                 result = action.text()
 
-                if result == "Copy":
+                if result == _("Copy"):
                     self.copySelection()
-                elif result == "Remove":
+                elif result == _("Remove"):
                     ##
                     # BUG #7
                     #
                     # Jobs still execute after been removed from list
                     # validate before remove
                     ##
-                    jobID = self.model.dataset[row, JobKey.ID]
-                    remove = removeJob(self, jobID)
-                    if remove:
-                        self.proxyModel.filterConditions["Remove"].append(row)
-                        self.proxyModel.setFilterFixedString("")
-                elif result == "Save":
+                    self.removeSelection()
+                elif result == _("Save"):
                     self.saveSelection()
 
     def contextMenuEventOriginal(self, event):
@@ -213,15 +211,12 @@ class JobsTableView(QTableView):
         # Adjust the width of Job Status column is specific to
         # current app
 
-
         header = self.horizontalHeader()
-        #header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
-
+        # header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
 
         width = header.sectionSize(2)
         header.setSectionResizeMode(2, QHeaderView.Interactive)
         header.resizeSection(2, width)
-
 
         header.setFont(self.parent.font())
 
@@ -235,6 +230,9 @@ class JobsTableView(QTableView):
         organization.
 
         Adapted from code provided by ekhumoro on StackOverflow
+        https://stackoverflow.com/questions/40469607/
+        how-to-copy-paste-multiple-items-form-qtableview-
+        created-by-qstandarditemmodel/40473855#40473855
         """
 
         selection = self.selectedIndexes()
@@ -255,7 +253,40 @@ class JobsTableView(QTableView):
             csv.writer(stream, delimiter="\t").writerows(table)
             QApplication.clipboard().setText(stream.getvalue())
 
+    def removeSelection(self):
+
+        model = self.proxyModel.sourceModel()
+        selection = self.selectedIndexes()
+        remove = None
+        removeItems = []
+
+        if selection:
+            if len(selection) > 1:
+                remove = removeJob(self, None)
+                if not remove:
+                    return
+            # Get all map indexes before table update
+            # When one element is removed the map won't work
+            for index in selection:
+                modelIndex = self.proxyModel.mapToSource(index)
+                jobRow = modelIndex.row()
+                jobID = model.dataset[jobRow, JobKey.ID]
+                removeItems.append((jobID, jobRow))
+
+            for (jobID, jobRow) in removeItems:
+                if remove is None:
+                    remove = removeJob(self, str(jobID))
+                if remove:
+                    print(f"Remove row {jobRow}")
+                    self.proxyModel.filterConditions["Remove"].append(jobRow)
+                    self.proxyModel.setFilterFixedString("")
+
+        return
+
     def saveSelection(self):
+        """
+        saveSelection save selected jobs
+        """
 
         model = self.proxyModel.sourceModel()
 
@@ -266,17 +297,24 @@ class JobsTableView(QTableView):
                 modelIndex = self.proxyModel.mapToSource(index)
                 jobRow = modelIndex.row()
 
-                job = JobInfo(
-                    jobRow,
-                    model.dataset[jobRow,],
-                    model,
-                    log=False,
-                )
+                if self.infoDialog.getProjectInfo():
+                    name, info = self.infoDialog.info
 
-                print(job.jobRow[JobKey.ID])
-                print(job.oCommand.command)
+                    job = JobInfo(
+                        jobRow,
+                        model.dataset[
+                            jobRow,
+                        ],
+                        model,
+                        log=False,
+                    )
 
-            #for row in rows:
+                    print(f"Project = {name}")
+                    print(f"Info {info}")
+                    print(job.jobRow[JobKey.ID])
+                    print(job.oCommand.command)
+
+            # for row in rows:
 
     def supportedDropActions(self):  # pylint: disable=no-self-use
 
@@ -305,17 +343,29 @@ class JobsTableView(QTableView):
 # Jobs still execute after been removed from list
 ##
 def removeJob(self, jobID):
+    """
+    removeJob confirm job remove filtering
+
+    Args:
+        jobID (int|None): if int is the job ID if None multi-selection
+
+    Returns:
+        bool: True remove selection. Do nothing if False
+    """
 
     language = config.data.get(config.ConfigKey.Language)
-    bAnswer = False
-    title = _(Text.txt0138) + ": " + str(jobID)
     leadQuestionMark = "¿" if language == "es" else ""
-
-    msg = leadQuestionMark + _(Text.txt0139) + "?"
-
+    bAnswer = False
+    if jobID is not None:
+        title = _(Text.txt0138) + ": " + str(jobID)
+        msg = leadQuestionMark + _(Text.txt0139) + "?"
+    else:
+        title = _(Text.txt0138)
+        msg = leadQuestionMark + _(Text.txt9000) + "?"
     bAnswer = yesNoDialog(self, msg, title)
 
     return bAnswer
+
 
 def addToDb(job, update=False):
     """
@@ -335,7 +385,6 @@ def addToDb(job, update=False):
     # Always open to start saving in mid of worker operating
     #
     database = SqlJobsTable(config.data.get(config.ConfigKey.SystemDB))
-
 
     # Compress job information:
     # compressed = zlib.compress(cPickle.dumps(obj))
