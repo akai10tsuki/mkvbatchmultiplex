@@ -170,13 +170,13 @@ def checkFiles(**kwargs):
                             },
                         )
 
-                #output.command.emit(
+                # output.command.emit(
                 #    "HERE: " + str(verify.unmatched),
                 #    {
                 #        LineOutput.Color: SvgColor.red,
                 #        LineOutput.AppendEnd: True,
                 #    },
-                #)
+                # )
 
                 output.command.emit("", {LineOutput.AppendEnd: True})
 
@@ -227,7 +227,8 @@ def checkFiles(**kwargs):
                 )
 
             output.command.emit(
-                "", {LineOutput.Color: color, LineOutput.AppendEnd: True},
+                "",
+                {LineOutput.Color: color, LineOutput.AppendEnd: True},
             )
 
     output.command.emit(
@@ -242,7 +243,8 @@ def checkFiles(**kwargs):
         )
 
     output.command.emit(
-        "", {LineOutput.Color: color, LineOutput.AppendEnd: True},
+        "",
+        {LineOutput.Color: color, LineOutput.AppendEnd: True},
     )
 
     return None
