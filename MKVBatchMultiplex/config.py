@@ -218,6 +218,8 @@ def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None, ap
 
     if data.get(ConfigKey.JobHistory) is None:
         data.set(ConfigKey.JobHistory, False)
+    #else:
+    #    data.set(ConfigKey.JobHistory, False)
 
     if data.get(ConfigKey.JobsAutoSave) is None:
         data.set(ConfigKey.JobsAutoSave, False)
