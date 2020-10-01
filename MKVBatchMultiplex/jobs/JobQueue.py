@@ -42,22 +42,18 @@ class JobInfo:  # pylint: disable=too-many-instance-attributes
     ):
 
         self.__jobRow = []
-
         self.jobRowNumber = jobRowNumber
-
         self.jobRow = jobRow
         self.oCommand = copy.deepcopy(
             tableModel.dataset.data[jobRowNumber][JobKey.Command].obj
         )
-
-        if not self.oCommand:
+        if (not self.oCommand) or (not self.oCommand.command):
             command = tableModel.dataset[jobRowNumber, JobKey.Command]
             self.oCommand = MKVCommandParser(command, log=log)
             if log:
                 MODULELOG.debug(
                     "JBQ0001: Job %s- Bad MKVCommandParser object.", jobRow[JobKey.ID]
                 )
-
         self.date = datetime.today()
         self.addTime = time()
         self.startTime = None
