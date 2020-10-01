@@ -5,10 +5,10 @@ JobsHistoryView - View to display/manipulate jobs
 # JTV0001
 
 import logging
-import io
-import csv
+#import io
+#import csv
 
-from PySide2.QtCore import Qt, QPersistentModelIndex, QModelIndex, Slot
+from PySide2.QtCore import Qt, QPersistentModelIndex, Slot
 
 from PySide2.QtWidgets import (
     QTableView,
@@ -19,12 +19,13 @@ from PySide2.QtWidgets import (
     QHeaderView,
 )
 
-#from vsutillib.mkv import MKVCommand, MKVCommandParser
-from vsutillib.mkv import MKVCommandParser
-
-from ..jobs import JobHistoryKey, SqlJobsTable, removeFromDb
+# from vsutillib.mkv import MKVCommand, MKVCommandParser
+#from vsutillib.mkv import MKVCommandParser
 
 from .. import config
+from ..jobs import JobHistoryKey, SqlJobsTable, removeFromDb
+
+from .JobsViewHelpers import removeJob
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -158,8 +159,9 @@ class JobsHistoryView(QTableView):
                 if result == _("Delete"):
                     self.deleteSelectedRows()
                 elif result == _("Remove"):
-                    self.proxyModel.filterConditions["Remove"].append(row)
-                    self.proxyModel.setFilterFixedString("")
+                    self.removeSelection()
+                    # self.proxyModel.filterConditions["Remove"].append(row)
+                    # self.proxyModel.setFilterFixedString("")
 
     def contextMenuEventOriginal(self, event):
         """
@@ -250,12 +252,38 @@ class JobsHistoryView(QTableView):
             row = modelIndex.row()
             rowid = model.dataset.data[row][JobHistoryKey.ID].obj
             rowid0 = model.dataset[row, JobHistoryKey.ID]
-            print(f"From History View - model call row {row} data row ID {rowid} ID {rowid0}")
+            print(
+                f"From History View - model call row {row} data row ID {rowid} ID {rowid0}"
+            )
             removeFromDb(jobsDB, rowid, rowid0)
 
             model.removeRows(row, 1)
 
         jobsDB.close()
+
+    def removeSelection(self):
+        """
+        removeSelection filter out selected rows
+        """
+
+        selection = self.selectedIndexes()
+        remove = None
+        removeItems = []
+
+        if selection:
+            remove = removeJob(self, None)
+            if not remove:
+                return
+            # Get all map indexes before table update
+            # When one element is removed the map won't work
+            for index in selection:
+                modelIndex = self.proxyModel.mapToSource(index)
+                row = modelIndex.row()
+                removeItems.append(row)
+
+            for row in removeItems:
+                self.proxyModel.filterConditions["Remove"].append(row)
+                self.proxyModel.setFilterFixedString("")
 
     def rowsAboutToBeRemoved(self, parent, first, last):
         pass

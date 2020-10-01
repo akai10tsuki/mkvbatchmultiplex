@@ -4,14 +4,14 @@ JobsTableWidget
 
 import logging
 
-try:
-    import cPickle as pickle
-except:
-    import pickle
-import zlib
+#try:
+#    import cPickle as pickle
+#except ImportError:
+#    import pickle
+#import zlib
 
 
-from PySide2.QtCore import QThreadPool, Qt, Slot
+from PySide2.QtCore import Qt, Slot
 from PySide2.QtWidgets import (
     QWidget,
     QHBoxLayout,
@@ -24,7 +24,7 @@ from vsutillib.pyqt import QPushButtonWidget, darkPalette, TabWidgetExtension
 from vsutillib.process import isThreadRunning
 
 from .. import config
-from ..jobs import JobStatus, JobKey, SqlJobsTable, JobsTableKey
+from ..jobs import JobStatus, JobKey #, SqlJobsTable, JobsTableKey
 from ..delegates import StatusComboBoxDelegate
 from ..utils import populate, Text, yesNoDialog
 
@@ -269,8 +269,13 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
 
             if bAnswer:
                 while job := self.parent.jobsQueue.pop():
+                    self.parent.jobsQueue.statusUpdateSignal.emit(job, JobStatus.Waiting)
 
-                    self.model.setData(job.statusIndex, JobStatus.Waiting)
+                #self.parent.jobsQueue.clear()
+                #for row in range(self.model.rowCount()):
+                #    if self.model.dataset[row, JobKey.Status] == JobStatus.Queue:
+                #        self.model.dataset[row, JobKey.Status] = JobStatus.Waiting
+
             # else:
             #    print("Nothing here")
 
@@ -334,6 +339,7 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
 
     @Slot(bool)
     def jobStatus(self, running):
+        """ Enable Abort related buttons """
 
         if running:
             self.jobStartQueueState(False)
@@ -343,7 +349,7 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
 
     @Slot(object)
     def jobStatusChangeCheck(self, index):
-
+        """ Check for Abort in Status column """
         row = index.row()
         column = index.column()
 

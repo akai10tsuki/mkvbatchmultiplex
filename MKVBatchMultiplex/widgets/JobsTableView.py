@@ -31,7 +31,9 @@ from vsutillib.mkv import MKVCommandParser
 
 from .. import config
 from ..jobs import JobStatus, JobKey, JobInfo, JobsTableKey, SqlJobsTable
-from ..utils import Text, yesNoDialog
+#from ..utils import Text
+
+from .JobsViewHelpers import removeJob
 from .ProjectInfoDialog import ProjectInfoDialogWidget
 
 MODULELOG = logging.getLogger(__name__)
@@ -144,17 +146,33 @@ class JobsTableView(QTableView):
             self.setColumnHidden(i, hide)
 
     def contextMenuEvent(self, event):
-        """Context Menu"""
+        """
+        contextMenuEvent Menu when an item in the view is right clicked
 
-        row = self.rowAt(event.pos().y())
+        Args:
+            event (event): used to get the row/column right clicked
+        """
+
+        model = self.proxyModel.sourceModel()
+        index = self.indexAt(event.pos())
+        modelIndex = self.proxyModel.mapToSource(index)
+        row = modelIndex.row()
+        totalSelectedRows = len(self.selectedIndexes())
+        # row = self.rowAt(event.pos().y())
         totalRows = self.proxyModel.rowCount()
 
         if 0 <= row < totalRows:
 
             menu = QMenu()
             menu.setFont(self.parent.font())
-            menu.addAction(_("Copy"))
-            menu.addAction(_("Remove"))
+            if totalSelectedRows == 1:
+                menu.addAction(_("Copy"))
+            if model.dataset[row, JobKey.Status] not in [
+                JobStatus.Running,
+                JobStatus.Skip,
+                JobStatus.Abort,
+            ]:
+                menu.addAction(_("Remove"))
             menu.addAction(_("Save"))
 
             if action := menu.exec_(event.globalPos()):
@@ -254,6 +272,9 @@ class JobsTableView(QTableView):
             QApplication.clipboard().setText(stream.getvalue())
 
     def removeSelection(self):
+        """
+        removeSelection filter out selected rows
+        """
 
         model = self.proxyModel.sourceModel()
         selection = self.selectedIndexes()
@@ -271,7 +292,12 @@ class JobsTableView(QTableView):
                 modelIndex = self.proxyModel.mapToSource(index)
                 jobRow = modelIndex.row()
                 jobID = model.dataset[jobRow, JobKey.ID]
-                removeItems.append((jobID, jobRow))
+                if model.dataset[jobRow, JobKey.Status] not in [
+                    JobStatus.Running,
+                    JobStatus.Skip,
+                    JobStatus.Abort,
+                ]:
+                    removeItems.append((jobID, jobRow))
 
             for (jobID, jobRow) in removeItems:
                 if remove is None:
@@ -337,34 +363,6 @@ class JobsTableView(QTableView):
             tableModel.insertRows(totalJobs, 1, data=data)
 
 
-##
-# BUG #7
-#
-# Jobs still execute after been removed from list
-##
-def removeJob(self, jobID):
-    """
-    removeJob confirm job remove filtering
-
-    Args:
-        jobID (int|None): if int is the job ID if None multi-selection
-
-    Returns:
-        bool: True remove selection. Do nothing if False
-    """
-
-    language = config.data.get(config.ConfigKey.Language)
-    leadQuestionMark = "¿" if language == "es" else ""
-    bAnswer = False
-    if jobID is not None:
-        title = _(Text.txt0138) + ": " + str(jobID)
-        msg = leadQuestionMark + _(Text.txt0139) + "?"
-    else:
-        title = _(Text.txt0138)
-        msg = leadQuestionMark + _(Text.txt9000) + "?"
-    bAnswer = yesNoDialog(self, msg, title)
-
-    return bAnswer
 
 
 def addToDb(job, update=False):

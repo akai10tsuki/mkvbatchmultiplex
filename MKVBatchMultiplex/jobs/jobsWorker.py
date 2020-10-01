@@ -4,13 +4,13 @@ jobsWorker
 
 import logging
 
-try:
-    import cPickle as pickle
-except:  # pylint: disable=bare-except
-    import pickle
+#try:
+#    import cPickle as pickle
+#except ImportError:  # pylint: disable=bare-except
+#    import pickle
 import re
-import sys
-import zlib
+#import sys
+#import zlib
 
 from datetime import datetime
 from time import time, sleep
@@ -27,7 +27,7 @@ from .. import config
 from ..utils import adjustSources
 
 from .jobsDB import addToDb
-from .jobKeys import JobStatus, JobKey, JobsTableKey
+from .jobKeys import JobStatus, JobKey
 from .SqlJobsTable import SqlJobsTable
 
 
@@ -37,7 +37,7 @@ MODULELOG.addHandler(logging.NullHandler())
 
 @staticVars(running=False)
 def jobsWorker(
-    jobQueue,
+    jobsQueue,
     output,
     proxyModel,
     funcProgress,
@@ -49,7 +49,7 @@ def jobsWorker(
     jobsWorker execute jobs on queue
 
     Args:
-        jobQueue (JobQueue): Job queue has all related information for the job
+        jobsQueue (jobsQueue): Job queue has all related information for the job
         funcProgress (func): function to call to report job progress. Defaults to None.
 
     Returns:
@@ -66,7 +66,7 @@ def jobsWorker(
         return "Working..."
 
     jobsWorker.running = True
-    totalJobs = len(jobQueue)
+    totalJobs = len(jobsQueue)
     remainingJobs = totalJobs - 1
     currentJob = 0
     indexTotal = [0, 0]
@@ -77,7 +77,7 @@ def jobsWorker(
     bSimulateRun = config.data.get(config.ConfigKey.SimulateRun)
     model = proxyModel.sourceModel()
 
-    while job := jobQueue.popLeft():
+    while job := jobsQueue.popLeft():
 
         # job = copy.deepcopy(qJob)
 
@@ -87,10 +87,10 @@ def jobsWorker(
         statusIndex = model.index(job.jobRowNumber, JobKey.Status)
 
         if abortAll:
-            jobQueue.statusUpdateSignal.emit(job, JobStatus.Aborted)
+            jobsQueue.statusUpdateSignal.emit(job, JobStatus.Aborted)
             continue
 
-        actualRemaining = len(jobQueue)
+        actualRemaining = len(jobsQueue)
 
         if actualRemaining == remainingJobs:
             remainingJobs -= 1
@@ -122,16 +122,16 @@ def jobsWorker(
         ##
         removed = bool(statusIndex.row() in proxyModel.filterConditions["Remove"])
         if removed:
-            jobQueue.statusUpdateSignal.emit(job, JobStatus.Removed)
+            jobsQueue.statusUpdateSignal.emit(job, JobStatus.Removed)
             continue
 
         # Check Job Status for Skip
         status = model.dataset[statusIndex.row(), statusIndex.column()]
-        if status == JobStatus.Skip:
-            jobQueue.statusUpdateSignal.emit(job, JobStatus.Skipped)
+        if status in [JobStatus.Removed, JobStatus.Skip]:
+            jobsQueue.statusUpdateSignal.emit(job, JobStatus.Skipped)
             continue
 
-        jobQueue.statusUpdateSignal.emit(job, JobStatus.Running)
+        jobsQueue.statusUpdateSignal.emit(job, JobStatus.Running)
         cli = RunCommand(
             processLine=displayRunJobs,
             processArgs=[job, output, indexTotal],
@@ -192,7 +192,7 @@ def jobsWorker(
                         JobStatus.AbortJob,
                         JobStatus.AbortJobError,
                     ]:
-                        jobQueue.statusUpdateSignal.emit(job, JobStatus.Abort)
+                        jobsQueue.statusUpdateSignal.emit(job, JobStatus.Abort)
                         status = JobStatus.Abort
                         exitStatus = queueStatus
                         if queueStatus == JobStatus.Abort:
@@ -202,7 +202,7 @@ def jobsWorker(
                                 f.unlink()
 
                 if status == JobStatus.Abort:
-                    jobQueue.statusUpdateSignal.emit(job, JobStatus.Aborted)
+                    jobsQueue.statusUpdateSignal.emit(job, JobStatus.Aborted)
                     job.jobRow[JobKey.Status] = JobStatus.Aborted
                     updateStatus = False
                     if exitStatus == "ended":
@@ -354,7 +354,7 @@ def jobsWorker(
                     job.jobRow[JobKey.Status] = JobStatus.Done
                 addToDb(jobsDB, job, update=True)
             if updateStatus:
-                jobQueue.statusUpdateSignal.emit(job, JobStatus.Done)
+                jobsQueue.statusUpdateSignal.emit(job, JobStatus.Done)
             if log:
                 MODULELOG.debug("RJB0009: Job ID: %s finished.", job.jobRow[JobKey.ID])
         else:
@@ -363,7 +363,7 @@ def jobsWorker(
             msg = "Job ID: {} cannot execute command.\n\nCommand: {}\n"
             msg = msg.format(job.jobRow[JobKey.ID], job.oCommand.command)
             output.error.emit(msg, {"color": SvgColor.red})
-            jobQueue.statusUpdateSignal.emit(job, JobStatus.Error)
+            jobsQueue.statusUpdateSignal.emit(job, JobStatus.Error)
             if log:
                 MODULELOG.debug(
                     "RJB0010: Job ID: %s cannot execute command: %s.",

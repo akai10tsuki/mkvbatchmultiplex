@@ -2,7 +2,7 @@
  deleage classes
 """
 
-# pylint: disable=unused-argument, bad-continuation
+# pylint: disable=unused-argument
 
 from PySide2.QtWidgets import (
     QStyledItemDelegate,
@@ -191,17 +191,20 @@ def _comboBoxItems(status):
     elif status in [
         JobStatus.Skip,
         JobStatus.Skipped,
-        JobStatus.Abort,
         JobStatus.Aborted,
         JobStatus.Done,
+        JobStatus.Removed,
     ]:
         comboItems = [status, JobStatus.Waiting]
 
     elif status in [JobStatus.Queue, JobStatus.Waiting]:
         comboItems = [status, JobStatus.Skip]
 
-    elif status in JobStatus.Running:
+    elif status == JobStatus.Running:
         comboItems = [status, JobStatus.Abort]
+
+    elif status == JobStatus.Abort:
+        return None
 
     else:
         return None
