@@ -30,11 +30,11 @@ from PySide2.QtWidgets import (
 from vsutillib.mkv import MKVCommandParser
 
 from .. import config
-from ..jobs import JobStatus, JobKey, JobInfo, JobsTableKey, SqlJobsTable
+from ..jobs import JobStatus, JobKey, JobInfo, JobsTableKey, saveToDb, SqlJobsTable
 #from ..utils import Text
 
 from .JobsViewHelpers import removeJob
-from .ProjectInfoDialog import ProjectInfoDialogWidget
+from .ProjectInfoDialogWidget import ProjectInfoDialogWidget
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -322,6 +322,9 @@ class JobsTableView(QTableView):
             for index in selection:
                 modelIndex = self.proxyModel.mapToSource(index)
                 jobRow = modelIndex.row()
+                jobID = model.dataset[jobRow, JobKey.ID]
+                title = self.infoDialog.windowTitle()
+                self.infoDialog.setWindowTitle(title + ' - ' + str(jobID))
 
                 if self.infoDialog.getProjectInfo():
                     name, info = self.infoDialog.info
@@ -334,11 +337,7 @@ class JobsTableView(QTableView):
                         model,
                         log=False,
                     )
-
-                    print(f"Project = {name}")
-                    print(f"Info {info}")
-                    print(job.jobRow[JobKey.ID])
-                    print(job.oCommand.command)
+                    saveToDb(job, name=name, description=info)
 
             # for row in rows:
 
@@ -361,81 +360,3 @@ class JobsTableView(QTableView):
             totalJobs = tableModel.rowCount()
             data = [["", ""], [JobStatus.Waiting, "Status code"], [command, command]]
             tableModel.insertRows(totalJobs, 1, data=data)
-
-
-
-
-def addToDb(job, update=False):
-    """
-    addToDb add the job to the history database
-
-    Args:
-        database (SqlJobsTable): history database
-        job (JobInfo): running job information
-        update (bool, optional): update is true if record should exits.
-            Defaults to False.
-
-    Returns:
-        int: rowid if insert successful. 0 otherwise.
-    """
-
-    #
-    # Always open to start saving in mid of worker operating
-    #
-    database = SqlJobsTable(config.data.get(config.ConfigKey.SystemDB))
-
-    # Compress job information:
-    # compressed = zlib.compress(cPickle.dumps(obj))
-
-    # Get it back:
-    # obj = cPickle.loads(zlib.decompress(compressed))
-
-    # Key ID, startTime
-    #
-
-    bSimulateRun = config.data.get(config.ConfigKey.SimulateRun)
-    rc = 0
-
-    if not bSimulateRun:
-        cmpJob = zlib.compress(pickle.dumps(job))
-        if not update:
-            rowid = database.insert(
-                job.jobRow[JobKey.ID],
-                job.date.isoformat(),
-                job.addTime,
-                job.startTime,
-                job.endTime,
-                cmpJob,
-                job.oCommand.command,
-                "Saved",
-                "Save Info",
-                1,
-                0,
-            )
-            rc = rowid
-
-            if rowid > 0:
-                sqlSearchUpdate = """
-                    INSERT INTO jobsSearch(rowidKey, id, startTime, command)
-                        VALUES(?, ?, ?, ?); """
-                database.sqlExecute(
-                    sqlSearchUpdate,
-                    rowid,
-                    job.jobRow[JobKey.ID],
-                    job.startTime,
-                    job.oCommand.command,
-                )
-            if rowid == 0:
-                print("error", database.error)
-                sys.exit()
-        else:
-            # jobsDB.update(449, (JobsTableKey.startTime, ), 80)
-            database.update(
-                job.jobRow[JobKey.ID],
-                (JobsTableKey.startTime, JobsTableKey.endTime, JobsTableKey.job),
-                job.startTime,
-                job.endTime,
-                cmpJob,
-            )
-
-    return rc
