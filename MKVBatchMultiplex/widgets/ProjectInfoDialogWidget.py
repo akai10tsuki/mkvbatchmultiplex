@@ -40,12 +40,10 @@ class ProjectInfoDialogWidget(QDialog):
         """Show dialog to set preferences"""
 
         self._initUI()
-        self.preferences.reset()
 
         rc = self.exec_()
         if rc:
-            self.__name = self.ui.leName
-            self.__info = self.ui.teDescription
-            self.applyChanges()
+            self.__name = self.ui.leName.text()
+            self.__info = self.ui.teDescription.toPlainText()
 
         return rc
