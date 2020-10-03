@@ -145,7 +145,7 @@ def jobsWorker(
         if job.oCommand:
             job.startTime = time()
 
-            if config.data.get(config.ConfigKey.JobHistory):
+            if config.data.get(config.ConfigKey.JobsAutoSave):
                 job.jobRow[JobKey.Status] = JobStatus.Running
                 addToDb(jobsDB, job)
 
@@ -208,7 +208,7 @@ def jobsWorker(
                     if exitStatus == "ended":
                         exitStatus = "aborted"
                     job.endTime = time()
-                    if config.data.get(config.ConfigKey.JobHistory):
+                    if config.data.get(config.ConfigKey.JobsAutoSave):
                         job.jobRow[JobKey.Status] = JobStatus.Aborted
                         addToDb(jobsDB, job, update=True)
                     break

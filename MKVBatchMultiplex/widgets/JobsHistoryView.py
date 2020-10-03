@@ -252,9 +252,6 @@ class JobsHistoryView(QTableView):
             row = modelIndex.row()
             rowid = model.dataset.data[row][JobHistoryKey.ID].obj
             rowid0 = model.dataset[row, JobHistoryKey.ID]
-            print(
-                f"From History View - model call row {row} data row ID {rowid} ID {rowid0}"
-            )
             removeFromDb(jobsDB, rowid, rowid0)
 
             model.removeRows(row, 1)

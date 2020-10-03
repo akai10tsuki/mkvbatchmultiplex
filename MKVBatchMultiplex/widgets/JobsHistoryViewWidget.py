@@ -290,14 +290,18 @@ def fillRows(self, rows):
         for row in rows:
             viewRow = [None, None, None, None]
             job = pickle.loads(zlib.decompress(row[JobsTableKey.jobIndex]))
-            dt = datetime.fromtimestamp(job.startTime)
+            if job.startTime is None:
+                dt = "0000-00-00 00:00:00"
+            else:
+                dt = datetime.fromtimestamp(job.startTime)
+                dt = dt.isoformat(sep=" ")
             viewRow[JobHistoryKey.ID] = [
                 row[JobsTableKey.IDIndex],
                 "",
                 row[JobsTableKey.rowidIndex],
             ]
             viewRow[JobHistoryKey.Date] = [
-                dt.isoformat(sep=" "),
+                dt,
                 "Date job was executed",
                 None,
             ]
