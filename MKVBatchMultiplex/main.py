@@ -234,6 +234,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         #self.historyWidget.tableView.sortByColumn(0, Qt.DescendingOrder)
         self.historyWidget = JobsHistoryViewWidget(groupTitle="Jobs Table")
         self.historyWidget.tableView.sortByColumn(0, Qt.DescendingOrder)
+        self.historyWidget.pariente = self
         self.logViewerWidget = LogViewerWidget()
 
         # Setup tabs for TabWidget

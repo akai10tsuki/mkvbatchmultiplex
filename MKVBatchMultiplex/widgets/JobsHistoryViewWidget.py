@@ -76,6 +76,7 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
         self.__log = None
         self.__tab = None
         self.__originalTab = None
+        self.__parent = parent
 
         self.parent = parent
         headers = tableHistoryHeaders()
@@ -166,6 +167,16 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
     def _initHelper(self):
 
         self.btnGrid.itemAt(_Button.FETCHJOBHISTORY).widget().setEnabled(True)
+        self.btnGrid.itemAt(_Button.PRINT).widget().hide()
+        self.btnGrid.itemAt(_Button.PRINT).widget().setEnabled(False)
+
+    @property
+    def pariente(self):
+        return self.__parent
+
+    @pariente.setter
+    def pariente(self, value):
+        self.__parent = value
 
     @Slot()
     def setLanguage(self):
@@ -236,8 +247,8 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
             proxyModel=self.proxyModel,
             output=self.output,
             outputType=outputType,
-            funcStart=self.parent.progressSpin.startAnimation,
-            funcFinished=self.parent.progressSpin.stopAnimation,
+            funcStart=self.pariente.progressSpin.startAnimation,
+            funcFinished=self.pariente.progressSpin.stopAnimation,
         )
 
     # def listRows(self):
@@ -411,7 +422,7 @@ def showOutputLines(**kwargs):
                     n = int(m.group(1))
                     if n < 100:
                         continue
-                if f := regOutputFileEx.search(line): # pylint: disable=unused-variable
+                if f := regOutputFileEx.search(line):  # pylint: disable=unused-variable
                     processedFiles += 1
                 output.insertTextSignal.emit(line, {"log": False})
                 # The signals are generated to fast and the History window
@@ -465,8 +476,9 @@ def showOutputLines(**kwargs):
                     msg, {"color": SvgColor.red, "appendEnd": True, "log": False}
                 )
 
-
         jobsDB.close()
+
+
 class _ShowKey:
 
     tableView = "tableView"
@@ -479,6 +491,8 @@ class _ShowKey:
 class _Button:
 
     FETCHJOBHISTORY = 0
+
+    PRINT = 6
 
 
 class _JobHKey:
