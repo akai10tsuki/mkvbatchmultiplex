@@ -412,17 +412,17 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.trayIcon.setMenuEnabled(visible)
         super().setVisible(visible)
 
-    @Slot(str)
-    def iconActivated(self, reason):
-        """Systray Icon"""
+    #@Slot(str)
+    #def iconActivated(self, reason):
+    #    """Systray Icon"""
 
-        print("main is icon activated")
-        if reason == QSystemTrayIcon.Trigger:
-            pass
-        if reason == QSystemTrayIcon.DoubleClick:
-            pass
-        if reason == QSystemTrayIcon.MiddleClick:
-            pass
+    #    print("main is icon activated")
+    #    if reason == QSystemTrayIcon.Trigger:
+    #        pass
+    #    if reason == QSystemTrayIcon.DoubleClick:
+    #        pass
+    #    if reason == QSystemTrayIcon.MiddleClick:
+    #        pass
 
     def configuration(self, action=None):
         """
