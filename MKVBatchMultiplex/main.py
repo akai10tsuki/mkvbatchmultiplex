@@ -21,7 +21,6 @@ from pathlib import Path
 from PySide2.QtCore import QByteArray, Slot, Signal
 from PySide2.QtGui import QColor, QFont, QIcon, Qt, QPixmap
 from PySide2.QtWidgets import (
-    QAction,
     QApplication,
     QMainWindow,
     QMessageBox,
@@ -30,7 +29,6 @@ from PySide2.QtWidgets import (
     QToolTip,
     QStatusBar,
     QStyle,
-    QSystemTrayIcon,
     QWidget,
 )
 
@@ -236,7 +234,6 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         #self.historyWidget.tableView.sortByColumn(0, Qt.DescendingOrder)
         self.historyWidget = JobsHistoryViewWidget(groupTitle="Jobs Table")
         self.historyWidget.tableView.sortByColumn(0, Qt.DescendingOrder)
-        self.historyWidget.pariente = self
         self.logViewerWidget = LogViewerWidget()
 
         # Setup tabs for TabWidget
