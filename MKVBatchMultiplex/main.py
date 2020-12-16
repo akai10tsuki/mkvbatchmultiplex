@@ -153,6 +153,8 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
         # Preferences menu
         self.setPreferences = PreferencesDialogWidget(self)
+        self.fileMenu = None
+        self.helpMenu = None
 
     def _initMenu(self):  # pylint: disable=too-many-statements
 
@@ -160,7 +162,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         # menuBar = self.menuBar()
 
         # File SubMenu
-        fileMenu = QMenuWidget(Text.txt0020)
+        self.fileMenu = QMenuWidget(Text.txt0020)
         closeIcon = self.style().standardIcon(QStyle.SP_DialogCloseButton)
 
         # Preferences
@@ -180,12 +182,12 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         actAbort.triggered.connect(abort)
 
         # Add actions to SubMenu
-        fileMenu.addAction(actPreferences)
-        fileMenu.addSeparator()
-        fileMenu.addAction(actExit)
-        fileMenu.addSeparator()
-        fileMenu.addAction(actAbort)
-        menuBar.addMenu(fileMenu)
+        self.fileMenu.addAction(actPreferences)
+        self.fileMenu.addSeparator()
+        self.fileMenu.addAction(actExit)
+        self.fileMenu.addSeparator()
+        self.fileMenu.addAction(actAbort)
+        menuBar.addMenu(self.fileMenu)
 
         # Help Menu
         actHelpContents = QActionWidget(Text.txt0061, self, textSuffix="...")
@@ -196,13 +198,13 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         actAbout.triggered.connect(self.about)
         actAboutQt = QActionWidget(Text.txt0064, self)
         actAboutQt.triggered.connect(self.aboutQt)
-        helpMenu = QMenuWidget(Text.txt0060)
-        helpMenu.addAction(actHelpContents)
-        helpMenu.addAction(actHelpUsing)
-        helpMenu.addSeparator()
-        helpMenu.addAction(actAbout)
-        helpMenu.addAction(actAboutQt)
-        menuBar.addMenu(helpMenu)
+        self.helpMenu = QMenuWidget(Text.txt0060)
+        self.helpMenu.addAction(actHelpContents)
+        self.helpMenu.addAction(actHelpUsing)
+        self.helpMenu.addSeparator()
+        self.helpMenu.addAction(actAbout)
+        self.helpMenu.addAction(actAboutQt)
+        menuBar.addMenu(self.helpMenu)
 
         # Init status var
         statusBar = QStatusBar()  # pylint: disable=unused-variable
@@ -512,24 +514,36 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
             font {QFont} -- font selected by user
         """
 
-        for a in self.menuBar().actions():
+        #for a in self.menuBar().actions():
             # menus on menubar are QAction classes
             # get the menu
-            m = a.menu()
-            m.setFont(font)
+        #    m = a.menu()
+        #    m.setFont(font)
 
-            for e in m.actions():
-                if e.isSeparator():
-                    continue
-                elif isinstance(e, QActionWidget):
-                    # subclass also QAction type but never a menu
-                    continue
-                elif isinstance(e, QAction):
-                    try:
-                        i = e.menu()
-                        i.setFont(font)
-                    except AttributeError:
-                        continue
+        #    for e in m.actions():
+        #        if e.isSeparator():
+        #            continue
+        #        elif isinstance(e, QActionWidget):
+        #            # subclass also QAction type but never a menu
+        #            continue
+        #        elif isinstance(e, QAction):
+        #            try:
+        #                i = e.menu()
+        #                i.setFont(font)
+        #            except AttributeError:
+        #                continue
+
+        for action in self.menuBar().actions():
+            if not action.isSeparator():
+                action.setFont(font)
+
+        for action in self.fileMenu.actions():
+            if not action.isSeparator():
+                action.setFont(font)
+
+        for action in self.helpMenu.actions():
+            if not action.isSeparator():
+                action.setFont(font)
 
         QToolTip.setFont(font)
         config.data.set(config.ConfigKey.Font, font.toString())
