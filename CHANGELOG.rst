@@ -21,6 +21,8 @@ Changed
   on the target cases trying to solve.  This of course is valid for
   **Algorithm 2**.  The language will be set as in the base source.
 
+- Better handling of files with special characters
+
 Fixed
 ~~~~~
 
