@@ -66,7 +66,8 @@ class GenCommandApp(QMainWindow):
         print(f"rootdir {rootdir}\nd       {p}\n")
 
         self.cmd0 = mkvmerge + r" " + l + r" --output '" + d + \
-                r"/Show Title - S01E01.mkv' --language 0:und --language 1:jpn " + \
+                r"/Show Title - S01E01.mkv' --language 0:und --track-name 0:x264 " + \
+                r"--language 1:jpn " + \
                 r"'(' '" + s + r"/avi/Show Title - S01E01.avi' ')' --language 0:eng '(' '" + s + \
                 r"/Subs/ass/ENG/Show Title - S01E01.ENG.ass' ')' --track-order 0:0,0:1,1:0"
 
