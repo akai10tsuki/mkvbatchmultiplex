@@ -3,7 +3,7 @@ Changelog
 
 (Unreleased)
 
-2.1.0a1.dev2 - 2020-12-16
+2.1.0a1.dev3 - 2020-12-16
 -------------------------
 
 Started working on request to save Jobs in order to reschedule it.
@@ -31,6 +31,13 @@ Fixed
 - Fix BUG #7 "Remove" in context menu on Jobs Table was not working
 - Fix BUG #8 Problem handling tracks titles
 - menu items status tip was not working
+
+
+2.1.0b1.dev2 - 2020-10-1
+------------------------
+
+- hotfix: Jobs were executed even when removed from the Jobs Table via context menu
+
 
 2.1.0a1.dev1 - 2020-9-16
 ------------------------
