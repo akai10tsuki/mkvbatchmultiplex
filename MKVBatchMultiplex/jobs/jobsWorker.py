@@ -27,7 +27,7 @@ from vsutillib.pyqt import SvgColor
 from .. import config
 from ..utils import adjustSources
 
-from .jobsDB import addToDb
+from .jobsDB import saveToDb
 from .jobKeys import JobStatus, JobKey
 from .SqlJobsTable import SqlJobsTable
 
@@ -148,7 +148,7 @@ def jobsWorker(
 
             if config.data.get(config.ConfigKey.JobsAutoSave):
                 job.jobRow[JobKey.Status] = JobStatus.Running
-                addToDb(jobsDB, job)
+                saveToDb(job)
 
             dt = datetime.fromtimestamp(job.startTime)
 
@@ -211,7 +211,7 @@ def jobsWorker(
                     job.endTime = time()
                     if config.data.get(config.ConfigKey.JobsAutoSave):
                         job.jobRow[JobKey.Status] = JobStatus.Aborted
-                        addToDb(jobsDB, job, update=True)
+                        saveToDb(job, update=True)
                     break
 
                 verify.verifyStructure(baseFiles, sourceFiles, destinationFile)
@@ -357,7 +357,8 @@ def jobsWorker(
             if config.data.get(config.ConfigKey.JobHistory):
                 if updateStatus:
                     job.jobRow[JobKey.Status] = JobStatus.Done
-                addToDb(jobsDB, job, update=True)
+                saveToDb(job, update=True)
+            model.dataset.data[job.jobRowNumber][JobKey.ID].obj = job
             if updateStatus:
                 jobsQueue.statusUpdateSignal.emit(job, JobStatus.Done)
             if log:
@@ -416,46 +417,39 @@ def errorMsg(output, msg, kwargs):
 
 
 @staticVars(printPercent=False, counting=False, count=0, line="")
-def displayRunJobs(ch, job, output, indexTotal, funcProgress=None):
+def displayRunJobs(
+    ch, job, output, indexTotal, funcProgress=None
+):  # pylint: disable=invalid-name
     """
-    Convenience function used by jobsWorker
-    to display lines of the mkvmerge
-    execution
+    Convenience function used by jobsWorker to display lines of the mkvmerge
+    execution.  The function interprets the input to recognize the lines.
+    Also returns the constructed line or None.
 
     Args:
-        line (str): line to display
+        ch (str): characters to display
     """
 
-    if ch == '\n':
+    if ch == "\n":
         displayRunJobs.line += ch
     elif ch == "%":
         displayRunJobs.line += "%"
     else:
         displayRunJobs.line += ch
-        return
+        return None
 
     regEx = re.compile(r":\W*(\d+)\%$")
     funcProgress.lblSetValue.emit(2, indexTotal[0] + 1)
     n = -1
-
-    # displayRunJobs.line = ch
-    # line = lineRaw
-    # line = lineRaw.rstrip()
-    # line = line.replace('\r', "")
-
-    # print(f"-{line}-")
 
     job.output.append(displayRunJobs.line)
 
     if m := regEx.search(displayRunJobs.line):
         n = int(m.group(1))
 
-    if (n < 0) and (displayRunJobs.line.find("Progress:") != -1):
-        return
-
     if displayRunJobs.printPercent:
         if displayRunJobs.line == "\n":
-            return
+            displayRunJobs.line = ""
+            return "\n"
 
     if n >= 0:
         if not displayRunJobs.printPercent:
@@ -467,9 +461,10 @@ def displayRunJobs(ch, job, output, indexTotal, funcProgress=None):
 
         output.job.emit(displayRunJobs.line, {"replaceLine": True})
         funcProgress.pbSetValues.emit(n, indexTotal[1] + n)
+        displayRunJobs.line += "\n"
     else:
         if displayRunJobs.printPercent:
-            # output.job.emit("\n", {})
+            output.job.emit("\n", {})
             displayRunJobs.printPercent = False
             displayRunJobs.counting = True
             displayRunJobs.count = 0
@@ -477,18 +472,15 @@ def displayRunJobs(ch, job, output, indexTotal, funcProgress=None):
             displayRunJobs.count += 1
         output.job.emit(displayRunJobs.line[:-1], {"appendLine": True})
 
-    # if (line.find("El multiplexado") == 0) or (line.find("Multiplexing took") == 0):
-    print(f"count {displayRunJobs.count}")
-    if displayRunJobs.count == 3:
+    if displayRunJobs.count == 2:
         displayRunJobs.count = 0
         displayRunJobs.printPercent = False
         displayRunJobs.counting = False
         output.job.emit("\n\n", {})
         job.output.append("\n\n")
 
-    print(f"proccess line {displayRunJobs.line}")
-
     # clear proccessed line
+    line = displayRunJobs.line
     displayRunJobs.line = ""
 
-    return
+    return line
