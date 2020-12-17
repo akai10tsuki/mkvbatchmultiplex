@@ -16,8 +16,6 @@ def setLanguageMenus(parent):
         menuActions (QMenu): item to transverse to set labels in correct locale
     """
 
-    print("Setting Language.....")
-
     for action in parent.menuItems:
         if isinstance(action, QActionWidget):
             action.setText(
