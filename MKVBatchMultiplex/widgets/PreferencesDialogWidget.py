@@ -84,12 +84,21 @@ class PreferencesDialogWidget(QDialog):
         #
         # Temporalily disable History
         #
-        #self.ui.chkBoxEnableJobHistory.setEnabled(False)
-        #self.ui.chkBoxAutoSaveJobHistory.setEnabled(False)
+        if config.data.get(config.ConfigKey.JobHistoryDisabled):
+            self.ui.chkBoxEnableJobHistory.setEnabled(False)
+            self.ui.chkBoxAutoSaveJobHistory.setEnabled(False)
+            self.ui.chkBoxEnableJobHistory.hide()
+            self.ui.chkBoxAutoSaveJobHistory.hide()
+
         if config.data.get(config.ConfigKey.JobHistory) is not None:
             self.ui.chkBoxEnableJobHistory.setChecked(
                 config.data.get(config.ConfigKey.JobHistory)
             )
+        if config.data.get(config.ConfigKey.JobsAutoSave) is not None:
+            self.ui.chkBoxAutoSaveJobHistory.setChecked(
+                config.data.get(config.ConfigKey.JobsAutoSave)
+            )
+
         #
         # Restore Windows Size
         #
