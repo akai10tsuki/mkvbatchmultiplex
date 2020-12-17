@@ -282,8 +282,8 @@ class JobsHistoryView(QTableView):
                 self.proxyModel.filterConditions["Remove"].append(row)
                 self.proxyModel.setFilterFixedString("")
 
-    def rowsAboutToBeRemoved(self, parent, first, last):
-        pass
+    def rowCountChanged(self, oldCount, newCount):
+        print(f"Rows changed old {oldCount} new {newCount}")
 
     @Slot(object)
     def clickClear(self, index):
