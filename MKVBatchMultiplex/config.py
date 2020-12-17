@@ -28,7 +28,9 @@ COPYRIGHT = "2018-2020, Efrain Vergara"
 LICENSE = "MIT"
 DESCRIPTION = "A mkv media batch multiplex."
 ENTRYPOINTS = {
-    "console_scripts": ["mkvbatchmultiplex=MKVBatchMultiplex:mainApp",],
+    "console_scripts": [
+        "mkvbatchmultiplex=MKVBatchMultiplex:mainApp",
+    ],
 }
 KEYWORDS = "mkv multimedia video mkvtoolnix plex"
 NAME = APPNAME.lower()
@@ -123,6 +125,7 @@ class ConfigKey:  # pylint: disable=too-few-public-methods
 
     Algorithm = "Algorithm"
     JobHistory = "JobHistory"
+    JobHistoryDisabled = "JobsHistoryDisabled"
     JobsAutoSave = "JobsAutoSave"
     JobsTable = "jobs"
     JobID = "JobID"
@@ -220,14 +223,23 @@ def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None, ap
 
     if data.get(ConfigKey.JobHistory) is None:
         data.set(ConfigKey.JobHistory, False)
-    #else:
-    #    data.set(ConfigKey.JobHistory, False)
+
+    if data.get(ConfigKey.JobHistoryDisabled) is None:
+        data.set(ConfigKey.JobHistoryDisabled, False)
+    else:
+        data.set(ConfigKey.JobHistoryDisabled, False)
 
     if data.get(ConfigKey.JobsAutoSave) is None:
         data.set(ConfigKey.JobsAutoSave, False)
+    #
+    # Temporalily disable uncomment statements
+    #
+    # data.set(ConfigKey.JobHistoryDisabled, True)
+    # data.set(ConfigKey.JobHistory, False)
 
     if data.get(ConfigKey.Algorithm) is None:
         data.set(ConfigKey.Algorithm, 1)
+
 
 def setDefaultFont(app):
     """save and set default font point size"""
@@ -337,7 +349,6 @@ def close():
     """exit accounting"""
 
     data.saveToFile()
-
     logging.info("CF0004: App End.")
 
 
