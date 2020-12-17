@@ -323,20 +323,24 @@ class JobsTableView(QTableView):
                 modelIndex = self.proxyModel.mapToSource(index)
                 jobRow = modelIndex.row()
                 jobID = model.dataset[jobRow, JobKey.ID]
+                job = model.dataset.data[jobRow][JobKey.ID].obj
+                if job:
+                    print(f"ID = {job.jobRow[JobKey.ID]} = {jobID}")
                 title = self.infoDialog.windowTitle()
                 self.infoDialog.setWindowTitle(title + ' - ' + str(jobID))
 
                 if self.infoDialog.getProjectInfo():
                     name, info = self.infoDialog.info
 
-                    job = JobInfo(
-                        jobRow,
-                        model.dataset[
+                    if job is None:
+                        job = JobInfo(
                             jobRow,
-                        ],
-                        model,
-                        log=False,
-                    )
+                            model.dataset[
+                                jobRow,
+                            ],
+                            model,
+                            log=False,
+                        )
                     saveToDb(job, name=name, description=info)
 
             # for row in rows:
