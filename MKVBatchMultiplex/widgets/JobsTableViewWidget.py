@@ -218,21 +218,21 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
     def output(self, value):
         self.__output = value
 
-    @property
-    def tab(self):
-        return self.__tab
+    #@property
+    #def tab(self):
+    #    return self.__tab
 
-    @tab.setter
-    def tab(self, value):
-        self.__tab = value
+    #@tab.setter
+    #def tab(self, value):
+    #    self.__tab = value
 
-    @property
-    def tabWidget(self):
-        return self.__tabWidget
+    #@property
+    #def tabWidget(self):
+    #    return self.__tabWidget
 
-    @tabWidget.setter
-    def tabWidget(self, value):
-        self.__tabWidget = value
+    #@tabWidget.setter
+    #def tabWidget(self, value):
+    #    self.__tabWidget = value
 
     def abortCurrentJob(self):
         self.controlQueue.append(JobStatus.AbortJob)
