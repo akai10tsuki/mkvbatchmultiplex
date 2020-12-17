@@ -70,7 +70,7 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
     """
 
     def __init__(self, parent=None, groupTitle=None, log=None):
-        super().__init__(parent=parent, tabWidgetChild=self)
+        super().__init__(parent=None, tabWidgetChild=self)
 
         self.__output = None
         self.__log = None
@@ -166,17 +166,17 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
 
     def _initHelper(self):
 
-        self.btnGrid.itemAt(_Button.FETCHJOBHISTORY).widget().setEnabled(True)
-        self.btnGrid.itemAt(_Button.PRINT).widget().hide()
+        self.btnGrid.itemAt(_Button.SHOWOUTPUT).widget().setEnabled(False)
+        self.btnGrid.itemAt(_Button.SHOWOUTPUTERRORS).widget().setEnabled(False)
+        self.btnGrid.itemAt(_Button.REFRESH).widget().setEnabled(False)
+        # self.btnGrid.itemAt(_Button.PRINT).widget().hide()
         self.btnGrid.itemAt(_Button.PRINT).widget().setEnabled(False)
+        self.btnGrid.itemAt(_Button.SELECTALL).widget().setEnabled(False)
+        self.btnGrid.itemAt(_Button.CLEARSELECTION).widget().setEnabled(False)
+        self.btnGrid.itemAt(_Button.CLEAROUTPUT).widget().setEnabled(False)
 
-    @property
-    def pariente(self):
-        return self.__parent
-
-    @pariente.setter
-    def pariente(self, value):
-        self.__parent = value
+        # self.cmdLine.textChanged.connect(self.analysisButtonState)
+        self.output.textChanged.connect(self.clearOutputButtonState)
 
     @Slot()
     def setLanguage(self):
@@ -208,6 +208,14 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
         """
 
         self.output.clear()
+
+    def clearOutputButtonState(self):
+        """Set clear button state"""
+
+        if self.output.text() != "":
+            self.btnGrid.itemAt(_Button.CLEAROUTPUT).widget().setEnabled(True)
+        else:
+            self.btnGrid.itemAt(_Button.CLEAROUTPUT).widget().setEnabled(False)
 
     def fetchJobHistory(self):
         """Get the log records from database"""
@@ -247,8 +255,8 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
             proxyModel=self.proxyModel,
             output=self.output,
             outputType=outputType,
-            funcStart=self.pariente.progressSpin.startAnimation,
-            funcFinished=self.pariente.progressSpin.stopAnimation,
+            funcStart=self.parent.progressSpin.startAnimation,
+            funcFinished=self.parent.progressSpin.stopAnimation,
         )
 
     # def listRows(self):
@@ -492,7 +500,14 @@ class _Button:
 
     FETCHJOBHISTORY = 0
 
+    SHOWOUTPUT = 2
+    SHOWOUTPUTERRORS = 3
+    REFRESH = 4
+
     PRINT = 6
+    SELECTALL = 7
+    CLEARSELECTION = 8
+    CLEAROUTPUT = 9
 
 
 class _JobHKey:
