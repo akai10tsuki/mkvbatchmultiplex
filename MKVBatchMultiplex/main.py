@@ -122,7 +122,9 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         #
         # Where am I running from
         #
-        if getattr(sys, "frozen", False):
+
+        # if getattr(sys, "frozen", False):
+        if sys.pyside_uses_embedding:
             # Running in a pyinstaller bundle
             self.appDirectory = Path(os.path.dirname(__file__))
         else:
@@ -158,7 +160,6 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
     def _initMenu(self):  # pylint: disable=too-many-statements
 
         menuBar = QMenuBar()
-        # menuBar = self.menuBar()
         self.menuItems = []
 
         # File SubMenu
@@ -241,9 +242,10 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.commandWidget = CommandWidget(self, self.proxyModel)
         self.jobsOutputWidget = JobsOutputWidget(self)
         self.errorOutputWidget = JobsOutputErrorsWidget(self)
+
         # historyWidget and logViewerWidget cannot have parent declared
         # They don't always display and create artifacts when not shown
-        self.historyWidget = JobsHistoryViewWidget(groupTitle="Jobs Table")
+        self.historyWidget = JobsHistoryViewWidget(self, groupTitle="Jobs Table")
         self.historyWidget.tableView.sortByColumn(0, Qt.DescendingOrder)
         self.logViewerWidget = LogViewerWidget()
 
