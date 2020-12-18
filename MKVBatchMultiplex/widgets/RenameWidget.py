@@ -15,12 +15,9 @@ from pathlib import Path
 
 from PySide2.QtCore import Signal, Qt, Slot
 from PySide2.QtWidgets import (
-    QFormLayout,
     QGridLayout,
-    QLabel,
     QWidget,
     QHBoxLayout,
-    QVBoxLayout,
     QSizePolicy,
     QGroupBox,
 )
@@ -119,7 +116,9 @@ class RenameWidget(pyqt.TabWidgetExtension, QWidget):
             self.outputRenameResultsSignal
         )
         btnApplyRename = pyqt.QPushButtonWidget(
-            Text.txt0208, function=self._applyRename, toolTip=Text.txt0209,
+            Text.txt0208,
+            function=self._applyRename,
+            toolTip=Text.txt0209,
         )
         btnApplyRename.setEnabled(False)
         btnUndoRename = pyqt.QPushButtonWidget(
@@ -291,7 +290,6 @@ class RenameWidget(pyqt.TabWidgetExtension, QWidget):
         self.textOriginalNames.textBox.verticalScrollBar().valueChanged.connect(
             self.scrollRenameChanged
         )
-
 
     def clear(self):
         """
