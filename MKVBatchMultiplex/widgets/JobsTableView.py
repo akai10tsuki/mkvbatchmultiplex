@@ -323,7 +323,8 @@ class JobsTableView(QTableView):
                 modelIndex = self.proxyModel.mapToSource(index)
                 jobRow = modelIndex.row()
                 jobID = model.dataset[jobRow, JobKey.ID]
-                job = model.dataset.data[jobRow][JobKey.ID].obj
+                rowID = model.dataset.data[jobRow][JobKey.ID].obj
+                job = model.dataset.data[jobRow][JobKey.Status].obj
                 if job:
                     print(f"ID = {job.jobRow[JobKey.ID]} = {jobID}")
                 title = self.infoDialog.windowTitle()
