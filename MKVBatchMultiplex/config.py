@@ -15,7 +15,7 @@ from vsutillib.files import ConfigurationSettings
 from vsutillib.log import LogRotateFileHandler
 from vsutillib.pyqt import QSignalLogHandler
 
-__VERSION = (2, 1, "0b1", "dev3")
+__VERSION = (2, 1, "0b1", "dev4")
 
 APPNAME = "MKVBatchMultiplex"
 VERSION = ".".join(map(str, __VERSION))
@@ -234,8 +234,8 @@ def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None, ap
     #
     # Temporalily disable uncomment statements
     #
-    data.set(ConfigKey.JobHistoryDisabled, True)
-    data.set(ConfigKey.JobHistory, False)
+    #data.set(ConfigKey.JobHistoryDisabled, True)
+    #data.set(ConfigKey.JobHistory, False)
 
     if data.get(ConfigKey.Algorithm) is None:
         data.set(ConfigKey.Algorithm, 1)
