@@ -103,6 +103,7 @@ Class for a table model with horizontal headers
 
 
 from PySide2.QtCore import QAbstractTableModel, Qt, QSortFilterProxyModel, QModelIndex
+from PySide2.QtWidgets import QTableView
 
 JOBID, JOBSTATUS, JOBCOMMAND = range(3)
 
@@ -117,7 +118,7 @@ class TableModel(QAbstractTableModel):
         class JobsTableModel -- table model for our view
     """
 
-    def __init__(self, tableData):
+    def __init__(self, parent=None, tableData=None):
         """
         Subclass of the QAbstractTableModel.
 
@@ -131,9 +132,14 @@ class TableModel(QAbstractTableModel):
             tableData {TableData} -- Class that supplies the header and row information
         """
 
-        super(TableModel, self).__init__()
+        super().__init__(parent)
 
+        self.parent = parent
         self.dataset = tableData
+        self._callRowCountChanged = False
+        if isinstance(self.parent, QTableView):
+            self._callRowCountChanged = True
+
 
     ####################
     # Item Data Handling
@@ -335,6 +341,9 @@ class TableModel(QAbstractTableModel):
 
             self.endInsertRows()
 
+            if self._callRowCountChanged:
+                self.parent.rowCountChanged(rowCount, rowCount + rows)
+
             return True
 
         return False
@@ -357,7 +366,15 @@ class TableModel(QAbstractTableModel):
 
             self.endRemoveRows()
 
-        return True
+            if self._callRowCountChanged:
+                newCount = rowCount - rows
+                if newCount < 0:
+                    newCount = 0
+                self.parent.rowCountChanged(rowCount, rowCount + rows)
+
+            return True
+
+        return False
 
     #
     # Enable Drag and Drop
@@ -375,8 +392,7 @@ class TableModel(QAbstractTableModel):
 
 
 class TableProxyModel(QSortFilterProxyModel):
-    """Proxy model
-    """
+    """Proxy model"""
 
     def __init__(self, model):
         """
