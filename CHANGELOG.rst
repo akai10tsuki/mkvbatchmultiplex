@@ -2,6 +2,24 @@ Changelog
 =========
 
 (Unreleased)
+------------
+
+Saved Jobs tab ready for first released.  This is useful for saving test jobs.
+Also repetitive Jobs when source files stay on same location and suffer
+modifications up to a final release.  Don't have to use mkvtoolix-gui for each
+iteration.
+
+Added
+~~~~~
+
+- Save Jobs tab to work with saved Jobs can be activated in Preferences
+- Option to save jobs with context menu on Jobs Table
+
+Changed
+~~~~~~~
+
+Fixed
+~~~~~
 
 2.1.0a1.dev3 - 2020-12-16
 -------------------------
@@ -36,7 +54,7 @@ Fixed
 2.1.0b1.dev2 - 2020-10-1
 ------------------------
 
-- hotfix: Jobs were executed even when removed from the Jobs Table via context menu
+- Jobs were executed even when removed from the Jobs Table via context menu
 
 
 2.1.0a1.dev1 - 2020-9-16
