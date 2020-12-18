@@ -302,12 +302,12 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
             self.logViewerWidget.title = "Log Viewer"
         if config.data.get(config.ConfigKey.JobHistory):
             tabsList.append(
-                [self.historyWidget, "Jobs History", "Examine any jobs saved."]
+                [self.historyWidget, "Saved Jobs", "Examine any jobs saved."]
             )
         else:
             self.historyWidget.tab = -1
             self.historyWidget.tabWidget = self.tabs
-            self.historyWidget.title = "Jobs History"
+            self.historyWidget.title = "Saved Jobs"
 
         self.tabs.addTabs(tabsList)
 
