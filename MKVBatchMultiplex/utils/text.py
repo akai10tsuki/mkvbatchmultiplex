@@ -164,8 +164,10 @@ class Text:  # pylint: disable=too-few-public-methods
     # JobHistoryWidget
     # 240
     txt0240 = S_("Date")
-    txt0241 = S_("Jobs History")
-    txt0242 = S_("Fetch History")
+    txt0241 = S_("Saved Jobs")
+    txt0242 = S_("Fetch Jobs")
+    txt0249 = S_("Jobs History")
+    txt0250 = S_("Fetch History")
     txt0243 = S_("Search")
     txt0244 = S_("Show Output")
     txt0245 = S_("Show Errors")
