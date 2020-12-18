@@ -7,9 +7,9 @@ Class for a table model with horizontal headers
 
 from PySide2.QtCore import Qt, QModelIndex
 
-from vsutillib.pyqt import checkColor, SvgColor
+from vsutillib.pyqt import SvgColor
 
-from ..dataset import TableData, tableHeaders
+#from ..dataset import TableData, tableHeaders
 from ..jobs import JobStatus, JobKey, jobStatusTooltip
 from .TableModel import TableModel
 
@@ -25,7 +25,7 @@ class JobsTableModel(TableModel):
     """
 
     def __init__(self, model, jobQueue):
-        super().__init__(model)
+        super().__init__(parent=None, tableData=model)
 
         self.jobQueue = jobQueue
         self.model = model
