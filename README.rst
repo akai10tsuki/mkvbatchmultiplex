@@ -24,10 +24,15 @@ mkvbatchmultiplex: MKVMERGE batch multiplexing
   :target: https://mkvbatchmultiplex.readthedocs.io/en/latest/?badge=latest
   :alt: Documentation Status
 
-This project went into a rewrite for version 2.  Rename module was added to
+This project went into a rewrite for version 2. Rename module was added to
 help maintain output file names Plex_ friendly.
 
-**New algorithm will try to solve some mismatched in file structure.**
+**New algorithm will try to solve some mismatches in file structure.**
+
+For release 2.1.0:
+
+Option o save Jobs when they need to be repeated with the source files in the
+same location.  Algorithm revisions to work in more cases.
 
 Description
 ===========
@@ -66,7 +71,7 @@ locale files.  On the source directory execute:
 Dependencies
 ************
 
-  * Python_ 3.8.1
+  * Python_ 3.8.1 or greater
 
     - lxml_ 4.5.2 or greater
     - natsort_ 7.0.1 or greater
@@ -74,7 +79,7 @@ Dependencies
     - PySide2_ 5.14 or greater
 
   * MediaInfo_ tested with versions 17.10->20.08
-  * MKVToolNix_ tested with versions 17.00->49.0.0
+  * MKVToolNix_ tested with versions 17.00->51.0.0
 
 In macOS 10.14 Dark theme MKVToolNix has to be version 30.0.0+ to use it.
 
