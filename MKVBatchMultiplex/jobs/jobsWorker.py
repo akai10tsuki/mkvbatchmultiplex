@@ -358,7 +358,7 @@ def jobsWorker(
                 if updateStatus:
                     job.jobRow[JobKey.Status] = JobStatus.Done
                 saveToDb(job, update=True)
-            model.dataset.data[job.jobRowNumber][JobKey.ID].obj = job
+            model.dataset.data[job.jobRowNumber][JobKey.Status].obj = job
             if updateStatus:
                 jobsQueue.statusUpdateSignal.emit(job, JobStatus.Done)
             if log:
