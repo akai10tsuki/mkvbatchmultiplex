@@ -11,7 +11,7 @@ import zlib
 
 from .. import config
 
-from .jobKeys import JobKey, JobsTableKey
+from .JobKeys import JobKey, JobsTableKey
 from .SqlJobsTable import SqlJobsTable
 
 def saveToDb(job, update=False, name=None, description=None):

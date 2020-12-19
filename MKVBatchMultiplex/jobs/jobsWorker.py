@@ -28,7 +28,7 @@ from .. import config
 from ..utils import adjustSources
 
 from .jobsDB import saveToDb
-from .jobKeys import JobStatus, JobKey
+from .JobKeys import JobStatus, JobKey
 from .SqlJobsTable import SqlJobsTable
 
 

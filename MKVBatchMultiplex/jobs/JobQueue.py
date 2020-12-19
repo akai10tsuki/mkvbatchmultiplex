@@ -17,7 +17,7 @@ from vsutillib.mkv import MKVCommandParser
 
 from .. import config
 from ..models import TableProxyModel
-from .jobKeys import JobStatus, JobKey
+from .JobKeys import JobStatus, JobKey
 from .RunJobs import RunJobs
 
 
