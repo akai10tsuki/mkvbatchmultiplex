@@ -30,11 +30,15 @@ class JobInfo:  # pylint: disable=too-many-instance-attributes
     JobInfo Information for a job
 
     Args:
-        status (str, optional): job status. Defaults to "".
-        index ([type], optional): index on job table. Defaults to None.
-        job (list, optional): row on job table. Defaults to None.
-        errors (list, optional): errors on job execution. Defaults to None.
-        output (list, optional): job output. Defaults to None.
+        **status** (str, optional): job status. Defaults to "".
+
+        **index** (QModelIndex, optional): index on job in table. Defaults to None.
+
+        **job** (list, optional): row on job in table. Defaults to None.
+
+        **errors** (list, optional): errors on job execution. Defaults to None.
+
+        **output** (list, optional): job execution output. Defaults to None.
     """
 
     def __init__(
@@ -63,11 +67,16 @@ class JobInfo:  # pylint: disable=too-many-instance-attributes
 
     @property
     def jobRow(self):
+        """
+        jobRow row of job in table read write
+
+        Returns:
+            int: row number of job in table
+        """
         return self.__jobRow
 
     @jobRow.setter
     def jobRow(self, value):
-
         if isinstance(value, list):
             self.__jobRow = []
             for cell in value:
@@ -75,6 +84,12 @@ class JobInfo:  # pylint: disable=too-many-instance-attributes
 
     @property
     def status(self):
+        """
+        status of job read write
+
+        Returns:
+            [type]: [description]
+        """
         return self.jobRow[JobKey.Status]
 
     @status.setter
@@ -85,10 +100,26 @@ class JobInfo:  # pylint: disable=too-many-instance-attributes
 
 class JobQueue(QObject):
     """
-    __init__ JobQueue - manage jobs
+    JobQueue - class to manage jobs queue
 
     Args:
-        jobWorkQueue (collections.dequeue, optional): set external dequeue. Defaults to None.
+        **parent** (QWidget): parent widget
+
+        **proxyModel** (TableProxyModel, optional): Proxy model for model/view.
+        Defaults to None.
+
+        **funcProgress** (function, optional): Function that updates progress bar.
+        Defaults to None.
+
+        **jobWorkQueue** (deque, optional): Queue to use to save Jobs to execute.
+        Defaults to None.
+
+        **controlQueue** (deque, optional): Queue to control Jobs execution.
+        Some status conditions are routed through here to Stop, Skip or Abort Jobs.
+        Defaults to None.
+
+        **log** (bool, optional): Logging can be cotrolled using this parameter.
+        Defaults to None.
     """
 
     # Class logging state
@@ -201,10 +232,22 @@ class JobQueue(QObject):
 
     @property
     def model(self):
+        """
+        model used in model/view read only
+
+        Returns:
+            JobsTableModel: model used in model/view
+        """
         return self.__model
 
     @property
     def proxyModel(self):
+        """
+        proxyModel of model used in model/view read write
+
+        Returns:
+            TableProxyModel: Filtered model of source model used in model/view
+        """
         return self.__proxyModel
 
     @proxyModel.setter
@@ -215,6 +258,12 @@ class JobQueue(QObject):
 
     @property
     def progress(self):
+        """
+        progress function to update progress bar read write
+
+        Returns:
+            DualProgressBar: progress bar of main window
+        """
         return self.__progress
 
     @progress.setter
@@ -223,17 +272,24 @@ class JobQueue(QObject):
 
     @Slot(object, str)
     def statusUpdate(self, job, status):
+        """
+        statusUpdate Slot to update status of a job
+
+        Args:
+            **job** (JobInfo): job to update
+
+            **status** (str): new status to set
+        """
 
         index = self.model.index(job.jobRowNumber, JobKey.Status)
         self.model.setData(index, status)
 
     def append(self, jobRow):
         """
-        append append job to queue
+        append job to Jobs queue
 
         Args:
-            jobRow (QModelIndex): index for job status on dataset
-            oCommand (list): job row on dataset
+            **jobRow** (QModelIndex): index for job status on dataset
 
         Returns:
             bool: True if append successful False otherwise
@@ -274,7 +330,7 @@ class JobQueue(QObject):
 
     def popLeft(self):
         """
-        pop return next job in queue
+        return next job in queue
 
         Returns:
             JobInfo: next job in queue
@@ -290,10 +346,10 @@ class JobQueue(QObject):
 
     def popRight(self):
         """
-        pop return next job in queue
+        return last job in queue
 
         Returns:
-            JobInfo: next job in queue
+            JobInfo: last job in queue
         """
 
         if self._workQueue:
@@ -306,7 +362,7 @@ class JobQueue(QObject):
 
     def pop(self):
         """
-        pop return next job in queue
+        pop return next job in queue like popLeft
 
         Returns:
             JobInfo: next job in queue
@@ -321,6 +377,9 @@ class JobQueue(QObject):
         return None
 
     def _checkEmptied(self):
+        """
+        _checkEmptied emit queueEmptiedSignal if job queue is empty
+        """
 
         if not self._workQueue:
             self.queueEmptiedSignal.emit()
@@ -328,7 +387,7 @@ class JobQueue(QObject):
     @Slot()
     def run(self):
         """
-        run test run worker thread
+        run will start the job queue
         """
 
         self.runJobs.proxyModel = self.proxyModel
