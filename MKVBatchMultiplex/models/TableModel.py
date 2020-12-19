@@ -109,29 +109,34 @@ JOBID, JOBSTATUS, JOBCOMMAND = range(3)
 
 
 class TableModel(QAbstractTableModel):
-    """Model for table view
+    """
+    Subclass of the QAbstractTableModel.
 
-    Arguments:
-        QAbstractTableModel {Class in QtCore} -- Base class for a table model
+    This class holds the table data and header information Overrides the methods:
+        - canDropMimeData(data, action, row, col, parent)
+        - columnCount(self, parent)
+        - data(index, role)
+        - flags(index)
+        - headerData(section, orientation, role)
+        - insertRows(position, rows, index)
+        - removeRows(position, rows, parent
+        - rowCount(parent)
+        - setData(index, value, role)
+        - setHeaderData(section, orientation, value, role)
+        - supportedDropActions()
 
-    Returns:
-        class JobsTableModel -- table model for our view
+
+    TableModel is defined in order to interact with data in a table represented
+    in the model/view
+
+    Args:
+        **parent** (QWidget): parent widget
+
+        **tableData** (TableData): Class that supplies the header and row
+        information
     """
 
     def __init__(self, parent=None, tableData=None):
-        """
-        Subclass of the QAbstractTableModel.
-
-        This class holds the table data and header information Overrides the methods:
-            data(self, index, role)
-            setData(self, index, value, role=Qt.EditRole)
-            headerData(self, section, orientation, role)
-            flags(self, index)
-
-        Arguments:
-            tableData {TableData} -- Class that supplies the header and row information
-        """
-
         super().__init__(parent)
 
         self.parent = parent
@@ -244,12 +249,17 @@ class TableModel(QAbstractTableModel):
         return None
 
     def rowCount(self, parent=None):
-        """Returns the number of rows in the model."""
-
+        """
+        Returns:
+            int: the number of rows in the model.
+        """
         return len(self.dataset)
 
     def columnCount(self, parent=None):
-        """Returns the number of columns in the model."""
+        """
+        Returns:
+            int: the number of columns in the model.
+        """
 
         return len(self.dataset.headers)
 
@@ -264,9 +274,12 @@ class TableModel(QAbstractTableModel):
         Update changes to the model data.
 
         Arguments:
-            index {int} - QModelIndex object that point to a call
-            value {object} - value to be set at index
-            role {int} - Qt role (default: {Qt.EditRole})
+            **index** (QModelIndex) - object that point to a cell
+
+            **value** (object) - value to be set at index
+
+            **role** (int) - Qt role. Default is Qt.EditRole.
+
         Returns:
             bool -- True is role is Qt.EditRole and data is updated
                 False otherwise
@@ -298,9 +311,10 @@ class TableModel(QAbstractTableModel):
         Set whetter a cell is enabled, selectable and/or editable.
 
         Arguments:
-            index {int} - QModelIndex object that point to a call
+            **index** (QModelIndex) - object that point to a cell
+
         Returns:
-            {int} - Qt flag ItemIsEnabled and ItemIsSelectable
+            int: Qt flag ItemIsEnabled and ItemIsSelectable
         """
 
         #
@@ -321,6 +335,23 @@ class TableModel(QAbstractTableModel):
     # Resizable Model
     #
     def insertRows(self, position, rows, index=QModelIndex(), data=None):
+        """
+        insertRows - insert the number of rows starting at position
+
+        Args:
+            **position** (int): starting position for rows insertion
+
+            **rows** (int): number of rows to insert
+
+            **index** (QModelIndex, optional): index to row at position. Defaults
+            to QModelIndex().
+
+            **data** (list, optional): If data is not None the information is used
+            to fill the data on the new rows. Defaults to None.
+
+        Returns:
+            bool: True if transaction successful. False otherwise.
+        """
 
         rowCount = self.rowCount()
         dataCount = 0 if data is None else len(data)
@@ -349,6 +380,17 @@ class TableModel(QAbstractTableModel):
         return False
 
     def removeRows(self, position, rows, parent=QModelIndex()):
+        """
+        removeRows remove a number of rows from the model/view
+
+        Args:
+            position (int): start position for rows to be deleted
+            rows (int): number of rows to delete
+            parent (QWidget, optional): parent widget. Defaults to QModelIndex().
+
+        Returns:
+            bool: True if transaction completed. False otherwise
+        """
 
         if position < 0:
             return False
@@ -380,10 +422,34 @@ class TableModel(QAbstractTableModel):
     # Enable Drag and Drop
     #
     def supportedDropActions(self):
+        """
+        supportedDropActions return flags to enable Drag and Drop
+
+        Returns:
+            int: Qt role
+        """
 
         return Qt.CopyAction | Qt.MoveAction
 
     def canDropMimeData(self, data, action, row, col, parent):
+        """
+        canDropMimeData determines if Mime data can be dropped it check for text
+        object.
+
+        Args:
+            **data** (object): object to drop
+
+            **action** (int): action to perform
+
+            **row** (int): row where drop is desired
+
+            **col** (int): col where drop is desired
+
+            **parent** (QWidget): parent widget
+
+        Returns:
+            bool: True if drop is enabled. False otherwise.
+        """
 
         if not data.hasFormat("text/plain"):
             return False
@@ -392,20 +458,19 @@ class TableModel(QAbstractTableModel):
 
 
 class TableProxyModel(QSortFilterProxyModel):
-    """Proxy model"""
+    """
+    Subclass of the QSortFilterProxyModel. This class allows the table view to interact with
+    the model indirectly via a middle-mas proxy that sorts or filters the table. It
+    re-implements the filterAcceptsRow method to allow flexibility on how data are filtered,
+    including filtering base on multiple columns. Re-implement filterAcceptsRow() method as
+    desired. Use self.sourceModel() to refer to the underlying table model. Use
+    mapToSource(index) to convert an index in the proxy model to an index in the underlying
+    model, allowing you to access the respective dataset via row and column index methods.
+
+    :param model: TableModel object holding the underlying model
+    """
 
     def __init__(self, model):
-        """
-        Subclass of the QSortFilterProxyModel. This class allows the table view to interact with
-        the model indirectly via a middle-mas proxy that sorts or filters the table. It
-        re-implements the filterAcceptsRow method to allow flexibility on how data are filtered,
-        including filtering base on multiple columns. Re-implement filterAcceptsRow() method as
-        desired. Use self.sourceModel() to refer to the underlying table model. Use
-        mapToSource(index) to convert an index in the proxy model to an index in the underlying
-        model, allowing you to access the respective dataset via row and column index methods.
-
-        :param model: TableModel object holding the underlying model
-        """
 
         super().__init__()
 
@@ -419,7 +484,7 @@ class TableProxyModel(QSortFilterProxyModel):
         False to remove the row
 
         :param sourceRow: int, the row index in the source model
-        :param sourceParent: parent object of source model
+        :param sourceParent: QWidget, parent object of source model
         """
 
         if sourceRow in self.filterConditions["Remove"]:

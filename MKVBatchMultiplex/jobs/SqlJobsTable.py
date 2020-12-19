@@ -8,10 +8,10 @@ from vsutillib.sql import SqlDb
 
 class SqlJobsTable(SqlDb):
     """
-    SqlJobsDB sqlite database for jobs history
+    SqlJobsDB class to access sqlite database for saving jobs
 
     Args:
-        SqlDb (class): class for managing sqlite connections
+        **dbFile** (str, pathlib.Path): database file.
     """
 
     def __init__(self, dbFile=None):
@@ -30,7 +30,7 @@ class SqlJobsTable(SqlDb):
     def _createJobsTable(self):
         # Create jobs table
         if self.connection is not None:
-            # version 2.0.0a2
+            # version 2.1.0
 
             sqlScript = """
                 -- start a transaction
@@ -72,13 +72,16 @@ class SqlJobsTable(SqlDb):
             if self.__lastError is None:
                 version = self.version("jobs")
                 if version is None:
-                    self.setVersion("jobs", "2.0.0")
+                    self.setVersion("jobs", "2.1.0")
+                version = self.version("jobsSearch")
+                if version is None:
+                    self.setVersion("jobsSearch", "2.1.0")
 
     @property
     def error(self):
         """
-        error needed to preserve error status on methods with more than one
-            execute commands
+        error is needed to preserve error status on methods with more than one
+        execute commands
 
         Returns:
             str: value of last error
@@ -93,8 +96,9 @@ class SqlJobsTable(SqlDb):
         set table version
 
         Args:
-            dbTable (str): sql table
-            version (str): table version
+            **dbTable** (str): sql table name
+
+            **version** (str): table version
         """
 
         version = self.version(args[0])
@@ -118,10 +122,10 @@ class SqlJobsTable(SqlDb):
 
     def version(self, dbTable):
         """
-        version get table version
+        get table version
 
         Args:
-            dbTable (str): sql table
+            **dbTable** (str): sql table
 
         Returns:
             str: version of table
@@ -141,7 +145,19 @@ class SqlJobsTable(SqlDb):
         return None
 
     def connect(self, database, autoCommit=False):
-        """override connect to create tables"""
+        """
+        connect to the database
+
+        Args:
+            **database** (str|pathlib.Path): database file on disk to connect
+
+            **autoCommit** (bool, optional): perform commit automatically after
+            tables updates. Defaults to False.
+
+        Returns:
+            sqlite3.Connection: sqlite3.Connection object if successful.
+            None otherwise.
+        """
         self.__lastError = None
 
         rc = super().connect(database, autoCommit)
@@ -155,7 +171,7 @@ class SqlJobsTable(SqlDb):
         delete job from database
 
         Args:
-            jobID (int): job id to delete
+            **jobID** (int): job id to delete
 
         Returns:
             sqlite3.cursor: cursor to the database aftter operation
@@ -181,7 +197,7 @@ class SqlJobsTable(SqlDb):
         insert job into database
 
         Args:
-            jobID (int): job id to insert
+            **jobID** (int): job id to insert
 
         Returns:
             sqlite3.cursor: cursor to the database after operation
@@ -208,10 +224,13 @@ class SqlJobsTable(SqlDb):
         if jobID is a dict the a WHERE clause with AND will be constructed
 
         Args:
-            jobID (int, dict): WHERE clause AND members and integer implies
-                WHERE id = ?
-            *args (tuple, optional): tuple with fields. Defaults to None.
-            fetchAll (bool, optional): fetch all records in query. Defaults to False.
+            **jobID** (int, dict)**: WHERE clause AND members and integer implies
+            WHERE id = ?
+
+            **\*args** (tuple, optional): tuple with fields. Defaults to None.
+
+            **fetchAll** (bool, optional): fetch all records in query.
+            Defaults to False.
 
         Returns:
             sqlite3.cursor: cursor to the operation results
@@ -279,7 +298,7 @@ class SqlJobsTable(SqlDb):
         textSearch do a full text search on jobs table command field
 
         Args:
-            searchText (str): text to search
+            **searchText** (str): text to search
 
         Returns:
             sqlite3.cursor: cursor to the operation results
@@ -310,9 +329,11 @@ class SqlJobsTable(SqlDb):
         fields = (id, addDate, addTime, startTime, endTime, job)
 
         Args:
-            jobID (int): job id to update
-            fields (tuple): fields to update
-            args (tuple): values to update
+            **jobID** (int): job id to update
+
+            **fields** (tuple): fields to update
+
+            **\*args** (tuple): values to update
         """
 
         self.__lastError = None
