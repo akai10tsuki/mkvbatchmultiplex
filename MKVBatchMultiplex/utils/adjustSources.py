@@ -4,6 +4,8 @@ adjustSources try and adjust tracks to account for structure difference
 
 import copy
 
+from pathlib import PurePath
+
 from vsutillib.media import MediaFileInfo, MediaTrackInfo
 from vsutillib.mkv import TracksOrder
 
@@ -31,6 +33,7 @@ def adjustSources(oCommand, index):
     dummyTrack = MediaTrackInfo()
     confidence = "None"
 
+    foundBadTrack = False
     for baseIndex, oBaseFile in enumerate(oCommand.oBaseFiles):
         baseFileInfo = oBaseFile.mediaFileInfo
         sourceFileInfo = MediaFileInfo(sourceFiles[baseIndex])
@@ -38,13 +41,16 @@ def adjustSources(oCommand, index):
         translate = {}
         usedTracks = []
         savedScore = -1
-        foundBadTrack = False
 
         for track in oBaseFile.trackOptions.tracks:
             i = int(track)
             if len(baseFileInfo) <= 0:
                 # source file with no tracks
-                return False, "Low"
+                suffix = PurePath(baseFileInfo.fileName).suffix # pathlib.Path or str
+                if suffix not in (".mka", ".mks", ".mkv"):
+                    continue
+                else:
+                    return False, "Low"
             trackBase = baseFileInfo[i]
             if i < len(sourceFileInfo):
                 # source less tracks than base
