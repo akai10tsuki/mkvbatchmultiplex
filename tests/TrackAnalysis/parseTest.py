@@ -6,7 +6,7 @@ import colorama
 
 from colorama import Fore, Back, Style
 
-from pathlib import Path
+from pathlib import Path, PurePath
 
 
 # from natsort import natsorted, ns
@@ -41,7 +41,10 @@ def test():
 
     # Example 08 Mahou Shoujo Ore
     cmd3 = r"'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en --output 'J:\Example\TestMedia\Example 08\Mahou Shoujo Ore (2018)\Season 01\[Erai-raws] Mahou Shoujo Ore - 01 [720p][Multiple Subtitle] (1).mkv' --no-subtitles --language 0:und --default-track 0:yes --display-dimensions 0:1280x720 --language 1:und --default-track 1:yes '(' 'J:\Example\TestMedia\Example 08\[Erai-raws] Mahou Shoujo Ore\[Erai-raws] Mahou Shoujo Ore - 01 [720p][Multiple Subtitle].mkv' ')' --track-order 0:0,0:1"
-    cmd = r"'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en --output 'J:\Example\TestMedia\Example 08\Mahou Shoujo Ore (2018)\Season 01 New\Mahou Shoujo Ore - S01E01 - Magical Girl☆Transform (1).mkv' --language 0:und --default-track 0:yes --display-dimensions 0:1280x720 --language 1:ja --default-track 1:yes '(' 'J:\Example\TestMedia\Example 08\Mahou Shoujo Ore (2018)\Season 01\Mahou Shoujo Ore - S01E01 - Magical Girl☆Transform.mkv' ')' --no-audio --no-video --subtitle-tracks 2,6 --sub-charset 2:UTF-8 --language 2:en --track-name '2:English(US)' --default-track 2:yes --sub-charset 6:UTF-8 --language 6:es --track-name 6:Espanol '(' 'J:\Example\TestMedia\Example 08\[Erai-raws] Mahou Shoujo Ore\[Erai-raws] Mahou Shoujo Ore - 01 [720p][Multiple Subtitle].mkv' ')' --track-order 0:0,0:1,1:2,1:6"
+    cmd10 = r"'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en --output 'J:\Example\TestMedia\Example 08\Mahou Shoujo Ore (2018)\Season 01 New\Mahou Shoujo Ore - S01E01 - Magical Girl☆Transform (1).mkv' --language 0:und --default-track 0:yes --display-dimensions 0:1280x720 --language 1:ja --default-track 1:yes '(' 'J:\Example\TestMedia\Example 08\Mahou Shoujo Ore (2018)\Season 01\Mahou Shoujo Ore - S01E01 - Magical Girl☆Transform.mkv' ')' --no-audio --no-video --subtitle-tracks 2,6 --sub-charset 2:UTF-8 --language 2:en --track-name '2:English(US)' --default-track 2:yes --sub-charset 6:UTF-8 --language 6:es --track-name 6:Espanol '(' 'J:\Example\TestMedia\Example 08\[Erai-raws] Mahou Shoujo Ore\[Erai-raws] Mahou Shoujo Ore - 01 [720p][Multiple Subtitle].mkv' ')' --track-order 0:0,0:1,1:2,1:6"
+
+    # Out of order
+    cmd = r"'C:\Program Files\MKVToolNix\mkvmerge.exe' --ui-language en --output 'C:\Projects\Python\PySide\mkvbatchmultiplex\tests/NewFiles/Show Title - S01E02.mkv' --language 0:und --language 1:spa --default-track 1:yes '(' 'C:\Projects\Python\PySide\mkvbatchmultiplex\tests/MediaFiles/mkv-nosubs/Show Title ' S01E02.mkv' ')' --language 0:eng --default-track 0:yes '(' 'C:\Projects\Python\PySide\mkvbatchmultiplex\tests/MediaFiles/Subs/ass/ENG/Show Title - S01E02.ENG.ass' ')' --track-order 0:0,0:1,1:0"
     #f = Path("./ass.xml").open(mode="wb")
     #xml = pymediainfo.MediaInfo.parse(r'J:\Example\TestMedia\Example 05\Subs\Show Title - S01E01.ENG.ass', output="OLDXML")
     #f.write(xml.encode())
@@ -80,21 +83,24 @@ def test():
 
     config.data.set(config.ConfigKey.Algorithm, 1)
 
-    for index, sourceFiles in enumerate(oCommand.oSourceFiles):
-        iVerify.verifyStructure(oCommand, index)
-        print(f"{Fore.GREEN}Index {index} - {sourceFiles[0]} not Ok")
-        print(f"Tracks matched {iVerify.matched} unmatched {iVerify.unmatched}{Style.RESET_ALL}")
-        if not iVerify:
-            rc, confidence = adjustSources(oCommand, index)
+    #for index, sourceFiles in enumerate(oCommand.oSourceFiles):
+    index = 2
+    sourceFiles = oCommand.oSourceFiles[index]
 
-            if rc:
-                _, shellCommand = oCommand.generateCommandByIndex(index, update=True)
-                print(f"New command - confidence {confidence}:\n{shellCommand}\n")
-            else:
-                print(f"Adjustment failed.")
+    iVerify.verifyStructure(oCommand, index)
+    print(f"{Fore.GREEN}Index {index} - {sourceFiles[0]}.")
+    print(f"Tracks matched {iVerify.matched} unmatched {iVerify.unmatched}{Style.RESET_ALL}")
+    if not iVerify:
+        rc, confidence = adjustSources(oCommand, index)
 
-            if not hasToGenerateCommands and rc:
-                hasToGenerateCommands = True
+        if rc:
+            _, shellCommand = oCommand.generateCommandByIndex(index, update=True)
+            print(f"New command - confidence {confidence}:\n{shellCommand}\n")
+        else:
+            print(f"Adjustment failed. rc {rc} {confidence}")
+
+        if not hasToGenerateCommands and rc:
+            hasToGenerateCommands = True
 
     config.data.set(config.ConfigKey.Algorithm, 1)
 
