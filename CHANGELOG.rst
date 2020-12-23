@@ -21,6 +21,8 @@ Changed
 Fixed
 ~~~~~
 
+- Algorithm 1 and 2 failed with external files with no tracks ej. subs files
+
 2.1.0a1.dev3 - 2020-12-16
 -------------------------
 
