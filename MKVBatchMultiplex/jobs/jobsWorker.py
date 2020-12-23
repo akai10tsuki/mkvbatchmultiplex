@@ -25,7 +25,8 @@ from vsutillib.process import RunCommand
 from vsutillib.pyqt import SvgColor
 
 from .. import config
-from ..utils import adjustSources
+
+# from ..utils import adjustSources
 
 from .jobsDB import saveToDb
 from .JobKeys import JobStatus, JobKey
@@ -143,6 +144,8 @@ def jobsWorker(
             log=log,
         )
 
+        algorithm = config.data.get(config.ConfigKey.Algorithm)
+
         if job.oCommand:
             job.startTime = time()
 
@@ -231,9 +234,11 @@ def jobsWorker(
                 #
                 runJob = bool(iVerify)
 
-                if config.data.get(config.ConfigKey.Algorithm) >= 1:
+                if algorithm >= 1:
                     if not iVerify:
-                        rc, confidence = adjustSources(job.oCommand, index)
+                        rc, confidence = mkv.adjustSources(
+                            job.oCommand, index, algorithm
+                        )
                         runJob = rc
                         if rc:
                             _, shellCommand = job.oCommand.generateCommandByIndex(
