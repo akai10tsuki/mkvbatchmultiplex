@@ -14,6 +14,7 @@ from pathlib import Path, PurePath
 from vsutillib.mkv import (
     IVerifyStructure,
     MKVCommandParser,
+    adjustSources
 )
 
 from GetTracks import GetTracks
@@ -21,7 +22,7 @@ from GetTracks import GetTracks
 
 from vsutillib.macos import isMacDarkMode
 
-from MKVBatchMultiplex.utils import adjustSources
+# from MKVBatchMultiplex.utils import adjustSources
 from MKVBatchMultiplex import config
 
 def test():
@@ -81,28 +82,27 @@ def test():
 
     hasToGenerateCommands = False
 
-    config.data.set(config.ConfigKey.Algorithm, 1)
+    # config.data.set(config.ConfigKey.Algorithm, 1)
 
-    #for index, sourceFiles in enumerate(oCommand.oSourceFiles):
-    index = 2
-    sourceFiles = oCommand.oSourceFiles[index]
+    for index, sourceFiles in enumerate(oCommand.oSourceFiles):
+        iVerify.verifyStructure(oCommand, index)
+        print(f"{Fore.GREEN}Index {index} - {sourceFiles[0]}.")
+        print(f"Tracks matched {iVerify.matched} unmatched {iVerify.unmatched}")
+        if not iVerify:
+            print(f"{Style.BRIGHT}Verification failed.{Style.RESET_ALL}")
+            rc, confidence = adjustSources(oCommand, index, 1)
 
-    iVerify.verifyStructure(oCommand, index)
-    print(f"{Fore.GREEN}Index {index} - {sourceFiles[0]}.")
-    print(f"Tracks matched {iVerify.matched} unmatched {iVerify.unmatched}{Style.RESET_ALL}")
-    if not iVerify:
-        rc, confidence = adjustSources(oCommand, index)
+            if rc:
+                _, shellCommand = oCommand.generateCommandByIndex(index, update=True)
+                print(f"{Fore.YELLOW}\nNew command - confidence {confidence}:\n{shellCommand}\n")
+            else:
+                print(f"{Fore.RED}Adjustment failed. Return code {rc} confidence {confidence}")
 
-        if rc:
-            _, shellCommand = oCommand.generateCommandByIndex(index, update=True)
-            print(f"New command - confidence {confidence}:\n{shellCommand}\n")
-        else:
-            print(f"Adjustment failed. rc {rc} {confidence}")
+            if not hasToGenerateCommands and rc:
+                hasToGenerateCommands = True
+        print()
 
-        if not hasToGenerateCommands and rc:
-            hasToGenerateCommands = True
-
-    config.data.set(config.ConfigKey.Algorithm, 1)
+    # config.data.set(config.ConfigKey.Algorithm, 1)
 
 if __name__ == "__main__":
     test()
