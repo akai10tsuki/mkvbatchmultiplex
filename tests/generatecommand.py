@@ -71,25 +71,27 @@ class GenCommandApp(QMainWindow):
                 r"'(' '" + s + r"/avi/Show Title - S01E01.avi' ')' --language 0:eng '(' '" + s + \
                 r"/Subs/ass/ENG/Show Title - S01E01.ENG.ass' ')' --track-order 0:0,0:1,1:0"
 
-        self.cmd1 = mkvmerge + r" " + l + " --output '" + d + \
-                r"/video - S01E02.mkv' --language 0:und --language 1:spa " + \
-                r"--default-track 1:yes '(' '" + s + \
-                r"/video - S01E02.avi' ')' --language 0:eng --default-track 0:yes '(' '" + s + \
-                r"/Subs/Video - S01E02.ass' ')' --track-order 0:0,0:1,1:0"
+        self.cmd1 = mkvmerge + r" " + l + r" --output '" + d + \
+                r"/Show Title - S01E02.mkv' --language 0:und --language 1:spa " + \
+                r"--default-track 1:yes " + \
+                r"'(' '" + s + r"/mkv-nosubs/Show Title ' S01E02.mkv' ')' " + \
+                r"--language 0:eng --default-track 0:yes " + \
+                r"'(' '" + s + r"/Subs/ass/ENG/Show Title - S01E02.ENG.ass' ')'" + \
+                r" --track-order 0:0,0:1,1:0"
 
-        self.cmd2 = mkvmerge + r" " + l + " --output '" + d + \
+        self.cmd2 = mkvmerge + r" " + l + r" --output '" + d + \
                 r"/video - S01E03.mkv' --language 0:und --language 1:spa " + \
                 r"--default-track 1:yes '(' '" + s + \
                 r"/video - S01E03.avi' ')' --language 0:eng --default-track 0:yes '(' '" + s + \
                 r"/Subs/Video - S01E03.ass' ')' --track-order 0:0,0:1,1:0"
 
-        self.cmd3 = mkvmerge + r" " + l + " --output '" + d + \
+        self.cmd3 = mkvmerge + r" " + l + r" --output '" + d + \
                 r"/video'\''S01E05.mkv' --language 0:und --language 1:spa " + \
                 r"--default-track 1:yes '(' '" + s + \
                 r"/video'\''S01E05.avi' ')' --language 0:eng --default-track 0:yes '(' '" + s + \
                 r"/Subs/Video'\''S01E05.ass' ')' --track-order 0:0,0:1,1:0"
 
-        self.cmd4 = mkvmerge + r" " + l + " --output " + d + \
+        self.cmd4 = mkvmerge + r" " + l + r" --output " + d + \
                 r"/video-S01E01.mkv --language 0:und --language 1:spa " + \
                 r"--default-track 1:yes '(' " + s + \
                 r"/video-S01E01.avi ')' --language 0:eng --default-track 0:yes '(' " + s + \
@@ -102,11 +104,11 @@ class GenCommandApp(QMainWindow):
         self.pushButton0.clicked.connect(   # pylint: disable=E1101
             lambda: self.pasteClipboard(0)
         )
-        #self.pushButton1 = QPushButton(" Command 1 ")
-        #self.pushButton1.resize(self.pushButton1.sizeHint())
-        #self.pushButton1.clicked.connect(   # pylint: disable=E1101
-        #    lambda: self.pasteClipboard(1)
-        #)
+        self.pushButton1 = QPushButton(" Command 1 ")
+        self.pushButton1.resize(self.pushButton1.sizeHint())
+        self.pushButton1.clicked.connect(   # pylint: disable=E1101
+            lambda: self.pasteClipboard(1)
+        )
         #self.pushButton2 = QPushButton(" Command 2 ")
         #self.pushButton2.resize(self.pushButton2.sizeHint())
         #self.pushButton2.clicked.connect(   # pylint: disable=E1101
@@ -134,7 +136,7 @@ class GenCommandApp(QMainWindow):
         layout = QGridLayout(widget)
         layout.addWidget(self.textWindow, 0, 0, 7, 60)
         layout.addWidget(self.pushButton0, 7, 0)
-        #layout.addWidget(self.pushButton1, 7, 1)
+        layout.addWidget(self.pushButton1, 7, 1)
         #layout.addWidget(self.pushButton2, 7, 2)
         #layout.addWidget(self.pushButton3, 7, 3)
         #layout.addWidget(self.pushButton4, 7, 4)
