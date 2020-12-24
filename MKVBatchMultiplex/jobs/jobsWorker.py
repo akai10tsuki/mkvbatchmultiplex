@@ -12,6 +12,7 @@ import re
 
 # import sys
 # import zlib
+# import pprint
 
 from datetime import datetime
 from time import time, sleep
@@ -164,7 +165,9 @@ def jobsWorker(
                 f"Job ID: {job.jobRow[JobKey.ID]} started.",
                 QSystemTrayIcon.Information,
             )
-            output.job.emit(msg, {"color": SvgColor.cyan})
+            msgArgs = {"color": SvgColor.cyan}
+            output.job.emit(msg, dict(msgArgs))
+            job.output.append([msg, dict(msgArgs)])
             exitStatus = "ended"
 
             if log:
@@ -175,6 +178,8 @@ def jobsWorker(
             if not job.oCommand.commandsGenerated:
                 output.job.emit("Generating commands...\n", {"appendEnd": True})
                 job.oCommand.generateCommands()
+
+            errorOutputOpen = False
 
             for (
                 index,
@@ -255,15 +260,22 @@ def jobsWorker(
                                 MODULELOG.warning("RJB0011: %s", msg)
                         else:
                             msg = (
-                                f"Warning command failed adjustment:\n"
+                                f"Warning command failed adjustment:\n\n"
                                 f"Command: {cmd}\n"
                             )
-                        output.job.emit(
-                            msg, {"color": SvgColor.yellowgreen, "appendEnd": True}
-                        )
+                        if not errorOutputOpen:
+                            markErrorOutput(job, output, start=True)
+                            errorOutputOpen = True
+
+                        msgArgs = {"color": SvgColor.yellowgreen, "appendEnd": True}
+                        output.job.emit(msg, dict(msgArgs))
                         output.error.emit(
-                            msg, {"color": SvgColor.yellowgreen, "appendEnd": True}
-                        )
+                            msg + "\n", dict(msgArgs)
+                        )  # hack making it work
+                        job.output.append([msg, dict(msgArgs)])
+                        job.errors.append(
+                            [msg + "\n", dict(msgArgs)]
+                        )  # hack making it work
                         if rc:
                             if log:
                                 MODULELOG.warning("RJB0011: %s", msg)
@@ -279,7 +291,8 @@ def jobsWorker(
                         "Source Files: {}\nDestination Files: {}\n"
                     )
                     msg = msg.format(cmd, baseFiles, sourceFiles, destinationFile)
-                    output.job.emit(msg, {"appendEnd": True})
+                    msgArgs = {"appendEnd": True}
+                    output.job.emit(msg, dict(msgArgs))
 
                     if log:
                         MODULELOG.debug("RJB0007: Structure checks ok")
@@ -295,15 +308,15 @@ def jobsWorker(
                     job.errors.append(verify.analysis)
                     totalErrors += 1
                     funcProgress.lblSetValue.emit(4, totalErrors)
-                    msg = "Error Job ID: {} ---------------------\n\n".format(
-                        job.jobRow[JobKey.ID]
-                    )
-                    output.error.emit(msg, {"color": SvgColor.red, "appendEnd": True})
+                    if not errorOutputOpen:
+                        markErrorOutput(job, output, start=True)
+                        errorOutputOpen = True
                     msg = "Destination File: {}\nFailed adjustment\n\n".format(
                         destinationFile
                     )
-                    job.output.append(msg)
-                    output.job.emit(msg, {"color": SvgColor.red, "appendEnd": True})
+                    msgArgs = {"color": SvgColor.red, "appendEnd": True}
+                    output.job.emit(msg, dict(msgArgs))
+                    job.output.append([msg, dict(msgArgs)])
                     for i, m in enumerate(verify.analysis):
                         if i == 0:
                             lines = m.split("\n")
@@ -316,24 +329,30 @@ def jobsWorker(
                                     if searchIndex >= 0:
                                         color = SvgColor.tomato
                                         findSource = False
-                                output.job.emit(line + "\n", {"color": color})
-                                output.error.emit(line + "\n", {"color": color})
-                                job.output.append(line + "\n")
+                                msg = line + "\n"
+                                msgArgs = {"color": color}
+                                output.job.emit(msg, dict(msgArgs))
+                                output.error.emit(msg, dict(msgArgs))
+                                job.output.append([msg, dict(msgArgs)])
                         else:
-                            output.job.emit(m, {"color": SvgColor.red})
-                            job.output.append(m + "\n")
-                            output.error.emit(m, {"color": SvgColor.red})
-                    job.output.append("\n")
-                    # output.job.emit("", {"appendEnd": True})
-                    msg = "Error Job ID: {} ---------------------\n\n".format(
-                        job.jobRow[JobKey.ID]
-                    )
-                    output.error.emit(msg, {"color": SvgColor.red, "appendEnd": True})
+                            msgArgs = {"color": SvgColor.red}
+                            output.job.emit(m, dict(msgArgs))
+                            output.error.emit(m, dict(msgArgs))
+                            job.output.append([m, dict(msgArgs)])
+                    output.job.emit("\n", {})
+                    output.error.emit("\n", {})
+                    job.output.append(["\n", {}])
+                    job.errors.append(["\n", {}])
                     if log:
                         MODULELOG.error("RJB0008: Structure check failed")
                 indexTotal[1] += 100
                 indexTotal[0] += 1
                 # End for loop for jobs in job.oCommand
+
+            if errorOutputOpen:
+                # Mark any error output end
+                markErrorOutput(job, output, start=False)
+                errorOutputOpen = False
 
             job.endTime = time()
             dtStart = datetime.fromtimestamp(job.startTime)
@@ -345,9 +364,10 @@ def jobsWorker(
                 dtEnd.isoformat(),
                 strFormatTimeDelta(dtDuration),
             )
-            job.output.append(msg)
             msg += "*******************\n\n\n"
-            output.job.emit(msg, {"color": SvgColor.cyan, "appendEnd": True})
+            msgArgs = {"color": SvgColor.cyan, "appendEnd": True}
+            output.job.emit(msg, dict(msgArgs))
+            job.output.append([msg, dict(msgArgs)])
             msg = "Job ID: {} {}\nruntime {}"
             msg = msg.format(
                 job.jobRow[JobKey.ID],
@@ -373,7 +393,9 @@ def jobsWorker(
             funcProgress.lblSetValue.emit(4, totalErrors)
             msg = "Job ID: {} cannot execute command.\n\nCommand: {}\n"
             msg = msg.format(job.jobRow[JobKey.ID], job.oCommand.command)
-            output.error.emit(msg, {"color": SvgColor.red})
+            msgArgs = {"color": SvgColor.red}
+            output.error.emit(msg, dict(msgArgs))
+            job.errors.append([msg, dict(msgArgs)])
             jobsQueue.statusUpdateSignal.emit(job, JobStatus.Error)
             if log:
                 MODULELOG.debug(
@@ -415,6 +437,37 @@ def dummyRunCommand(funcProgress, indexTotal, controlQueue):
                 break
 
 
+def markErrorOutput(job, output, start=True):
+    """
+    markErrorOutput start/stop messages for error output
+
+    Args:
+        **job** (JobInfo): current job
+
+        **output** (OutputWindows): give access to the output widgets
+
+        **start** (bool, optional): signal the start or stop message.
+        Defaults to True.
+    """
+
+    dt = datetime.fromtimestamp(time())
+
+    if start:
+        msg = "---------------------\n"
+        msg += "Messages for Job ID: {} started at {}.\n\n".format(
+            job.jobRow[JobKey.ID], dt.isoformat()
+        )
+    else:
+        msg = "Messages for Job ID: {} ended at {}.\n\n".format(
+            job.jobRow[JobKey.ID], dt.isoformat()
+        )
+        msg += "---------------------\n"
+
+    msgArgs = {"color": SvgColor.yellow, "appendEnd": True}
+    output.error.emit(msg, dict(msgArgs))
+    job.errors.append([msg, dict(msgArgs)])
+
+
 def errorMsg(output, msg, kwargs):
 
     output.error.emit(msg, kwargs)
@@ -446,7 +499,7 @@ def displayRunJobs(
     funcProgress.lblSetValue.emit(2, indexTotal[0] + 1)
     n = -1
 
-    job.output.append(displayRunJobs.line)
+    job.output.append([displayRunJobs.line, {}])
 
     if m := regEx.search(displayRunJobs.line):
         n = int(m.group(1))
@@ -460,7 +513,7 @@ def displayRunJobs(
         if not displayRunJobs.printPercent:
             # output.job.emit("", {})
             displayRunJobs.printPercent = True
-            job.output.append("")
+            # job.output.append(["", {}])  # Test Line
 
         displayRunJobs.line = displayRunJobs.line.strip()
 
@@ -482,7 +535,8 @@ def displayRunJobs(
         displayRunJobs.printPercent = False
         displayRunJobs.counting = False
         output.job.emit("\n\n", {})
-        job.output.append("\n\n")
+        # job.output.append(["\n\n", {}]) hack cannot find the read difference
+        job.output.append(["\n", {}])
 
     # clear proccessed line
     line = displayRunJobs.line
