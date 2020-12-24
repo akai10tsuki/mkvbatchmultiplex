@@ -5,7 +5,7 @@ from sqlite3 import Error as SQLiteError
 
 from vsutillib.sql import SqlDb
 
-
+from .. import config
 class SqlJobsTable(SqlDb):
     """
     SqlJobsDB class to access sqlite database for saving jobs
@@ -29,10 +29,12 @@ class SqlJobsTable(SqlDb):
 
     def _createJobsTable(self):
         # Create jobs table
+        dbVersion = config.data.get(config.ConfigKey.DbVersion)
+
         if self.connection is not None:
             # version 2.1.0
 
-            sqlScript = """
+            sqlCreateTableScript = """
                 -- start a transaction
                 BEGIN TRANSACTION;
 
@@ -60,10 +62,20 @@ class SqlJobsTable(SqlDb):
                     USING fts5(rowidKey, id, startTime, command);
                 """
 
+            sqlDropTablesScript = """
+                -- start a transaction
+                BEGIN TRANSACTION;
+
+                -- drop the table
+                DROP TABLE jobs;
+
+                DROP TABLE jobsSearch;
+                """
+
             self.__lastError = None
 
             try:
-                self.connection.executescript(sqlScript)
+                self.connection.executescript(sqlCreateTableScript)
                 self.commit()
             except SQLiteError as e:
                 self.__lastError = "SQLiteError: {}".format(e)
@@ -72,7 +84,16 @@ class SqlJobsTable(SqlDb):
             if self.__lastError is None:
                 version = self.version("jobs")
                 if version is None:
-                    self.setVersion("jobs", "2.1.0")
+                    self.setVersion("jobs", dbVersion)
+                elif version != dbVersion:
+                    self.connection.executescript(sqlDropTablesScript)
+                    self.commit()
+                    self.connection.executescript(sqlCreateTableScript)
+                    self.commit()
+
+                    self.setVersion("jobs", dbVersion)
+                    self.setVersion("jobsSearch", dbVersion)
+
                 version = self.version("jobsSearch")
                 if version is None:
                     self.setVersion("jobsSearch", "2.1.0")
@@ -218,6 +239,7 @@ class SqlJobsTable(SqlDb):
     def fetchJob(
         self, jobID, *args, fetchAll=False, whereClause=None, orderClause=None
     ):
+        # pylint: disable=anomalous-backslash-in-string
         """
         fetchJob fetch information from database by job id
 
@@ -323,6 +345,7 @@ class SqlJobsTable(SqlDb):
         pass
 
     def update(self, jobID, fields, *args, whereClause=None):
+        # pylint: disable=anomalous-backslash-in-string
         """
         update job information on database
 
