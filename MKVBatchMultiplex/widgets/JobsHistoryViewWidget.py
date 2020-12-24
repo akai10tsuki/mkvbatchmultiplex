@@ -11,6 +11,7 @@ except:  # pylint: disable=bare-except
     import pickle
 import re
 import zlib
+#import pprint
 
 from datetime import datetime, timedelta
 
@@ -182,10 +183,10 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
             _JobHKey.ID, Qt.Horizontal, "  " + _(Text.txt0131) + "  "
         )
         self.tableView.model.setHeaderData(
-            _JobHKey.Date, Qt.Horizontal, " " + _(Text.txt0240) + " "
+            _JobHKey.Date, Qt.Horizontal, "    " + _(Text.txt0240) + "    "
         )
         self.tableView.model.setHeaderData(
-            _JobHKey.Status, Qt.Horizontal, "  " + _(Text.txt0132) + "  "
+            _JobHKey.Status, Qt.Horizontal, "    " + _(Text.txt0132) + "    "
         )
         self.tableView.model.setHeaderData(
             _JobHKey.Command, Qt.Horizontal, _(Text.txt0133)
@@ -222,9 +223,7 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
                 self.btnGrid.itemAt(_Button.PRINT).widget().hide()
                 self.btnGrid.itemAt(_Button.REFRESH).widget().setEnabled(True)
                 self.btnGrid.itemAt(_Button.SHOWOUTPUT).widget().setEnabled(False)
-                self.btnGrid.itemAt(_Button.SHOWOUTPUTERRORS).widget().setEnabled(
-                    False
-                )
+                self.btnGrid.itemAt(_Button.SHOWOUTPUTERRORS).widget().setEnabled(False)
                 if totalSelectedRows == 0:
                     self.btnGrid.itemAt(_Button.CLEARSELECTION).widget().setEnabled(
                         False
@@ -458,7 +457,9 @@ def showOutputLines(**kwargs):
 
         row = index.row()
         # column = index.column()
-        job = model.dataset.data[row][JobHistoryKey.Command].obj # TODO: change to status
+        job = model.dataset.data[row][
+            JobHistoryKey.Command
+        ].obj  # TODO: change to status
         rowid = model.dataset.data[row][JobHistoryKey.ID].obj
         if job is None:
             records = jobsDB.fetchJob({"rowid": rowid}, JobsTableKey.job)
@@ -480,14 +481,15 @@ def showOutputLines(**kwargs):
             indexes = tableView.selectedIndexes()
 
             processedFiles = 0
-            for line in job.output:
+            for line, arguments in job.output:
                 if m := regPercentEx.search(line):
                     n = int(m.group(1))
                     if n < 100:
                         continue
                 if f := regOutputFileEx.search(line):  # pylint: disable=unused-variable
                     processedFiles += 1
-                output.insertTextSignal.emit(line, {"log": False})
+                arguments["log"] = False
+                output.insertTextSignal.emit(line, arguments)
                 # The signals are generated to fast and the History window
                 # seems unresponsive
                 sleep(0.000001)
@@ -498,7 +500,6 @@ def showOutputLines(**kwargs):
                 # seems unresponsive
                 sleep(0.000001)
 
-
             msg = stats(job)
 
             output.insertTextSignal.emit(msg, {"log": False})
@@ -506,47 +507,31 @@ def showOutputLines(**kwargs):
         elif outputType == _ShowKey.errors:
 
             for analysis in job.errors:
-
-                msg = "Error Job ID: {} ---------------------\n\n".format(
-                    job.jobRow[JobKey.ID]
-                )
-
-                output.insertTextSignal.emit(
-                    msg, {"color": SvgColor.red, "appendEnd": True, "log": False}
-                )
-
-                # msg = "\nDestination File: {}\n\n".format(destinationFile)
-                # output.error.emit(msg,
-                #     {"color": SvgColor.red, "appendEnd": True, "log": False})
-
-                for i, m in enumerate(analysis):
-                    if i == 0:
-                        lines = m.split("\n")
-                        findSource = True
-                        for index, line in enumerate(lines):
-                            color = SvgColor.orange
-                            if findSource and (
-                                (searchIndex := line.find("File Name")) >= 0
-                            ):
-                                if searchIndex >= 0:
-                                    color = SvgColor.tomato
-                                    findSource = False
+                if isinstance(analysis[1], dict):
+                    output.insertTextSignal.emit(analysis[0], analysis[1])
+                    sleep(0.000001)
+                else:
+                    for i, m in enumerate(analysis):
+                        if i == 0:
+                            lines = m.split("\n")
+                            findSource = True
+                            for index, line in enumerate(lines):
+                                color = SvgColor.orange
+                                if findSource and (
+                                    (searchIndex := line.find("File Name")) >= 0
+                                ):
+                                    if searchIndex >= 0:
+                                        color = SvgColor.tomato
+                                        findSource = False
+                                output.insertTextSignal.emit(
+                                    line + "\n", {"color": color, "log": False}
+                                )
+                                sleep(0.000001)
+                        else:
                             output.insertTextSignal.emit(
-                                line + "\n", {"color": color, "log": False}
+                                m, {"color": SvgColor.red, "log": False}
                             )
                             sleep(0.000001)
-                    else:
-                        output.insertTextSignal.emit(
-                            m, {"color": SvgColor.red, "log": False}
-                        )
-
-                msg = "Error Job ID: {} ---------------------\n\n".format(
-                    job.jobRow[JobKey.ID]
-                )
-                output.insertTextSignal.emit(
-                    msg, {"color": SvgColor.red, "appendEnd": True, "log": False}
-                )
-
         jobsDB.close()
 
 
