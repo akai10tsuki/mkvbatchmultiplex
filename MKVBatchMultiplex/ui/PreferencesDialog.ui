@@ -278,6 +278,20 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>cmbBoxInterfaceLanguage</tabstop>
+  <tabstop>fcmbBoxFontFamily</tabstop>
+  <tabstop>spinBoxFontSize</tabstop>
+  <tabstop>chkBoxEnableLogging</tabstop>
+  <tabstop>chkBoxEnableLogViewer</tabstop>
+  <tabstop>chkBoxEnableJobHistory</tabstop>
+  <tabstop>chkBoxAutoSaveJobHistory</tabstop>
+  <tabstop>chkBoxRestoreWindowSize</tabstop>
+  <tabstop>rbZero</tabstop>
+  <tabstop>rbOne</tabstop>
+  <tabstop>rbTwo</tabstop>
+  <tabstop>btnRestoreDefaults</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
