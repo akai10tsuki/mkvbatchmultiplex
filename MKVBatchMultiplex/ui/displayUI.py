@@ -4,9 +4,12 @@
 
 import sys
 
-from PySide2.QtWidgets import QApplication, QDialog
+from PySide2.QtWidgets import QApplication, QDialog, QDialogButtonBox
 from Ui_PreferencesDialog import Ui_PreferencesDialog
+from Ui_ProjectInfoDialog import Ui_ProjectInfoDialog
+from Ui_ProjectInfoOkDialog import Ui_ProjectInfoOkDialog
 from Ui_SearchTextDialog import Ui_SearchTextDialog
+
 
 #class MainWindow(QMainWindow):
 #    def __init__(self):
@@ -20,6 +23,19 @@ class PreferencesDialog(QDialog):
         self.ui = Ui_PreferencesDialog()
         self.ui.setupUi(self)
 
+class ProjectInfoDialog(QDialog):
+    def __init__(self):
+        super().__init__()
+        self.ui = Ui_ProjectInfoDialog()
+        self.ui.setupUi(self)
+        self.ui.buttonBox.setStandardButtons(QDialogButtonBox.Ok)
+
+class ProjectInfoOkDialog(QDialog):
+    def __init__(self):
+        super().__init__()
+        self.ui = Ui_ProjectInfoOkDialog()
+        self.ui.setupUi(self)
+
 class SearchTextDialog(QDialog):
     def __init__(self):
         super().__init__()
@@ -30,7 +46,7 @@ class SearchTextDialog(QDialog):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
-    window = PreferencesDialog()
+    window = ProjectInfoDialog()
     window.show()
 
     sys.exit(app.exec_())
