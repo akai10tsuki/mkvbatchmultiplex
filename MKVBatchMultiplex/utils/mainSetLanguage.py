@@ -5,7 +5,7 @@ set language locale for main window menus
 from vsutillib.pyqt import QMenuWidget, QActionWidget
 
 from .. import config
-from .text import Text
+from .Text import Text
 
 
 def setLanguageMenus(parent):
