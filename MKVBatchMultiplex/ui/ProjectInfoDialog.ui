@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>ProjectInfoDialog</class>
- <widget class="QDialog" name="projectInfo">
+ <widget class="QDialog" name="ProjectInfoDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -84,12 +84,16 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>leName</tabstop>
+  <tabstop>teDescription</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>projectInfo</receiver>
+   <receiver>ProjectInfoDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -105,7 +109,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>projectInfo</receiver>
+   <receiver>ProjectInfoDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
