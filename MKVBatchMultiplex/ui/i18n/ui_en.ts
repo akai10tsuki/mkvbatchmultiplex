@@ -70,6 +70,42 @@
     </message>
 </context>
 <context>
+    <name>ProjectInfoDialog</name>
+    <message>
+        <location filename="ProjectInfoDialog.ui" line="19"/>
+        <source>Project Information</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="ProjectInfoDialog.ui" line="47"/>
+        <source>Name</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="ProjectInfoDialog.ui" line="70"/>
+        <source>Description</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>ProjectInfoOkDialog</name>
+    <message>
+        <location filename="ProjectInfoOkDialog.ui" line="19"/>
+        <source>Project Information</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="ProjectInfoOkDialog.ui" line="47"/>
+        <source>Name</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="ProjectInfoOkDialog.ui" line="70"/>
+        <source>Description</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
     <name>SearchTextDialog</name>
     <message>
         <location filename="SearchTextDialog.ui" line="19"/>
@@ -84,24 +120,6 @@
     <message>
         <location filename="SearchTextDialog.ui" line="65"/>
         <source>Text to search:</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>projectInfo</name>
-    <message>
-        <location filename="ProjectInfo.ui" line="47"/>
-        <source>Name</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="ProjectInfo.ui" line="70"/>
-        <source>Description</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="ProjectInfo.ui" line="19"/>
-        <source>Project Information</source>
         <translation></translation>
     </message>
 </context>
