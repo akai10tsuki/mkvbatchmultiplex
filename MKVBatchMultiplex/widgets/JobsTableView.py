@@ -9,12 +9,12 @@ import csv
 import logging
 import io
 
-try:
-    import cPickle as pickle
-except:  # pylint: disable=bare-except
-    import pickle
-import sys
-import zlib
+#try:
+#    import cPickle as pickle
+#except:  # pylint: disable=bare-except
+#    import pickle
+#import sys
+#import zlib
 
 from PySide2.QtCore import Qt
 
@@ -29,8 +29,9 @@ from PySide2.QtWidgets import (
 
 from vsutillib.mkv import MKVCommandParser
 
-from .. import config
-from ..jobs import JobStatus, JobKey, JobInfo, JobsTableKey, saveToDb, SqlJobsTable
+#from .. import config
+#from ..jobs import JobStatus, JobKey, JobInfo, JobsTableKey, saveToDb, SqlJobsTable
+from ..jobs import JobStatus, JobKey, JobInfo, saveToDb
 #from ..utils import Text
 
 from .JobsViewHelpers import removeJob
@@ -327,6 +328,8 @@ class JobsTableView(QTableView):
                 job = model.dataset.data[jobRow][JobKey.Status].obj
                 if job:
                     print(f"ID = {job.jobRow[JobKey.ID]} = {jobID}")
+                if rowID:
+                    print(f"Database row ID = {rowID}")
                 title = self.infoDialog.windowTitle()
                 self.infoDialog.setWindowTitle(title + ' - ' + str(jobID))
 
