@@ -260,7 +260,7 @@ class JobsHistoryView(QTableView):
                 model = self.proxyModel.sourceModel()
                 row = rows[3]
                 column = columns[3]
-                command = model.dataset.data[row][column].cell
+                command = model.dataset.data[row][column].cell.strip()
                 QApplication.clipboard().setText(command)
 
     def supportedDropActions(self):  # pylint: disable=no-self-use
