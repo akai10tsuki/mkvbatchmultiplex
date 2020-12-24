@@ -89,6 +89,7 @@ FORCELOG = True
 WORKERTHREADNAME = "jobsWorker"
 SYSTEMDATABASE = "itsue.db"
 ALGORITHMDEFAULT = 1
+DATABASEVERSION = "2.1.0"
 
 #######################
 #######################
@@ -132,6 +133,7 @@ class ConfigKey:  # pylint: disable=too-few-public-methods
     LogViewer = "LogViewer"
     Tab = "Tab"
     TabText = "TabText"
+    DbVersion = "DbVersion"
 
 
 class Key:
@@ -220,6 +222,9 @@ def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None, ap
 
     if data.get(Key.MaxRegExCount) is None:
         data.set(Key.MaxRegExCount, 20)
+
+    if data.get(ConfigKey.DbVersion) is None:
+        data.set(ConfigKey.DbVersion, DATABASEVERSION)
 
     if data.get(ConfigKey.JobHistory) is None:
         data.set(ConfigKey.JobHistory, False)
