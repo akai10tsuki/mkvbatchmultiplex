@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'PreferencesDialog.ui'
 ##
-## Created by: Qt User Interface Compiler version 5.15.1
+## Created by: Qt User Interface Compiler version 5.15.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -85,6 +85,17 @@ class Ui_PreferencesDialog(object):
         self.btnRestoreDefaults = QPushButton(PreferencesDialog)
         self.btnRestoreDefaults.setObjectName(u"btnRestoreDefaults")
         self.btnRestoreDefaults.setGeometry(QRect(50, 430, 351, 34))
+        QWidget.setTabOrder(self.cmbBoxInterfaceLanguage, self.fcmbBoxFontFamily)
+        QWidget.setTabOrder(self.fcmbBoxFontFamily, self.spinBoxFontSize)
+        QWidget.setTabOrder(self.spinBoxFontSize, self.chkBoxEnableLogging)
+        QWidget.setTabOrder(self.chkBoxEnableLogging, self.chkBoxEnableLogViewer)
+        QWidget.setTabOrder(self.chkBoxEnableLogViewer, self.chkBoxEnableJobHistory)
+        QWidget.setTabOrder(self.chkBoxEnableJobHistory, self.chkBoxAutoSaveJobHistory)
+        QWidget.setTabOrder(self.chkBoxAutoSaveJobHistory, self.chkBoxRestoreWindowSize)
+        QWidget.setTabOrder(self.chkBoxRestoreWindowSize, self.rbZero)
+        QWidget.setTabOrder(self.rbZero, self.rbOne)
+        QWidget.setTabOrder(self.rbOne, self.rbTwo)
+        QWidget.setTabOrder(self.rbTwo, self.btnRestoreDefaults)
 
         self.retranslateUi(PreferencesDialog)
         self.btnBox.accepted.connect(PreferencesDialog.accept)
