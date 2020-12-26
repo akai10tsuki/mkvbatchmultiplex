@@ -6,27 +6,29 @@ import platform
 import pprint
 import re
 import shlex
-
-import colorama
-
-from colorama import Fore, Back, Style
-
 from pathlib import Path, PurePath
 
-
-# from natsort import natsorted, ns
-
-from vsutillib.mkv import IVerifyStructure, MKVAttachments, stripEncaseQuotes
-
-from adjustSources import adjustSources
-
-from GetTracks import GetTracks
-from MKVCommandParser import MKVCommandParser
-
-from vsutillib.macos import isMacDarkMode
+import colorama
+from colorama import Back, Fore, Style
 
 # from MKVBatchMultiplex.utils import adjustSources
+from vsutillib.macos import isMacDarkMode
+from vsutillib.mkv import (
+    IVerifyStructure,
+    generateCommandTemplate,
+    MKVAttachments,
+    MKVCommandParser,
+)
+
+from adjustSources import adjustSources
+from GetTracks import GetTracks
+
+# from MKVCommandParser import MKVCommandParser
+#from commandTemplate import commandTemplate
+
 from MKVBatchMultiplex import config
+
+# from natsort import natsorted, ns
 
 
 def test():
@@ -110,57 +112,71 @@ def test():
 
     colorama.init()
 
-    fTemplate = _template(cmd, hasTitle=True)
+    #oAttachments = MKVAttachments()
+
+    #template, dMatch = generateCommandTemplate(cmd, attachments=oAttachments, setTitle=True)
+
+    #print(template)
+
+    #return
 
     iVerify = IVerifyStructure()
     oCommand = MKVCommandParser()
     oCommand.command = cmd
 
-    print(f"Template = {fTemplate}\n")
-    print(f"Template = {oCommand.commandTemplate}\n")
+    # for m in dMatch[MKVParseKey.baseFilesMatch]:
+    #    print(m)
 
-    return
+    #print()
+    #print(f"mkvmerge = {oCommand.mkvmerge}\n")
+    #print(f"Templates {oCommand.commandTemplate}\n")
+    #print(f"Output File {oCommand.cliOutputFile}")
+    #print(f"Chapters File {oCommand.cliChaptersFile}")
+    #print()
 
-    trackOptions = oCommand.oSourceFiles.sourceFiles[0].trackOptions
-    mediaInfo = oCommand.oSourceFiles.sourceFiles[0].trackOptions.mediaInfo
-    filesInDir = oCommand.oSourceFiles.sourceFiles[0].filesInDir
-    sources = oCommand.oSourceFiles.sourceFiles[0]
+    #trackOptions = oCommand.oSourceFiles.sourceFiles[0].trackOptions
+    #mediaInfo = oCommand.oSourceFiles.sourceFiles[0].trackOptions.mediaInfo
+    #filesInDir = oCommand.oSourceFiles.sourceFiles[0].filesInDir
+    #sources = oCommand.oSourceFiles.sourceFiles[0]
 
-    print(f"Tracks = {trackOptions.tracks}\n")
-    print(f"Template = {oCommand.commandTemplate}\n")
+    #print(f"Tracks = {trackOptions.tracks}\n")
 
-    print(f"Track options {trackOptions.options}")
-    print(f"Tracks {trackOptions.tracks}")
-    print(f"Names {trackOptions.trackNames}")
-    print(f"Track Edited {trackOptions.trackTitleEdited}")
-    for track in trackOptions.tracks:
-        print(f"Name match {trackOptions.trackNameMatch(track)}")
+    #print(f"Track options {trackOptions.options}")
+    #print(f"Tracks {trackOptions.tracks}")
+    #print(f"Names {trackOptions.trackNames}")
+    #print(f"Track Edited {trackOptions.trackTitleEdited}")
+    #for track in trackOptions.tracks:
+    #    print(f"Name match {trackOptions.trackNameMatch(track)}")
+    #for f in filesInDir:
+    #    print(f)
 
-    return
+    #print()
 
-    for key in trackOptions.trackNames:
-        print(f"Track {key} title {trackOptions.trackNames[key][1]}")
-        print(f"Media {key} title {mediaInfo[int(key)].title}")
-        print(
-            f"            Are they equal? {mediaInfo[int(key)].title == trackOptions.trackNames[key][1]}"
-        )
-        print(f"Track {key} Modified: {trackOptions.trackTitleEdited[key]}\n")
+    #print(f"Attachment string\n{oCommand.oAttachments.attachmentsMatchString}")
 
-        for index, mediaFile in enumerate(filesInDir):
-            print(f"     File: {mediaFile}")
-            trackIndex = int(key)
-            if trackIndex < len(sources.filesMediaInfo[index]):
-                print(
-                    f"     Track Title {sources.filesMediaInfo[index][trackIndex].title}"
-                )
-            else:
-                print("     Track not found..")
+    #for key in trackOptions.trackNames:
+    #    print(f"Track {key} title {trackOptions.trackNames[key][1]}")
+    #    print(f"Media {key} title {mediaInfo[int(key)].title}")
+    #    print(
+    #        f"            Are they equal? {mediaInfo[int(key)].title == trackOptions.trackNames[key][1]}"
+    #    )
+    #    print(f"Track {key} Modified: {trackOptions.trackTitleEdited[key]}\n")
 
-        print()
+    #    for index, mediaFile in enumerate(filesInDir):
+    #        print(f"     File: {mediaFile}")
+    #        trackIndex = int(key)
+    #        if trackIndex < len(sources.filesMediaInfo[index]):
+    #            print(
+    #                f"     Track Title {sources.filesMediaInfo[index][trackIndex].title}"
+    #            )
+    #        else:
+    #            print("     Track not found..")
 
-    pprint.pprint(oCommand.oSourceFiles.sourceFiles[0].filesInDir)
+    #    print()
 
-    return
+    #pprint.pprint(oCommand.oSourceFiles.sourceFiles[0].filesInDir)
+
+    #return
 
     hasToGenerateCommands = False
 
@@ -168,16 +184,17 @@ def test():
 
     for index, sourceFiles in enumerate(oCommand.oSourceFiles):
         iVerify.verifyStructure(oCommand, index)
-        print(f"{Fore.GREEN}Index {index} - {sourceFiles[0]}.")
-        print(f"Tracks matched {iVerify.matched} unmatched {iVerify.unmatched}")
+        print(f"{Style.DIM}{Fore.GREEN}Index {index} - {sourceFiles[0]}.")
+        print(f"{Style.NORMAL}Tracks matched {iVerify.matched} unmatched {iVerify.unmatched}")
         if not iVerify:
-            print(f"{Style.BRIGHT}Verification failed.{Style.RESET_ALL}")
-            rc, confidence = adjustSources(oCommand, index, 1)
+            print(f"{Style.BRIGHT}{Fore.BLUE}Verification failed.{Style.RESET_ALL}")
+            rc, confidence, average = adjustSources(oCommand, index, algorithm)
 
             if rc:
                 _, shellCommand = oCommand.generateCommandByIndex(index, update=True)
                 print(
-                    f"{Fore.YELLOW}\nNew command - confidence {confidence}:\n{shellCommand}\n"
+                    f"{Fore.YELLOW}\nNew command - confidence {confidence}"
+                    f"-average({average}):\n{shellCommand}\n"
                 )
             else:
                 print(
@@ -188,122 +205,18 @@ def test():
                 hasToGenerateCommands = True
         print()
 
-    # config.data.set(config.ConfigKey.Algorithm, 1)
 
-
-def _template(bashCommand, hasTitle=False):
-
-    cmdTemplate = bashCommand
-
-    reExecutableEx = re.compile(r"^(.*?)\s--")
-    reOutputFileEx = re.compile(r".*?--output\s(.*?)\s--")
-    reFilesEx = re.compile(r"'\(' (.*?) '\)'")
-    reChaptersFileEx = re.compile(r"--chapter-language (.*?) --chapters (.*?) (?=--)")
-    reTracksOrderEx = re.compile(r"--track-order\s(.*)")
-    reTitleEx = re.compile(r"--title\s(.*?)(?=$|\s--)")
-
-    if matchExecutable := reExecutableEx.match(cmdTemplate):
-        m = matchExecutable.group(1)
-        f = stripEncaseQuotes(m)
-        e = shlex.quote(f)
-
-        ##
-        # BUG 1
-        # Reported by zFerry98
-        #
-        # When running in Windows there is no space in the mkvmerge executable path
-        # \ is use as escape
-        # Command: ['C:binmkvtoolnixmkvmerge.exe', ...
-        #
-        # Solution:
-        #   Force quotes for mkvmerge executable
-        #
-        #   Command: ['C:\\bin\\mkvtoolnix\\mkvmerge.exe'
-        ##
-        if platform.system() == "Windows":
-            if e[0:1] != "'":
-                e = "'" + f + "'"
-        ##
-
-        step = 0
-        cmdTemplate = bashCommand
-        #print(f"Template Step {step}\n{cmdTemplate}\n")
-        cmdTemplate = cmdTemplate.replace(m, e, 1)
-        step += 1
-        #print(f"Template Quotes for Executable Step {step}\n{cmdTemplate}\n")
-
-        if matchOutputFile := reOutputFileEx.match(bashCommand):
-            matchString = matchOutputFile.group(1)
-            cmdTemplate = cmdTemplate.replace(matchString, MKVParseKey.outputFile, 1)
-            step += 1
-            #print(f"Template OutputFile Step {step}\n{cmdTemplate}\n")
-
-        if matchFiles := reFilesEx.finditer(bashCommand):
-            for index, match in enumerate(matchFiles):
-                matchString = match.group(0)
-                key = "<SOURCE{}>".format(str(index))
-                cmdTemplate = cmdTemplate.replace(matchString, key, 1)
-            step += 1
-            #print(f"Template {key} Step {step}\n{cmdTemplate}\n")
-
-        oAttachments = MKVAttachments()
-        oAttachments.strCommand = bashCommand
-
-        if oAttachments.cmdLineAttachments:
-            cmdTemplate = cmdTemplate.replace(
-                oAttachments.attachmentsMatchString,
-                MKVParseKey.attachmentFiles,
-                1,
-            )
-            step += 1
-            #print(f"Template attachments {step}\n{cmdTemplate}\n")
-
-        ##
-        # Bug #3
-        #
-        # It was not preserving the episode title
-        #
-        # Remove title before parsing and added the <TITLE> key to the template
-        # If there is no title read --title '' will be used.
-        # working with \ ' " backslash, single and double quotes in same title
-        ##
-
-        # Add title to template
-
-        if match := reChaptersFileEx.search(bashCommand):
-            matchString = match.group(2)
-            cmdTemplate = cmdTemplate.replace(matchString, MKVParseKey.chaptersFile, 1)
-            step += 1
-            #print(f"Template Chapters Step {step} {cmdTemplate}\n")
-
-        if hasTitle:
-            if match := reTitleEx.search(bashCommand):
-                matchString = match.group(1)
-                cmdTemplate = cmdTemplate.replace(
-                    matchString,
-                    MKVParseKey.title,
-                    1,
-                )
-            else:
-                cmdTemplate += "--title " + MKVParseKey.title
-
-            step += 1
-            #print(f"Template Title Step {step}\n{cmdTemplate}\n")
-
-        if match := reTracksOrderEx.search(bashCommand):
-            matchString = match.group(1)
-            cmdTemplate = cmdTemplate.replace(matchString, MKVParseKey.trackOrder, 1)
-            step += 1
-            #print(f"Template Step {step} {cmdTemplate}\n")
-
-    return cmdTemplate
-class MKVParseKey:
+class MKVParseKeyCarajo:
 
     attachmentFiles = "<ATTACHMENTS>"
     chaptersFile = "<CHAPTERS>"
     outputFile = "<OUTPUTFILE>"
     title = "<TITLE>"
     trackOrder = "<ORDER>"
+    mkvmergeMatch = "mkvmergeMatch"
+    outputMatch = "outputMatch"
+    baseFilesMatch = "baseFilesMatch"
+    chaptersMatch = "chaptersMatch"
 
 
 if __name__ == "__main__":
