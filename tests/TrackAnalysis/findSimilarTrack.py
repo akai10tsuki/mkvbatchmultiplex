@@ -17,10 +17,6 @@ def findSimilarTrack(oBaseFile, sourceFile, track, usedTracks, algorithm=1):
         if p > basePoints:
             basePoints = p
             trackOrder = trk.streamOrder
-        print(f"File: {oBaseFile.fileName}")
-        print(f"base type = {track.trackType} lang = {track.language}")
-        print(f"test type = {trk.trackType} lang = {trk.language}")
-        print(f"Results track order {trackOrder} points {p}")
 
     return trackOrder, basePoints
 

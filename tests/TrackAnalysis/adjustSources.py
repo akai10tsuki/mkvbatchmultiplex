@@ -43,10 +43,9 @@ def adjustSources(oCommand, index, algorithm=1):
 
     foundBadTrack = False
     unsolvedMismatch = False
-    average = scoreAvarage()
+    average = ScoreAverage()
 
     for baseIndex, oBaseFile in enumerate(oCommand.oBaseFiles):
-        print(f"Testing file {oBaseFile.fileName}")
         baseFileInfo = oBaseFile.mediaFileInfo
         sourceFileInfo = MediaFileInfo(sourceFiles[baseIndex])
         trackOptions = oBaseFile.trackOptions
@@ -85,7 +84,6 @@ def adjustSources(oCommand, index, algorithm=1):
             if trackBase != trackSource:
                 if not foundBadTrack:
                     foundBadTrack = True
-                    print("Found bad track..")
                 trackSimilar, score = findSimilarTrack(
                     oBaseFile, sourceFileInfo, trackBase, usedTracks, algorithm
                 )
@@ -93,7 +91,6 @@ def adjustSources(oCommand, index, algorithm=1):
                     average.addUnits(1)
                     average.addPoints(score)
                     if trackSimilar not in usedTracks:
-                        print("Solve mismatch...")
                         usedTracks.append(trackSimilar)
                         translate[track] = str(trackSimilar)
                         if savedScore > 0:
@@ -116,7 +113,6 @@ def adjustSources(oCommand, index, algorithm=1):
                     else:
                         if not unsolvedMismatch:
                             unsolvedMismatch = True
-                            print("Unsolved mismatch..")
                         translate = {}
                         break
             else:
@@ -133,17 +129,14 @@ def adjustSources(oCommand, index, algorithm=1):
             oCommand.commandTemplates[index] = newTemplate
             tracksOrderTranslation.update(trackOpts.orderTranslation)
             confidence = "High"
-            if savedScore < 5:
+            if average.average() < 5:
                 confidence = "Low"
-            elif savedScore < 8:
+            elif average.average() < 8:
                 confidence = "Medium"
-
-        print(f"Average = {average.average()}")
 
     if not foundBadTrack:
         # No needed tracks failed match.
         # Nothing to do go ahead with command.
-        print("No bad tracks found...")
         confidence = "High - Needed track(s) matched."
         rc = True
 
@@ -152,11 +145,10 @@ def adjustSources(oCommand, index, algorithm=1):
         tracksOrder.translation = tracksOrderTranslation
         oCommand.tracksOrder[index] = tracksOrder.strOrder()
 
-    print(f"Adjust reccomends rc = {rc} confidence = {confidence}")
-    return rc, confidence
+    return rc, confidence, average.average()
 
 
-class scoreAvarage:
+class ScoreAverage:
     """
     Avarage of units and points
     """
