@@ -222,8 +222,6 @@ def jobsWorker(
                         saveToDb(job, update=True)
                     break
 
-                verify.verifyStructure(baseFiles, sourceFiles, destinationFile)
-
                 iVerify.verifyStructure(job.oCommand, index)
 
                 if log:
@@ -305,7 +303,7 @@ def jobsWorker(
                         cli.command = cmd
                         cli.run()
                 else:
-                    job.errors.append(verify.analysis)
+                    job.errors.append(iVerify.analysis)
                     totalErrors += 1
                     funcProgress.lblSetValue.emit(4, totalErrors)
                     if not errorOutputOpen:
@@ -317,7 +315,7 @@ def jobsWorker(
                     msgArgs = {"color": SvgColor.red, "appendEnd": True}
                     output.job.emit(msg, dict(msgArgs))
                     job.output.append([msg, dict(msgArgs)])
-                    for i, m in enumerate(verify.analysis):
+                    for i, m in enumerate(iVerify.analysis):
                         if i == 0:
                             lines = m.split("\n")
                             findSource = True
