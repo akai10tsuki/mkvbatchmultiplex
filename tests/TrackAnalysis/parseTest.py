@@ -134,23 +134,42 @@ def test():
     #print(f"Chapters File {oCommand.cliChaptersFile}")
     #print()
 
-    #trackOptions = oCommand.oSourceFiles.sourceFiles[0].trackOptions
-    #mediaInfo = oCommand.oSourceFiles.sourceFiles[0].trackOptions.mediaInfo
-    #filesInDir = oCommand.oSourceFiles.sourceFiles[0].filesInDir
-    #sources = oCommand.oSourceFiles.sourceFiles[0]
+    cmdTemplate = oCommand.commandTemplate
+    correctionDone = False
+    for oBaseFile in oCommand.oBaseFiles:
+        trackOptions = oBaseFile.trackOptions
 
-    #print(f"Tracks = {trackOptions.tracks}\n")
+        print(f" Match String {oBaseFile.fullMatchString}")
+        print(f"     Tracks = {trackOptions.tracks}")
+        print(f"Track options {trackOptions.options}")
+        print(f"       Tracks {trackOptions.tracks}")
 
-    #print(f"Track options {trackOptions.options}")
-    #print(f"Tracks {trackOptions.tracks}")
-    #print(f"Names {trackOptions.trackNames}")
-    #print(f"Track Edited {trackOptions.trackTitleEdited}")
-    #for track in trackOptions.tracks:
-    #    print(f"Name match {trackOptions.trackNameMatch(track)}")
+        if trackOptions.trackNames:
+            print(f"        Names {trackOptions.trackNames}")
+            print(f" Track Edited {trackOptions.trackTitleEdited}")
+            for track in trackOptions.tracks:
+                print(f"   Name match {trackOptions.trackNameMatch(track)}")
+
+        if oBaseFile.trackOptions.hasNamesToPreserve:
+            matchString = oBaseFile.fullMatchStringWithKey()
+            templateCorrection = oBaseFile.fullMatchStringCorrected(withKey=True)
+            print(f"\n{matchString}\n{templateCorrection}")
+            cmdTemplate = cmdTemplate.replace(matchString, templateCorrection, 1)
+            if not correctionDone:
+                correctionDone = True
+        else:
+            print("Nothing to see.")
+        print()
+
+    if correctionDone:
+        print(f"Original Template\n{oCommand.originalCommandTemplate}")
+        print(f"New Template\n{oCommand.commandTemplate}")
+    print()
+
     #for f in filesInDir:
     #    print(f)
 
-    #print()
+    print()
 
     #print(f"Attachment string\n{oCommand.oAttachments.attachmentsMatchString}")
 
@@ -176,7 +195,7 @@ def test():
 
     #pprint.pprint(oCommand.oSourceFiles.sourceFiles[0].filesInDir)
 
-    #return
+    return
 
     hasToGenerateCommands = False
 
