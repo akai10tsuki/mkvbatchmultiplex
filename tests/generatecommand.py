@@ -113,6 +113,31 @@ class GenCommandApp(QMainWindow):
             + r"'(' '"
             + s
             + r"/test/subs/ENG/Show Title - S01E01.ENG.ass' ')' "
+            + r"--attachment-name Font01.otf "
+            + r"--attachment-mime-type application/vnd.ms-opentype "
+            + r"--attach-file '"
+            + s
+            + r"/test/Attachments/Font01.otf' "
+            + r"--attachment-name Font02.otf "
+            + r"--attachment-mime-type application/vnd.ms-opentype "
+            + r"--attach-file '"
+            + s
+            + r"/test/Attachments/Font02.otf' "
+            + r"--attachment-name Font03.ttf "
+            + r"--attachment-mime-type application/x-truetype-font "
+            + r"--attach-file '"
+            + s
+            + r"/test/Attachments/Font03.ttf' "
+            + r"--attachment-name Font04.ttf "
+            + r"--attachment-mime-type application/x-truetype-font "
+            + r"--attach-file '"
+            + s
+            + r"/test/Attachments/Font04.ttf' "
+            + r"--title 'Show Title Number 2' "
+            + r"--chapter-language und "
+            + r"--chapters '"
+            + s
+            + r"/test/chapters/Show Title - S01E01 - Chapters.xml' "
             + r"--track-order 0:0,0:1,1:0,2:0"
         )
 
