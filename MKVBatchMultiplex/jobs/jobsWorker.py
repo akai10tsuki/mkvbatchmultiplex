@@ -145,7 +145,11 @@ def jobsWorker(
             log=log,
         )
 
-        algorithm = config.data.get(config.ConfigKey.Algorithm)
+        if job.algorithm is None:
+            algorithm = config.data.get(config.ConfigKey.Algorithm)
+        else:
+            algorithm = job.algorithm
+            print(f"Setting algorithm in JobWorker to {job.algorithm}")
 
         if job.oCommand:
             job.startTime = time()
@@ -157,8 +161,8 @@ def jobsWorker(
             dt = datetime.fromtimestamp(job.startTime)
 
             msg = "*******************\n"
-            msg += "Job ID: {} started at {}.\n\n".format(
-                job.jobRow[JobKey.ID], dt.isoformat()
+            msg += "Job ID: {} started at {} using algorithm {}.\n\n".format(
+                job.jobRow[JobKey.ID], dt.isoformat(), algorithm
             )
             trayIconMessageSignal.emit(
                 "Information - MKVBatchMultiplex",

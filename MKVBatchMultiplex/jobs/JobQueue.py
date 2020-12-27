@@ -42,7 +42,14 @@ class JobInfo:  # pylint: disable=too-many-instance-attributes
     """
 
     def __init__(
-        self, jobRowNumber, jobRow, tableModel, errors=None, output=None, log=False,
+        self,
+        jobRowNumber,
+        jobRow,
+        tableModel,
+        algorithm=None,
+        errors=None,
+        output=None,
+        log=False,
     ):
 
         self.__jobRow = []
@@ -64,6 +71,11 @@ class JobInfo:  # pylint: disable=too-many-instance-attributes
         self.endTime = None
         self.errors = [] if errors is None else errors
         self.output = [] if output is None else output
+        if algorithm is None:
+            self.algorithm = config.data.get(config.ConfigKey.Algorithm)
+        else:
+            self.algorithm = algorithm
+            print(f"Setting algorithm in JobInfo to {algorithm}")
 
     @property
     def jobRow(self):
@@ -284,7 +296,7 @@ class JobQueue(QObject):
         index = self.model.index(job.jobRowNumber, JobKey.Status)
         self.model.setData(index, status)
 
-    def append(self, jobRow):
+    def append(self, jobRow, algorithm=None):
         """
         append job to Jobs queue
 
@@ -295,13 +307,17 @@ class JobQueue(QObject):
             bool: True if append successful False otherwise
         """
 
-        status = self.model.dataset[jobRow,][JobKey.Status]
+        status = self.model.dataset[
+            jobRow,
+        ][JobKey.Status]
         if status != JobStatus.AddToQueue:
             if status == JobStatus.Waiting:
                 self.addWaitingItemSignal.emit()
             return False
 
-        jobID = self.model.dataset[jobRow,][JobKey.ID]
+        jobID = self.model.dataset[
+            jobRow,
+        ][JobKey.ID]
 
         jobIndex = self.model.index(jobRow, JobKey.ID)
 
@@ -310,7 +326,15 @@ class JobQueue(QObject):
             self.__jobID += 1
             config.data.set(config.ConfigKey.JobID, self.__jobID)
 
-        newJob = JobInfo(jobRow, self.model.dataset[jobRow,], self.model, log=self.log,)
+        newJob = JobInfo(
+            jobRow,
+            self.model.dataset[
+                jobRow,
+            ],
+            self.model,
+            algorithm=algorithm,
+            log=self.log,
+        )
 
         self._workQueue.append(newJob)
         index = self.model.index(jobRow, JobKey.Status)

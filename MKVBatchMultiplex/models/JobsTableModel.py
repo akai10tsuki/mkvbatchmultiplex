@@ -127,12 +127,17 @@ class JobsTableModel(TableModel):
             bool: True if transaction successful. False otherwise.
         """
 
+        algorithm = data[0][2]
+        data[0][2] = None
+
+        print(f"Algorithm in JobsTableModel {algorithm}")
+
         rc = super(JobsTableModel, self).insertRows(position, rows, index, data=data)
 
         if rc:
             for r in range(0, rows):
                 jobRow = position + r
-                self.jobQueue.append(jobRow)
+                self.jobQueue.append(jobRow, algorithm=algorithm)
             self.jobQueue.statusChangeSignal.emit(index)
 
         return rc
