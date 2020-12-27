@@ -359,6 +359,10 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         # connect log viewer
         config.logViewer.connect(self.logViewerWidget.logMessage)
 
+        # connect JobHistory and commandWidget
+        self.historyWidget.pasteCommandSignal.connect(self.commandWidget.updateCommand)
+        self.historyWidget.updateAlgorithmSignal.connect(self.commandWidget.updateAlgorithm)
+
     def _initUI(self):
 
         # Create Widgets
