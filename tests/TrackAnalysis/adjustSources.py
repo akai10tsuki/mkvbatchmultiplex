@@ -45,6 +45,8 @@ def adjustSources(oCommand, index, algorithm=1):
     unsolvedMismatch = False
     average = ScoreAverage()
 
+    translationList = [None] * 3
+
     for baseIndex, oBaseFile in enumerate(oCommand.oBaseFiles):
         baseFileInfo = oBaseFile.mediaFileInfo
         sourceFileInfo = MediaFileInfo(sourceFiles[baseIndex])
@@ -120,6 +122,7 @@ def adjustSources(oCommand, index, algorithm=1):
                     usedTracks.append(i)
 
         if translate:
+            translationList[baseIndex] = copy.deepcopy(translate)
             if not rc:
                 rc = True
             template = oCommand.commandTemplates[index]
@@ -134,6 +137,10 @@ def adjustSources(oCommand, index, algorithm=1):
             elif average.average() < 8:
                 confidence = "Medium"
 
+
+    # Save translations
+    oCommand.translations[index] = translationList
+
     if not foundBadTrack:
         # No needed tracks failed match.
         # Nothing to do go ahead with command.
@@ -141,7 +148,7 @@ def adjustSources(oCommand, index, algorithm=1):
         rc = True
 
     if tracksOrderTranslation and oCommand.cliTracksOrder:
-        # What is the logic of this
+        # update track order on oCommand for given index
         tracksOrder.translation = tracksOrderTranslation
         oCommand.tracksOrder[index] = tracksOrder.strOrder()
 
