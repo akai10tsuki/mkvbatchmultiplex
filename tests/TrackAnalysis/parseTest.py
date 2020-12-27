@@ -18,13 +18,14 @@ from vsutillib.mkv import (
     generateCommandTemplate,
     MKVAttachments,
     MKVCommandParser,
+    TracksOrder,
 )
 
 from adjustSources import adjustSources
 from GetTracks import GetTracks
 
 # from MKVCommandParser import MKVCommandParser
-#from commandTemplate import commandTemplate
+# from commandTemplate import commandTemplate
 
 from MKVBatchMultiplex import config
 
@@ -92,7 +93,6 @@ def test():
         r"chapters\Show Title - S01E01 - Chapters.xml' "
         r"--track-order 0:0,0:1,1:0,2:0"
     )
-
     # f = Path("./ass.xml").open(mode="wb")
     # xml = pymediainfo.MediaInfo.parse(r'J:\Example\TestMedia\Example
     # 05\Subs\Show Title - S01E01.ENG.ass', output="OLDXML")
@@ -112,68 +112,78 @@ def test():
 
     colorama.init()
 
-    #oAttachments = MKVAttachments()
+    # oAttachments = MKVAttachments()
 
-    #template, dMatch = generateCommandTemplate(cmd, attachments=oAttachments, setTitle=True)
+    # template, dMatch = generateCommandTemplate(cmd, attachments=oAttachments, setTitle=True)
 
-    #print(template)
+    # print(template)
 
-    #return
+    # return
 
     iVerify = IVerifyStructure()
     oCommand = MKVCommandParser()
     oCommand.command = cmd
+    tracksOrder = TracksOrder(oCommand.cliTracksOrder)
+    templateAdjustments = TemplateAdjustments(oCommand)
+
+    # for command in oCommand.strCommands:
+    #    print(command)
+
+    # return
 
     # for m in dMatch[MKVParseKey.baseFilesMatch]:
     #    print(m)
 
-    #print()
-    #print(f"mkvmerge = {oCommand.mkvmerge}\n")
-    #print(f"Templates {oCommand.commandTemplate}\n")
-    #print(f"Output File {oCommand.cliOutputFile}")
-    #print(f"Chapters File {oCommand.cliChaptersFile}")
-    #print()
+    # print()
+    # print(f"mkvmerge = {oCommand.mkvmerge}\n")
+    # print(f"Templates {oCommand.commandTemplate}\n")
+    # print(f"Output File {oCommand.cliOutputFile}")
+    # print(f"Chapters File {oCommand.cliChaptersFile}")
+    # print()
 
-    cmdTemplate = oCommand.commandTemplate
-    correctionDone = False
-    for oBaseFile in oCommand.oBaseFiles:
-        trackOptions = oBaseFile.trackOptions
+    # cmdTemplate = oCommand.commandTemplate
+    # correctionDone = False
+    # for oBaseFile in oCommand.oBaseFiles:
+    #    trackOptions = oBaseFile.trackOptions
 
-        print(f" Match String {oBaseFile.fullMatchString}")
-        print(f"     Tracks = {trackOptions.tracks}")
-        print(f"Track options {trackOptions.options}")
-        print(f"       Tracks {trackOptions.tracks}")
+    #    print(f" Match String {oBaseFile.fullMatchString}")
+    #    print(f"     Tracks = {trackOptions.tracks}")
+    #    print(f"Track options {trackOptions.options}")
+    #    print(f"       Tracks {trackOptions.tracks}")
 
-        if trackOptions.trackNames:
-            print(f"        Names {trackOptions.trackNames}")
-            print(f" Track Edited {trackOptions.trackTitleEdited}")
-            for track in trackOptions.tracks:
-                print(f"   Name match {trackOptions.trackNameMatch(track)}")
+    #    if trackOptions.trackNames:
+    #        print(f"        Names {trackOptions.trackNames}")
+    #        print(f" Track Edited {trackOptions.trackTitleEdited}")
+    #        for track in trackOptions.tracks:
+    #            print(f"   Name match {trackOptions.trackNameMatch(track)}")
 
-        if oBaseFile.trackOptions.hasNamesToPreserve:
-            matchString = oBaseFile.fullMatchStringWithKey()
-            templateCorrection = oBaseFile.fullMatchStringCorrected(withKey=True)
-            print(f"\n{matchString}\n{templateCorrection}")
-            cmdTemplate = cmdTemplate.replace(matchString, templateCorrection, 1)
-            if not correctionDone:
-                correctionDone = True
-        else:
-            print("Nothing to see.")
-        print()
+    #    if oBaseFile.trackOptions.hasNamesToPreserve:
+    #        matchString = oBaseFile.fullMatchStringWithKey()
+    #        templateCorrection = oBaseFile.fullMatchStringCorrected(withKey=True)
+    #        print(f"\n{matchString}\n{templateCorrection}")
+    #        cmdTemplate = cmdTemplate.replace(matchString, templateCorrection, 1)
+    #        if not correctionDone:
+    #            correctionDone = True
+    #    else:
+    #        print("Nothing to see.")
+    #    print()
 
-    if correctionDone:
-        print(f"Original Template\n{oCommand.originalCommandTemplate}")
-        print(f"New Template\n{oCommand.commandTemplate}")
-    print()
+    # if correctionDone:
+    #    print(f"command form var\n{cmd}")
+    #    print(f"Original Command\n{oCommand.command}")
+    #    print(f"Original Template\n{oCommand.originalCommandTemplate}")
+    #    print(f"New Template\n{oCommand.commandTemplate}")
+    #    print(f"strCommand\n{oCommand.strCommands[3]}\nfrom template\n{oCommand.commandTemplates[3]}")
+    # print()
 
-    #for f in filesInDir:
+    # for f in filesInDir:
     #    print(f)
 
-    print()
+    # print()
 
-    #print(f"Attachment string\n{oCommand.oAttachments.attachmentsMatchString}")
+    # print(f"Attachment string\n{oCommand.oAttachments.attachmentsMatchString}")
 
-    #for key in trackOptions.trackNames:
+    # for key in trackOptions.trackNames:
     #    print(f"Track {key} title {trackOptions.trackNames[key][1]}")
     #    print(f"Media {key} title {mediaInfo[int(key)].title}")
     #    print(
@@ -193,18 +203,21 @@ def test():
 
     #    print()
 
-    #pprint.pprint(oCommand.oSourceFiles.sourceFiles[0].filesInDir)
+    # pprint.pprint(oCommand.oSourceFiles.sourceFiles[0].filesInDir)
 
-    return
+    # return
 
     hasToGenerateCommands = False
 
     algorithm = 1
 
+    translations = [None] * 6
     for index, sourceFiles in enumerate(oCommand.oSourceFiles):
         iVerify.verifyStructure(oCommand, index)
         print(f"{Style.DIM}{Fore.GREEN}Index {index} - {sourceFiles[0]}.")
-        print(f"{Style.NORMAL}Tracks matched {iVerify.matched} unmatched {iVerify.unmatched}")
+        print(
+            f"{Style.NORMAL}Tracks matched {iVerify.matched} unmatched {iVerify.unmatched}"
+        )
         if not iVerify:
             print(f"{Style.BRIGHT}{Fore.BLUE}Verification failed.{Style.RESET_ALL}")
             rc, confidence, average = adjustSources(oCommand, index, algorithm)
@@ -215,6 +228,7 @@ def test():
                     f"{Fore.YELLOW}\nNew command - confidence {confidence}"
                     f"-average({average}):\n{shellCommand}\n"
                 )
+                # Preserve
             else:
                 print(
                     f"{Fore.RED}Adjustment failed. Return code {rc} confidence {confidence}"
@@ -222,20 +236,242 @@ def test():
 
             if not hasToGenerateCommands and rc:
                 hasToGenerateCommands = True
-        print()
+        else:
+            # Preserve
+            pass
+        print(Style.RESET_ALL)
+
+    #for index, element in enumerate(oCommand.oBaseFiles):
+    #    for fileIndex, fileName in enumerate(element.filesInDir):
+    #        trackOpts = element.trackOptions
+    #        translationList = oCommand.translations[fileIndex]
+    #        if translationList is not None:
+    #            sourceTranslation = translationList[index]
+    #            if sourceTranslation is not None:
+    #                trackOpts.translation = sourceTranslation
+    #                print(f"For file {fileName}")
+    #                print(f"Tranlation? {trackOpts.strOptions()}")
+    #                print()
+    #                for key in trackOpts.trackNames:
+    #                    print(trackOpts.strTrackName(key))
+
+    #print()
+    #print(oCommand.originalCommandTemplate)
+    #print()
+    #preserveNames(oCommand)
+
+    #for fileIndex in range(len(oCommand)):
+    fileIndex = 3
+    print(templateAdjustments.template(fileIndex))
 
 
-class MKVParseKeyCarajo:
+    return
 
-    attachmentFiles = "<ATTACHMENTS>"
-    chaptersFile = "<CHAPTERS>"
-    outputFile = "<OUTPUTFILE>"
-    title = "<TITLE>"
-    trackOrder = "<ORDER>"
-    mkvmergeMatch = "mkvmergeMatch"
-    outputMatch = "outputMatch"
-    baseFilesMatch = "baseFilesMatch"
-    chaptersMatch = "chaptersMatch"
+    for shellCommand in oCommand.shellCommands:
+        print(shellCommand)
+
+
+def preserveNames(self):
+    """
+    preserveNames alter template if track names have to be preserved
+    """
+
+    originalcommandTemplate = self.originalCommandTemplate
+    correctionDone = False
+    optionsSrc = TemplateOptions()
+
+    print("\n\n")
+    for index, oBaseFile in enumerate(self.oSourceFiles.oBaseFiles):
+
+        if oBaseFile.trackOptions.hasNamesToPreserve:
+            trackOpts = oBaseFile.trackOptions
+            matchString = oBaseFile.fullMatchStringWithKey()
+            optionsSrc.index = index
+            optionsSrc.trackOptions = oBaseFile.trackOptions
+            for fileIndex, cmdTemplate in enumerate(self.commandTemplates):
+                optionsSrc.template = cmdTemplate
+                translationList = self.translations[fileIndex]
+                print(f"Tlist {translationList}")
+                if translationList is not None:
+                    sourceTranslation = translationList[index]
+                else:
+                    sourceTranslation = None
+
+                templateCorrection = oBaseFile.fullMatchStringCorrected(withKey=True)
+
+                print(f"{optionsSrc.sourceOptions(withKey=True)}")
+                print(
+                    f"{optionsSrc.sourceOptionAdjusted(translation=sourceTranslation, withKey=True)}\n"
+                )
+
+                # cmdTemplate = cmdTemplate.replace(matchString, templateCorrection, 1)
+
+                # if not correctionDone:
+                #    correctionDone = True
+
+    # if correctionDone:
+    #    self.commandTemplate = cmdTemplate
+
+
+class TemplateOptions:
+
+    def __init(self, cmdTemplate=None, index=None, oCommand=None):
+
+        self.subEx = re.compile(r"(.*?) ('\(' (.*?) '\)')")
+
+        if cmdTemplate is not None:
+            self.template = cmdTemplate
+
+        if index is not None:
+            self.index = index
+
+    def _initVars(self):
+
+        self.__index = None
+        self.__trackOptions = None
+        self.__template = None
+
+    @property
+    def index(self):
+        return self.__index
+
+    @index.setter
+    def index(self, value):
+        self.__index = value
+
+    @property
+    def key(self):
+        strTmp = f"<SOURCE{str(self.index)}>"
+        return strTmp
+
+    @property
+    def trackOptions(self):
+        return self.__trackOptions
+
+    @trackOptions.setter
+    def trackOptions(self, value):
+        self.__trackOptions = value
+
+    @property
+    def template(self):
+        return self.__template
+
+    @template.setter
+    def template(self, value):
+        self.__template = value
+
+    def sourceOptions(self, withKey=False):
+        """
+        sourceOptions options
+
+        Args:
+            withKey (bool, optional): Return options by source if True return
+            string with source key. Defaults to False.
+
+        Returns:
+            str: option by source
+        """
+        if self.index == 0:
+            regEx = r"<OUTPUTFILE>\s(.*?)\s<SOURCE0>"
+        else:
+            regEx = f"<SOURCE{str(self.index - 1)}>" + r"\s(.*?)\s" + self.key
+            regEx.format(str(self.index - 1), str(self.index))
+
+        strTmp = ""
+        if options := re.search(regEx, self.template):
+            strTmp = options.group(1)
+            if withKey:
+                strTmp += f" {self.key}"
+
+        return strTmp
+
+    def sourceOptionAdjusted(self, translation=None, withKey=False):
+        """
+        sourceOptionAdjusted remove track-name if not edited
+
+        Args:
+            withKey (bool, optional): If True return string with key instead of
+            file string. Defaults to False.
+
+        Returns:
+            str: string with substitutions if any
+        """
+
+        if translation is not None:
+            self.trackOptions.translation = translation
+        strTmp = self.sourceOptions(withKey=withKey)
+        for track, edited in self.trackOptions.trackTitleEdited.items():
+            if not edited:
+                trackName = self.trackOptions.strTrackName(track)
+                strTmp = strTmp.replace(" " + trackName, "", 1)
+
+        return strTmp
+
+    def keySub(self):
+
+        kSub = f"\\1 {self.key}>"
+        strTmp = self.subEx.sub(kSub, self.sourceOptions)
+
+        return strTmp
+
+class TemplateAdjustments:
+
+    def __init__(self, oCommand=None):
+
+        if oCommand is not None:
+            self.oCommand = oCommand
+
+    def _initVars(self):
+
+        self._templateOptions = TemplateOptions()
+        self.__oCommand = None
+
+    @property
+    def oCommand(self):
+        return self.__oCommand
+
+    @oCommand.setter
+    def oCommand(self, value):
+        self.__oCommand = value
+
+    def template(self, fileIndex):
+        return self.oCommand.commandTemplates[fileIndex]
+
+    def templatePreserveNames(self, fileIndex):
+        """
+        templatePreserveNames return the template with track names removed when
+        necessary
+
+        Args:
+            fileIndex (int): index of file template to adjust
+        """
+
+        template = self.template(fileIndex)
+        tmpTemplate = template
+
+        for baseIndex, oBaseFile in enumerate(self.oCommand.oBaseFiles):
+
+            self._templateOptions.index = baseIndex
+            self._templateOptions.trackOptions = oBaseFile.trackOptions
+            self._templateOptions.template = template
+
+            if oBaseFile.trackOptions.hasNamesToPreserve:
+                translationList = self.oCommand.translations[fileIndex]
+                if translationList is not None:
+                    sourceTranslation = translationList[fileIndex]
+                else:
+                    sourceTranslation = {}
+
+                self._templateOptions.trackOptions.translation = sourceTranslation
+
+
+
+
+
+
+
+
+
 
 
 if __name__ == "__main__":
