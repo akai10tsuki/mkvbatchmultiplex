@@ -19,7 +19,7 @@ from datetime import datetime, timedelta
 # from pprint import pprint
 from time import sleep
 
-from PySide2.QtCore import Qt, Slot
+from PySide2.QtCore import Qt, Signal, Slot
 from PySide2.QtWidgets import (
     QWidget,
     QHBoxLayout,
@@ -63,6 +63,9 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
         JobsHistoryView ([type]): [description]
         QWidget ([type]): [description]
     """
+
+    pasteCommandSignal = Signal(str)
+    updateAlgorithmSignal = Signal(int)
 
     def __init__(self, parent=None, groupTitle=None, log=None):
         super().__init__(parent=None, tabWidgetChild=self)
@@ -382,7 +385,7 @@ def fillRows(self, rows):
             viewRow[JobHistoryKey.Status] = [
                 job.jobRow[JobKey.Status],
                 "",
-                None,
+                job,
             ]
             viewRow[JobHistoryKey.Command] = [
                 job.jobRow[JobKey.Command],

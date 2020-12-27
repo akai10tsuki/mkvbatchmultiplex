@@ -71,11 +71,11 @@ class JobInfo:  # pylint: disable=too-many-instance-attributes
         self.endTime = None
         self.errors = [] if errors is None else errors
         self.output = [] if output is None else output
+        self.algorithm = None
         if algorithm is None:
             self.algorithm = config.data.get(config.ConfigKey.Algorithm)
         else:
             self.algorithm = algorithm
-            print(f"Setting algorithm in JobInfo to {algorithm}")
 
     @property
     def jobRow(self):

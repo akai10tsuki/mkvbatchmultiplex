@@ -160,14 +160,14 @@ class JobsHistoryView(QTableView):
 
             menu = QMenu()
             menu.setFont(self.parent.font())
-            menu.addAction(_("Copy"))
+            menu.addAction(_("Copy to command"))
             # menu.addAction(_("Remove"))
             menu.addAction(_("Delete"))
 
             if action := menu.exec_(event.globalPos()):
                 result = action.text()
 
-                if result == _("Copy"):
+                if result == _("Copy to command"):
                     self.copyCommand()
                 if result == _("Delete"):
                     self.deleteSelectedRows()
@@ -261,7 +261,12 @@ class JobsHistoryView(QTableView):
                 row = rows[3]
                 column = columns[3]
                 command = model.dataset.data[row][column].cell.strip()
+                job = model.dataset.data[row][JobHistoryKey.Status].obj
                 QApplication.clipboard().setText(command)
+                self.parent.pasteCommandSignal.emit(command)
+                if job is not None:
+                    self.parent.updateAlgorithmSignal.emit(job.algorithm)
+
 
     def supportedDropActions(self):  # pylint: disable=no-self-use
 

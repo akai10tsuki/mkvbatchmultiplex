@@ -422,6 +422,12 @@ class CommandWidget(TabWidgetExtension, QWidget):
         self.cmdLine.setText(command)
         self.cmdLine.setCursorPosition(0)
 
+    @Slot(int)
+    def updateAlgorithm(self, algorithm):
+
+        if 0 <= algorithm < len(self.radioButtons):
+            self.radioButtons[algorithm].setChecked(True)
+
     @Slot(bool)
     def jobStatus(self, running):
         """

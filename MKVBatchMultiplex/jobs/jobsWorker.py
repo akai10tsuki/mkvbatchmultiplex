@@ -149,7 +149,6 @@ def jobsWorker(
             algorithm = config.data.get(config.ConfigKey.Algorithm)
         else:
             algorithm = job.algorithm
-            print(f"Setting algorithm in JobWorker to {job.algorithm}")
 
         if job.oCommand:
             job.startTime = time()
