@@ -12,7 +12,7 @@ from vsutillib.mkv import TracksOrder
 from findSimilarTrack import findSimilarTrack
 
 
-def adjustSources(oCommand, index, algorithm=1):
+def adjustSources(oCommand, index, algorithm=1, update=True):
     """
     adjustSources scan tracks and adjust for structure difference:
 
@@ -38,6 +38,7 @@ def adjustSources(oCommand, index, algorithm=1):
     tracksOrder = TracksOrder(oCommand.cliTracksOrder)
     tracksOrderTranslation = {}
     sourceFiles = oCommand.oSourceFiles[index]
+    workTemplate = oCommand.commandTemplates[index]
     dummyTrack = MediaTrackInfo()
     confidence = "None"
 
@@ -125,11 +126,19 @@ def adjustSources(oCommand, index, algorithm=1):
             translationList[baseIndex] = copy.deepcopy(translate)
             if not rc:
                 rc = True
-            template = oCommand.commandTemplates[index]
+            # template = oCommand.commandTemplates[index]
+            # template = workTemplate
+
             trackOpts = copy.deepcopy(trackOptions)
             trackOpts.translation = translate
-            newTemplate = template.replace(trackOpts.options, trackOpts.strOptions(), 1)
-            oCommand.commandTemplates[index] = newTemplate
+            # newTemplate = template.replace(trackOpts.options, trackOpts.strOptions(), 1)
+
+            workTemplate = workTemplate.replace(
+                trackOpts.options, trackOpts.strOptions(), 1
+            )
+
+            # oCommand.commandTemplates[index] = newTemplate
+
             tracksOrderTranslation.update(trackOpts.orderTranslation)
             confidence = "High"
             if average.average() < 5:
@@ -137,9 +146,10 @@ def adjustSources(oCommand, index, algorithm=1):
             elif average.average() < 8:
                 confidence = "Medium"
 
-
     # Save translations
-    oCommand.translations[index] = translationList
+    if update:
+        oCommand.translations[index] = translationList
+        oCommand.commandTemplates[index] = workTemplate
 
     if not foundBadTrack:
         # No needed tracks failed match.
@@ -150,9 +160,20 @@ def adjustSources(oCommand, index, algorithm=1):
     if tracksOrderTranslation and oCommand.cliTracksOrder:
         # update track order on oCommand for given index
         tracksOrder.translation = tracksOrderTranslation
-        oCommand.tracksOrder[index] = tracksOrder.strOrder()
+        if update:
+            oCommand.tracksOrder[index] = tracksOrder.strOrder()
 
-    return rc, confidence, average.average()
+    if update:
+        return rc, confidence, average.average()
+
+    return (
+        rc,
+        confidence,
+        average.average(),
+        workTemplate,
+        translationList,
+        tracksOrder,
+    )
 
 
 class ScoreAverage:
