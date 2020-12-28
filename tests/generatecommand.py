@@ -108,7 +108,7 @@ class GenCommandApp(QMainWindow):
             + r"--language 0:en "
             + r"'(' '"
             + s
-            + r"/test/mka/Show Title - S01E02.en.mka' ')' "
+            + r"/test/mka/ENG/Show Title - S01E02.en.mka' ')' "
             + r"--language 0:en "
             + r"'(' '"
             + s
@@ -147,12 +147,40 @@ class GenCommandApp(QMainWindow):
             + l
             + r" --output '"
             + d
-            + r"/video - S01E03.mkv' --language 0:und --language 1:spa "
-            + r"--default-track 1:yes '(' '"
+            + r"/Show Title ' S01E02.mkv' --language 0:und "
+            + r"--track-name '0:Video Name Test 02' --default-track 0:yes "
+            + r"--display-dimensions 0:640x360 --language 1:ja --default-track 1:yes "
+            + r"'(' '"
             + s
-            + r"/video - S01E03.avi' ')' --language 0:eng --default-track 0:yes '(' '"
+            + r"/test/mkv/Show Title ' S01E02.mkv' ')' "
+            + r"--language 0:en --track-name '0:English Track' "
+            + r"'(' '"
             + s
-            + r"/Subs/Video - S01E03.ass' ')' --track-order 0:0,0:1,1:0"
+            + r"/test/mka/ENG/Show Title - S01E01.en.mka' ')' "
+            + r"--language 0:en --track-name 0:English "
+            + r"'(' '"
+            + s
+            + r"/test/subs/ENG/Show Title - S01E01.ENG.ass' ')' "
+            + r"--no-audio --no-video --sub-charset 2:UTF-8 --language 2:es "
+            + r"--track-name 2:Español --default-track 2:yes "
+            + r"'(' '"
+            + s
+            + r"/test/subs/SPA/Show Title - S01E01.mkv' ')' "
+            + r"--attachment-name Font01.otf "
+            + r"--attachment-mime-type application/vnd.ms-opentype "
+            + r"--attach-file '"
+            + s
+            + r"/test/Attachments/Font01.otf' "
+            + r"--attachment-name Font02.otf "
+            + r"--attachment-mime-type application/vnd.ms-opentype "
+            + r"--attach-file '"
+            + s
+            + r"/test/Attachments/Font02.otf' "
+            + r"--title 'Show Title Number 2' --chapter-language und "
+            + r"--chapters '"
+            + s
+            + r"/test/chapters/Show Title - S01E01 - Chapters.xml' "
+            + r"--track-order 0:0,0:1,1:0,2:0,3:2"
         )
 
         self.cmd3 = (
