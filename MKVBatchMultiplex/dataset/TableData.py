@@ -100,8 +100,6 @@ class Index:
         return self._row
 
 
-
-
 class TableData:
     """
     Class to represent data in a table with columns headers
