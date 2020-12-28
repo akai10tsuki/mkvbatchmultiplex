@@ -44,7 +44,7 @@ def test():
     # Sequential name in track name - to study how to preserve
     # Title in source - check when title is in second source
     # Tracks out of order
-    cmd = (
+    cmd0 = (
         r"'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en "
         r"--output "
         r"'C:/Projects/Python/PySide/mkvbatchmultiplex/tests/NewFiles/"
@@ -58,7 +58,7 @@ def test():
         r"')' "
         r"--language 0:en --track-name '0:English Track' "
         r"'('"
-        r" 'C:/Projects/Python/PySide/mkvbatchmultiplex/tests/MediaFiles/test/mka/"
+        r" 'C:/Projects/Python/PySide/mkvbatchmultiplex/tests/MediaFiles/test/mka/ENG/"
         r"Show Title - S01E02.en.mka' "
         r"')' "
         r"--language 0:en "
@@ -93,6 +93,103 @@ def test():
         r"chapters\Show Title - S01E01 - Chapters.xml' "
         r"--track-order 0:0,0:1,1:0,2:0"
     )
+
+    mkvmerge = r"'C:/Program Files/MKVToolNix/mkvmerge.exe'"
+    d = r"C:/Projects/Python/PySide/mkvbatchmultiplex/tests/NewFiles"
+    l = r"--ui-language en"
+    s = r"C:/Projects/Python/PySide/mkvbatchmultiplex/tests/MediaFiles"
+
+    cmd = (
+        mkvmerge
+        + r" "
+        + l
+        + r" --output '"
+        + d
+        + r"/Show Title ' S01E02.mkv' --language 0:und "
+        + r"--track-name '0:Video Name Test 02' --default-track 0:yes "
+        + r"--display-dimensions 0:640x360 --language 1:ja "
+        + r"--track-name '1:Original Audio' --default-track 1:yes "
+        + r"'(' '"
+        + s
+        + r"/test/mkv/Show Title ' S01E02.mkv' ')' "
+        + r"--language 0:en "
+        + r"'(' '"
+        + s
+        + r"/test/mka/ENG/Show Title - S01E02.en.mka' ')' "
+        + r"--language 0:en "
+        + r"'(' '"
+        + s
+        + r"/test/subs/ENG/Show Title - S01E01.ENG.ass' ')' "
+        + r"--attachment-name Font01.otf "
+        + r"--attachment-mime-type application/vnd.ms-opentype "
+        + r"--attach-file '"
+        + s
+        + r"/test/Attachments/Font01.otf' "
+        + r"--attachment-name Font02.otf "
+        + r"--attachment-mime-type application/vnd.ms-opentype "
+        + r"--attach-file '"
+        + s
+        + r"/test/Attachments/Font02.otf' "
+        + r"--attachment-name Font03.ttf "
+        + r"--attachment-mime-type application/x-truetype-font "
+        + r"--attach-file '"
+        + s
+        + r"/test/Attachments/Font03.ttf' "
+        + r"--attachment-name Font04.ttf "
+        + r"--attachment-mime-type application/x-truetype-font "
+        + r"--attach-file '"
+        + s
+        + r"/test/Attachments/Font04.ttf' "
+        + r"--title 'Show Title Number 2' "
+        + r"--chapter-language und "
+        + r"--chapters '"
+        + s
+        + r"/test/chapters/Show Title - S01E01 - Chapters.xml' "
+        + r"--track-order 0:0,0:1,1:0,2:0"
+    )
+
+    cmd2 = (
+        mkvmerge
+        + r" "
+        + l
+        + r" --output '"
+        + d
+        + r"/Show Title ' S01E02.mkv' --language 0:und "
+        + r"--track-name '0:Video Name Test 02' --default-track 0:yes "
+        + r"--display-dimensions 0:640x360 --language 1:ja --default-track 1:yes "
+        + r"'(' '"
+        + s
+        + r"/test/mkv/Show Title ' S01E02.mkv' ')' "
+        + r"--language 0:en --track-name '0:English Track' "
+        + r"'(' '"
+        + s
+        + r"/test/mka/ENG/Show Title - S01E01.en.mka' ')' "
+        + r"--language 0:en --track-name 0:English "
+        + r"'(' '"
+        + s
+        + r"/test/subs/ENG/Show Title - S01E01.ENG.ass' ')' "
+        + r"--no-audio --no-video --sub-charset 2:UTF-8 --language 2:es "
+        + r"--track-name 2:Español --default-track 2:yes "
+        + r"'(' '"
+        + s
+        + r"/test/subs/SPA/Show Title - S01E01.mkv' ')' "
+        + r"--attachment-name Font01.otf "
+        + r"--attachment-mime-type application/vnd.ms-opentype "
+        + r"--attach-file '"
+        + s
+        + r"/test/Attachments/Font01.otf' "
+        + r"--attachment-name Font02.otf "
+        + r"--attachment-mime-type application/vnd.ms-opentype "
+        + r"--attach-file '"
+        + s
+        + r"/test/Attachments/Font02.otf' "
+        + r"--title 'Show Title Number 2' --chapter-language und "
+        + r"--chapters '"
+        + s
+        + r"/test/chapters/Show Title - S01E01 - Chapters.xml' "
+        + r"--track-order 0:0,0:1,1:0,2:0,3:2"
+    )
+
     # f = Path("./ass.xml").open(mode="wb")
     # xml = pymediainfo.MediaInfo.parse(r'J:\Example\TestMedia\Example
     # 05\Subs\Show Title - S01E01.ENG.ass', output="OLDXML")
@@ -124,7 +221,7 @@ def test():
     oCommand = MKVCommandParser()
     oCommand.command = cmd
     tracksOrder = TracksOrder(oCommand.cliTracksOrder)
-    templateAdjustments = TemplateAdjustments(oCommand)
+    templateAdjustments = TemplateAdjustments(oCommand, algorithm=1)
 
     # for command in oCommand.strCommands:
     #    print(command)
@@ -207,6 +304,16 @@ def test():
 
     # return
 
+    fileIndex = 3
+    oldTemplate = templateAdjustments.template(fileIndex)
+    newTemplate = templateAdjustments.templatePreserveNames(fileIndex)
+    originalTemplate = templateAdjustments.template(fileIndex)
+    print(f"Old Template:\n{oldTemplate}\n\nNew Template:\n{newTemplate}\n")
+    print(f"Original Template:{originalTemplate}")
+
+
+    return
+
     hasToGenerateCommands = False
 
     algorithm = 1
@@ -241,7 +348,7 @@ def test():
             pass
         print(Style.RESET_ALL)
 
-    #for index, element in enumerate(oCommand.oBaseFiles):
+    # for index, element in enumerate(oCommand.oBaseFiles):
     #    for fileIndex, fileName in enumerate(element.filesInDir):
     #        trackOpts = element.trackOptions
     #        translationList = oCommand.translations[fileIndex]
@@ -255,17 +362,12 @@ def test():
     #                for key in trackOpts.trackNames:
     #                    print(trackOpts.strTrackName(key))
 
-    #print()
-    #print(oCommand.originalCommandTemplate)
-    #print()
-    #preserveNames(oCommand)
+    # print()
+    # print(oCommand.originalCommandTemplate)
+    # print()
+    # preserveNames(oCommand)
 
-    #for fileIndex in range(len(oCommand)):
-    fileIndex = 3
-    print(templateAdjustments.template(fileIndex))
-
-
-    return
+    # for fileIndex in range(len(oCommand)):
 
     for shellCommand in oCommand.shellCommands:
         print(shellCommand)
@@ -314,7 +416,6 @@ def preserveNames(self):
 
 
 class TemplateOptions:
-
     def __init(self, cmdTemplate=None, index=None, oCommand=None):
 
         self.subEx = re.compile(r"(.*?) ('\(' (.*?) '\)')")
@@ -414,17 +515,27 @@ class TemplateOptions:
 
         return strTmp
 
-class TemplateAdjustments:
 
-    def __init__(self, oCommand=None):
+class TemplateAdjustments:
+    def __init__(self, oCommand=None, algorithm=1):
 
         if oCommand is not None:
             self.oCommand = oCommand
+
+        self.algorithm = algorithm
 
     def _initVars(self):
 
         self._templateOptions = TemplateOptions()
         self.__oCommand = None
+        self.__templatesAdjusted = None
+        self.__templatesNamesPreserved = None
+        self.__translationList = None
+        self.__tracksOrder = None
+        self.__needAdjustment = None
+        self.__rc = None
+        self.__confidence = None
+        self.__average = None
 
     @property
     def oCommand(self):
@@ -432,10 +543,39 @@ class TemplateAdjustments:
 
     @oCommand.setter
     def oCommand(self, value):
+
+        self._initVars()
         self.__oCommand = value
+        totalFiles = len(self.__oCommand)
+        self.__templatesAdjusted = [None] * totalFiles
+        self.__templatesNamesPreserved = [None] * totalFiles
+        self.__translationList = [None] * totalFiles
+        self.__tracksOrder = [None] * totalFiles
+        self.__needAdjustment = [None] * totalFiles
+        self.__rc = [None] * totalFiles
+        self.__confidence = [None] * totalFiles
+        self.__average = [None] * totalFiles
 
     def template(self, fileIndex):
         return self.oCommand.commandTemplates[fileIndex]
+
+    def adjustTemplate(self, fileIndex):
+        """adjust template"""
+
+        (
+            rc,
+            confidence,
+            average,
+            template,
+            translationList,
+            tracksOrder,
+        ) = adjustSources(self.oCommand, fileIndex, self.algorithm, update=False)
+
+        if rc:
+            self.__needAdjustment[fileIndex] = True
+            self.__templatesAdjusted[fileIndex] = template
+            self.__translationList[fileIndex] = translationList
+            self.__tracksOrder = tracksOrder
 
     def templatePreserveNames(self, fileIndex):
         """
@@ -447,7 +587,6 @@ class TemplateAdjustments:
         """
 
         template = self.template(fileIndex)
-        tmpTemplate = template
 
         for baseIndex, oBaseFile in enumerate(self.oCommand.oBaseFiles):
 
@@ -458,20 +597,18 @@ class TemplateAdjustments:
             if oBaseFile.trackOptions.hasNamesToPreserve:
                 translationList = self.oCommand.translations[fileIndex]
                 if translationList is not None:
-                    sourceTranslation = translationList[fileIndex]
+                    sourceTranslation = translationList[baseIndex]
                 else:
                     sourceTranslation = {}
 
                 self._templateOptions.trackOptions.translation = sourceTranslation
+                option = self._templateOptions.sourceOptions(withKey=True)
+                optionAdjusted = self._templateOptions.sourceOptionAdjusted(
+                    withKey=True
+                )
+                template = template.replace(option, optionAdjusted, 1)
 
-
-
-
-
-
-
-
-
+        return template
 
 
 if __name__ == "__main__":
