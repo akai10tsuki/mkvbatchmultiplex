@@ -130,7 +130,7 @@ class JobsTableModel(TableModel):
         algorithm = data[0][2]
         data[0][2] = None
 
-        print(f"Algorithm in JobsTableModel {algorithm}")
+        # print(f"Algorithm in JobsTableModel {algorithm}")
 
         rc = super(JobsTableModel, self).insertRows(position, rows, index, data=data)
 
