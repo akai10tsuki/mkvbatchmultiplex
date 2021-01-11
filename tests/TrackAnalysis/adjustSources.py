@@ -28,6 +28,8 @@ def adjustSources(oCommand, index, algorithm=1, update=True):
     Args:
         oCommand (MKVCommandParser): current commands for job
         index (int): command index
+        update (book): if True update command object, False don't save changes.
+        Default is True. (original functionality)
 
     Returns:
         bool: True if conflict resolved.  False otherwise.
@@ -75,8 +77,7 @@ def adjustSources(oCommand, index, algorithm=1, update=True):
                 ):
                     # Hope this are the supported subs move to config.
                     continue
-                else:
-                    return False, "Low"
+                return False, "Low"
             trackBase = baseFileInfo[i]
             if i < len(sourceFileInfo):
                 # source less tracks than base
