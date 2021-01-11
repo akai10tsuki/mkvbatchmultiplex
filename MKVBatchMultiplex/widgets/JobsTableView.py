@@ -304,7 +304,7 @@ class JobsTableView(QTableView):
                 if remove is None:
                     remove = removeJob(self, str(jobID))
                 if remove:
-                    print(f"Remove row {jobRow}")
+                    #print(f"Remove row {jobRow}")
                     self.proxyModel.filterConditions["Remove"].append(jobRow)
                     self.proxyModel.setFilterFixedString("")
 
@@ -326,10 +326,10 @@ class JobsTableView(QTableView):
                 jobID = model.dataset[jobRow, JobKey.ID]
                 rowID = model.dataset.data[jobRow][JobKey.ID].obj
                 job = model.dataset.data[jobRow][JobKey.Status].obj
-                if job:
-                    print(f"ID = {job.jobRow[JobKey.ID]} = {jobID}")
-                if rowID:
-                    print(f"Database row ID = {rowID}")
+                #if job:
+                #    print(f"ID = {job.jobRow[JobKey.ID]} = {jobID}")
+                #if rowID:
+                #    print(f"Database row ID = {rowID}")
                 title = self.infoDialog.windowTitle()
                 self.infoDialog.setWindowTitle(title + ' - ' + str(jobID))
 
