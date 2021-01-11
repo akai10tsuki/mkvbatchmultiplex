@@ -4,7 +4,10 @@ Changelog
 (Unreleased)
 ------------
 
-Saved Jobs tab ready for first released.  This is useful for saving test jobs.
+2.1.0a1.dev4 - 2021-01-10
+-------------------------
+
+Saved Jobs tab ready for first release.  This is useful for saving test jobs.
 Also repetitive Jobs when source files stay on same location and suffer
 modifications up to a final release.  Don't have to use mkvtoolix-gui for each
 iteration.
@@ -21,7 +24,9 @@ Changed
 Fixed
 ~~~~~
 
-- Algorithm 1 and 2 failed with external files with no tracks ej. subs files
+- BUG #10 Algorithm 1 and 2 failed with external subs files
+  - Subs using UTF-8 with BOM don't generate track information on situations
+  where the subs have file with and without BOM structure test failed
 
 2.1.0a1.dev3 - 2020-12-16
 -------------------------
