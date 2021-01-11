@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MediaInfo xmlns="https://mediaarea.net/mediainfo"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://mediaarea.net/mediainfo https://mediaarea.net/mediainfo/mediainfo_2_0.xsd" version="2.0">
+    <creatingLibrary version="20.09" url="https://mediaarea.net/MediaInfo">MediaInfoLib</creatingLibrary>
+    <media ref="C:\Projects\Python\PySide\mkvbatchmultiplex\tests\MediaFiles\test\subs\ITA\Show Title - S01E01.ITA.ass">
+        <track type="General">
+            <Count>331</Count>
+            <StreamCount>1</StreamCount>
+            <StreamKind>General</StreamKind>
+            <StreamKind_String>General</StreamKind_String>
+            <StreamKindID>0</StreamKindID>
+            <CompleteName>C:\Projects\Python\PySide\mkvbatchmultiplex\tests\MediaFiles\test\subs\ITA\Show Title - S01E01.ITA.ass</CompleteName>
+            <FolderName>C:\Projects\Python\PySide\mkvbatchmultiplex\tests\MediaFiles\test\subs\ITA</FolderName>
+            <FileNameExtension>Show Title - S01E01.ITA.ass</FileNameExtension>
+            <FileName>Show Title - S01E01.ITA</FileName>
+            <FileExtension>ass</FileExtension>
+            <FileSize>1026</FileSize>
+            <FileSize_String>1.00 KiB</FileSize_String>
+            <FileSize_String1>1 KiB</FileSize_String1>
+            <FileSize_String2>1.0 KiB</FileSize_String2>
+            <FileSize_String3>1.00 KiB</FileSize_String3>
+            <FileSize_String4>1.002 KiB</FileSize_String4>
+            <StreamSize>1026</StreamSize>
+            <StreamSize_String>1.00 KiB (100%)</StreamSize_String>
+            <StreamSize_String1>1 KiB</StreamSize_String1>
+            <StreamSize_String2>1.0 KiB</StreamSize_String2>
+            <StreamSize_String3>1.00 KiB</StreamSize_String3>
+            <StreamSize_String4>1.002 KiB</StreamSize_String4>
+            <StreamSize_String5>1.00 KiB (100%)</StreamSize_String5>
+            <StreamSize_Proportion>1.00000</StreamSize_Proportion>
+            <File_Created_Date>UTC 2021-01-10 23:50:12.999</File_Created_Date>
+            <File_Created_Date_Local>2021-01-10 18:50:12.999</File_Created_Date_Local>
+            <File_Modified_Date>UTC 2020-09-04 01:49:27.726</File_Modified_Date>
+            <File_Modified_Date_Local>2020-09-03 20:49:27.726</File_Modified_Date_Local>
+        </track>
+    </media>
+</MediaInfo>
+
+<?xml version="1.0" encoding="UTF-8"?>
+<MediaInfo xmlns="https://mediaarea.net/mediainfo"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://mediaarea.net/mediainfo https://mediaarea.net/mediainfo/mediainfo_2_0.xsd" version="2.0">
+    <creatingLibrary version="20.09" url="https://mediaarea.net/MediaInfo">MediaInfoLib</creatingLibrary>
+    <media ref="C:\Projects\Python\PySide\mkvbatchmultiplex\tests\MediaFiles\test\subs\ITA\Show Title - S01E01.ITA.ass">
+        <track type="General">
+            <Count>331</Count>
+            <StreamCount>1</StreamCount>
+            <StreamKind>General</StreamKind>
+            <StreamKind_String>General</StreamKind_String>
+            <StreamKindID>0</StreamKindID>
+            <CompleteName>C:\Projects\Python\PySide\mkvbatchmultiplex\tests\MediaFiles\test\subs\ITA\Show Title - S01E01.ITA.ass</CompleteName>
+            <FolderName>C:\Projects\Python\PySide\mkvbatchmultiplex\tests\MediaFiles\test\subs\ITA</FolderName>
+            <FileNameExtension>Show Title - S01E01.ITA.ass</FileNameExtension>
+            <FileName>Show Title - S01E01.ITA</FileName>
+            <FileExtension>ass</FileExtension>
+            <FileSize>1026</FileSize>
+            <FileSize_String>1.00 KiB</FileSize_String>
+            <FileSize_String1>1 KiB</FileSize_String1>
+            <FileSize_String2>1.0 KiB</FileSize_String2>
+            <FileSize_String3>1.00 KiB</FileSize_String3>
+            <FileSize_String4>1.002 KiB</FileSize_String4>
+            <StreamSize>1026</StreamSize>
+            <StreamSize_String>1.00 KiB (100%)</StreamSize_String>
+            <StreamSize_String1>1 KiB</StreamSize_String1>
+            <StreamSize_String2>1.0 KiB</StreamSize_String2>
+            <StreamSize_String3>1.00 KiB</StreamSize_String3>
+            <StreamSize_String4>1.002 KiB</StreamSize_String4>
+            <StreamSize_String5>1.00 KiB (100%)</StreamSize_String5>
+            <StreamSize_Proportion>1.00000</StreamSize_Proportion>
+            <File_Created_Date>UTC 2021-01-10 23:50:12.999</File_Created_Date>
+            <File_Created_Date_Local>2021-01-10 18:50:12.999</File_Created_Date_Local>
+            <File_Modified_Date>UTC 2020-09-04 01:49:27.726</File_Modified_Date>
+            <File_Modified_Date_Local>2020-09-03 20:49:27.726</File_Modified_Date_Local>
+        </track>
+    </media>
+</MediaInfo>
+
+<?xml version="1.0" encoding="UTF-8"?>
+<Mediainfo version="20.09">
+    <File>
+        <track type="General">
+            <Count>331</Count>
+            <Count_of_stream_of_this_kind>1</Count_of_stream_of_this_kind>
+            <Kind_of_stream>General</Kind_of_stream>
+            <Kind_of_stream>General</Kind_of_stream>
+            <Stream_identifier>0</Stream_identifier>
+            <Complete_name>C:\Projects\Python\PySide\mkvbatchmultiplex\tests\MediaFiles\test\subs\ITA\Show Title - S01E01.ITA.ass</Complete_name>
+            <Folder_name>C:\Projects\Python\PySide\mkvbatchmultiplex\tests\MediaFiles\test\subs\ITA</Folder_name>
+            <File_name_extension>Show Title - S01E01.ITA.ass</File_name_extension>
+            <File_name>Show Title - S01E01.ITA</File_name>
+            <File_extension>ass</File_extension>
+            <File_size>1026</File_size>
+            <File_size>1.00 KiB</File_size>
+            <File_size>1 KiB</File_size>
+            <File_size>1.0 KiB</File_size>
+            <File_size>1.00 KiB</File_size>
+            <File_size>1.002 KiB</File_size>
+            <Stream_size>1026</Stream_size>
+            <Stream_size>1.00 KiB (100%)</Stream_size>
+            <Stream_size>1 KiB</Stream_size>
+            <Stream_size>1.0 KiB</Stream_size>
+            <Stream_size>1.00 KiB</Stream_size>
+            <Stream_size>1.002 KiB</Stream_size>
+            <Stream_size>1.00 KiB (100%)</Stream_size>
+            <Proportion_of_this_stream>1.00000</Proportion_of_this_stream>
+            <File_creation_date>UTC 2021-01-10 23:50:12.999</File_creation_date>
+            <File_creation_date__local_>2021-01-10 18:50:12.999</File_creation_date__local_>
+            <File_last_modification_date>UTC 2020-09-04 01:49:27.726</File_last_modification_date>
+            <File_last_modification_date__local_>2020-09-03 20:49:27.726</File_last_modification_date__local_>
+        </track>
+    </File>
+</Mediainfo>
+
+<?xml version="1.0" encoding="UTF-8"?>
+<Mediainfo version="20.09">
+    <File>
+        <track type="General">
+            <Count>332</Count>
+            <Count_of_stream_of_this_kind>1</Count_of_stream_of_this_kind>
+            <Kind_of_stream>General</Kind_of_stream>
+            <Kind_of_stream>General</Kind_of_stream>
+            <Stream_identifier>0</Stream_identifier>
+            <Count_of_text_streams>1</Count_of_text_streams>
+            <Text_Format_List>ASS</Text_Format_List>
+            <Text_Format_WithHint_List>ASS</Text_Format_WithHint_List>
+            <Text_codecs>ASS</Text_codecs>
+            <Complete_name>C:\Projects\Python\PySide\mkvbatchmultiplex\tests\MediaFiles\test\subs\ITA\Show Title - S01E02.ITA.ass</Complete_name>
+            <Folder_name>C:\Projects\Python\PySide\mkvbatchmultiplex\tests\MediaFiles\test\subs\ITA</Folder_name>
+            <File_name_extension>Show Title - S01E02.ITA.ass</File_name_extension>
+            <File_name>Show Title - S01E02.ITA</File_name>
+            <File_extension>ass</File_extension>
+            <Format>ASS</Format>
+            <Format>ASS</Format>
+            <Format_Info>Advanced SubStation Alpha</Format_Info>
+            <Format_Url>http://ffdshow.sourceforge.net/tikiwiki/tiki-index.php?page=Getting+ffdshow</Format_Url>
+            <Format_Extensions_usually_used>ssa</Format_Extensions_usually_used>
+            <Commercial_name>ASS</Commercial_name>
+            <File_size>1023</File_size>
+            <File_size>1 023 Bytes</File_size>
+            <File_size>1 023 Bytes</File_size>
+            <File_size>1 023 Bytes</File_size>
+            <File_size>1 023 Bytes</File_size>
+            <File_size>1 023.0 Bytes</File_size>
+            <Stream_size>1023</Stream_size>
+            <Stream_size>1 023 Bytes (100%)</Stream_size>
+            <Stream_size>1 023 Bytes</Stream_size>
+            <Stream_size>1 023 Bytes</Stream_size>
+            <Stream_size>1 023 Bytes</Stream_size>
+            <Stream_size>1 023.0 Bytes</Stream_size>
+            <Stream_size>1 023 Bytes (100%)</Stream_size>
+            <Proportion_of_this_stream>1.00000</Proportion_of_this_stream>
+            <File_creation_date>UTC 2021-01-10 18:40:49.886</File_creation_date>
+            <File_creation_date__local_>2021-01-10 13:40:49.886</File_creation_date__local_>
+            <File_last_modification_date>UTC 2021-01-10 23:55:18.110</File_last_modification_date>
+            <File_last_modification_date__local_>2021-01-10 18:55:18.110</File_last_modification_date__local_>
+            <FileExtension_Invalid>ssa</FileExtension_Invalid>
+        </track>
+        <track type="Text">
+            <Count>238</Count>
+            <Count_of_stream_of_this_kind>1</Count_of_stream_of_this_kind>
+            <Kind_of_stream>Text</Kind_of_stream>
+            <Kind_of_stream>Text</Kind_of_stream>
+            <Stream_identifier>0</Stream_identifier>
+            <Format>ASS</Format>
+            <Format>ASS</Format>
+            <Format_Url>http://ffdshow.sourceforge.net/tikiwiki/tiki-index.php?page=Getting+ffdshow</Format_Url>
+            <Commercial_name>ASS</Commercial_name>
+            <Compression_mode>Lossless</Compression_mode>
+            <Compression_mode>Lossless</Compression_mode>
+        </track>
+    </File>
+</Mediainfo>
