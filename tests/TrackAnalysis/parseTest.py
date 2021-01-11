@@ -306,12 +306,21 @@ def test():
 
     fileIndex = 3
     oldTemplate = templateAdjustments.template(fileIndex)
+    adjustedTemplate = templateAdjustments.adjustTemplate(fileIndex)
     newTemplate = templateAdjustments.templatePreserveNames(fileIndex)
+    strCommand, shellCommand = oCommand.generateCommandByIndex(
+        fileIndex,
+        update=False,
+        template=newTemplate,
+        tracksOrder=templateAdjustments.adjustedTrackOrder(fileIndex),
+    )
     originalTemplate = templateAdjustments.template(fileIndex)
-    print(f"Old Template:\n{oldTemplate}\n\nNew Template:\n{newTemplate}\n")
-    print(f"Original Template:{originalTemplate}")
+    print(f"Old Template:\n{oldTemplate}\n\nAdjusted Template:\n{adjustedTemplate}\n")
 
+    print(f"New Template\n{newTemplate}\n\nOriginal Template:\n{originalTemplate}")
 
+    print(f"Command\n{strCommand}\n\nShell Command\n{shellCommand}\n")
+    print(f"Command\n{oCommand.strCommands[fileIndex]}\n\nShell Command\n{oCommand.shellCommands[fileIndex]}")
     return
 
     hasToGenerateCommands = False
@@ -562,6 +571,8 @@ class TemplateAdjustments:
     def adjustTemplate(self, fileIndex):
         """adjust template"""
 
+        currentTemplate = self.template(fileIndex)
+
         (
             rc,
             confidence,
@@ -575,9 +586,17 @@ class TemplateAdjustments:
             self.__needAdjustment[fileIndex] = True
             self.__templatesAdjusted[fileIndex] = template
             self.__translationList[fileIndex] = translationList
-            self.__tracksOrder = tracksOrder
+            self.__tracksOrder[fileIndex] = tracksOrder
+            print(f"Tracks Order? {tracksOrder} info {tracksOrder.strOrder()}")
 
-    def templatePreserveNames(self, fileIndex):
+            return self.__templatesAdjusted[fileIndex]
+
+        return currentTemplate
+
+    def adjustedTrackOrder(self, fileIndex):
+        return self.__tracksOrder[fileIndex].strOrder()
+
+    def templatePreserveNames(self, fileIndex, useAdjusted=True):
         """
         templatePreserveNames return the template with track names removed when
         necessary
@@ -588,6 +607,12 @@ class TemplateAdjustments:
 
         template = self.template(fileIndex)
 
+        if useAdjusted:
+            isAdjusted = self.__needAdjustment[fileIndex]
+            if isAdjusted:
+                template = self.__templatesAdjusted[fileIndex]
+                print(f"Adjusted Template on preserve\n{template}\n")
+
         for baseIndex, oBaseFile in enumerate(self.oCommand.oBaseFiles):
 
             self._templateOptions.index = baseIndex
@@ -595,7 +620,7 @@ class TemplateAdjustments:
             self._templateOptions.template = template
 
             if oBaseFile.trackOptions.hasNamesToPreserve:
-                translationList = self.oCommand.translations[fileIndex]
+                translationList = self.__translationList[fileIndex]
                 if translationList is not None:
                     sourceTranslation = translationList[baseIndex]
                 else:
@@ -607,6 +632,11 @@ class TemplateAdjustments:
                     withKey=True
                 )
                 template = template.replace(option, optionAdjusted, 1)
+
+                print(f"Voy a bregar con for Source {baseIndex}:")
+                print(
+                    f"sourceTranslation\n{sourceTranslation}option\n{option}\noption adjusted\n{optionAdjusted}"
+                )
 
         return template
 
