@@ -125,15 +125,16 @@ class ConfigKey:  # pylint: disable=too-few-public-methods
     #
 
     Algorithm = "Algorithm"
+    DbVersion = "DbVersion"
+    JobsAutoSave = "JobsAutoSave"
     JobHistory = "JobHistory"
     JobHistoryDisabled = "JobsHistoryDisabled"
-    JobsAutoSave = "JobsAutoSave"
-    JobsTable = "jobs"
     JobID = "JobID"
+    JobsTable = "jobs"
     LogViewer = "LogViewer"
     Tab = "Tab"
     TabText = "TabText"
-    DbVersion = "DbVersion"
+    TextSuffix = "TextSuffix"
 
 
 class Key:
@@ -220,11 +221,14 @@ def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None, ap
     #
     setRegEx()
 
-    if data.get(Key.MaxRegExCount) is None:
-        data.set(Key.MaxRegExCount, 20)
+    if data.get(ConfigKey.Algorithm) is None:
+        data.set(ConfigKey.Algorithm, 1)
 
     if data.get(ConfigKey.DbVersion) is None:
         data.set(ConfigKey.DbVersion, DATABASEVERSION)
+
+    if data.get(ConfigKey.JobsAutoSave) is None:
+        data.set(ConfigKey.JobsAutoSave, False)
 
     if data.get(ConfigKey.JobHistory) is None:
         data.set(ConfigKey.JobHistory, False)
@@ -234,16 +238,29 @@ def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None, ap
     else:
         data.set(ConfigKey.JobHistoryDisabled, False)
 
-    if data.get(ConfigKey.JobsAutoSave) is None:
-        data.set(ConfigKey.JobsAutoSave, False)
+    if data.get(Key.MaxRegExCount) is None:
+        data.set(Key.MaxRegExCount, 20)
+
+    if data.get(ConfigKey.TextSuffix) is None:
+        data.set(ConfigKey.TextSuffix, (
+                    ".srt",
+                    ".ssa",
+                    ".ass",
+                    ".pgs",
+                    ".idx",
+                    ".vob",
+                    ".vtt",
+                    ".usf",
+                    ".dvb",
+                    ".smi",
+                )
+        )
+
     #
     # Temporalily disable uncomment statements
     #
     #data.set(ConfigKey.JobHistoryDisabled, True)
     #data.set(ConfigKey.JobHistory, False)
-
-    if data.get(ConfigKey.Algorithm) is None:
-        data.set(ConfigKey.Algorithm, 1)
 
 
 def setDefaultFont(app):
