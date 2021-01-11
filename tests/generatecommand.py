@@ -141,6 +141,8 @@ class GenCommandApp(QMainWindow):
             + r"--track-order 0:0,0:1,1:0,2:0"
         )
 
+#            + r"/test/subs/ENG/Show Title - S01E01.ENG.ass' ')' "
+
         self.cmd2 = (
             mkvmerge
             + r" "
@@ -166,6 +168,10 @@ class GenCommandApp(QMainWindow):
             + r"'(' '"
             + s
             + r"/test/subs/SPA/Show Title - S01E01.mkv' ')' "
+            + r"--language 0:it --track-name 0:Italiano "
+            + r"'(' '"
+            + s
+            + r"/test/subs/ITA/Show Title - S01E01.ITA.ass' ')' "
             + r"--attachment-name Font01.otf "
             + r"--attachment-mime-type application/vnd.ms-opentype "
             + r"--attach-file '"
@@ -180,7 +186,7 @@ class GenCommandApp(QMainWindow):
             + r"--chapters '"
             + s
             + r"/test/chapters/Show Title - S01E01 - Chapters.xml' "
-            + r"--track-order 0:0,0:1,1:0,2:0,3:2"
+            + r"--track-order 0:0,0:1,1:0,2:0,3:0,4:2"
         )
 
         self.cmd3 = (
@@ -222,11 +228,11 @@ class GenCommandApp(QMainWindow):
         self.pushButton1.clicked.connect(  # pylint: disable=E1101
             lambda: self.pasteClipboard(1)
         )
-        # self.pushButton2 = QPushButton(" Command 2 ")
-        # self.pushButton2.resize(self.pushButton2.sizeHint())
-        # self.pushButton2.clicked.connect(   # pylint: disable=E1101
-        #    lambda: self.pasteClipboard(2)
-        # )
+        self.pushButton2 = QPushButton(" Command 2 ")
+        self.pushButton2.resize(self.pushButton2.sizeHint())
+        self.pushButton2.clicked.connect(   # pylint: disable=E1101
+           lambda: self.pasteClipboard(2)
+        )
         # self.pushButton3 = QPushButton(" Command 3 ")
         # self.pushButton3.resize(self.pushButton2.sizeHint())
         # self.pushButton3.clicked.connect(   # pylint: disable=E1101
@@ -248,7 +254,7 @@ class GenCommandApp(QMainWindow):
         layout.addWidget(self.textWindow, 0, 0, 7, 60)
         layout.addWidget(self.pushButton0, 7, 0)
         layout.addWidget(self.pushButton1, 7, 1)
-        # layout.addWidget(self.pushButton2, 7, 2)
+        layout.addWidget(self.pushButton2, 7, 2)
         # layout.addWidget(self.pushButton3, 7, 3)
         # layout.addWidget(self.pushButton4, 7, 4)
         layout.addWidget(self.pushButtonExit, 7, 5)
