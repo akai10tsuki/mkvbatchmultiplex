@@ -241,7 +241,20 @@ class SqlJobsTable(SqlDb):
     ):
         # pylint: disable=anomalous-backslash-in-string
         """
-        fetchJob fetch information from database by job id
+        fetchJob fetch information from database it will always read the rowid
+        as first field.
+           - if jobID is integer it translate to WHERE id = ?
+
+           - when jobID is a dictionary it means WHERE col1 = ? AND col2 = ?, ...
+
+           - args is a tuple with the fields needed when jobID is and int and
+           no other parameter is set it will fetch the field **job**
+
+           - fetchAll=True would permit to have more than one run for a job in
+           the database includes execution time to distinguish job runs
+
+           - whereClause literal WHERE clause to use no clause will be
+           constructed automatically
 
         if jobID is a dict the a WHERE clause with AND will be constructed
 
@@ -305,6 +318,7 @@ class SqlJobsTable(SqlDb):
             + ";"
         )
 
+        # print(f"Fetch ID {sqlFetchID}\nvalues = [{values}]")
         if values:
             cursor = self.sqlExecute(sqlFetchID, *values)
         else:
@@ -352,7 +366,7 @@ class SqlJobsTable(SqlDb):
         fields = (id, addDate, addTime, startTime, endTime, job)
 
         Args:
-            **jobID** (int): job id to update
+            **jobID** (int, dict): job id to update
 
             **fields** (tuple): fields to update
 
