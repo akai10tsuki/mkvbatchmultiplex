@@ -174,6 +174,7 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0246 = S_("Print")
     txt0247 = S_("Select All")
     txt0248 = S_("Clear Selection")
+    txt0249 = S_("Description")
 
 
     """
