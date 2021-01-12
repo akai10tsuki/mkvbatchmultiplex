@@ -52,7 +52,7 @@ class JobsHistoryView(QTableView):
 
     # Signals
     rowCountChangedSignal = Signal(int, int)
-    clickedOutsideRowsSignal = Signal()
+    clickedOutsideRowsSignal = Signal(int, int)
 
     def __init__(self, parent=None, title=None, log=None):
         super(JobsHistoryView, self).__init__()
@@ -215,7 +215,13 @@ class JobsHistoryView(QTableView):
 
         if row < 0:
             # generate signal when clicked outside the rows
-            self.clickedOutsideRowsSignal.emit()
+            # this action would deselect all rows but is slow
+            # compared the trigger of the signal which make it
+            # fail on buttonState this arguments are set to
+            # recognize the event and attend the event as if
+            # no rows are selected un-elegant hack
+            # print("Clicked outside.....")
+            self.clickedOutsideRowsSignal.emit(-1, 0)
 
     def selectedRowsCount(self):
 
