@@ -4,13 +4,13 @@ Changelog
 (Unreleased)
 ------------
 
-2.1.0a1.dev4 - 2021-01-10
--------------------------
-
-Saved Jobs tab ready for first release.  This is useful for saving test jobs.
-Also repetitive Jobs when source files stay on same location and suffer
+New Save Jobs tab ready for first release.  This is useful for saving test jobs.
+Also repetitive Jobs when source files stay on same location and go through
 modifications up to a final release.  Don't have to use mkvtoolix-gui for each
 iteration.
+
+2.1.0a1.dev4 - 2021-01-10
+-------------------------
 
 Added
 ~~~~~

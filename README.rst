@@ -34,6 +34,14 @@ For release 2.1.0:
 Option o save Jobs when they need to be repeated with the source files in the
 same location.  Algorithm revisions to work in more cases.
 
+Development version
+===================
+
+2.1.0b1.dev4
+************
+
+`Windows 10 development version`_ (64-bit).
+
 Description
 ===========
 
@@ -186,3 +194,4 @@ See https://mkvbatchmultiplex.readthedocs.io for more information.
 .. _lxml: https://lxml.de/
 .. _natsort: https://github.com/SethMMorton/natsort
 .. _wiki: https://github.com/akai10tsuki/mkvbatchmultiplex/wiki
+.. _Windows 10 development version: https://github.com/akai10tsuki/mkvbatchmultiplex/releases/download/v2.1.0b1.dev4/MKVBatchMultiplex-2.1.0b1.dev4-iss-AMD64.exe
