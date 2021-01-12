@@ -89,6 +89,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
         # initialize the gazillion variables
         self._initVars()
+        configLanguage(self)
 
         # Widow Title self.appDirectory on _initVars()
         self.setWindowTitle(config.APPNAME + ": " + config.DESCRIPTION)
@@ -102,7 +103,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
         # Restore configuration elements
         self.configuration(action=config.Action.Restore)
-        self.setLanguage()
+        #self.setLanguage()
 
         # tray icon
         self.trayIcon = QSystemTrayIconWidget(self, self.windowIcon())
@@ -585,6 +586,21 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         """About QT"""
 
         QMessageBox.aboutQt(self, config.APPNAME)
+
+def configLanguage(self):
+    """
+    Set application language the scheme permits runtime changes
+    """
+
+    language = config.data.get(config.ConfigKey.Language)
+
+    lang = gettext.translation(
+        config.NAME, localedir=str(config.LOCALE), languages=[language]
+    )
+    if self.uiSetLanguage.setLanguage(language):
+        pass
+    lang.install(names=("ngettext",))
+    config.data.set(config.ConfigKey.Language, language)
 
 
 @Slot(int)
