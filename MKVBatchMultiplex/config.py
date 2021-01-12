@@ -24,7 +24,7 @@ AUTHOR = "Efrain Vergara"
 EMAIL = "akai10tsuki@gmail.com"
 
 # for setup.py
-COPYRIGHT = "2018-2020, Efrain Vergara"
+COPYRIGHT = "2018-2021, Efrain Vergara"
 LICENSE = "MIT"
 DESCRIPTION = "A mkv media batch multiplex."
 ENTRYPOINTS = {
