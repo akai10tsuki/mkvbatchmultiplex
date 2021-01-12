@@ -20,7 +20,9 @@ from datetime import datetime, timedelta
 from time import sleep
 
 from PySide2.QtCore import Qt, Signal, Slot
+from PySide2.QtGui import QTextCursor
 from PySide2.QtWidgets import (
+    QDialogButtonBox,
     QWidget,
     QHBoxLayout,
     QGroupBox,
@@ -39,6 +41,8 @@ from vsutillib.misc import strFormatTimeDelta
 
 from ..config import data as config
 from ..config import ConfigKey
+
+from .ProjectInfoDialogWidget import ProjectInfoDialogWidget
 
 from ..jobs import (
     JobHistoryKey,
@@ -74,6 +78,7 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
 
         self.tableView = JobsHistoryView(self, groupTitle)
         self.search = SearchTextDialogWidget(self)
+        self.infoDialog = ProjectInfoDialogWidget(self)
         self._initUI(groupTitle)
         self._initHelper()
 
@@ -107,9 +112,9 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
             function=self.clearOutputWindow,
             toolTip="Clear output window",
         )
-        btnRefresh = QPushButtonWidget(
-            "Refresh",
-            function=self.refresh,
+        btnShowInfo = QPushButtonWidget(
+            "Description",
+            function=self.showInfo,
             toolTip="Refresh table view with any new information",
         )
         btnSelectAll = QPushButtonWidget(
@@ -134,7 +139,7 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
         self.btnGrid.addWidget(btnSearchText)
         self.btnGrid.addWidget(btnShowOutput)
         self.btnGrid.addWidget(btnShowOutputErrors)
-        self.btnGrid.addWidget(btnRefresh)
+        self.btnGrid.addWidget(btnShowInfo)
         self.btnGrid.addStretch()
         self.btnGrid.addWidget(btnPrint)
         self.btnGrid.addWidget(btnSelectAll)
@@ -157,7 +162,7 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
 
         self.btnGrid.itemAt(_Button.SHOWOUTPUT).widget().setEnabled(False)
         self.btnGrid.itemAt(_Button.SHOWOUTPUTERRORS).widget().setEnabled(False)
-        self.btnGrid.itemAt(_Button.REFRESH).widget().setEnabled(False)
+        self.btnGrid.itemAt(_Button.SHOWINFO).widget().setEnabled(False)
         # self.btnGrid.itemAt(_Button.PRINT).widget().hide()
         self.btnGrid.itemAt(_Button.PRINT).widget().setEnabled(False)
         self.btnGrid.itemAt(_Button.SELECTALL).widget().setEnabled(False)
@@ -167,8 +172,11 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
         # self.cmdLine.textChanged.connect(self.analysisButtonState)
         self.output.textChanged.connect(self.clearOutputButtonState)
         self.tableView.clicked.connect(self.rowsClicked)
-        self.tableView.clickedOutsideRowsSignal.connect(self.rowsClicked)
+        self.tableView.clickedOutsideRowsSignal.connect(self.buttonsState)
         self.tableView.rowCountChangedSignal.connect(self.buttonsState)
+
+        # Just Ok on info dialog
+        self.infoDialog.ui.buttonBox.setStandardButtons(QDialogButtonBox.Ok)
 
     @Slot()
     def setLanguage(self):
@@ -197,7 +205,7 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
         )
 
     @Slot(int, int)
-    def buttonsState(self, _, newCount):
+    def buttonsState(self, oldCount, newCount):
         """
         buttonsState enable disable buttons according to row count
 
@@ -207,25 +215,33 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
         """
 
         if newCount <= 0:
-            # print("View Widget Entering buttonsState 0 rows ...")
+            #print("View Widget Entering buttonsState 0 rows ...")
             self.btnGrid.itemAt(_Button.CLEARSELECTION).widget().setEnabled(False)
             self.btnGrid.itemAt(_Button.PRINT).widget().setEnabled(False)
-            self.btnGrid.itemAt(_Button.REFRESH).widget().setEnabled(False)
+            self.btnGrid.itemAt(_Button.SHOWINFO).widget().setEnabled(False)
             self.btnGrid.itemAt(_Button.SELECTALL).widget().setEnabled(False)
             self.btnGrid.itemAt(_Button.SHOWOUTPUT).widget().setEnabled(False)
             self.btnGrid.itemAt(_Button.SHOWOUTPUTERRORS).widget().setEnabled(False)
+            if oldCount < 0:
+                totalRows = self.tableView.model.rowCount()
+                if totalRows > 0:
+                    self.btnGrid.itemAt(_Button.SELECTALL).widget().setEnabled(True)
         else:
             totalRows = self.tableView.model.rowCount()
             totalSelectedRows = self.tableView.selectedRowsCount()
 
-            # print(f"View Widget Entering buttonsState {totalRows}
-            # rows {totalSelectedRows} selected ...")
+            #print(
+            #    (
+            #        f"View Widget Entering buttonsState total rows {totalRows} "
+            #        f"total selected rows {totalSelectedRows} selected ..."
+            #    )
+            #)
 
             if totalRows == 0:
                 self.buttonsState(0, 0)
             else:
                 self.btnGrid.itemAt(_Button.PRINT).widget().hide()
-                self.btnGrid.itemAt(_Button.REFRESH).widget().setEnabled(True)
+                self.btnGrid.itemAt(_Button.SHOWINFO).widget().setEnabled(False)
                 self.btnGrid.itemAt(_Button.SHOWOUTPUT).widget().setEnabled(False)
                 self.btnGrid.itemAt(_Button.SHOWOUTPUTERRORS).widget().setEnabled(False)
                 if totalSelectedRows == 0:
@@ -238,6 +254,7 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
                     self.btnGrid.itemAt(_Button.CLEARSELECTION).widget().setEnabled(
                         True
                     )
+                    self.btnGrid.itemAt(_Button.SHOWINFO).widget().setEnabled(True)
                     self.btnGrid.itemAt(_Button.SHOWOUTPUT).widget().setEnabled(True)
                     self.btnGrid.itemAt(_Button.SHOWOUTPUTERRORS).widget().setEnabled(
                         True
@@ -336,22 +353,53 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
 
         self.output.insertTextSignal.emit("\n", {"log": False})
 
-    def refresh(self):
+    def showInfo(self):
         """Refresh jobs records"""
 
-        jobsDB = SqlJobsTable(config.get(ConfigKey.SystemDB))
+        indexes = self.tableView.selectionModel().selectedRows()
 
-        if jobsDB:
-            rows = jobsDB.fetchJob(0)
-            for row in rows:
-                job = pickle.loads(zlib.decompress(row[JobsTableKey.jobIndex]))
-                # print(
-                #    "Job ID = {} Status = {}".format(
-                #        row[JobsTableKey.IDIndex], job.jobRow[JobKey.Status]
-                #    )
-                # )
+        if len(indexes) == 1:
 
-        jobsDB.close()
+            jobsDB = SqlJobsTable(config.get(ConfigKey.SystemDB))
+
+            index = self.tableView.proxyModel.mapToSource(indexes[0])
+            model = self.tableView.proxyModel.sourceModel()
+
+            row = index.row()
+            # column = index.column()
+            # job = model.dataset.data[row][
+            #    JobHistoryKey.Status
+            # ].obj  # TODO: change to status
+            rowid = model.dataset.data[row][JobHistoryKey.ID].obj
+            jobID = model.dataset.data[row][JobHistoryKey.ID].cell
+            if rowid is not None:
+                records = jobsDB.fetchJob(
+                    {"rowid": rowid},
+                    JobsTableKey.projectName,
+                    JobsTableKey.projectInfo,
+                )
+                if records:
+                    record = records.fetchone()
+                    #print(f"Houston we have a record.\n\nProject Name: [{record}]")
+                    title = self.infoDialog.windowTitle()
+                    self.infoDialog.setWindowTitle(title + " - " + str(jobID))
+                    self.infoDialog.name = record[1]
+                    self.infoDialog.description = record[2]
+                    self.infoDialog.ui.teDescription.moveCursor(QTextCursor.Start)
+
+                    self.infoDialog.getProjectInfo()
+                    name, desc = self.infoDialog.info
+                    records = jobsDB.update(
+                        {"rowid": rowid},
+                        (
+                            JobsTableKey.projectName,
+                            JobsTableKey.projectInfo,
+                        ),
+                        name,
+                        desc,
+                    )
+
+            jobsDB.close()
 
 
 def fillRows(self, rows):
@@ -462,15 +510,16 @@ def showOutputLines(**kwargs):
         row = index.row()
         # column = index.column()
         job = model.dataset.data[row][
-            JobHistoryKey.Command
+            JobHistoryKey.Status
         ].obj  # TODO: change to status
         rowid = model.dataset.data[row][JobHistoryKey.ID].obj
         if job is None:
+            # print("Fetching Job")
             records = jobsDB.fetchJob({"rowid": rowid}, JobsTableKey.job)
             if records:
                 record = records.fetchone()
                 job = pickle.loads(zlib.decompress(record[1]))
-                model.dataset.data[row][JobHistoryKey.Command].obj = copy.deepcopy(job)
+                model.dataset.data[row][JobHistoryKey.Status].obj = copy.deepcopy(job)
             else:
                 msg = "Information cannot be read."
                 output.insertTextSignal.emit(msg, {"log": False})
@@ -554,7 +603,7 @@ class _Button:
 
     SHOWOUTPUT = 2
     SHOWOUTPUTERRORS = 3
-    REFRESH = 4
+    SHOWINFO = 4
 
     PRINT = 6
     SELECTALL = 7
