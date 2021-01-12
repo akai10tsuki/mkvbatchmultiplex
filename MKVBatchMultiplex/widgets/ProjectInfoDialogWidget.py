@@ -36,6 +36,28 @@ class ProjectInfoDialogWidget(QDialog):
     def info(self):
         return self.__name, self.__info
 
+    @property
+    def name(self):
+        return self.__name
+
+    @name.setter
+    def name(self, value):
+        if isinstance(value, str):
+            self.__name = value
+            self.ui.leName.clear()
+            self.ui.leName.setText(self.__name)
+
+    @property
+    def description(self):
+        return self.__info
+
+    @description.setter
+    def description(self, value):
+        if isinstance(value, str):
+            self.__info = value
+            self.ui.teDescription.clear()
+            self.ui.teDescription.insertPlainText(self.__info)
+
     def getProjectInfo(self):
         """Show dialog to set preferences"""
 
