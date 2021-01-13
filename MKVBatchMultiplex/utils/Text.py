@@ -72,6 +72,7 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0092 = S_("Default")
     txt0093 = S_("Set Algorithm to default value")
     txt0094 = S_("Algorithm")
+    txt0095 = S_("Date of execution")
 
     # JobTableWidgets
     # 120
@@ -128,7 +129,7 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0165 = S_("Paste Clipboard contents in command line")
     txt0166 = S_("Add Queue")
     txt0167 = S_("Add command to jobs table and put on Queue")
-    # txt0168 = S_()
+    txt0168 = S_("Examine any saved jobs, copy and run again if needed")
     txt0169 = S_("Start processing jobs on Queue")
     txt0170 = S_("Analysis")
     txt0171 = S_("Print analysis of command line")
