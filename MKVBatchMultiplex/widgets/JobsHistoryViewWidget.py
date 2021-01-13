@@ -93,45 +93,58 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
         self.output = QOutputTextWidget(self)
 
         btnFetchJobHistory = QPushButtonWidget(
-            "Fetch Jobs",
+            Text.txt0242,
             function=self.fetchJobHistory,
-            toolTip="Fetch and display old saved jobs processed by worker",
+            margins="  ",
+            toolTip=Text.txt0251,
         )
         btnSearchText = QPushButtonWidget(
-            "Search",
+            Text.txt0243,
             function=self.searchText,
-            toolTip="Do full text search on commands",
+            margins="  ",
+            toolTip=Text.txt0254,
         )
         btnClearSelection = QPushButtonWidget(
-            "Clear Selection",
+            Text.txt0248,
             function=self.clearSelection,
-            toolTip="Clear selected rows",
+            margins="  ",
+            toolTip=Text.txt0256,
         )
         btnClearOutput = QPushButtonWidget(
-            "Clear Output",
+            Text.txt0255,
             function=self.clearOutputWindow,
-            toolTip="Clear output window",
+            margins="  ",
+            toolTip=Text.txt0257,
         )
         btnShowInfo = QPushButtonWidget(
-            "Description",
+            Text.txt0249,
             function=self.showInfo,
-            toolTip="Refresh table view with any new information",
+            margins="  ",
+            toolTip=Text.txt0258,
         )
         btnSelectAll = QPushButtonWidget(
-            "Select All", function=self.selectAll, toolTip="Select all rows"
+            Text.txt0247,
+            function=self.selectAll,
+            margins="  ",
+            toolTip=Text.txt0259,
         )
         btnPrint = QPushButtonWidget(
-            "Print", function=self.printDataset, toolTip="List Rows"
+            Text.txt0246,
+            function=self.printDataset,
+            margins="  ",
+            toolTip=Text.txt0260,
         )
         btnShowOutput = QPushButtonWidget(
-            "Show Output",
+            Text.txt0244,
             function=lambda: self.showOutput(_ShowKey.output),
-            toolTip="Show job output run",
+            margins="  ",
+            toolTip=Text.txt0262,
         )
         btnShowOutputErrors = QPushButtonWidget(
-            "Show Errors",
+            Text.txt0245,
             function=lambda: self.showOutput(_ShowKey.errors),
-            toolTip="Show job output errors",
+            margins="  ",
+            toolTip=Text.txt0262,
         )
 
         self.btnGrid = QHBoxLayout()
@@ -187,8 +200,9 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
         for index in range(self.btnGrid.count()):
             widget = self.btnGrid.itemAt(index).widget()
             if isinstance(widget, QPushButtonWidget):
-                widget.setText("  " + _(widget.originalText) + "  ")
-                widget.setToolTip(_(widget.toolTip))
+                widget.setLanguage()
+                #widget.setText("  " + _(widget.originalText) + "  ")
+                #widget.setToolTip(widget.toolTip)
 
         self.grpBox.setTitle(_(Text.txt0130))
         self.tableView.model.setHeaderData(
@@ -215,7 +229,7 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
         """
 
         if newCount <= 0:
-            #print("View Widget Entering buttonsState 0 rows ...")
+            # print("View Widget Entering buttonsState 0 rows ...")
             self.btnGrid.itemAt(_Button.CLEARSELECTION).widget().setEnabled(False)
             self.btnGrid.itemAt(_Button.PRINT).widget().setEnabled(False)
             self.btnGrid.itemAt(_Button.SHOWINFO).widget().setEnabled(False)
@@ -230,12 +244,12 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
             totalRows = self.tableView.model.rowCount()
             totalSelectedRows = self.tableView.selectedRowsCount()
 
-            #print(
+            # print(
             #    (
             #        f"View Widget Entering buttonsState total rows {totalRows} "
             #        f"total selected rows {totalSelectedRows} selected ..."
             #    )
-            #)
+            # )
 
             if totalRows == 0:
                 self.buttonsState(0, 0)
@@ -380,7 +394,7 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
                 )
                 if records:
                     record = records.fetchone()
-                    #print(f"Houston we have a record.\n\nProject Name: [{record}]")
+                    # print(f"Houston we have a record.\n\nProject Name: [{record}]")
                     title = self.infoDialog.windowTitle()
                     self.infoDialog.setWindowTitle(title + " - " + str(jobID))
                     self.infoDialog.name = record[1]

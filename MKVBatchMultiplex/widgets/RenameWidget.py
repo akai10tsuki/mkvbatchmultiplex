@@ -118,15 +118,16 @@ class RenameWidget(pyqt.TabWidgetExtension, QWidget):
         btnApplyRename = pyqt.QPushButtonWidget(
             Text.txt0208,
             function=self._applyRename,
+            margins="  ",
             toolTip=Text.txt0209,
         )
         btnApplyRename.setEnabled(False)
         btnUndoRename = pyqt.QPushButtonWidget(
-            Text.txt0210, function=self._undoRename, toolTip=Text.txt0211
+            Text.txt0210, function=self._undoRename, margins="  ", toolTip=Text.txt0211
         )
         btnUndoRename.setEnabled(False)
         btnClear = pyqt.QPushButtonWidget(
-            Text.txt0212, function=self.clear, toolTip=Text.txt0213
+            Text.txt0212, function=self.clear, margins="  ", toolTip=Text.txt0213
         )
         self.btnGrid = QHBoxLayout()
         self.btnGrid.addWidget(btnApplyRename)
@@ -324,8 +325,9 @@ class RenameWidget(pyqt.TabWidgetExtension, QWidget):
         for index in range(self.btnGrid.count()):
             widget = self.btnGrid.itemAt(index).widget()
             if isinstance(widget, pyqt.QPushButtonWidget):
-                widget.setText("  " + _(widget.originalText) + "  ")
-                widget.setToolTip(_(widget.toolTip))
+                widget.setLanguage()
+                #widget.setText("  " + _(widget.originalText) + "  ")
+                #widget.setToolTip(_(widget.toolTip))
         for w in [self.textRegEx, self.textSubString]:
             w.lblText.setText(_(w.label) + ": ")
             w.cmdLine.setToolTip(_(w.toolTip))

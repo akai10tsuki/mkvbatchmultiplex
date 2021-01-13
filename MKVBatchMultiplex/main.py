@@ -87,9 +87,13 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.defaultPalette = palette
         self.parent = parent
 
+        # Language Setup
+        self.setLanguageInWidgets = SetLanguage()
+        self.uiSetLanguage = UiSetLanguage(self)
+        configLanguage(self)
+
         # initialize the gazillion variables
         self._initVars()
-        configLanguage(self)
 
         # Widow Title self.appDirectory on _initVars()
         self.setWindowTitle(config.APPNAME + ": " + config.DESCRIPTION)
@@ -134,10 +138,6 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.controlQueue = deque()
         self.jobsQueue = JobQueue(self, controlQueue=self.controlQueue)
 
-        # Language Setup
-        self.setLanguageWidget = SetLanguage()
-        self.uiSetLanguage = UiSetLanguage(self)
-
         # Progress information setup
         self.progressBar = DualProgressBar(self, align=Qt.Horizontal)
         self.jobsLabel = QFormatLabel(Text.txt0085, init=[0, 0, 0, 0, 0],)
@@ -165,17 +165,17 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
         # File SubMenu
         self.fileMenu = QMenuWidget(Text.txt0020)
-        closeIcon = self.style().standardIcon(QStyle.SP_DialogCloseButton)
+        exitIcon = self.style().standardIcon(QStyle.SP_DialogCloseButton)
 
         # Preferences
         actPreferences = QActionWidget(
-            "&Preferences", self, shortcut="Ctrl+P", statusTip="Setup program options"
+            Text.txt0050, self, shortcut=Text.txt0026, statusTip=Text.txt0051,
         )
         actPreferences.triggered.connect(self.setPreferences.getPreferences)
 
         # Exit application
         actExit = QActionWidget(
-            closeIcon, Text.txt0021, self, shortcut=Text.txt0022, statusTip=Text.txt0023,
+            exitIcon, Text.txt0021, self, shortcut=Text.txt0022, statusTip=Text.txt0023,
         )
         actExit.triggered.connect(self.close)
 
@@ -343,12 +343,12 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.commandWidget.rename = self.renameWidget
 
         # setup widgets setLanguage to SetLanguage change signal
-        self.setLanguageWidget.addSlot(self.tableViewWidget.setLanguage)
-        self.setLanguageWidget.addSlot(self.commandWidget.setLanguage)
-        self.setLanguageWidget.addSlot(self.tabs.setLanguage)
-        self.setLanguageWidget.addSlot(self.renameWidget.setLanguage)
-        self.setLanguageWidget.addSlot(self.historyWidget.setLanguage)
-        self.setLanguageWidget.addSlot(self.setPreferences.retranslateUi)
+        self.setLanguageInWidgets.addSlot(self.tableViewWidget.setLanguage)
+        self.setLanguageInWidgets.addSlot(self.commandWidget.setLanguage)
+        self.setLanguageInWidgets.addSlot(self.tabs.setLanguage)
+        self.setLanguageInWidgets.addSlot(self.renameWidget.setLanguage)
+        self.setLanguageInWidgets.addSlot(self.historyWidget.setLanguage)
+        self.setLanguageInWidgets.addSlot(self.setPreferences.retranslateUi)
 
         # connect to tabs widget tab change Signal
         self.tabs.currentChanged.connect(tabChange)
@@ -550,17 +550,20 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
             menuItem (QMenuWidget) -- menu object making the call for checkmark update
         """
 
-        if language is None:
-            language = config.data.get(config.ConfigKey.Language)
+        #if language is None:
+        #    language = config.data.get(config.ConfigKey.Language)
 
-        lang = gettext.translation(
-            config.NAME, localedir=str(config.LOCALE), languages=[language]
-        )
-        if self.uiSetLanguage.setLanguage(language):
-            pass
-        lang.install(names=("ngettext",))
-        config.data.set(config.ConfigKey.Language, language)
-        self.setWindowTitle(Text.txt0001)
+        #lang = gettext.translation(
+        #    config.NAME, localedir=str(config.LOCALE), languages=[language]
+        #)
+        #if self.uiSetLanguage.setLanguage(language):
+        #    pass
+        #lang.install(names=("ngettext",))
+        #config.data.set(config.ConfigKey.Language, language)
+
+        configLanguage(self, language)
+
+        self.setWindowTitle(_(Text.txt0001))
         self.jobsLabel.template = " " + _(Text.txt0085) + " "
         self.progressBar.label = _(Text.txt0091) + ":"
 
@@ -568,7 +571,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         setLanguageMenus(self)
 
         # Update language on other window widgets
-        self.setLanguageWidget.emitSignal()
+        self.setLanguageInWidgets.emitSignal()
 
     def about(self):
         """About"""
@@ -587,12 +590,13 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
         QMessageBox.aboutQt(self, config.APPNAME)
 
-def configLanguage(self):
+def configLanguage(self, language=None):
     """
     Set application language the scheme permits runtime changes
     """
 
-    language = config.data.get(config.ConfigKey.Language)
+    if language is None:
+        language = config.data.get(config.ConfigKey.Language)
 
     lang = gettext.translation(
         config.NAME, localedir=str(config.LOCALE), languages=[language]

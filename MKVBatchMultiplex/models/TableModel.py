@@ -299,6 +299,11 @@ class TableModel(QAbstractTableModel):
             if orientation == Qt.Horizontal:
                 self.dataset[section] = value
                 self.headerDataChanged.emit(orientation, section, section)
+        elif role == Qt.ToolTipRole:
+            if orientation == Qt.Horizontal:
+                self.dataset.headers[section].attribute["ToolTip"] = value
+                self.headerDataChanged.emit(orientation, section, section)
+
 
     #
     # Used by Editable and Read-Only Items Models

@@ -4,9 +4,6 @@ set language locale for main window menus
 
 from vsutillib.pyqt import QMenuWidget, QActionWidget
 
-from .. import config
-from .Text import Text
-
 
 def setLanguageMenus(parent):
     """
@@ -17,21 +14,5 @@ def setLanguageMenus(parent):
     """
 
     for action in parent.menuItems:
-        if isinstance(action, QActionWidget):
-            action.setText(
-                action.textPrefix + _(action.originalText) + action.textSuffix
-            )
-            if action.statusTip:
-                action.setStatusTip(_(action.statusTip))
-            if action.toolTip:
-                if action.toolTip == Text.txt0020:
-                    msg = _(action.toolTip).format(
-                        "~/" + config.FILESROOT + "/" + config.LOGFILE
-                    )
-                    action.setStatusTip(msg)
-                else:
-                    action.setStatusTip(_(action.toolTip))
-        if isinstance(action, QMenuWidget):
-            action.setTitle(
-                action.titlePrefix + _(action.originalTitle) + action.titleSuffix
-            )
+        if isinstance(action, (QActionWidget, QMenuWidget)):
+            action.setLanguage()
