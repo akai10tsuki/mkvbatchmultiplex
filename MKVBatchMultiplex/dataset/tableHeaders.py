@@ -67,7 +67,7 @@ def tableHistoryHeaders():
                 "Label": " " + _(Text.txt0131) + "  ",
                 "Alignment": "right",
                 "Width": 80,
-                "ToolTip": "Job identification number",
+                "ToolTip": _(Text.txt0086),
             },
         ],
         [
@@ -78,7 +78,7 @@ def tableHistoryHeaders():
                 "Label": "  " + _(Text.txt0240) + "  ",
                 "Alignment": "center",
                 "Width": 80,
-                "ToolTip": "Date of execution",
+                "ToolTip": _(Text.txt0095),
             },
         ],
         [
@@ -89,7 +89,7 @@ def tableHistoryHeaders():
                 "Label": "  " + _(Text.txt0132) + "  ",
                 "Alignment": "center",
                 "Width": 80,
-                "ToolTip": "Application code for the job status",
+                "ToolTip": _(Text.txt0087),
             },
         ],
         [
@@ -100,7 +100,7 @@ def tableHistoryHeaders():
                 "Label": _(Text.txt0133),
                 "Alignment": "center",
                 "Width": 4096,
-                "ToolTip": "Command generated for MKVMERGE by MKVToolNix",
+                "ToolTip": _(Text.txt0088),
             },
         ],
     ]

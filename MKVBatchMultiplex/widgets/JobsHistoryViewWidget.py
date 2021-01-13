@@ -201,21 +201,42 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
             widget = self.btnGrid.itemAt(index).widget()
             if isinstance(widget, QPushButtonWidget):
                 widget.setLanguage()
-                #widget.setText("  " + _(widget.originalText) + "  ")
-                #widget.setToolTip(widget.toolTip)
+                # widget.setText("  " + _(widget.originalText) + "  ")
+                # widget.setToolTip(widget.toolTip)
 
         self.grpBox.setTitle(_(Text.txt0130))
         self.tableView.model.setHeaderData(
             _JobHKey.ID, Qt.Horizontal, "  " + _(Text.txt0131) + "  "
         )
         self.tableView.model.setHeaderData(
+            _JobHKey.ID,
+            Qt.Horizontal,
+            "  " + _(Text.txt0086) + "  ",
+            role=Qt.ToolTipRole,
+        )
+        self.tableView.model.setHeaderData(
             _JobHKey.Date, Qt.Horizontal, "    " + _(Text.txt0240) + "    "
+        )
+        self.tableView.model.setHeaderData(
+            _JobHKey.Date,
+            Qt.Horizontal,
+            "    " + _(Text.txt0095) + "    ",
+            role=Qt.ToolTipRole,
         )
         self.tableView.model.setHeaderData(
             _JobHKey.Status, Qt.Horizontal, "    " + _(Text.txt0132) + "    "
         )
         self.tableView.model.setHeaderData(
+            _JobHKey.Status,
+            Qt.Horizontal,
+            "    " + _(Text.txt0087) + "    ",
+            role=Qt.ToolTipRole,
+        )
+        self.tableView.model.setHeaderData(
             _JobHKey.Command, Qt.Horizontal, _(Text.txt0133)
+        )
+        self.tableView.model.setHeaderData(
+            _JobHKey.Command, Qt.Horizontal, _(Text.txt0086), role=Qt.ToolTipRole
         )
 
     @Slot(int, int)
