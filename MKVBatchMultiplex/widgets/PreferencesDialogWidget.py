@@ -385,7 +385,7 @@ class Preferences(QObject):
             self.__changedData = True
 
     @Slot(object)
-    def toggledRadioButton(self, rButton): # pylint: disable=unused-argument
+    def toggledRadioButton(self, rButton):  # pylint: disable=unused-argument
 
         if not self.__changedData:
             self.__changedData = True
