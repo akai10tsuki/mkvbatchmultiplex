@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  \n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-12-17 15:19-0500\n"
+"POT-Creation-Date: 2021-01-12 20:08-0500\n"
 "PO-Revision-Date: 2020-01-24 23:59-0500\n"
 "Last-Translator: \n"
 "Language: en_US\n"
@@ -58,444 +58,501 @@ msgstr ""
 msgid "Force exit"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:32
-msgid "&Settings"
+#: MKVBatchMultiplex/utils/text.py:29
+msgid "Ctrl+P"
 msgstr ""
 
 #: MKVBatchMultiplex/utils/text.py:33
-msgid "Enable logging"
+msgid "&Settings"
 msgstr ""
 
 #: MKVBatchMultiplex/utils/text.py:34
-msgid "Enable session logging in {}"
+msgid "Enable logging"
 msgstr ""
 
 #: MKVBatchMultiplex/utils/text.py:35
-msgid "Font && size"
+msgid "Enable session logging in {}"
 msgstr ""
 
 #: MKVBatchMultiplex/utils/text.py:36
+msgid "Font && size"
+msgstr ""
+
+#: MKVBatchMultiplex/utils/text.py:37
 msgid "Select font & size"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:38
+#: MKVBatchMultiplex/utils/text.py:39
 msgid "&Interface language"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:40
+#: MKVBatchMultiplex/utils/text.py:41
 msgid "Restore defaults"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:41
+#: MKVBatchMultiplex/utils/text.py:42
 msgid "Restore settings for font, window size and position"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:44
+#: MKVBatchMultiplex/utils/text.py:45
 msgid "&Preferences"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:45
+#: MKVBatchMultiplex/utils/text.py:46
 msgid "Setup program options"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:49
+#: MKVBatchMultiplex/utils/text.py:50
 msgid "&Help"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:50
+#: MKVBatchMultiplex/utils/text.py:51
 msgid "Contents"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:51
+#: MKVBatchMultiplex/utils/text.py:52
 msgid "Using"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:52
+#: MKVBatchMultiplex/utils/text.py:53
 msgid "About"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:53
+#: MKVBatchMultiplex/utils/text.py:54
 msgid "About QT"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:57
+#: MKVBatchMultiplex/utils/text.py:58
 msgid "Close App"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:58
+#: MKVBatchMultiplex/utils/text.py:59
 msgid "Are you sure you want to exit"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:59
+#: MKVBatchMultiplex/utils/text.py:60
 msgid "Yes"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:61
+#: MKVBatchMultiplex/utils/text.py:62
 msgid "Confirm restore ..."
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:62
+#: MKVBatchMultiplex/utils/text.py:63
 msgid "Restore default settings"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:64
+#: MKVBatchMultiplex/utils/text.py:65
 msgid "Jobs: {0:3d} - Current: {1:3d} - File: {2:3d} of {3:3d} - Errors: {4:3d}"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:65
+#: MKVBatchMultiplex/utils/text.py:66
 msgid "Job identification number"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:66
+#: MKVBatchMultiplex/utils/text.py:67
 msgid "Application code for the job status"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:67
+#: MKVBatchMultiplex/utils/text.py:68
 msgid "Command generated for MKVMERGE by MKVToolNix"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:68
+#: MKVBatchMultiplex/utils/text.py:69
 msgid "Jobs are still running"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:69
+#: MKVBatchMultiplex/utils/text.py:70
 msgid "Exit"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:70
+#: MKVBatchMultiplex/utils/text.py:71
 msgid "Progress"
 msgstr ""
 
+#: MKVBatchMultiplex/utils/text.py:72
+msgid "Default"
+msgstr ""
+
+#: MKVBatchMultiplex/utils/text.py:73
+msgid "Set Algorithm to default value"
+msgstr ""
+
 #: MKVBatchMultiplex/utils/text.py:74
-msgid "Populate"
-msgstr ""
-
-#: MKVBatchMultiplex/utils/text.py:75
-msgid "Add test jobs to table"
-msgstr ""
-
-#: MKVBatchMultiplex/utils/text.py:76
-msgid "Queue Waiting Jobs"
-msgstr ""
-
-#: MKVBatchMultiplex/utils/text.py:77
-msgid "Add all Waiting jobs to the Queue"
+msgid "Algorithm"
 msgstr ""
 
 #: MKVBatchMultiplex/utils/text.py:78
-msgid "Clear Queue"
+msgid "Populate"
 msgstr ""
 
 #: MKVBatchMultiplex/utils/text.py:79
-msgid "Remove jobs from Queue"
+msgid "Add test jobs to table"
 msgstr ""
 
 #: MKVBatchMultiplex/utils/text.py:80
-msgid "Start Worker"
+msgid "Queue Waiting Jobs"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:81 MKVBatchMultiplex/utils/text.py:128
-msgid "Start processing jobs on Queue"
+#: MKVBatchMultiplex/utils/text.py:81
+msgid "Add all Waiting jobs to the Queue"
 msgstr ""
 
 #: MKVBatchMultiplex/utils/text.py:82
-msgid "Debug"
+msgid "Clear Queue"
 msgstr ""
 
 #: MKVBatchMultiplex/utils/text.py:83
-msgid "Print current dataset to console"
+msgid "Remove jobs from Queue"
 msgstr ""
 
 #: MKVBatchMultiplex/utils/text.py:84
-msgid "Jobs Table"
+msgid "Start Worker"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:85
-msgid "ID"
+#: MKVBatchMultiplex/utils/text.py:85 MKVBatchMultiplex/utils/text.py:132
+msgid "Start processing jobs on Queue"
 msgstr ""
 
 #: MKVBatchMultiplex/utils/text.py:86
-msgid "Status"
+msgid "Debug"
 msgstr ""
 
 #: MKVBatchMultiplex/utils/text.py:87
-msgid "Command"
+msgid "Print current dataset to console"
 msgstr ""
 
 #: MKVBatchMultiplex/utils/text.py:88
-msgid "Abort Running Job"
+msgid "Jobs Table"
 msgstr ""
 
 #: MKVBatchMultiplex/utils/text.py:89
-msgid "Abort running job and continue with next in Queue"
+msgid "ID"
 msgstr ""
 
 #: MKVBatchMultiplex/utils/text.py:90
-msgid "Abort Jobs"
+msgid "Status"
 msgstr ""
 
 #: MKVBatchMultiplex/utils/text.py:91
-msgid "Abort running job and put jobs in Queue in Waiting status"
+msgid "Command"
 msgstr ""
 
 #: MKVBatchMultiplex/utils/text.py:92
-msgid "Remove Job"
+msgid "Abort Running Job"
 msgstr ""
 
 #: MKVBatchMultiplex/utils/text.py:93
-msgid "Remove job from list"
+msgid "Abort running job and continue with next in Queue"
 msgstr ""
 
 #: MKVBatchMultiplex/utils/text.py:94
-msgid "Remove selected jobs"
+msgid "Abort Jobs"
 msgstr ""
 
 #: MKVBatchMultiplex/utils/text.py:95
-msgid "Copy"
+msgid "Abort running job and put jobs in Queue in Waiting status"
 msgstr ""
 
 #: MKVBatchMultiplex/utils/text.py:96
-msgid "Remove"
+msgid "Remove Job"
 msgstr ""
 
 #: MKVBatchMultiplex/utils/text.py:97
-msgid "Delete"
+msgid "Remove job from list"
 msgstr ""
 
 #: MKVBatchMultiplex/utils/text.py:98
-msgid "Save"
+msgid "Remove selected jobs"
+msgstr ""
+
+#: MKVBatchMultiplex/utils/text.py:99
+msgid "Copy"
+msgstr ""
+
+#: MKVBatchMultiplex/utils/text.py:100
+msgid "Remove"
+msgstr ""
+
+#: MKVBatchMultiplex/utils/text.py:101
+msgid "Delete"
 msgstr ""
 
 #: MKVBatchMultiplex/utils/text.py:102
+msgid "Save"
+msgstr ""
+
+#: MKVBatchMultiplex/utils/text.py:106
 msgid "Jobs"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:103
+#: MKVBatchMultiplex/utils/text.py:107
 msgid "Jobs Output"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:104
+#: MKVBatchMultiplex/utils/text.py:108
 msgid "Jobs Errors"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:105
+#: MKVBatchMultiplex/utils/text.py:109
 msgid "Rename Files"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:107
+#: MKVBatchMultiplex/utils/text.py:111
 msgid "Jobs table to manipulate job status and Queue"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:108
+#: MKVBatchMultiplex/utils/text.py:112
 msgid "Output generated by jobs and job handling"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:109
+#: MKVBatchMultiplex/utils/text.py:113
 msgid "Errors generated by processing or running of jobs"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:110
+#: MKVBatchMultiplex/utils/text.py:114
 msgid "Rename the output files ej. Series Name - S01E01.mkv, ..."
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:111
+#: MKVBatchMultiplex/utils/text.py:115
 msgid "Enter generated command and see any test output"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:113
+#: MKVBatchMultiplex/utils/text.py:117
 msgid "Log Viewer"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:114
+#: MKVBatchMultiplex/utils/text.py:118
 msgid "Display log entries"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:115
+#: MKVBatchMultiplex/utils/text.py:119
 msgid "Messages registered in current running log"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:119
+#: MKVBatchMultiplex/utils/text.py:123
 msgid "Add Command"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:120
+#: MKVBatchMultiplex/utils/text.py:124
 msgid "Add command to jobs table with Waiting status"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:121 MKVBatchMultiplex/utils/text.py:135
+#: MKVBatchMultiplex/utils/text.py:125 MKVBatchMultiplex/utils/text.py:139
+#: MKVBatchMultiplex/utils/text.py:185
 msgid "Clear Output"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:122 MKVBatchMultiplex/utils/text.py:136
+#: MKVBatchMultiplex/utils/text.py:126 MKVBatchMultiplex/utils/text.py:140
 msgid "Erase text in output window"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:123
+#: MKVBatchMultiplex/utils/text.py:127
 msgid "Paste"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:124
+#: MKVBatchMultiplex/utils/text.py:128
 msgid "Paste Clipboard contents in command line"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:125
+#: MKVBatchMultiplex/utils/text.py:129
 msgid "Add Queue"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:126
+#: MKVBatchMultiplex/utils/text.py:130
 msgid "Add command to jobs table and put on Queue"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:129
+#: MKVBatchMultiplex/utils/text.py:133
 msgid "Analysis"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:130
+#: MKVBatchMultiplex/utils/text.py:134
 msgid "Print analysis of command line"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:131
+#: MKVBatchMultiplex/utils/text.py:135
 msgid "Commands"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:132
+#: MKVBatchMultiplex/utils/text.py:136
 msgid "Commands to be applied"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:133
+#: MKVBatchMultiplex/utils/text.py:137
 msgid "Check Files"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:134
+#: MKVBatchMultiplex/utils/text.py:138
 msgid "Check files for consistency"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:137
+#: MKVBatchMultiplex/utils/text.py:141
 msgid "Reset"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:138
+#: MKVBatchMultiplex/utils/text.py:142
 msgid "Reset state completely to work with another batch"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:139
+#: MKVBatchMultiplex/utils/text.py:143
 msgid "Clear output"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:140
+#: MKVBatchMultiplex/utils/text.py:144 MKVBatchMultiplex/utils/text.py:187
 msgid "Clear output window"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:141
+#: MKVBatchMultiplex/utils/text.py:145
 msgid "Rename"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:142
+#: MKVBatchMultiplex/utils/text.py:146
 msgid "Rename output files"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:146
+#: MKVBatchMultiplex/utils/text.py:150
 msgid "Regular Expression"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:147
+#: MKVBatchMultiplex/utils/text.py:151
 msgid "Enter regular expression"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:148
+#: MKVBatchMultiplex/utils/text.py:152
 msgid "Substitution String"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:149
+#: MKVBatchMultiplex/utils/text.py:153
 msgid "Enter substitution string"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:150
+#: MKVBatchMultiplex/utils/text.py:154
 msgid "Original names"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:151
+#: MKVBatchMultiplex/utils/text.py:155
 msgid "Name generated base on parsed command"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:152
+#: MKVBatchMultiplex/utils/text.py:156
 msgid "Rename to"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:153
+#: MKVBatchMultiplex/utils/text.py:157
 msgid "Names that will be used for commands"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:154
+#: MKVBatchMultiplex/utils/text.py:158
 msgid "Apply Rename"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:155
+#: MKVBatchMultiplex/utils/text.py:159
 msgid "Replace the original names with the operation result"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:157
+#: MKVBatchMultiplex/utils/text.py:161
 msgid "Undo"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:158
+#: MKVBatchMultiplex/utils/text.py:162
 msgid "Undo rename operation"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:159
+#: MKVBatchMultiplex/utils/text.py:163
 msgid "Clear"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:160
+#: MKVBatchMultiplex/utils/text.py:164
 msgid "Clear names start over"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:161
+#: MKVBatchMultiplex/utils/text.py:165
 msgid "Invalid regex"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:166
+#: MKVBatchMultiplex/utils/text.py:170
 msgid "Date"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:167
+#: MKVBatchMultiplex/utils/text.py:171
 msgid "Saved Jobs"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:168
+#: MKVBatchMultiplex/utils/text.py:172
 msgid "Fetch Jobs"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:169
-msgid "Jobs History"
-msgstr ""
-
-#: MKVBatchMultiplex/utils/text.py:170
-msgid "Fetch History"
-msgstr ""
-
-#: MKVBatchMultiplex/utils/text.py:171
+#: MKVBatchMultiplex/utils/text.py:173
 msgid "Search"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:172
+#: MKVBatchMultiplex/utils/text.py:174
 msgid "Show Output"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:173
+#: MKVBatchMultiplex/utils/text.py:175
 msgid "Show Errors"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:174
+#: MKVBatchMultiplex/utils/text.py:176
 msgid "Print"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:175
+#: MKVBatchMultiplex/utils/text.py:177
 msgid "Select All"
 msgstr ""
 
-#: MKVBatchMultiplex/utils/text.py:176
+#: MKVBatchMultiplex/utils/text.py:178
 msgid "Clear Selection"
+msgstr ""
+
+#: MKVBatchMultiplex/utils/text.py:179
+msgid "Description"
+msgstr ""
+
+#: MKVBatchMultiplex/utils/text.py:180
+msgid "Display saved Job information"
+msgstr ""
+
+#: MKVBatchMultiplex/utils/text.py:181
+msgid "Fetch and display saved jobs"
+msgstr ""
+
+#: MKVBatchMultiplex/utils/text.py:182
+msgid "Jobs History"
+msgstr ""
+
+#: MKVBatchMultiplex/utils/text.py:183
+msgid "Fetch History"
+msgstr ""
+
+#: MKVBatchMultiplex/utils/text.py:184
+msgid "Do full text search on commands"
+msgstr ""
+
+#: MKVBatchMultiplex/utils/text.py:186
+msgid "Clear selected rows"
+msgstr ""
+
+#: MKVBatchMultiplex/utils/text.py:188
+msgid "Display job project information"
+msgstr ""
+
+#: MKVBatchMultiplex/utils/text.py:189
+msgid "Select all rows"
+msgstr ""
+
+#: MKVBatchMultiplex/utils/text.py:190
+msgid "List rows"
+msgstr ""
+
+#: MKVBatchMultiplex/utils/text.py:191
+msgid "Show job output run"
+msgstr ""
+
+#: MKVBatchMultiplex/utils/text.py:192
+msgid "Show job output errors"
 msgstr ""
 
 #~ msgid "Restore"

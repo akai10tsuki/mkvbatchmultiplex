@@ -26,6 +26,7 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0023 = S_("Exit Application")
     txt0024 = S_("Abort")
     txt0025 = S_("Force exit")
+    txt0026 = S_("Ctrl+P")
 
 
     # 40
@@ -68,6 +69,9 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0089 = S_("Jobs are still running")
     txt0090 = S_("Exit")
     txt0091 = S_("Progress")
+    txt0092 = S_("Default")
+    txt0093 = S_("Set Algorithm to default value")
+    txt0094 = S_("Algorithm")
 
     # JobTableWidgets
     # 120
@@ -166,8 +170,6 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0240 = S_("Date")
     txt0241 = S_("Saved Jobs")
     txt0242 = S_("Fetch Jobs")
-    txt0249 = S_("Jobs History")
-    txt0250 = S_("Fetch History")
     txt0243 = S_("Search")
     txt0244 = S_("Show Output")
     txt0245 = S_("Show Errors")
@@ -175,6 +177,19 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0247 = S_("Select All")
     txt0248 = S_("Clear Selection")
     txt0249 = S_("Description")
+    txt0250 = S_("Display saved Job information")
+    txt0251 = S_("Fetch and display saved jobs")
+    txt0252 = S_("Jobs History")
+    txt0253 = S_("Fetch History")
+    txt0254 = S_("Do full text search on commands")
+    txt0255 = S_("Clear Output")
+    txt0256 = S_("Clear selected rows")
+    txt0257 = S_("Clear output window")
+    txt0258 = S_("Display job project information")
+    txt0259 = S_("Select all rows")
+    txt0260 = S_("List rows")
+    txt0261 = S_("Show job output run")
+    txt0262 = S_("Show job output errors")
 
 
     """
