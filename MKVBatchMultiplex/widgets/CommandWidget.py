@@ -199,7 +199,7 @@ class CommandWidget(TabWidgetExtension, QWidget):
         self.lblAlgorithm = QLabelWidget(
             Text.txt0094,
             textSuffix=":  ",
-            )
+        )
         self.rbZero = QRadioButton("0", self)
         self.rbOne = QRadioButton("1", self)
         self.rbTwo = QRadioButton("2", self)
@@ -592,20 +592,26 @@ class CommandWidget(TabWidgetExtension, QWidget):
             widget = self.frmCmdLine.itemAt(index, QFormLayout.LabelRole).widget()
             if isinstance(widget, QPushButtonWidget):
                 widget.setLanguage()
-                #widget.setText("  " + _(widget.originalText) + "  ")
-                #widget.setToolTip(_(widget.toolTip))
+                # widget.setText("  " + _(widget.originalText) + "  ")
+                # widget.setToolTip(_(widget.toolTip))
 
         for index in range(self.btnHBox.count()):
             widget = self.btnHBox.itemAt(index).widget()
-            if isinstance(widget, (QLabelWidget, QPushButtonWidget, )):
+            if isinstance(
+                widget,
+                (
+                    QLabelWidget,
+                    QPushButtonWidget,
+                ),
+            ):
                 widget.setLanguage()
 
         for index in range(self.btnGrid.count()):
             widget = self.btnGrid.itemAt(index).widget()
             if isinstance(widget, QPushButtonWidget):
                 widget.setLanguage()
-                #widget.setText("  " + _(widget.originalText) + "  ")
-                #widget.setToolTip(_(widget.toolTip))
+                # widget.setText("  " + _(widget.originalText) + "  ")
+                # widget.setToolTip(_(widget.toolTip))
 
     def toggledRadioButton(self, rButton):
         for index, rb in enumerate(self.radioButtons):
