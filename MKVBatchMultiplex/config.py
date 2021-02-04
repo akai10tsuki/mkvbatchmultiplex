@@ -166,7 +166,7 @@ def init(filesRoot=None, cfgFile=None, logFile=None, name=None, version=None, ap
     if cfgFile is None:
         configFile = Path(filesPath, CONFIGFILE)
     else:
-        configFile = Path(filesPath, configFile)
+        configFile = Path(filesPath, cfgFile)
 
     data.setConfigFile(configFile)
     data.readFromFile()
