@@ -667,5 +667,13 @@ def mainApp():
     config.close()
 
 
+# This if for Pylance _() is not defined
+def _(dummy):
+    return dummy
+
+
+del _
+
+
 if __name__ == "__main__":
     sys.exit(mainApp())
