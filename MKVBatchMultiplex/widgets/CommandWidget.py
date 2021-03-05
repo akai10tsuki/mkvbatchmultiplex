@@ -6,13 +6,11 @@ import logging
 
 # import time
 
-from PySide2.QtCore import QRect, Signal, Slot
+from PySide2.QtCore import Signal, Slot
 from PySide2.QtGui import QColor, QPalette
 from PySide2.QtWidgets import (
     QApplication,
-    QFrame,
     QHBoxLayout,
-    QLabel,
     QWidget,
     QGridLayout,
     QGroupBox,
@@ -89,7 +87,7 @@ class CommandWidget(TabWidgetExtension, QWidget):
         self.frmCmdLine = QFormLayout()
         btnPasteClipboard = QPushButtonWidget(
             Text.txt0164,
-            function=self.pasteClipboard,
+            function=lambda: qtRunFunctionInThread(self.pasteClipboard),
             margins="  ",
             toolTip=Text.txt0165,
         )
