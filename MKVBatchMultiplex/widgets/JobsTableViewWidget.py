@@ -72,6 +72,8 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
         self.grpGrid = QGridLayout()
         self.grpBox = QGroupBox(title)
 
+        btnPopulate = None
+
         if config.data.get(config.ConfigKey.SimulateRun):
             btnPopulate = QPushButtonWidget(
                 Text.txt0120,
@@ -308,8 +310,9 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
         for index in range(self.btnGrid.count()):
             widget = self.btnGrid.itemAt(index).widget()
             if isinstance(widget, QPushButtonWidget):
-                widget.setText("  " + _(widget.originalText) + "  ")
-                widget.setToolTip(_(widget.toolTip))
+                widget.setLanguage()
+                # widget.setText("  " + _(widget.originalText) + "  ")
+                # widget.setToolTip(_(widget.toolTip))
 
         self.grpBox.setTitle(_(Text.txt0130))
 
@@ -419,3 +422,11 @@ class _Button:
     ABORTCURRENTJOB = 3
     ABORTJOBS = 4
     FETCHJOBHISTORY = 6
+
+
+# This if for Pylance _() is not defined in PyLance
+def _(dummy: str) -> str:
+    return dummy
+
+
+del _
