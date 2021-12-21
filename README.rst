@@ -24,6 +24,8 @@ mkvbatchmultiplex: MKVMERGE batch multiplexing
   :target: https://mkvbatchmultiplex.readthedocs.io/en/latest/?badge=latest
   :alt: Documentation Status
 
+The hiatus will stop soon I will retake the project on January 2022.
+
 This project went into a rewrite for version 2. Rename module was added to
 help maintain output file names Plex_ friendly.
 
