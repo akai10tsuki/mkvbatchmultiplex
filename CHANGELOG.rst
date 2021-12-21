@@ -4,6 +4,8 @@ Changelog
 (Unreleased)
 ------------
 
+In order to retake development will migrate first to PySide6.
+
 New Save Jobs tab ready for first release.  This is useful for saving test jobs.
 Also repetitive Jobs when source files stay on same location and go through
 modifications up to a final release.  Don't have to use mkvtoolix-gui for each
