@@ -3,9 +3,11 @@
 """
 import platform
 
-from PySide2.QtCore import Slot
+from PySide2.QtCore import Signal, Slot
 from PySide2.QtWidgets import QAction, QApplication, QMenu, QSystemTrayIcon
 from PySide2 import QtWidgets
+
+from .. import config
 
 class QSystemTrayIconWidget(QSystemTrayIcon):
     """
@@ -14,6 +16,8 @@ class QSystemTrayIconWidget(QSystemTrayIcon):
     Args:
         icon (QIcon): icon to use
     """
+
+    setToolTipSignal = Signal(str)
 
     def __init__(self, parent, icon, seconds=5):
         super().__init__(parent)
@@ -33,6 +37,9 @@ class QSystemTrayIconWidget(QSystemTrayIcon):
 
             self._trayIconActionsCreate()
             self._trayIconCreate(icon)
+
+            self.setToolTip(config.APPNAME)
+            self.setToolTipSignal.connect(self.setToolTip)
 
             self.activated.connect(self.iconActivated)
 
@@ -91,7 +98,8 @@ class QSystemTrayIconWidget(QSystemTrayIcon):
 
     @Slot(str)
     def iconActivated(self, reason):
-        print("iconActivated")
+        """ Check icon activation event """
+
         if reason == QSystemTrayIcon.Trigger:
             print("Trigger")
         if reason == QSystemTrayIcon.DoubleClick:
@@ -101,10 +109,12 @@ class QSystemTrayIconWidget(QSystemTrayIcon):
         if reason == QSystemTrayIcon.Context:
             print("Context Request")
 
-    @Slot(int)
-    def setVisible(self, visible):
-        print("Visible")
-        super().visible(visible)
+    #@Slot(int)
+    #def setVisible(self, visible):
+    #    print("Visible")
+    #    super().visible(visible)
+
+    @Slot(str)
 
     @Slot(int)
     def setMenuEnabled(self, visible):
@@ -119,4 +129,4 @@ class QSystemTrayIconWidget(QSystemTrayIcon):
     @Slot(str, str, object, int)
     def showMessage(self, title, msg, icon=QSystemTrayIcon.Information, mSecs=1000):
 
-        super().showMessage(title, msg, icon, self.__seconds + 1000)
+        super().showMessage(title, msg, icon, self.__seconds + mSecs)

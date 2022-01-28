@@ -14,6 +14,7 @@ from vsutillib.pyqt import SvgColor
 from .. import config
 from ..models import TableProxyModel
 
+#from .jobsWorker import jobsWorker
 from .jobsWorker import jobsWorker
 
 MODULELOG = logging.getLogger(__name__)
@@ -22,7 +23,27 @@ MODULELOG.addHandler(logging.NullHandler())
 
 class RunJobs(QObject):
     """
-    run test run worker thread
+    RunJobs - class instantiated and called by JobQueue.run() it will start the
+    Jobs Worker in a new thread to proccess the Jobs queue.
+
+    Args:
+        **parent** (QWidget): parent widget
+
+        **jobsQueue** (deque, optional): Queue with Jobs to execute. Defaults to
+        None.
+
+        **progressFunc** (function, optional): Function that updates progress bar.
+        Defaults to None.
+
+        **proxyModel** (TableProxyModel, optional): Proxy model for model/view.
+        Defaults to None.
+
+        **controlQueue** (deque, optional): Queue to control Jobs execution.
+        Some status conditions are routed through here to Stop, Skip or Abort Jobs.
+        Defaults to None.
+
+        **log** (bool, optional): Logging can be cotrolled using this parameter.
+        Defaults to None.
     """
 
     finishedSignal = Signal()
@@ -108,10 +129,22 @@ class RunJobs(QObject):
 
     @property
     def running(self):
+        """
+        running read only property
+
+        Returns:
+            bool: True if jobs worker is running. False otherwise.
+        """
         return isThreadRunning(config.WORKERTHREADNAME)
 
     @property
     def jobsqueue(self):
+        """
+        jobsqueue jobs queue read write
+
+        Returns:
+            deque: jobs queue
+        """
         return self.__jobsQueue
 
     @jobsqueue.setter
@@ -120,10 +153,22 @@ class RunJobs(QObject):
 
     @property
     def model(self):
+        """
+        model used in model/view read only
+
+        Returns:
+            JobsTableModel: model used in model/view
+        """
         return self.__model
 
     @property
     def proxyModel(self):
+        """
+        proxyModel of model used in model/view read write
+
+        Returns:
+            TableProxyModel: Filtered model of source model used in model/view
+        """
         return self.__proxyModel
 
     @proxyModel.setter
@@ -134,6 +179,12 @@ class RunJobs(QObject):
 
     @property
     def output(self):
+        """
+        output permit access to output windows read write
+
+        Returns:
+            OutputWindows: provides access to command, job, and error tabs
+        """
         return self.__output
 
     @output.setter
@@ -142,6 +193,12 @@ class RunJobs(QObject):
 
     @property
     def process(self):
+        """
+        process function to proccess jobs output from subprocess pipe read write
+
+        Returns:
+            function: function to process jobs output
+        """
         return self.__process
 
     @process.setter
@@ -150,6 +207,12 @@ class RunJobs(QObject):
 
     @property
     def progress(self):
+        """
+        progress function to update progress bar read write
+
+        Returns:
+            DualProgressBar: progress bar of main window
+        """
         return self.__progress
 
     @progress.setter
@@ -158,7 +221,8 @@ class RunJobs(QObject):
 
     def run(self):
         """
-        run summit jobs to worker
+        run summit jobs queue to jobs worker in new thread. While running any
+        new job added to the queue will be proccessed.
         """
 
         if self.jobsqueue and not self.running:
@@ -166,7 +230,7 @@ class RunJobs(QObject):
                 jobsWorker,
                 self.jobsqueue,
                 self.output,
-                self.model,
+                self.proxyModel,
                 self.progress,
                 self.controlQueue,
                 self.parent.parent.trayIconMessageSignal,

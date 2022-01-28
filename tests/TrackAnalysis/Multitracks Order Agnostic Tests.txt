@@ -1,0 +1,96 @@
+
+
+'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en --output 'U:\Plex\Series\Anime\Assasins Pride (2019)\Season 01\Assassins Pride -  S01E01 (1).mkv' --audio-tracks 3 --subtitle-tracks 6,7 --language 0:und --default-track 0:yes --display-dimensions 0:1920x1080 --language 3:jpn --sub-charset 6:UTF-8 --language 6:eng --sub-charset 7:UTF-8 --language 7:spa --track-name '7:Latin American' '(' 'F:\BT\OK\Assassins Pride [TV-1] [2019] [BDRip] [1080p] [RUS + JAP + ENG] [Multi-Subs]\Assassins Pride -  S01E01.mkv' ')' --track-order 0:0,0:3,0:6,0:7
+
+'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en --output 'U:\Plex\Series\Anime\Assasins Pride (2019)\Season 01\Assassins Pride -  S01E10 (1).mkv' --audio-tracks 3 --subtitle-tracks 6,13 --language 0:und --display-dimensions 0:1920x1080 --language 3:jpn --default-track 3:yes --sub-charset 6:UTF-8 --language 6:eng --sub-charset 13:UTF-8 --language 13:spa --track-name '13:Latin American' --default-track 13:yes '(' 'F:\BT\OK\Assassins Pride [TV-1] [2019] [BDRip] [1080p] [RUS + JAP + ENG] [Multi-Subs]\Assassins Pride -  S01E10.mkv' ')' --track-order 0:0,0:3,0:6,0:13
+
+'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en --output 'U:\Plex\Series\Anime\Assasins Pride (2019)\Season 01\Assassins Pride -  S01E12 (1).mkv' --audio-tracks 3 --subtitle-tracks 6,7 --language 0:und --display-dimensions 0:1920x1080 --language 3:jpn --default-track 3:yes --sub-charset 6:UTF-8 --language 6:eng --default-track 6:yes --sub-charset 7:UTF-8 --language 7:spa --track-name '7:Latin American' '(' 'F:\BT\OK\Assassins Pride [TV-1] [2019] [BDRip] [1080p] [RUS + JAP + ENG] [Multi-Subs]\Assassins Pride -  S01E12.mkv' ')' --track-order 0:0,0:3,0:6,0:7
+
+
+
+'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en
+--output 'U:\Plex\Series\Anime\Assasins Pride (2019)\Season 01\Assassins Pride -  S01E01 (1).mkv'
+--audio-tracks 3 --subtitle-tracks 6,7
+--language 0:und --default-track 0:yes --display-dimensions 0:1920x1080
+--language 3:jpn --default-track 3:yes
+--sub-charset 6:UTF-8 --language 6:eng --default-track 6:yes
+--sub-charset 7:UTF-8 --language 7:spa --track-name '7:Latin American'
+'(' 'F:\BT\OK\Assassins Pride [TV-1] [2019] [BDRip] [1080p] [RUS + JAP + ENG] [Multi-Subs]\Assassins Pride -  S01E01.mkv' ')'
+--track-order 0:0,0:3,0:6,0:7
+
+
+'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en
+--output 'U:\Plex\Series\Anime\Assasins Pride (2019)\Season 01\Assassins Pride -  S01E10 (1).mkv'
+--audio-tracks 3 --subtitle-tracks 6,13
+--language 0:und --display-dimensions 0:1920x1080
+--language 3:jpn --default-track 3:yes
+--sub-charset 6:UTF-8 --language 6:eng
+--sub-charset 13:UTF-8 --language 13:spa --track-name '13:Latin American' --default-track 13:yes
+'(' 'F:\BT\OK\Assassins Pride [TV-1] [2019] [BDRip] [1080p] [RUS + JAP + ENG] [Multi-Subs]\Assassins Pride -  S01E10.mkv' ')'
+--track-order 0:0,0:3,0:6,0:13
+
+
+'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en
+--output 'U:\Plex\Series\Anime\Assasins Pride (2019)\Season 01\Assassins Pride -  S01E12 (1).mkv'
+--audio-tracks 3 --subtitle-tracks 6,7
+--language 0:und --display-dimensions 0:1920x1080
+--language 3:jpn --default-track 3:yes
+--sub-charset 6:UTF-8 --language 6:eng --default-track 6:yes
+--sub-charset 7:UTF-8 --language 7:spa --track-name '7:Latin American'
+'(' 'F:\BT\OK\Assassins Pride [TV-1] [2019] [BDRip] [1080p] [RUS + JAP + ENG] [Multi-Subs]\Assassins Pride -  S01E12.mkv' ')'
+--track-order 0:0,0:3,0:6,0:7
+
+
+Arte
+
+File 01
+
+"C:\Program Files\MKVToolNix\mkvmerge.exe" --ui-language en
+--output ^"E:\Example\TestMedia\Example 07\Source\Arte - 01 ^(BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng^) ^(1^).mkv^"
+--language 0:und --default-track 0:yes --display-dimensions 0:1920x1080
+--language 1:rus --track-name 1:AniLibria.tv --default-track 1:yes
+--language 2:rus --track-name 2:Wakanim.tv
+--language 3:jpn
+--language 4:jpn --track-name 4:comments
+--sub-charset 5:UTF-8 --language 5:rus --track-name ^"5:надписи^" --default-track 5:yes
+--sub-charset 6:UTF-8 --language 6:rus --track-name 6:AniLibria.tv
+--sub-charset 7:UTF-8 --language 7:rus --track-name ^"7:Yakusub Studio^"
+--sub-charset 8:UTF-8 --language 8:fre --track-name ^"8:Wakanim.tv dehardsub Arisaka^"
+--sub-charset 9:UTF-8 --language 9:ara --track-name 9:Athbul-Khayal
+--sub-charset 10:UTF-8 --language 10:eng --track-name 10:ShowY
+--sub-charset 11:UTF-8 --language 11:eng --track-name 11:Funimation
+^"^(^" ^"E:\Example\TestMedia\Example 07\Source\Arte - 01 ^(BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng^).mkv^" ^"^)^"
+--track-order 0:0,0:1,0:2,0:3,0:4,0:5,0:6,0:7,0:8,0:9,0:10,0:11
+
+'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en
+--output 'E:\Example\TestMedia\Example 07\Arte (2020)\Season 01\Arte - 01 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng) (1).mkv'
+--audio-tracks 3 --subtitle-tracks 10,11
+--language 0:und --default-track 0:yes --display-dimensions 0:1920x1080
+--language 3:jpn --default-track 3:yes
+--sub-charset 10:UTF-8 --language 10:eng --track-name 10:ShowY --default-track 10:yes
+--sub-charset 11:UTF-8 --language 11:eng --track-name 11:Funimation
+'(' 'E:\Example\TestMedia\Example 07\Source\Arte - 01 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mkv' ')'
+--track-order 0:0,0:3,0:10,0:11
+
+'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en
+--output 'E:\Example\TestMedia\Example 07\Arte (2020)\Season 01\Arte - 01 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng) (1).mkv'
+--audio-tracks 3 --subtitle-tracks 10,11 --language 0:und --default-track 0:yes --display-dimensions 0:1920x1080
+--language 3:jpn --default-track 3:yes
+--sub-charset 10:UTF-8 --language 10:eng --track-name 10:ShowY --default-track 10:yes
+--sub-charset 11:UTF-8 --language 11:eng --track-name 11:Funimation
+'(' 'E:\Example\TestMedia\Example 07\Source\Arte - 01 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mkv' ')'
+--track-order 0:0,0:3,0:11,0:10
+
+File 02
+
+"C:\Program Files\MKVToolNix\mkvmerge.exe" --ui-language en --output ^"E:\Example\TestMedia\Example 07\Source\Arte - 02 ^(BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng^) ^(1^).mkv^" --language 0:und --default-track 0:yes --display-dimensions 0:1920x1080 --language 1:rus --track-name 1:AniLibria.tv --default-track 1:yes --language 2:rus --track-name 2:Wakanim.tv --language 3:jpn --sub-charset 4:UTF-8 --language 4:rus --track-name ^"4:надписи^" --default-track 4:yes --sub-charset 5:UTF-8 --language 5:rus --track-name 5:AniLibria.tv --sub-charset 6:UTF-8 --language 6:rus --track-name ^"6:Yakusub Studio^" --sub-charset 7:UTF-8 --language 7:fre --track-name ^"7:Wakanim.tv dehardsub Arisaka^" --sub-charset 8:UTF-8 --language 8:ara --track-name 8:Athbul-Khayal --sub-charset 9:UTF-8 --language 9:eng --track-name 9:ShowY --sub-charset 10:UTF-8 --language 10:eng --track-name 10:Funimation ^"^(^" ^"E:\Example\TestMedia\Example 07\Source\Arte - 02 ^(BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng^).mkv^" ^"^)^" --track-order 0:0,0:1,0:2,0:3,0:4,0:5,0:6,0:7,0:8,0:9,0:10
+
+'C:/Program Files/MKVToolNix/mkvmerge.exe' --ui-language en
+--output 'E:\Example\TestMedia\Example 07\Arte (2020)\Season 01\Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng) (1).mkv'
+--audio-tracks 3 --subtitle-tracks 9,10
+--language 0:und --default-track 0:yes --display-dimensions 0:1920x1080
+--language 3:jpn --default-track 3:yes
+--sub-charset 9:UTF-8 --language 9:eng --track-name 9:ShowY
+--sub-charset 10:UTF-8 --language 10:eng --track-name 10:Funimation
+'(' 'E:\Example\TestMedia\Example 07\Source\Arte - 02 (BDRip 1920x1080 HEVC FLAC Rus + Jap + Eng).mkv' ')'
+--track-order 0:0,0:3,0:9,0:10

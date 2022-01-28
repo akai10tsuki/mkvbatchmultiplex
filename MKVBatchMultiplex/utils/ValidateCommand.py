@@ -51,7 +51,7 @@ class ValidateCommand(QValidator):
         return cls.__log
 
     def __init__(self, parent, resultSignal, log=None):
-        super(ValidateCommand, self).__init__(parent)
+        super().__init__(parent)
 
         self.parent = parent
         self.resultSignal = resultSignal

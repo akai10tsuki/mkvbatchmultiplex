@@ -2,6 +2,8 @@
 Text strings used in the application
 """
 
+# 90001 - Overflow
+
 
 class Text:  # pylint: disable=too-few-public-methods
     """
@@ -24,6 +26,7 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0023 = S_("Exit Application")
     txt0024 = S_("Abort")
     txt0025 = S_("Force exit")
+    txt0026 = S_("Ctrl+P")
 
 
     # 40
@@ -66,6 +69,10 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0089 = S_("Jobs are still running")
     txt0090 = S_("Exit")
     txt0091 = S_("Progress")
+    txt0092 = S_("Default")
+    txt0093 = S_("Set Algorithm to default value")
+    txt0094 = S_("Algorithm")
+    txt0095 = S_("Date of execution")
 
     # JobTableWidgets
     # 120
@@ -87,6 +94,13 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0135 = S_("Abort running job and continue with next in Queue")
     txt0136 = S_("Abort Jobs")
     txt0137 = S_("Abort running job and put jobs in Queue in Waiting status")
+    txt0138 = S_("Remove Job")
+    txt0139 = S_("Remove job from list")
+    txt9000 = S_("Remove selected jobs")
+    txt9001 = S_("Copy")
+    txt9002 = S_("Remove")
+    txt9003 = S_("Delete")
+    txt9004 = S_("Save")
 
     # TabsWidget
     # 140
@@ -115,7 +129,7 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0165 = S_("Paste Clipboard contents in command line")
     txt0166 = S_("Add Queue")
     txt0167 = S_("Add command to jobs table and put on Queue")
-    # txt0168 = S_()
+    txt0168 = S_("Examine any saved jobs, copy and run again if needed")
     txt0169 = S_("Start processing jobs on Queue")
     txt0170 = S_("Analysis")
     txt0171 = S_("Print analysis of command line")
@@ -153,15 +167,30 @@ class Text:  # pylint: disable=too-few-public-methods
 
 
     # JobHistoryWidget
+    # 240
     txt0240 = S_("Date")
-    txt0241 = S_("Jobs History")
-    txt0242 = S_("Fetch History")
+    txt0241 = S_("Saved Jobs")
+    txt0242 = S_("Fetch Jobs")
     txt0243 = S_("Search")
     txt0244 = S_("Show Output")
     txt0245 = S_("Show Errors")
     txt0246 = S_("Print")
     txt0247 = S_("Select All")
     txt0248 = S_("Clear Selection")
+    txt0249 = S_("Description")
+    txt0250 = S_("Display saved Job information")
+    txt0251 = S_("Fetch and display saved jobs")
+    txt0252 = S_("Jobs History")
+    txt0253 = S_("Fetch History")
+    txt0254 = S_("Do full text search on commands")
+    txt0255 = S_("Clear Output")
+    txt0256 = S_("Clear selected rows")
+    txt0257 = S_("Clear output window")
+    txt0258 = S_("Display job project information")
+    txt0259 = S_("Select all rows")
+    txt0260 = S_("List rows")
+    txt0261 = S_("Show job output run")
+    txt0262 = S_("Show job output errors")
 
 
     """

@@ -37,8 +37,14 @@ class SearchTextDialogWidget(QDialog):
         """
         _initVars set properties values for a reusable class
         """
-        self.ui.btnSearchText.setEnabled(False)
-        self.btnBoxOk.setEnabled(False)
+
+        if self.ui.leSearchText.text()  == "":
+            self.ui.btnSearchText.setEnabled(False)
+            self.btnBoxOk.setEnabled(False)
+        else:
+            self.ui.btnSearchText.setEnabled(True)
+            self.btnBoxOk.setEnabled(True)
+
         self.cursor = None
         self.ui.lblResult.setText("")
 
@@ -84,8 +90,10 @@ class SearchTextDialogWidget(QDialog):
 
         if self.ui.leSearchText.text() != "":
             self.ui.btnSearchText.setEnabled(True)
+            self.ui.lblResult.setText("")
         else:
             self.ui.btnSearchText.setEnabled(False)
+            self.btnBoxOk.setEnabled(False)
 
 
 class Search(QObject):
@@ -125,8 +133,9 @@ class Search(QObject):
                         self.parent.cursor = self.parent.database.textSearch(
                             fullTextExp
                         )
+                        msg = "Records found."
                     else:
-                        msg = ""
+                        msg = "No Records found."
                 else:
                     msg = "Nothing found."
                     self.parent.btnBoxOk.setEnabled(False)

@@ -12,13 +12,17 @@ except:  # pylint: disable=bare-except
 import re
 import zlib
 
+# import pprint
+
 from datetime import datetime, timedelta
 
 # from pprint import pprint
 from time import sleep
 
-from PySide2.QtCore import Qt, Slot
+from PySide2.QtCore import Qt, Signal, Slot
+from PySide2.QtGui import QTextCursor
 from PySide2.QtWidgets import (
+    QDialogButtonBox,
     QWidget,
     QHBoxLayout,
     QGroupBox,
@@ -33,13 +37,12 @@ from vsutillib.pyqt import (
     TabWidgetExtension,
 )
 
-# from vsutillib.process import isThreadRunning
 from vsutillib.misc import strFormatTimeDelta
-
-# from vsutillib.mkv import MKVParseKey
 
 from ..config import data as config
 from ..config import ConfigKey
+
+from .ProjectInfoDialogWidget import ProjectInfoDialogWidget
 
 from ..jobs import (
     JobHistoryKey,
@@ -47,10 +50,6 @@ from ..jobs import (
     SqlJobsTable,
     JobsTableKey,
 )
-from ..dataset import TableData, tableHistoryHeaders
-
-# from ..delegates import StatusComboBoxDelegate
-from ..models import TableModel, TableProxyModel
 from ..utils import Text
 
 from .JobsHistoryView import JobsHistoryView
@@ -69,21 +68,17 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
         QWidget ([type]): [description]
     """
 
-    def __init__(self, parent=None, groupTitle=None, log=None):
-        super().__init__(parent=parent, tabWidgetChild=self)
+    pasteCommandSignal = Signal(str)
+    updateAlgorithmSignal = Signal(int)
 
-        self.__output = None
-        self.__log = None
-        self.__tab = None
-        self.__originalTab = None
+    def __init__(self, parent=None, groupTitle=None, log=None):
+        super().__init__(parent=None, tabWidgetChild=self)
 
         self.parent = parent
-        headers = tableHistoryHeaders()
-        self.tableData = TableData(headerList=headers, dataList=[])
-        self.model = TableModel(self.tableData)
-        self.proxyModel = TableProxyModel(self.model)
-        self.tableView = JobsHistoryView(self, self.proxyModel, groupTitle)
+
+        self.tableView = JobsHistoryView(self, groupTitle)
         self.search = SearchTextDialogWidget(self)
+        self.infoDialog = ProjectInfoDialogWidget(self)
         self._initUI(groupTitle)
         self._initHelper()
 
@@ -98,45 +93,58 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
         self.output = QOutputTextWidget(self)
 
         btnFetchJobHistory = QPushButtonWidget(
-            "Fetch History",
+            Text.txt0242,
             function=self.fetchJobHistory,
-            toolTip="Fetch and display old saved jobs processed by worker",
+            margins="  ",
+            toolTip=Text.txt0251,
         )
         btnSearchText = QPushButtonWidget(
-            "Search",
+            Text.txt0243,
             function=self.searchText,
-            toolTip="Do full text search on commands",
+            margins="  ",
+            toolTip=Text.txt0254,
         )
         btnClearSelection = QPushButtonWidget(
-            "Clear Selection",
-            function=self.tableView.clearSelection,
-            toolTip="Clear selected rows",
+            Text.txt0248,
+            function=self.clearSelection,
+            margins="  ",
+            toolTip=Text.txt0256,
         )
         btnClearOutput = QPushButtonWidget(
-            "Clear Output",
+            Text.txt0255,
             function=self.clearOutputWindow,
-            toolTip="Clear output window",
+            margins="  ",
+            toolTip=Text.txt0257,
         )
-        btnRefresh = QPushButtonWidget(
-            "Refresh",
-            function=self.refresh,
-            toolTip="Refresh table view with any new information",
+        btnShowInfo = QPushButtonWidget(
+            Text.txt0249,
+            function=self.showInfo,
+            margins="  ",
+            toolTip=Text.txt0258,
         )
         btnSelectAll = QPushButtonWidget(
-            "Select All", function=self.tableView.selectAll, toolTip="Select all rows"
+            Text.txt0247,
+            function=self.selectAll,
+            margins="  ",
+            toolTip=Text.txt0259,
         )
         btnPrint = QPushButtonWidget(
-            "Print", function=self.printDataset, toolTip="List Rows"
+            Text.txt0246,
+            function=self.printDataset,
+            margins="  ",
+            toolTip=Text.txt0260,
         )
         btnShowOutput = QPushButtonWidget(
-            "Show Output",
+            Text.txt0244,
             function=lambda: self.showOutput(_ShowKey.output),
-            toolTip="Show job output run",
+            margins="  ",
+            toolTip=Text.txt0262,
         )
         btnShowOutputErrors = QPushButtonWidget(
-            "Show Errors",
+            Text.txt0245,
             function=lambda: self.showOutput(_ShowKey.errors),
-            toolTip="Show job output errors",
+            margins="  ",
+            toolTip=Text.txt0262,
         )
 
         self.btnGrid = QHBoxLayout()
@@ -144,7 +152,7 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
         self.btnGrid.addWidget(btnSearchText)
         self.btnGrid.addWidget(btnShowOutput)
         self.btnGrid.addWidget(btnShowOutputErrors)
-        self.btnGrid.addWidget(btnRefresh)
+        self.btnGrid.addWidget(btnShowInfo)
         self.btnGrid.addStretch()
         self.btnGrid.addWidget(btnPrint)
         self.btnGrid.addWidget(btnSelectAll)
@@ -165,7 +173,23 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
 
     def _initHelper(self):
 
-        self.btnGrid.itemAt(_Button.FETCHJOBHISTORY).widget().setEnabled(True)
+        self.btnGrid.itemAt(_Button.SHOWOUTPUT).widget().setEnabled(False)
+        self.btnGrid.itemAt(_Button.SHOWOUTPUTERRORS).widget().setEnabled(False)
+        self.btnGrid.itemAt(_Button.SHOWINFO).widget().setEnabled(False)
+        # self.btnGrid.itemAt(_Button.PRINT).widget().hide()
+        self.btnGrid.itemAt(_Button.PRINT).widget().setEnabled(False)
+        self.btnGrid.itemAt(_Button.SELECTALL).widget().setEnabled(False)
+        self.btnGrid.itemAt(_Button.CLEARSELECTION).widget().setEnabled(False)
+        self.btnGrid.itemAt(_Button.CLEAROUTPUT).widget().setEnabled(False)
+
+        # self.cmdLine.textChanged.connect(self.analysisButtonState)
+        self.output.textChanged.connect(self.clearOutputButtonState)
+        self.tableView.clicked.connect(self.rowsClicked)
+        self.tableView.clickedOutsideRowsSignal.connect(self.buttonsState)
+        self.tableView.rowCountChangedSignal.connect(self.buttonsState)
+
+        # Just Ok on info dialog
+        self.infoDialog.ui.buttonBox.setStandardButtons(QDialogButtonBox.Ok)
 
     @Slot()
     def setLanguage(self):
@@ -176,20 +200,117 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
         for index in range(self.btnGrid.count()):
             widget = self.btnGrid.itemAt(index).widget()
             if isinstance(widget, QPushButtonWidget):
-                widget.setText("  " + _(widget.originalText) + "  ")
-                widget.setToolTip(_(widget.toolTip))
+                widget.setLanguage()
+                # widget.setText("  " + _(widget.originalText) + "  ")
+                # widget.setToolTip(widget.toolTip)
 
         self.grpBox.setTitle(_(Text.txt0130))
-        self.model.setHeaderData(
+        self.tableView.model.setHeaderData(
             _JobHKey.ID, Qt.Horizontal, "  " + _(Text.txt0131) + "  "
         )
-        self.model.setHeaderData(
-            _JobHKey.Date, Qt.Horizontal, " " + _(Text.txt0240) + " "
+        self.tableView.model.setHeaderData(
+            _JobHKey.ID,
+            Qt.Horizontal,
+            "  " + _(Text.txt0086) + "  ",
+            role=Qt.ToolTipRole,
         )
-        self.model.setHeaderData(
-            _JobHKey.Status, Qt.Horizontal, "  " + _(Text.txt0132) + "  "
+        self.tableView.model.setHeaderData(
+            _JobHKey.Date, Qt.Horizontal, "    " + _(Text.txt0240) + "    "
         )
-        self.model.setHeaderData(_JobHKey.Command, Qt.Horizontal, _(Text.txt0133))
+        self.tableView.model.setHeaderData(
+            _JobHKey.Date,
+            Qt.Horizontal,
+            "    " + _(Text.txt0095) + "    ",
+            role=Qt.ToolTipRole,
+        )
+        self.tableView.model.setHeaderData(
+            _JobHKey.Status, Qt.Horizontal, "    " + _(Text.txt0132) + "    "
+        )
+        self.tableView.model.setHeaderData(
+            _JobHKey.Status,
+            Qt.Horizontal,
+            "    " + _(Text.txt0087) + "    ",
+            role=Qt.ToolTipRole,
+        )
+        self.tableView.model.setHeaderData(
+            _JobHKey.Command, Qt.Horizontal, _(Text.txt0133)
+        )
+        self.tableView.model.setHeaderData(
+            _JobHKey.Command, Qt.Horizontal, _(Text.txt0086), role=Qt.ToolTipRole
+        )
+
+    @Slot(int, int)
+    def buttonsState(self, oldCount, newCount):
+        """
+        buttonsState enable disable buttons according to row count
+
+        Args:
+            oldCount (int): old row count number
+            newCount (int): new row count number
+        """
+
+        if newCount <= 0:
+            # print("View Widget Entering buttonsState 0 rows ...")
+            self.btnGrid.itemAt(_Button.CLEARSELECTION).widget().setEnabled(False)
+            self.btnGrid.itemAt(_Button.PRINT).widget().setEnabled(False)
+            self.btnGrid.itemAt(_Button.SHOWINFO).widget().setEnabled(False)
+            self.btnGrid.itemAt(_Button.SELECTALL).widget().setEnabled(False)
+            self.btnGrid.itemAt(_Button.SHOWOUTPUT).widget().setEnabled(False)
+            self.btnGrid.itemAt(_Button.SHOWOUTPUTERRORS).widget().setEnabled(False)
+            if oldCount < 0:
+                totalRows = self.tableView.model.rowCount()
+                if totalRows > 0:
+                    self.btnGrid.itemAt(_Button.SELECTALL).widget().setEnabled(True)
+        else:
+            totalRows = self.tableView.model.rowCount()
+            totalSelectedRows = self.tableView.selectedRowsCount()
+
+            # print(
+            #    (
+            #        f"View Widget Entering buttonsState total rows {totalRows} "
+            #        f"total selected rows {totalSelectedRows} selected ..."
+            #    )
+            # )
+
+            if totalRows == 0:
+                self.buttonsState(0, 0)
+            else:
+                self.btnGrid.itemAt(_Button.PRINT).widget().hide()
+                self.btnGrid.itemAt(_Button.SHOWINFO).widget().setEnabled(False)
+                self.btnGrid.itemAt(_Button.SHOWOUTPUT).widget().setEnabled(False)
+                self.btnGrid.itemAt(_Button.SHOWOUTPUTERRORS).widget().setEnabled(False)
+                if totalSelectedRows == 0:
+                    self.btnGrid.itemAt(_Button.CLEARSELECTION).widget().setEnabled(
+                        False
+                    )
+                    self.btnGrid.itemAt(_Button.PRINT).widget().setEnabled(False)
+                    self.btnGrid.itemAt(_Button.SELECTALL).widget().setEnabled(False)
+                elif totalSelectedRows == 1:
+                    self.btnGrid.itemAt(_Button.CLEARSELECTION).widget().setEnabled(
+                        True
+                    )
+                    self.btnGrid.itemAt(_Button.SHOWINFO).widget().setEnabled(True)
+                    self.btnGrid.itemAt(_Button.SHOWOUTPUT).widget().setEnabled(True)
+                    self.btnGrid.itemAt(_Button.SHOWOUTPUTERRORS).widget().setEnabled(
+                        True
+                    )
+                if totalSelectedRows == totalRows:
+                    self.btnGrid.itemAt(_Button.SELECTALL).widget().setEnabled(False)
+                else:
+                    self.btnGrid.itemAt(_Button.SELECTALL).widget().setEnabled(True)
+
+    def clearOutputButtonState(self):
+        """Set clear button state"""
+
+        if self.output.toPlainText() != "":
+            self.btnGrid.itemAt(_Button.CLEAROUTPUT).widget().setEnabled(True)
+        else:
+            self.btnGrid.itemAt(_Button.CLEAROUTPUT).widget().setEnabled(False)
+
+    @Slot()
+    def rowsClicked(self):
+        totalRows = self.tableView.model.rowCount()
+        self.buttonsState(0, totalRows)
 
     def clearOutputWindow(self):
         """
@@ -197,6 +318,16 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
         """
 
         self.output.clear()
+
+    def clearSelection(self):
+
+        self.tableView.clearSelection()
+        self.rowsClicked()
+
+    def selectAll(self):
+
+        self.tableView.selectAll()
+        self.rowsClicked()
 
     def fetchJobHistory(self):
         """Get the log records from database"""
@@ -206,9 +337,9 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
         if jobsDB:
             rows = jobsDB.fetchJob(0)
             if rows:
-                totalRows = self.model.rowCount()
+                totalRows = self.tableView.model.rowCount()
                 if totalRows > 0:
-                    self.model.removeRows(0, totalRows)
+                    self.tableView.model.removeRows(0, totalRows)
                 fillRows(self, rows)
 
         jobsDB.close()
@@ -221,9 +352,9 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
         if jobsDB:
             rows = self.search.searchText(jobsDB)
             if rows:
-                totalRows = self.model.rowCount()
+                totalRows = self.tableView.model.rowCount()
                 if totalRows > 0:
-                    self.model.removeRows(0, totalRows)
+                    self.tableView.model.removeRows(0, totalRows)
                 fillRows(self, rows)
 
         jobsDB.close()
@@ -233,21 +364,19 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
         qtRunFunctionInThread(
             showOutputLines,
             tableView=self.tableView,
-            proxyModel=self.proxyModel,
+            proxyModel=self.tableView.proxyModel,
             output=self.output,
             outputType=outputType,
             funcStart=self.parent.progressSpin.startAnimation,
             funcFinished=self.parent.progressSpin.stopAnimation,
         )
 
-    # def listRows(self):
-
     def printDataset(self):
         """
         printDataset development debug
         """
         # QApplication.setPalette(darkPalette())
-        dataset = self.model.dataset
+        dataset = self.tableView.model.dataset
 
         for r in range(0, len(dataset)):
             self.output.insertTextSignal.emit(
@@ -259,22 +388,53 @@ class JobsHistoryViewWidget(TabWidgetExtension, QWidget):
 
         self.output.insertTextSignal.emit("\n", {"log": False})
 
-    def refresh(self):
+    def showInfo(self):
         """Refresh jobs records"""
 
-        jobsDB = SqlJobsTable(config.get(ConfigKey.SystemDB))
+        indexes = self.tableView.selectionModel().selectedRows()
 
-        if jobsDB:
-            rows = jobsDB.fetchJob(0)
-            for row in rows:
-                job = pickle.loads(zlib.decompress(row[JobsTableKey.jobIndex]))
-                print(
-                    "Job ID = {} Status = {}".format(
-                        row[JobsTableKey.IDIndex], job.jobRow[JobKey.Status]
-                    )
+        if len(indexes) == 1:
+
+            jobsDB = SqlJobsTable(config.get(ConfigKey.SystemDB))
+
+            index = self.tableView.proxyModel.mapToSource(indexes[0])
+            model = self.tableView.proxyModel.sourceModel()
+
+            row = index.row()
+            # column = index.column()
+            # job = model.dataset.data[row][
+            #    JobHistoryKey.Status
+            # ].obj  # TODO: change to status
+            rowid = model.dataset.data[row][JobHistoryKey.ID].obj
+            jobID = model.dataset.data[row][JobHistoryKey.ID].cell
+            if rowid is not None:
+                records = jobsDB.fetchJob(
+                    {"rowid": rowid},
+                    JobsTableKey.projectName,
+                    JobsTableKey.projectInfo,
                 )
+                if records:
+                    record = records.fetchone()
+                    # print(f"Houston we have a record.\n\nProject Name: [{record}]")
+                    title = self.infoDialog.windowTitle()
+                    self.infoDialog.setWindowTitle(title + " - " + str(jobID))
+                    self.infoDialog.name = record[1]
+                    self.infoDialog.description = record[2]
+                    self.infoDialog.ui.teDescription.moveCursor(QTextCursor.Start)
 
-        jobsDB.close()
+                    self.infoDialog.getProjectInfo()
+                    name, desc = self.infoDialog.info
+                    records = jobsDB.update(
+                        {"rowid": rowid},
+                        (
+                            JobsTableKey.projectName,
+                            JobsTableKey.projectInfo,
+                        ),
+                        name,
+                        desc,
+                    )
+
+            jobsDB.close()
 
 
 def fillRows(self, rows):
@@ -290,28 +450,32 @@ def fillRows(self, rows):
         for row in rows:
             viewRow = [None, None, None, None]
             job = pickle.loads(zlib.decompress(row[JobsTableKey.jobIndex]))
-            dt = datetime.fromtimestamp(job.startTime)
+            if job.startTime is None:
+                dt = "0000-00-00 00:00:00"
+            else:
+                dt = datetime.fromtimestamp(job.startTime)
+                dt = dt.isoformat(sep=" ")
             viewRow[JobHistoryKey.ID] = [
                 row[JobsTableKey.IDIndex],
                 "",
                 row[JobsTableKey.rowidIndex],
             ]
             viewRow[JobHistoryKey.Date] = [
-                dt.isoformat(sep=" "),
+                dt,
                 "Date job was executed",
                 None,
             ]
             viewRow[JobHistoryKey.Status] = [
                 job.jobRow[JobKey.Status],
                 "",
-                None,
+                job,
             ]
             viewRow[JobHistoryKey.Command] = [
                 job.jobRow[JobKey.Command],
                 job.jobRow[JobKey.Command],
                 None,
             ]
-            self.model.insertRows(rowNumber, 1, data=viewRow)
+            self.tableView.model.insertRows(rowNumber, 1, data=viewRow)
             rowNumber += 1
 
 
@@ -380,14 +544,17 @@ def showOutputLines(**kwargs):
 
         row = index.row()
         # column = index.column()
-        job = model.dataset.data[row][JobHistoryKey.Command].obj
+        job = model.dataset.data[row][
+            JobHistoryKey.Status
+        ].obj  # TODO: change to status
         rowid = model.dataset.data[row][JobHistoryKey.ID].obj
         if job is None:
+            # print("Fetching Job")
             records = jobsDB.fetchJob({"rowid": rowid}, JobsTableKey.job)
             if records:
                 record = records.fetchone()
                 job = pickle.loads(zlib.decompress(record[1]))
-                model.dataset.data[row][JobHistoryKey.Command].obj = copy.deepcopy(job)
+                model.dataset.data[row][JobHistoryKey.Status].obj = copy.deepcopy(job)
             else:
                 msg = "Information cannot be read."
                 output.insertTextSignal.emit(msg, {"log": False})
@@ -397,22 +564,30 @@ def showOutputLines(**kwargs):
 
             regPercentEx = re.compile(r":\W*(\d+)%$")
             # The file 'file name' has been opened for writing.
-            # TODO: how to doit without locale dependency
+            # TODO: how to do it without locale dependency
             regOutputFileEx = re.compile(r"file (.*?) has")
             indexes = tableView.selectedIndexes()
 
             processedFiles = 0
-            for line in job.output:
+            for line, arguments in job.output:
                 if m := regPercentEx.search(line):
                     n = int(m.group(1))
                     if n < 100:
                         continue
-                if f := regOutputFileEx.search(line): # pylint: disable=unused-variable
+                if f := regOutputFileEx.search(line):  # pylint: disable=unused-variable
                     processedFiles += 1
+                arguments["log"] = False
+                output.insertTextSignal.emit(line, arguments)
+                # The signals are generated to fast and the History window
+                # seems unresponsive
+                sleep(0.000001)
+
+            for line in job.oCommand.strCommands:
                 output.insertTextSignal.emit(line, {"log": False})
                 # The signals are generated to fast and the History window
                 # seems unresponsive
                 sleep(0.000001)
+
             msg = stats(job)
 
             output.insertTextSignal.emit(msg, {"log": False})
@@ -420,46 +595,32 @@ def showOutputLines(**kwargs):
         elif outputType == _ShowKey.errors:
 
             for analysis in job.errors:
-
-                msg = "Error Job ID: {} ---------------------\n\n".format(
-                    job.jobRow[JobKey.ID]
-                )
-
-                output.insertTextSignal.emit(
-                    msg, {"color": SvgColor.red, "appendEnd": True, "log": False}
-                )
-
-                # msg = "\nDestination File: {}\n\n".format(destinationFile)
-                # output.error.emit(msg,
-                #     {"color": SvgColor.red, "appendEnd": True, "log": False})
-
-                for i, m in enumerate(analysis):
-                    if i == 0:
-                        lines = m.split("\n")
-                        findSource = True
-                        for index, line in enumerate(lines):
-                            color = SvgColor.orange
-                            if findSource and (
-                                (searchIndex := line.find("File Name")) >= 0
-                            ):
-                                if searchIndex >= 0:
-                                    color = SvgColor.tomato
-                                    findSource = False
+                if isinstance(analysis[1], dict):
+                    output.insertTextSignal.emit(analysis[0], analysis[1])
+                    sleep(0.000001)
+                else:
+                    for i, m in enumerate(analysis):
+                        if i == 0:
+                            lines = m.split("\n")
+                            findSource = True
+                            for index, line in enumerate(lines):
+                                color = SvgColor.orange
+                                if findSource and (
+                                    (searchIndex := line.find("File Name")) >= 0
+                                ):
+                                    if searchIndex >= 0:
+                                        color = SvgColor.tomato
+                                        findSource = False
+                                output.insertTextSignal.emit(
+                                    line + "\n", {"color": color, "log": False}
+                                )
+                                sleep(0.000001)
+                        else:
                             output.insertTextSignal.emit(
-                                line + "\n", {"color": color, "log": False}
+                                m, {"color": SvgColor.red, "log": False}
                             )
                             sleep(0.000001)
-                    else:
-                        output.insertTextSignal.emit(
-                            m, {"color": SvgColor.red, "log": False}
-                        )
-
-                msg = "Error Job ID: {} ---------------------\n\n".format(
-                    job.jobRow[JobKey.ID]
-                )
-                output.insertTextSignal.emit(
-                    msg, {"color": SvgColor.red, "appendEnd": True, "log": False}
-                )
+        jobsDB.close()
 
 
 class _ShowKey:
@@ -474,6 +635,15 @@ class _ShowKey:
 class _Button:
 
     FETCHJOBHISTORY = 0
+
+    SHOWOUTPUT = 2
+    SHOWOUTPUTERRORS = 3
+    SHOWINFO = 4
+
+    PRINT = 6
+    SELECTALL = 7
+    CLEARSELECTION = 8
+    CLEAROUTPUT = 9
 
 
 class _JobHKey:

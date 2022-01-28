@@ -3,20 +3,24 @@ class CommandWidget
 """
 
 import logging
-#import time
+
+# import time
 
 from PySide2.QtCore import Signal, Slot
 from PySide2.QtGui import QColor, QPalette
 from PySide2.QtWidgets import (
     QApplication,
+    QHBoxLayout,
     QWidget,
     QGridLayout,
     QGroupBox,
     QFormLayout,
     QLineEdit,
+    QRadioButton,
 )
 
 from vsutillib.pyqt import (
+    QLabelWidget,
     QOutputTextWidget,
     QPushButtonWidget,
     qtRunFunctionInThread,
@@ -63,6 +67,7 @@ class CommandWidget(TabWidgetExtension, QWidget):
         self.__tab = None
 
         # self.oCommand = MKVCommand()
+        self.algorithm = None
         self.oCommand = MKVCommandParser()
         self.controlQueue = controlQueue
         self.parent = parent
@@ -81,7 +86,10 @@ class CommandWidget(TabWidgetExtension, QWidget):
         #
         self.frmCmdLine = QFormLayout()
         btnPasteClipboard = QPushButtonWidget(
-            Text.txt0164, function=self.pasteClipboard, toolTip=Text.txt0165,
+            Text.txt0164,
+            function=lambda: qtRunFunctionInThread(self.pasteClipboard),
+            margins="  ",
+            toolTip=Text.txt0165,
         )
         self.cmdLine = QLineEdit()
         self.cmdLine.setValidator(
@@ -101,20 +109,26 @@ class CommandWidget(TabWidgetExtension, QWidget):
         btnAddCommand = QPushButtonWidget(
             Text.txt0160,
             function=lambda: self.addCommand(JobStatus.Waiting),
+            margins="  ",
             toolTip=Text.txt0161,
         )
         btnRename = QPushButtonWidget(
             Text.txt0182,
             function=self.parent.renameWidget.setAsCurrentTab,
+            margins="  ",
             toolTip=Text.txt0183,
         )
         btnAddQueue = QPushButtonWidget(
             Text.txt0166,
             function=lambda: self.addCommand(JobStatus.AddToQueue),
+            margins="  ",
             toolTip=Text.txt0167,
         )
         btnStartQueue = QPushButtonWidget(
-            Text.txt0126, function=self.parent.jobsQueue.run, toolTip=Text.txt0169,
+            Text.txt0126,
+            function=self.parent.jobsQueue.run,
+            margins="  ",
+            toolTip=Text.txt0169,
         )
         btnAnalysis = QPushButtonWidget(
             Text.txt0170,
@@ -124,6 +138,7 @@ class CommandWidget(TabWidgetExtension, QWidget):
                 output=self.output,
                 log=self.log,
             ),
+            margins="  ",
             toolTip=Text.txt0171,
         )
         btnShowCommands = QPushButtonWidget(
@@ -135,6 +150,7 @@ class CommandWidget(TabWidgetExtension, QWidget):
                 oCommand=self.oCommand,
                 log=self.log,
             ),
+            margins="  ",
             toolTip=Text.txt0173,
         )
         btnCheckFiles = QPushButtonWidget(
@@ -146,13 +162,20 @@ class CommandWidget(TabWidgetExtension, QWidget):
                 oCommand=self.oCommand,
                 log=self.log,
             ),
+            margins="  ",
             toolTip=Text.txt0175,
         )
         btnClear = QPushButtonWidget(
-            Text.txt0176, function=self.clearOutputWindow, toolTip=Text.txt0177,
+            Text.txt0176,
+            function=self.clearOutputWindow,
+            margins="  ",
+            toolTip=Text.txt0177,
         )
         btnReset = QPushButtonWidget(
-            Text.txt0178, function=self.reset, toolTip=Text.txt0179,
+            Text.txt0178,
+            function=self.reset,
+            margins="  ",
+            toolTip=Text.txt0179,
         )
 
         self.btnGrid.addWidget(btnAddCommand, 0, 0)
@@ -168,12 +191,40 @@ class CommandWidget(TabWidgetExtension, QWidget):
         self.btnGrid.addWidget(btnReset, 6, 1)
         self.btnGroup.setLayout(self.btnGrid)
 
+        self.btnGroupBox = QGroupBox()
+        self.btnHBox = QHBoxLayout()
+
+        self.lblAlgorithm = QLabelWidget(
+            Text.txt0094,
+            textSuffix=":  ",
+        )
+        self.rbZero = QRadioButton("0", self)
+        self.rbOne = QRadioButton("1", self)
+        self.rbTwo = QRadioButton("2", self)
+
+        btnDefaultAlgorithm = QPushButtonWidget(
+            Text.txt0092,
+            function=self.setDefaultAlgorithm,
+            margins="  ",
+            toolTip=Text.txt0093,
+        )
+
+        self.radioButtons = [self.rbZero, self.rbOne, self.rbTwo]
+
+        self.btnHBox.addWidget(self.lblAlgorithm)
+        self.btnHBox.addWidget(self.rbZero)
+        self.btnHBox.addWidget(self.rbOne)
+        self.btnHBox.addWidget(self.rbTwo)
+        self.btnHBox.addWidget(btnDefaultAlgorithm)
+        self.btnGroupBox.setLayout(self.btnHBox)
+
     def _initUI(self):
 
         grid = QGridLayout()
         grid.addWidget(self.command, 0, 0, 1, 2)
-        grid.addWidget(self.btnGroup, 1, 0)
-        grid.addWidget(self.outputWindow, 1, 1, 10, 1)
+        grid.addWidget(self.btnGroupBox, 1, 0)
+        grid.addWidget(self.btnGroup, 2, 0)
+        grid.addWidget(self.outputWindow, 2, 1, 10, 1)
 
         self.setLayout(grid)
 
@@ -233,6 +284,13 @@ class CommandWidget(TabWidgetExtension, QWidget):
         # Misc
         #
         self.cmdLine.setClearButtonEnabled(True)  # button at end of line to clear it
+
+        # Algorithm radio buttons
+        self.rbZero.toggled.connect(lambda: self.toggledRadioButton(self.rbZero))
+        self.rbOne.toggled.connect(lambda: self.toggledRadioButton(self.rbOne))
+        self.rbTwo.toggled.connect(lambda: self.toggledRadioButton(self.rbTwo))
+
+        self.setDefaultAlgorithm()
 
     @classmethod
     def classLog(cls, setLogging=None):
@@ -377,6 +435,12 @@ class CommandWidget(TabWidgetExtension, QWidget):
         self.cmdLine.setText(command)
         self.cmdLine.setCursorPosition(0)
 
+    @Slot(int)
+    def updateAlgorithm(self, algorithm):
+
+        if 0 <= algorithm < len(self.radioButtons):
+            self.radioButtons[algorithm].setChecked(True)
+
     @Slot(bool)
     def jobStatus(self, running):
         """
@@ -413,12 +477,45 @@ class CommandWidget(TabWidgetExtension, QWidget):
         command = self.cmdLine.text()
         # [cell value, tooltip, obj]
         data = [
-            ["", "", None],
+            ["", "", self.algorithm],
             [status, "Status code", None],
             [command, command, self.oCommand],
         ]
         self.model.insertRows(totalJobs, 1, data=data)
         self.cmdLine.clear()
+
+    def analysisButtonState(self):
+        """Set clear button state"""
+
+        if self.cmdLine.text() != "":
+            self.btnGrid.itemAt(_Button.ANALYSIS).widget().setEnabled(True)
+        else:
+            self.btnGrid.itemAt(_Button.ANALYSIS).widget().setEnabled(False)
+
+    def clearButtonState(self):
+        """Set clear button state"""
+
+        if self.outputWindow.toPlainText() != "":
+            self.btnGrid.itemAt(_Button.CLEAR).widget().setEnabled(True)
+        else:
+            self.btnGrid.itemAt(_Button.CLEAR).widget().setEnabled(False)
+
+    def clearOutputWindow(self):
+        """
+        clearOutputWindow clear the command output window
+        """
+
+        language = config.data.get(config.ConfigKey.Language)
+        bAnswer = False
+
+        # Clear output window?
+        title = "Clear output"
+        msg = "¿" if language == "es" else ""
+        msg += "Clear output window" + "?"
+        bAnswer = yesNoDialog(self, msg, title)
+
+        if bAnswer:
+            self.outputWindow.clear()
 
     def printJobIDAdded(self, index):
 
@@ -439,47 +536,6 @@ class CommandWidget(TabWidgetExtension, QWidget):
             )
             self.update()
             self.updateCommandSignal.emit(clip)
-
-    def clearButtonState(self):
-        """Set clear button state"""
-
-        if self.outputWindow.toPlainText() != "":
-            self.btnGrid.itemAt(_Button.CLEAR).widget().setEnabled(True)
-        else:
-            self.btnGrid.itemAt(_Button.CLEAR).widget().setEnabled(False)
-
-    def analysisButtonState(self):
-        """Set clear button state"""
-
-        if self.cmdLine.text() != "":
-            self.btnGrid.itemAt(_Button.ANALYSIS).widget().setEnabled(True)
-        else:
-            self.btnGrid.itemAt(_Button.ANALYSIS).widget().setEnabled(False)
-
-    def clearOutputWindow(self):
-        """
-        clearOutputWindow clear the command output window
-        """
-
-        language = config.data.get(config.ConfigKey.Language)
-        bAnswer = False
-
-        # Clear output window?
-        title = "Clear output"
-        msg = "¿" if language == "es" else ""
-        msg += "Clear output window" + "?"
-        bAnswer = yesNoDialog(self, msg, title)
-
-        if bAnswer:
-            self.outputWindow.clear()
-
-    def resetButtonState(self):
-        """Set clear button state"""
-
-        if self.output.jobOutput.toPlainText() != "":
-            self.btnGrid.itemAt(_Button.RESET).widget().setEnabled(True)
-        else:
-            self.btnGrid.itemAt(_Button.RESET).widget().setEnabled(False)
 
     def reset(self):
         """
@@ -509,6 +565,22 @@ class CommandWidget(TabWidgetExtension, QWidget):
         else:
             messageBox(self, "Reset", "Jobs are running..")
 
+    def resetButtonState(self):
+        """Set clear button state"""
+
+        if self.output.jobOutput.toPlainText() != "":
+            self.btnGrid.itemAt(_Button.RESET).widget().setEnabled(True)
+        else:
+            self.btnGrid.itemAt(_Button.RESET).widget().setEnabled(False)
+
+    def setDefaultAlgorithm(self):
+        #
+        # Algorithm
+        #
+        if config.data.get(config.ConfigKey.Algorithm) is not None:
+            currentAlgorithm = config.data.get(config.ConfigKey.Algorithm)
+            self.radioButtons[currentAlgorithm].setChecked(True)
+
     def setLanguage(self):
         """
         setLanguage language use in buttons/labels to be called by MainWindow
@@ -517,14 +589,32 @@ class CommandWidget(TabWidgetExtension, QWidget):
         for index in range(self.frmCmdLine.rowCount()):
             widget = self.frmCmdLine.itemAt(index, QFormLayout.LabelRole).widget()
             if isinstance(widget, QPushButtonWidget):
-                widget.setText("  " + _(widget.originalText) + "  ")
-                widget.setToolTip(_(widget.toolTip))
+                widget.setLanguage()
+                # widget.setText("  " + _(widget.originalText) + "  ")
+                # widget.setToolTip(_(widget.toolTip))
+
+        for index in range(self.btnHBox.count()):
+            widget = self.btnHBox.itemAt(index).widget()
+            if isinstance(
+                widget,
+                (
+                    QLabelWidget,
+                    QPushButtonWidget,
+                ),
+            ):
+                widget.setLanguage()
 
         for index in range(self.btnGrid.count()):
             widget = self.btnGrid.itemAt(index).widget()
             if isinstance(widget, QPushButtonWidget):
-                widget.setText("  " + _(widget.originalText) + "  ")
-                widget.setToolTip(_(widget.toolTip))
+                widget.setLanguage()
+                # widget.setText("  " + _(widget.originalText) + "  ")
+                # widget.setToolTip(_(widget.toolTip))
+
+    def toggledRadioButton(self, rButton):
+        for index, rb in enumerate(self.radioButtons):
+            if rb.isChecked():
+                self.algorithm = index
 
 
 class _Button:

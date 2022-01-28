@@ -2,6 +2,8 @@
  Table headers definition
 """
 
+from ..utils import Text
+
 def tableHeaders():
     """
     tableHeaders table model headers
@@ -16,10 +18,10 @@ def tableHeaders():
             {
                 "Type": "int",
                 "CastFunction": int,
-                "Label": " " + "ID" + "  ",
+                "Label": " " + _(Text.txt0131) + "  ",
                 "Alignment": "right",
                 "Width": 80,
-                "ToolTip": "Job identification number",
+                "ToolTip": _(Text.txt0086),
             },
         ],
         [
@@ -27,10 +29,10 @@ def tableHeaders():
             {
                 "Type": "str",
                 "CastFunction": str,
-                "Label": "  " + "Status" + "  ",
+                "Label": "  " + _(Text.txt0132) + "  ",
                 "Alignment": "center",
                 "Width": 80,
-                "ToolTip": "Application code for the job status",
+                "ToolTip": _(Text.txt0087),
             },
         ],
         [
@@ -38,10 +40,10 @@ def tableHeaders():
             {
                 "Type": "str",
                 "CastFunction": str,
-                "Label": "Command",
+                "Label": _(Text.txt0133),
                 "Alignment": "center",
                 "Width": 4096,
-                "ToolTip": "Command generated for MKVMERGE by MKVToolNix",
+                "ToolTip": _(Text.txt0088),
             },
         ],
     ]
@@ -62,10 +64,10 @@ def tableHistoryHeaders():
             {
                 "Type": "int",
                 "CastFunction": int,
-                "Label": " " + "ID" + "  ",
+                "Label": " " + _(Text.txt0131) + "  ",
                 "Alignment": "right",
                 "Width": 80,
-                "ToolTip": "Job identification number",
+                "ToolTip": _(Text.txt0086),
             },
         ],
         [
@@ -73,10 +75,10 @@ def tableHistoryHeaders():
             {
                 "Type": "str",
                 "CastFunction": str,
-                "Label": "  " + "Date" + "  ",
+                "Label": "  " + _(Text.txt0240) + "  ",
                 "Alignment": "center",
                 "Width": 80,
-                "ToolTip": "Date of execution",
+                "ToolTip": _(Text.txt0095),
             },
         ],
         [
@@ -84,10 +86,10 @@ def tableHistoryHeaders():
             {
                 "Type": "str",
                 "CastFunction": str,
-                "Label": "  " + "Status" + "  ",
+                "Label": "  " + _(Text.txt0132) + "  ",
                 "Alignment": "center",
                 "Width": 80,
-                "ToolTip": "Application code for the job status",
+                "ToolTip": _(Text.txt0087),
             },
         ],
         [
@@ -95,10 +97,10 @@ def tableHistoryHeaders():
             {
                 "Type": "str",
                 "CastFunction": str,
-                "Label": "Command",
+                "Label": _(Text.txt0133),
                 "Alignment": "center",
                 "Width": 4096,
-                "ToolTip": "Command generated for MKVMERGE by MKVToolNix",
+                "ToolTip": _(Text.txt0088),
             },
         ],
     ]

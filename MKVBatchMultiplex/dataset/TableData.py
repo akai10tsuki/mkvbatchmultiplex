@@ -1,61 +1,19 @@
 """
-Class to represent data in a table with headers
-
-Header:
-    header (str} - header ID
-    attribute (dict}  -
-        "Type": type of element in cell
-        "CastFunction": function to cast cell to element type
-        "Label": label header for the column
-        "Alignment": alignment for column header label
-        "Width": width for the column header
-
-        [
-            "jobID",
-            {
-                "Type": "int",
-                "CastFunction": int,
-                "Label": "Job ID",
-                "Alignment": "right",
-                "Width": 80,
-            },
-        ],
+Module that defines the table data use in the model/view
 """
 
 # pylint: disable=too-few-public-methods
 
 import itertools
 
-class HeaderAttributeKey:
-
-    Alignment = "Alignment"
-    CastFunction = "CastFunction"
-    Label = "Label"
-    Type = "Type"
-    Width = "Width"
-
-
-class DataKey:
-
-    Cell = 0
-    ToolTip = 1
-    Obj = 2
-
-
-class HeaderInfo:
-    """
-    Header information
-    """
-
-    header = None
-    attribute = None
-    headerList = None
-    toolTip = None
-
 
 class DataItem:
     """
-    Data item information
+    Data item information:
+        - cell (object) = value of cell in table cast to a type depending on
+          attribute in header
+        - toolTip (str) = toolTip to show when mouse hovers over it
+        - obj (object) = python object
     """
 
     cell = None
@@ -63,9 +21,46 @@ class DataItem:
     obj = None
 
 
+class DataKey:
+    """
+    DataItem index names for when the DataItem is represented in a list.
+    """
+
+    Cell = 0
+    ToolTip = 1
+    Obj = 2
+
+
+class HeaderAttributeKey:
+    """
+    Header Attribute dictionary keys.
+    """
+
+    Alignment = "Alignment"
+    CastFunction = "CastFunction"
+    Label = "Label"
+    ToolTip = "ToolTip"
+    Type = "Type"
+    Width = "Width"
+
+
+class HeaderInfo:
+    """
+    Header information for a column
+
+        - header (str) - column name
+        - attribute (dict) - for the attributes to apply to the cell data
+        - toolTip (str) - toolTip to show
+    """
+
+    header = None
+    attribute = None
+    toolTip = None
+
+
 class Index:
     """
-    Dummy QModelIndex
+    Dummy QModelIndex to ease data manupulations.
 
     Returns:
         Index: Dummy QModelIndex
@@ -76,51 +71,131 @@ class Index:
         self._row = row
         self._column = column
 
-    def row(self):
-        return self._row
-
     def column(self):
+        """
+        column of cell
+
+        Returns:
+            int: column of cell in table
+        """
         return self._column
 
-    def isValid(self):
+    def isValid(self):  # pylint: disable=no-self-use
+        """
+        isValid dummy check for Index validity
+
+        Returns:
+            bool: allways returns true
+        """
         return True
+
+    def row(self):
+        """
+        row of cell
+
+        Returns:
+            int: row of cell in table
+        """
+
+        return self._row
 
 
 class TableData:
     """
     Class to represent data in a table with columns headers
 
-    data[x][y] = DataItem
+    data[row][column] = DataItem
 
-    A header is a list of the form:
-        [str, dict]
-        str = string representing the column name
-        dict = dictionary representing different attributes
-        [
-            "Column Name",
-            {
-                "Alignment": "center",
-                "CastFunction": str,
-                "Label": "Column Label",
-                "ToolTip": "Tool Tip string"
-                "Type": "str",
-                "Width": 220,
-            },
-        ]
 
-    Raises:
-        IndexError: index is out of range
-        TypeError: invalid index type
+    Args:
+        **headerList** (list, optional): List with header information.
+        Defaults to None.
+
+            A headerList is a list of the form:
+
+                [str, dict]
+
+                (str) - string representing the column name
+
+                (dict) - dictionary representing different attributes
+
+                    - "Alignment": alignment for column header label
+                    - "CastFunction": function to cast cell to element type
+                    - "Label": label header for the column
+                    - "ToolTip": text to show for tool tip
+                    - "Type": type of element in cell
+                    - "Width": width for the column header
+
+                ::
+
+                    [
+                        "Column Name",
+                        {
+                            "Alignment": "center",
+                            "CastFunction": str,
+                            "Label": "Column Label",
+                            "ToolTip": "Tool Tip string"
+                            "Type": "str",
+                            "Width": 220,
+                        },
+                    ]
+
+        **dataList** (list, optional): list with initialization data.
+        Defaults to None.
+
+            dataList is a list that represent a table with m rows and n columns
+            in the form:
+
+            .. code:: python
+
+                dataList = [ row1, row2 , ...]
+
+                row = [
+                    [cell value, toolTip value, obj value],
+                    [cell value, toolTip value, obj value],
+                    ...
+                ]
+
+                rows have n columns
+
+                dataList = [
+                    [
+                        [cell value, toolTip value, obj value],
+                        [cell value, toolTip value, obj value],
+                        ...
+                    ],
+                    [
+                        [cell value, toolTip value, obj value],
+                        [cell value, toolTip value, obj value],
+                        ...
+                    ],
+                    ...
+                ]
+
+                dataList has m rows
+
+            Every row should have the same number of columns.
+
+        Raises:
+        ::
+            IndexError: index is out of range
+            TypeError: invalid index type
 
     Returns:
-        str -- tableData[index] column header
-        list - tableData[index,] data row
-        object - tableData[row, col] element at position row,col on table
+        If an instance of the class is accessed using list notation the class returns:
+
+            If **data** is a TableData instance.
+
+                data[row] - column header
+
+                data[row,] - table row at index
+
+                tableData[row, col] - element at position row, col on table
     """
 
     def __init__(self, headerList=None, dataList=None):
 
-        self.data = []  # 2 dimensional dataset
+        self.data = []  # 2 dimensional dataset of DataItem
         self.headers = []  # list of HeaderInfo objects
         self.headerName = []  # list of header/columns names HeaderInfo.header
 
@@ -133,17 +208,23 @@ class TableData:
                 self.insertRow(0, dataList)
             else:
                 for position, data in enumerate(dataList):
+                    # data is expected to be 3 element list
                     self.insertRow(position, data)
 
     def __getitem__(self, index):
 
         if isinstance(index, (int, slice)):
+            # to access the elements in full dataset.data[row][column] for DataItem
+            #  or dataset.data[row][col].member for DataIem.member
+            # dataset[index] returns columns labels
             if (index < 0) or (index > len(self.headers) - 1):
                 raise IndexError("list index [{}] out of range".format(index))
 
-            return self.headers[index].attribute["Label"]
+            return self.headers[index].attribute[HeaderAttributeKey.Label]
 
         if isinstance(index, tuple):
+            # dataset[row,] returns the [row] list
+            # dataset[row, col] returns DataIem.cell value
             col = None
 
             if len(index) == 1:
@@ -188,71 +269,87 @@ class TableData:
 
     def addHeader(self, header=None):
         """
-        Add header information
+        Add header information. header has the form = [str, dict]
 
         Keyword Arguments:
-            header (list) -- list containing the a header (default: {None})
+            **header** (list) -- list containing the a header (default: {None})
         """
 
         if header is not None:
             oHeader = HeaderInfo()
             oHeader.header = header[0]
             oHeader.attribute = header[1]
-            oHeader.headerList = header
             self.headerName.append(header[0])
             self.headers.append(oHeader)
 
-    def setData(self, index, value):
+    def deleteColumn(self, index):
         """
-        Insert row at the end of the data table
+        Delete a column from the table
 
-        Keyword Arguments:
-            dataItem (list) -- list containing a data row (default: {None})
+        Arguments:
+            **index** (int) -- column to delete
+
+        Returns:
+            list -- list containing the header ID, header attributes and data rows deleted
         """
 
-        if (value is not None) and index.isValid():
-            # Use self.insertRow() so only one method add data
-            # better for logging purposes
-            row = index.row()
-            column = index.column()
+        deletedInfo = []
+        deletedRows = []
+        deletedInfo.append(self.headers.pop(index))
+        deletedInfo.append(self.headerName.pop(index))
 
-            if isinstance(value, DataItem):
-                self.data[row][column].cell = value.cell
-                self.data[row][column].toolTip = value.toolTip
-                self.data[row][column].obj = value.obj
+        for row in self.data:
+            deletedRows.append(row.pop(index))
+
+        deletedInfo.append(deletedRows)
+
+        return deletedInfo
+
+    def insertColumn(self, position=0, columnHeader=None, columnData=None):
+        """
+        Insert a data column
+
+        Arguments:
+            **position** (int) -- column number where to insert the data
+
+            **columnHeader** (str) -- header for column to be inserted
+
+            **columnData** (list) -- data to insert in column cells
+        """
+
+        if columnHeader is None:
+            self.headers.insert(position, HeaderInfo())
+            self.headerName.insert(position, "")
+        else:
+            if isinstance(columnHeader, list):
+                oHeader = HeaderInfo()
+                oHeader.header = columnHeader[0]
+                oHeader.attribute = columnHeader[1]
+                self.headers.insert(position, oHeader)
+                self.headerName.insert(position, oHeader.header)
+            elif isinstance(columnHeader, HeaderInfo):
+                self.headers.insert(position, columnHeader)
+                self.headers.insert(position, columnHeader.header)
             else:
-                self.data[row][column].cell = value
+                raise TypeError("Invalid column header type.")
 
-            return True
-
-        return False
-
-    def setToolTip(self, index, value):
-        """
-        Insert row at the end of the data table
-
-        Keyword Arguments:
-            dataItem (list) -- list containing a data row (default: {None})
-        """
-
-        if (value is not None) and index.isValid():
-            # Use self.insertRow() so only one method add data
-            # better for logging purposes
-            row = index.row()
-            column = index.column()
-            self.data[row][column].toolTip = value
-
-            return True
-
-        return False
+        if columnData is None:
+            for r in self.data:
+                r.insert(position, DataItem())
+        else:
+            for _, r in enumerate(self.data):
+                element = DataItem()
+                element.cell = columnData[0]
+                r.insert(position, columnData[1])
 
     def insertRow(self, position, row=None):
         """
         Insert a data row
 
         Arguments:
-            position (int) -- row number where to insert the data
-            row (list) -- list with row data
+            **position** (int) -- row number where to insert the data
+
+            **row** (list) -- list with row data. Defaults to {None}
         """
 
         if row is not None:
@@ -287,7 +384,7 @@ class TableData:
         Delete a data row
 
         Arguments:
-            index (int) -- row number to delete 0 based
+            **index** (int) -- row number to delete 0 based
 
         Returns:
             list -- row deleted
@@ -296,61 +393,46 @@ class TableData:
 
         return element
 
-    def insertColumn(self, position=0, columnHeader=None, columnData=None):
+    def setData(self, index, value):
         """
-        Insert a data column
+        Insert row at the end of the data table
 
-        Arguments:
-            position (int) -- column number where to insert the data
-            columnHeader (str) -- header for column to be inserted
-            columnData (list) -- data to insert in column cells
+        Keyword Arguments:
+            **dataItem** (list) -- list containing a data row (default: {None})
         """
 
-        if columnHeader is None:
-            self.headers.insert(position, HeaderInfo())
-            self.headerName.insert(position, "")
-        else:
-            if isinstance(columnHeader, list):
-                oHeader = HeaderInfo()
-                oHeader.header = columnHeader[0]
-                oHeader.attribute = columnHeader[1]
-                oHeader.headerList = columnHeader
-                self.headers.insert(position, oHeader)
-                self.headerName.insert(position, oHeader.header)
-            elif isinstance(columnHeader, HeaderInfo):
-                self.headers.insert(position, columnHeader)
-                self.headers.insert(position, columnHeader.header)
+        if (value is not None) and index.isValid():
+            # Use self.insertRow() so only one method add data
+            # better for logging purposes
+            row = index.row()
+            column = index.column()
+
+            if isinstance(value, DataItem):
+                self.data[row][column].cell = value.cell
+                self.data[row][column].toolTip = value.toolTip
+                self.data[row][column].obj = value.obj
             else:
-                raise TypeError("Invalid column header type.")
+                self.data[row][column].cell = value
 
-        if columnData is None:
-            for r in self.data:
-                r.insert(position, DataItem())
-        else:
-            for _, r in enumerate(self.data):
-                element = DataItem()
-                element.cell = columnData[0]
-                r.insert(position, columnData[1])
+            return True
 
-    def deleteColumn(self, index):
+        return False
+
+    def setToolTip(self, index, value):
         """
-        Delete a column from the table
+        Insert row at the end of the data table
 
-        Arguments:
-            index (int) -- column to delete
-
-        Returns:
-            list -- list containing the header ID, header attributes and data rows deleted
+        Keyword Arguments:
+            **dataItem** (list) -- list containing a data row (default: {None})
         """
 
-        deletedInfo = []
-        deletedRows = []
-        deletedInfo.append(self.headers.pop(index))
-        deletedInfo.append(self.headerName.pop(index))
+        if (value is not None) and index.isValid():
+            # Use self.insertRow() so only one method add data
+            # better for logging purposes
+            row = index.row()
+            column = index.column()
+            self.data[row][column].toolTip = value
 
-        for row in self.data:
-            deletedRows.append(row.pop(index))
+            return True
 
-        deletedInfo.append(deletedRows)
-
-        return deletedInfo
+        return False

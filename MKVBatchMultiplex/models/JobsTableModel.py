@@ -7,9 +7,9 @@ Class for a table model with horizontal headers
 
 from PySide2.QtCore import Qt, QModelIndex
 
-from vsutillib.pyqt import checkColor, SvgColor
+from vsutillib.pyqt import SvgColor
 
-from ..dataset import TableData, tableHeaders
+#from ..dataset import TableData, tableHeaders
 from ..jobs import JobStatus, JobKey, jobStatusTooltip
 from .TableModel import TableModel
 
@@ -18,17 +18,27 @@ from .TableModel import TableModel
 
 class JobsTableModel(TableModel):
     """
-    Subclass of TableModel
+    Subclass of the QAbstractTableModel.
+
+    This class holds the table data and header information Overrides the
+    methods:
+        - data(index, role)
+        - insertRows(position, rows, index, data)
+        - setData(index, value, role)
+
+    The class is defined in order to interact with the job queue for some
+    operations on the model/view
 
     Args:
-        TableModel (TableModel): Table Data Model
+        **tableData** (TableData): Table Data for the model
+
+        **jobQueue** (deque): job queue
     """
 
-    def __init__(self, model, jobQueue):
-        super().__init__(model)
+    def __init__(self, tableData, jobQueue):
+        super().__init__(parent=None, tableData=tableData)
 
         self.jobQueue = jobQueue
-        self.model = model
 
     #
     # Read-Only
@@ -41,11 +51,14 @@ class JobsTableModel(TableModel):
         Use by views and delegates to get table information.
 
         Arguments:
-            index {int} - QModelIndex object that point to a call
-            role {int} - what type of data to return. Roles include:
-                Qt.DisplayRole, Qt.EditRole, Qt.TextAlignmentRole, Qt.DecorationRole,
-                Qt.ToolTipRole, Qt.StatusTipRole, Qt.FontRole, Qt.BackgroundRole
-                Qt.ForgroundRole
+            **index** (QModelIndex) - QModelIndex object that point to a cell
+
+            **role** (int) - what type of data to return.
+
+        Roles include:
+            Qt.DisplayRole, Qt.EditRole, Qt.TextAlignmentRole, Qt.DecorationRole,
+            Qt.ToolTipRole, Qt.StatusTipRole, Qt.FontRole, Qt.BackgroundRole
+            Qt.ForgroundRole
         """
 
         if index.isValid():
@@ -92,15 +105,39 @@ class JobsTableModel(TableModel):
     #
     # Resizable Model
     #
-
     def insertRows(self, position, rows, index=QModelIndex(), data=None):
+        """
+        TableDataModel.insertRows() override
+
+        Insert the number of rows starting at position.  And add the jobs to the
+        jobs queue.
+
+        Args:
+            **position** (int): starting position for rows insertion
+
+            **rows** (int): number of rows to insert
+
+            **index** (QModelIndex, optional): index to row at position. Defaults
+            to QModelIndex().
+
+            **data** (list, optional): If data is not None the information is used
+            to fill the data on the new rows. Defaults to None.
+
+        Returns:
+            bool: True if transaction successful. False otherwise.
+        """
+
+        algorithm = data[0][2]
+        data[0][2] = None
+
+        # print(f"Algorithm in JobsTableModel {algorithm}")
 
         rc = super(JobsTableModel, self).insertRows(position, rows, index, data=data)
 
         if rc:
             for r in range(0, rows):
                 jobRow = position + r
-                self.jobQueue.append(jobRow)
+                self.jobQueue.append(jobRow, algorithm=algorithm)
             self.jobQueue.statusChangeSignal.emit(index)
 
         return rc
@@ -108,17 +145,19 @@ class JobsTableModel(TableModel):
     #
     # Editable
     #
-
     def setData(self, index, value, role=Qt.EditRole):
         """
-        QAbstractTableModel.setData() override
+        TableDataModel.setData() override
 
         Update changes to the model data.
 
         Arguments:
-            index {int} - QModelIndex object that point to a call
-            value {object} - value to be set at index
-            role {int} - Qt role (default: {Qt.EditRole})
+            **index** (int) - QModelIndex object that point to a cell
+
+            **value** (object) - value to be set at index
+
+            **role** (int) - Qt role (default: {Qt.EditRole})
+
         Returns:
             bool -- True is role is Qt.EditRole and data is updated
                 False otherwise

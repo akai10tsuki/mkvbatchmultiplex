@@ -5,10 +5,11 @@ JobsHistoryView - View to display/manipulate jobs
 # JTV0001
 
 import logging
-import io
-import csv
 
-from PySide2.QtCore import Qt, QPersistentModelIndex, QModelIndex, Slot
+# import io
+# import csv
+
+from PySide2.QtCore import Qt, QPersistentModelIndex, Signal, Slot
 
 from PySide2.QtWidgets import (
     QTableView,
@@ -19,10 +20,17 @@ from PySide2.QtWidgets import (
     QHeaderView,
 )
 
-#from vsutillib.mkv import MKVCommand, MKVCommandParser
-from vsutillib.mkv import MKVCommandParser
+# from vsutillib.mkv import MKVCommand, MKVCommandParser
+# from vsutillib.mkv import MKVCommandParser
 
-from ..jobs import JobStatus, JobHistoryKey
+from .. import config
+from ..jobs import JobHistoryKey, SqlJobsTable, removeFromDb
+from ..utils import yesNoDialog
+
+from ..dataset import TableData, tableHistoryHeaders
+from ..models import TableModel, TableProxyModel
+
+from .JobsViewHelpers import removeJob
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -42,22 +50,30 @@ class JobsHistoryView(QTableView):
     # Class logging state
     __log = False
 
-    def __init__(self, parent=None, proxyModel=None, title=None, log=None):
+    # Signals
+    rowCountChangedSignal = Signal(int, int)
+    clickedOutsideRowsSignal = Signal(int, int)
+
+    def __init__(self, parent=None, title=None, log=None):
         super(JobsHistoryView, self).__init__()
 
         self.__log = None  # Instance logging state None = Class state prevails
 
         self.parent = parent
-        self.proxyModel = proxyModel
+        # self.proxyModel = proxyModel
         self.viewTitle = title
         self.log = log
 
-        self.setModel(proxyModel)
+        headers = tableHistoryHeaders()
+        self.tableData = TableData(headerList=headers, dataList=[])
+        self.model = TableModel(self, tableData=self.tableData)
+        self.proxyModel = TableProxyModel(self.model)
+
+        self.setModel(self.proxyModel)
         self.sortByColumn(0, Qt.AscendingOrder)
         self.setSortingEnabled(True)
         # self.setSelectionMode(QAbstractItemView.SingleSelection)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.clicked.connect(self.clickClear)
         self._initHelper()
 
     def _initHelper(self):
@@ -144,20 +160,21 @@ class JobsHistoryView(QTableView):
 
             menu = QMenu()
             menu.setFont(self.parent.font())
-            menu.addAction("Copy")
-            menu.addAction("Remove")
-            menu.addAction("Delete")
+            menu.addAction(_("Copy to command"))
+            # menu.addAction(_("Remove"))
+            menu.addAction(_("Delete"))
 
             if action := menu.exec_(event.globalPos()):
                 result = action.text()
 
-                if result == "Copy":
+                if result == _("Copy to command"):
                     self.copyCommand()
-                if result == "Delete":
+                if result == _("Delete"):
                     self.deleteSelectedRows()
-                elif result == "Remove":
-                    self.proxyModel.filterConditions["Remove"].append(row)
-                    self.proxyModel.setFilterFixedString("")
+                elif result == _("Remove"):
+                    self.removeSelection()
+                    # self.proxyModel.filterConditions["Remove"].append(row)
+                    # self.proxyModel.setFilterFixedString("")
 
     def contextMenuEventOriginal(self, event):
         """
@@ -189,6 +206,29 @@ class JobsHistoryView(QTableView):
         elif selection == menuItems["Delete"]:
             self.deleteSelectedRows()
 
+    def mousePressEvent(self, event):
+
+        super().mousePressEvent(event)
+
+        row = self.rowAt(event.pos().y())
+        # print(f"Selected Rows View clicked row = {row}")
+
+        if row < 0:
+            # generate signal when clicked outside the rows
+            # this action would deselect all rows but is slow
+            # compared the trigger of the signal which make it
+            # fail on buttonState this arguments are set to
+            # recognize the event and attend the event as if
+            # no rows are selected un-elegant hack
+            # print("Clicked outside.....")
+            self.clickedOutsideRowsSignal.emit(-1, 0)
+
+    def selectedRowsCount(self):
+
+        selectedRows = len(self.selectionModel().selectedRows())
+
+        return selectedRows
+
     def resizeEvent(self, event):
 
         # Adjust the size of rows when font changes
@@ -206,7 +246,11 @@ class JobsHistoryView(QTableView):
         header.resizeSection(2, width)
         header.setFont(self.parent.font())
 
-        super(JobsHistoryView, self).resizeEvent(event)
+        super().resizeEvent(event)
+
+    def clearSelection(self):
+        print("clearSelection")
+        super().clearSelection()
 
     def copyCommand(self):
         """
@@ -222,8 +266,13 @@ class JobsHistoryView(QTableView):
                 model = self.proxyModel.sourceModel()
                 row = rows[3]
                 column = columns[3]
-                command = model.dataset.data[row][column].cell
+                command = model.dataset.data[row][column].cell.strip()
+                job = model.dataset.data[row][JobHistoryKey.Status].obj
                 QApplication.clipboard().setText(command)
+                self.parent.pasteCommandSignal.emit(command)
+                if job is not None:
+                    self.parent.updateAlgorithmSignal.emit(job.algorithm)
+
 
     def supportedDropActions(self):  # pylint: disable=no-self-use
 
@@ -234,24 +283,65 @@ class JobsHistoryView(QTableView):
         deleteSelectedRows delete selected rows
         """
 
-        model = self.proxyModel.sourceModel()
+        bAnswer = yesNoDelete(self, "Permanently delete selected rows", "Delete rows")
 
-        proxyIndexList = []
-        for i in self.selectionModel().selectedRows():
-            index = QPersistentModelIndex(i)
-            proxyIndexList.append(index)
+        if bAnswer:
 
-        for index in proxyIndexList:
-            modelIndex = self.proxyModel.mapToSource(index)
-            row = modelIndex.row()
-            rowid = model.dataset.data[row][JobHistoryKey.ID].obj
-            rowid0 = model.dataset[row, JobHistoryKey.ID]
-            print(f"From History View - model call row {row} data row ID {rowid} ID {rowid0}")
-            model.removeRows(row, 1)
+            jobsDB = SqlJobsTable(config.data.get(config.ConfigKey.SystemDB))
 
-    def rowsAboutToBeRemoved(self, parent, first, last):
-        pass
+            model = self.proxyModel.sourceModel()
 
-    @Slot(object)
-    def clickClear(self, index):
-        pass
+            proxyIndexList = []
+            for i in self.selectionModel().selectedRows():
+                index = QPersistentModelIndex(i)
+                proxyIndexList.append(index)
+
+            for index in proxyIndexList:
+                modelIndex = self.proxyModel.mapToSource(index)
+                row = modelIndex.row()
+                rowid = model.dataset.data[row][JobHistoryKey.ID].obj
+                rowid0 = model.dataset[row, JobHistoryKey.ID]
+                removeFromDb(jobsDB, rowid, rowid0)
+                model.removeRows(row, 1)
+
+            jobsDB.close()
+
+    def removeSelection(self):
+        """
+        removeSelection filter out selected rows
+        """
+
+        selection = self.selectedIndexes()
+        remove = None
+        removeItems = []
+
+        if selection:
+            remove = removeJob(self, None)
+            if not remove:
+                return
+            # Get all map indexes before table update
+            # When one element is removed the map won't work
+            for index in selection:
+                modelIndex = self.proxyModel.mapToSource(index)
+                row = modelIndex.row()
+                removeItems.append(row)
+
+            for row in removeItems:
+                self.proxyModel.filterConditions["Remove"].append(row)
+                self.proxyModel.setFilterFixedString("")
+
+    def rowCountChanged(self, oldCount, newCount):
+        self.rowCountChangedSignal.emit(oldCount, newCount)
+
+
+def yesNoDelete(parent, pMsg, pTitle):
+    """Confirm deletetion"""
+
+    language = config.data.get(config.ConfigKey.Language)
+    bAnswer = False
+    title = _(pTitle)
+    msg = "¿" if language == "es" else ""
+    msg += _(pMsg) + "?"
+    bAnswer = yesNoDialog(parent, msg, title)
+
+    return bAnswer

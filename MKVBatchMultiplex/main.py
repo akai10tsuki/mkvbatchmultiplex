@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
-JobsTable
+Main Window
 """
 
 # MAI0003
@@ -21,7 +21,6 @@ from pathlib import Path
 from PySide2.QtCore import QByteArray, Slot, Signal
 from PySide2.QtGui import QColor, QFont, QIcon, Qt, QPixmap
 from PySide2.QtWidgets import (
-    QAction,
     QApplication,
     QMainWindow,
     QMessageBox,
@@ -30,7 +29,6 @@ from PySide2.QtWidgets import (
     QToolTip,
     QStatusBar,
     QStyle,
-    QSystemTrayIcon,
     QWidget,
 )
 
@@ -64,7 +62,7 @@ from .widgets import (
     PreferencesDialogWidget,
     RenameWidget,
 )
-from .utils import ( # pylint: disable=unused-import
+from .utils import (  # pylint: disable=unused-import
     icons,
     Text,
     OutputWindows,
@@ -89,6 +87,11 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.defaultPalette = palette
         self.parent = parent
 
+        # Language Setup
+        self.setLanguageInWidgets = SetLanguage()
+        self.uiSetLanguage = UiSetLanguage(self)
+        configLanguage(self)
+
         # initialize the gazillion variables
         self._initVars()
 
@@ -104,7 +107,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
         # Restore configuration elements
         self.configuration(action=config.Action.Restore)
-        self.setLanguage()
+        # self.setLanguage()
 
         # tray icon
         self.trayIcon = QSystemTrayIconWidget(self, self.windowIcon())
@@ -124,7 +127,9 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         #
         # Where am I running from
         #
-        if getattr(sys, "frozen", False):
+
+        # if getattr(sys, "frozen", False):
+        if sys.pyside_uses_embedding:
             # Running in a pyinstaller bundle
             self.appDirectory = Path(os.path.dirname(__file__))
         else:
@@ -133,13 +138,12 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.controlQueue = deque()
         self.jobsQueue = JobQueue(self, controlQueue=self.controlQueue)
 
-        # Language Setup
-        self.setLanguageWidget = SetLanguage()
-        self.uiSetLanguage = UiSetLanguage(self)
-
         # Progress information setup
         self.progressBar = DualProgressBar(self, align=Qt.Horizontal)
-        self.jobsLabel = QFormatLabel(Text.txt0085, init=[0, 0, 0, 0, 0],)
+        self.jobsLabel = QFormatLabel(
+            Text.txt0085,
+            init=[0, 0, 0, 0, 0],
+        )
         self.progress = Progress(self, self.progressBar, self.jobsLabel)
         self.jobsQueue.progress = self.progress
         self.progressSpin = QProgressIndicator(self)
@@ -153,39 +157,53 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
         # Preferences menu
         self.setPreferences = PreferencesDialogWidget(self)
+        self.fileMenu = None
+        self.helpMenu = None
+        self.menuItems = None
 
     def _initMenu(self):  # pylint: disable=too-many-statements
 
         menuBar = QMenuBar()
-        # menuBar = self.menuBar()
+        self.menuItems = []
 
         # File SubMenu
-        fileMenu = QMenuWidget(Text.txt0020)
-        closeIcon = self.style().standardIcon(QStyle.SP_DialogCloseButton)
+        self.fileMenu = QMenuWidget(Text.txt0020)
+        exitIcon = self.style().standardIcon(QStyle.SP_DialogCloseButton)
 
         # Preferences
         actPreferences = QActionWidget(
-            "&Preferences", self, shortcut="Ctrl+P", tooltip="Setup program options"
+            Text.txt0050,
+            self,
+            shortcut=Text.txt0026,
+            statusTip=Text.txt0051,
         )
         actPreferences.triggered.connect(self.setPreferences.getPreferences)
 
         # Exit application
         actExit = QActionWidget(
-            closeIcon, Text.txt0021, self, shortcut=Text.txt0022, tooltip=Text.txt0023,
+            exitIcon,
+            Text.txt0021,
+            self,
+            shortcut=Text.txt0022,
+            statusTip=Text.txt0023,
         )
         actExit.triggered.connect(self.close)
 
         # Abort
-        actAbort = QActionWidget(Text.txt0024, self, tooltip=Text.txt0025)
+        actAbort = QActionWidget(Text.txt0024, self, statusTip=Text.txt0025)
         actAbort.triggered.connect(abort)
 
         # Add actions to SubMenu
-        fileMenu.addAction(actPreferences)
-        fileMenu.addSeparator()
-        fileMenu.addAction(actExit)
-        fileMenu.addSeparator()
-        fileMenu.addAction(actAbort)
-        menuBar.addMenu(fileMenu)
+        self.fileMenu.addAction(actPreferences)
+        self.fileMenu.addSeparator()
+        self.fileMenu.addAction(actExit)
+        self.fileMenu.addSeparator()
+        self.fileMenu.addAction(actAbort)
+        menuBar.addMenu(self.fileMenu)
+        self.menuItems.append(self.fileMenu)
+        self.menuItems.append(actPreferences)
+        self.menuItems.append(actExit)
+        self.menuItems.append(actAbort)
 
         # Help Menu
         actHelpContents = QActionWidget(Text.txt0061, self, textSuffix="...")
@@ -196,16 +214,21 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         actAbout.triggered.connect(self.about)
         actAboutQt = QActionWidget(Text.txt0064, self)
         actAboutQt.triggered.connect(self.aboutQt)
-        helpMenu = QMenuWidget(Text.txt0060)
-        helpMenu.addAction(actHelpContents)
-        helpMenu.addAction(actHelpUsing)
-        helpMenu.addSeparator()
-        helpMenu.addAction(actAbout)
-        helpMenu.addAction(actAboutQt)
-        menuBar.addMenu(helpMenu)
+        self.helpMenu = QMenuWidget(Text.txt0060)
+        self.helpMenu.addAction(actHelpContents)
+        self.helpMenu.addAction(actHelpUsing)
+        self.helpMenu.addSeparator()
+        self.helpMenu.addAction(actAbout)
+        self.helpMenu.addAction(actAboutQt)
+        menuBar.addMenu(self.helpMenu)
+        self.menuItems.append(self.helpMenu)
+        self.menuItems.append(actHelpContents)
+        self.menuItems.append(actHelpUsing)
+        self.menuItems.append(actAbout)
+        self.menuItems.append(actAboutQt)
 
         # Init status var
-        statusBar = QStatusBar()  # pylint: disable=unused-variable
+        statusBar = QStatusBar()
         statusBar.addPermanentWidget(VerticalLine())
         statusBar.addPermanentWidget(self.jobsLabel)
         statusBar.addPermanentWidget(VerticalLine())
@@ -223,15 +246,18 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
 
         # Widgets for tabs
         self.tableViewWidget = JobsTableViewWidget(
-            self, self.proxyModel, self.controlQueue, "Jobs Table"
+            self, self.proxyModel, self.controlQueue, _(Text.txt0130)
         )
         self.tableViewWidget.tableView.sortByColumn(0, Qt.AscendingOrder)
         self.renameWidget = RenameWidget(self)
         self.commandWidget = CommandWidget(self, self.proxyModel)
         self.jobsOutputWidget = JobsOutputWidget(self)
         self.errorOutputWidget = JobsOutputErrorsWidget(self)
-        #self.historyWidget = JobsHistoryViewWidget(groupTitle="Jobs Table")
-        #self.historyWidget.tableView.sortByColumn(0, Qt.DescendingOrder)
+
+        # historyWidget and logViewerWidget cannot have parent declared
+        # They don't always display and create artifacts when not shown
+        self.historyWidget = JobsHistoryViewWidget(self, groupTitle=_(Text.txt0130))
+        self.historyWidget.tableView.sortByColumn(0, Qt.DescendingOrder)
         self.logViewerWidget = LogViewerWidget()
 
         # Setup tabs for TabWidget
@@ -241,58 +267,56 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         tabsList.append(
             [
                 self.commandWidget,
-                "Command",
-                "Enter generated command and see any test output",
+                _(Text.txt0133),
+                _(Text.txt0148),
             ]
         )
         tabsList.append(
             [
                 self.tableViewWidget,
-                "Jobs",
-                "Jobs table to manipulate job status and Queue",
+                _(Text.txt0140),
+                _(Text.txt0144),
             ]
         )
         tabsList.append(
             [
                 self.jobsOutputWidget,
-                "Jobs Output",
-                "Output generated by jobs and job handling",
+                _(Text.txt0141),
+                _(Text.txt0145),
             ]
         )
         tabsList.append(
             [
                 self.errorOutputWidget,
-                "Jobs Errors",
-                "Errors generated by processing or running of jobs",
+                _(Text.txt0142),
+                _(Text.txt0146),
             ]
         )
         tabsList.append(
             [
                 self.renameWidget,
-                "Rename Files",
-                "Rename the output files ej. Series Name - S01E01.mkv, ...",
+                _(Text.txt0143),
+                _(Text.txt0147),
             ]
         )
         if config.data.get(config.ConfigKey.LogViewer):
             tabsList.append(
                 [
                     self.logViewerWidget,
-                    "Log Viewer",
-                    "Messages registered in current running log",
+                    _(Text.txt0149),
+                    _(Text.txt0151),
                 ]
             )
         else:
             self.logViewerWidget.tab = -1
             self.logViewerWidget.tabWidget = self.tabs
-            self.logViewerWidget.title = "Log Viewer"
-        #if config.data.get(config.ConfigKey.JobHistory):
-        #    tabsList.append(
-        #        [self.historyWidget, "Jobs History", "Examine any jobs saved."]
-        #    )
-        #else:
-        #    self.historyWidget.tab = -1
-        #    self.historyWidget.tabWidget = self.tabs
-        #    self.historyWidget.title = "Jobs History"
+            self.logViewerWidget.title = _(Text.txt0149)
+        if config.data.get(config.ConfigKey.JobHistory):
+            tabsList.append([self.historyWidget, _(Text.txt0241), _(Text.txt0168)])
+        else:
+            self.historyWidget.tab = -1
+            self.historyWidget.tabWidget = self.tabs
+            self.historyWidget.title = _(Text.txt0241)
 
         self.tabs.addTabs(tabsList)
 
@@ -301,7 +325,7 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         _initHelper setup signals, do any late binds and misc configuration
         """
 
-        # progress spin
+        # work in progress spin
         self.progressSpin.displayedWhenStopped = True
         self.progressSpin.color = checkColor(
             QColor(42, 130, 218), config.data.get(config.ConfigKey.DarkMode)
@@ -320,19 +344,19 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.commandWidget.outputWindow.setReadOnly(True)
         self.jobsOutputWidget.setReadOnly(True)
         self.errorOutputWidget.setReadOnly(True)
-        #self.historyWidget.output.setReadOnly(True)
+        self.historyWidget.output.setReadOnly(True)
         self.jobsOutputWidget.textChanged.connect(self.commandWidget.resetButtonState)
 
         # Give commandWidget access to renameWidget
         self.commandWidget.rename = self.renameWidget
 
         # setup widgets setLanguage to SetLanguage change signal
-        self.setLanguageWidget.addSlot(self.tableViewWidget.setLanguage)
-        self.setLanguageWidget.addSlot(self.commandWidget.setLanguage)
-        self.setLanguageWidget.addSlot(self.tabs.setLanguage)
-        self.setLanguageWidget.addSlot(self.renameWidget.setLanguage)
-        #self.setLanguageWidget.addSlot(self.historyWidget.setLanguage)
-        self.setLanguageWidget.addSlot(self.setPreferences.retranslateUi)
+        self.setLanguageInWidgets.addSlot(self.tableViewWidget.setLanguage)
+        self.setLanguageInWidgets.addSlot(self.commandWidget.setLanguage)
+        self.setLanguageInWidgets.addSlot(self.tabs.setLanguage)
+        self.setLanguageInWidgets.addSlot(self.renameWidget.setLanguage)
+        self.setLanguageInWidgets.addSlot(self.historyWidget.setLanguage)
+        self.setLanguageInWidgets.addSlot(self.setPreferences.retranslateUi)
 
         # connect to tabs widget tab change Signal
         self.tabs.currentChanged.connect(tabChange)
@@ -344,6 +368,12 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         # connect log viewer
         config.logViewer.connect(self.logViewerWidget.logMessage)
 
+        # connect JobHistory and commandWidget
+        self.historyWidget.pasteCommandSignal.connect(self.commandWidget.updateCommand)
+        self.historyWidget.updateAlgorithmSignal.connect(
+            self.commandWidget.updateAlgorithm
+        )
+
     def _initUI(self):
 
         # Create Widgets
@@ -353,6 +383,9 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         widget.setLayout(layout)
         self.setCentralWidget(widget)
 
+    #
+    # Events override
+    #
     def closeEvent(self, event):
         """
         Override QMainWindow.closeEvent
@@ -400,17 +433,20 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         self.trayIcon.setMenuEnabled(visible)
         super().setVisible(visible)
 
-    @Slot(str)
-    def iconActivated(self, reason):
-        """Systray Icon"""
+    # @Slot(str)
+    # def iconActivated(self, reason):
+    #    """Systray Icon"""
 
-        print("main is icon activated")
-        if reason == QSystemTrayIcon.Trigger:
-            pass
-        if reason == QSystemTrayIcon.DoubleClick:
-            pass
-        if reason == QSystemTrayIcon.MiddleClick:
-            pass
+    #    print("main is icon activated")
+    #    if reason == QSystemTrayIcon.Trigger:
+    #        pass
+    #    if reason == QSystemTrayIcon.DoubleClick:
+    #        pass
+    #    if reason == QSystemTrayIcon.MiddleClick:
+    #        pass
+    #
+    # Events override End
+    #
 
     def configuration(self, action=None):
         """
@@ -499,29 +535,22 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
             font {QFont} -- font selected by user
         """
 
-        for a in self.menuBar().actions():
-            # menus on menubar are QAction classes
-            # get the menu
-            m = a.menu()
-            m.setFont(font)
+        for action in self.menuBar().actions():
+            if not action.isSeparator():
+                action.setFont(font)
 
-            for e in m.actions():
-                if e.isSeparator():
-                    continue
-                elif isinstance(e, QActionWidget):
-                    # subclass also QAction type but never a menu
-                    continue
-                elif isinstance(e, QAction):
-                    try:
-                        i = e.menu()
-                        i.setFont(font)
-                    except AttributeError:
-                        continue
+        for action in self.fileMenu.actions():
+            if not action.isSeparator():
+                action.setFont(font)
+
+        for action in self.helpMenu.actions():
+            if not action.isSeparator():
+                action.setFont(font)
 
         QToolTip.setFont(font)
         config.data.set(config.ConfigKey.Font, font.toString())
 
-    def setLanguage(self, language=None, menuItem=None):
+    def setLanguage(self, language=None):
         """
         Set application language the scheme permits runtime changes
 
@@ -530,31 +559,28 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
             menuItem (QMenuWidget) -- menu object making the call for checkmark update
         """
 
-        if language is None:
-            language = config.data.get(config.ConfigKey.Language)
+        # if language is None:
+        #    language = config.data.get(config.ConfigKey.Language)
 
-        lang = gettext.translation(
-            config.NAME, localedir=str(config.LOCALE), languages=[language]
-        )
-        if self.uiSetLanguage.setLanguage(language):
-            pass
-        lang.install(names=("ngettext",))
-        config.data.set(config.ConfigKey.Language, language)
-        self.setWindowTitle(Text.txt0001)
+        # lang = gettext.translation(
+        #    config.NAME, localedir=str(config.LOCALE), languages=[language]
+        # )
+        # if self.uiSetLanguage.setLanguage(language):
+        #    pass
+        # lang.install(names=("ngettext",))
+        # config.data.set(config.ConfigKey.Language, language)
+
+        configLanguage(self, language)
+
+        self.setWindowTitle(_(Text.txt0001))
         self.jobsLabel.template = " " + _(Text.txt0085) + " "
         self.progressBar.label = _(Text.txt0091) + ":"
 
         # Set langque main windows
-        setLanguageMenus(self.menuBar().actions())
-
-        # Update checkboxes in the select language menu
-        if menuItem is not None:
-            for a in self.languageMenu.actions():
-                a.setChecked(False)
-            menuItem.setChecked(True)
+        setLanguageMenus(self)
 
         # Update language on other window widgets
-        self.setLanguageWidget.emitSignal()
+        self.setLanguageInWidgets.emitSignal()
 
     def about(self):
         """About"""
@@ -572,6 +598,23 @@ class MainWindow(QMainWindow):  # pylint: disable=R0902
         """About QT"""
 
         QMessageBox.aboutQt(self, config.APPNAME)
+
+
+def configLanguage(self, language=None):
+    """
+    Set application language the scheme permits runtime changes
+    """
+
+    if language is None:
+        language = config.data.get(config.ConfigKey.Language)
+
+    lang = gettext.translation(
+        config.NAME, localedir=str(config.LOCALE), languages=[language]
+    )
+    if self.uiSetLanguage.setLanguage(language):
+        pass
+    lang.install(names=("ngettext",))
+    config.data.set(config.ConfigKey.Language, language)
 
 
 @Slot(int)
@@ -622,6 +665,14 @@ def mainApp():
     MainWindow()
     app.exec_()
     config.close()
+
+
+# This if for Pylance _() is not defined
+def _(dummy):
+    return dummy
+
+
+del _
 
 
 if __name__ == "__main__":

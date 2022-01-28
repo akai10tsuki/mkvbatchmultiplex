@@ -15,12 +15,9 @@ from pathlib import Path
 
 from PySide2.QtCore import Signal, Qt, Slot
 from PySide2.QtWidgets import (
-    QFormLayout,
     QGridLayout,
-    QLabel,
     QWidget,
     QHBoxLayout,
-    QVBoxLayout,
     QSizePolicy,
     QGroupBox,
 )
@@ -119,15 +116,18 @@ class RenameWidget(pyqt.TabWidgetExtension, QWidget):
             self.outputRenameResultsSignal
         )
         btnApplyRename = pyqt.QPushButtonWidget(
-            Text.txt0208, function=self._applyRename, toolTip=Text.txt0209,
+            Text.txt0208,
+            function=self._applyRename,
+            margins="  ",
+            toolTip=Text.txt0209,
         )
         btnApplyRename.setEnabled(False)
         btnUndoRename = pyqt.QPushButtonWidget(
-            Text.txt0210, function=self._undoRename, toolTip=Text.txt0211
+            Text.txt0210, function=self._undoRename, margins="  ", toolTip=Text.txt0211
         )
         btnUndoRename.setEnabled(False)
         btnClear = pyqt.QPushButtonWidget(
-            Text.txt0212, function=self.clear, toolTip=Text.txt0213
+            Text.txt0212, function=self.clear, margins="  ", toolTip=Text.txt0213
         )
         self.btnGrid = QHBoxLayout()
         self.btnGrid.addWidget(btnApplyRename)
@@ -176,6 +176,14 @@ class RenameWidget(pyqt.TabWidgetExtension, QWidget):
         self.textSubString.cmdLine.itemsChangeSignal.connect(
             lambda: self.saveItems(Key.SubString)
         )
+
+        self.textOriginalNames.textBox.verticalScrollBar().valueChanged.connect(
+            self.scrollRenameChanged
+        )
+        self.textRenameResults.textBox.verticalScrollBar().valueChanged.connect(
+            self.scrollResultsChanged
+        )
+
         if maxCount is not None:
             self.textRegEx.cmdLine.setMaxCount(maxCount)
             self.textSubString.cmdLine.setMaxCount(maxCount)
@@ -223,49 +231,6 @@ class RenameWidget(pyqt.TabWidgetExtension, QWidget):
     def output(self, value):
         self.__output = value
 
-    def clear(self):
-        """
-        clear reset widget working variables and widgets
-        """
-
-        self._outputFileNames = []
-        self._renameFileNames = []
-        self._bFilesDropped = False
-        self.textRegEx.cmdLine.lineEdit().clear()
-        self.textSubString.cmdLine.lineEdit().clear()
-        self.textOriginalNames.textBox.clear()
-        self.textRenameResults.textBox.clear()
-
-    def clearButtonState(self):
-        """Set clear button state"""
-
-        if self.textOriginalNames.textBox.toPlainText() != "":
-            self.btnGrid.itemAt(ButtonIndex.Clear).widget().setEnabled(True)
-        else:
-            self.btnGrid.itemAt(ButtonIndex.Clear).widget().setEnabled(False)
-
-    def connectToSetFiles(self, objSignal):
-
-        objSignal.connect(self.setFiles)
-
-    def setLanguage(self):
-        """
-        setLanguage set labels according to locale
-        """
-
-        for index in range(self.btnGrid.count()):
-            widget = self.btnGrid.itemAt(index).widget()
-            if isinstance(widget, pyqt.QPushButtonWidget):
-                widget.setText("  " + _(widget.originalText) + "  ")
-                widget.setToolTip(_(widget.toolTip))
-        for w in [self.textRegEx, self.textSubString]:
-            w.lblText.setText(_(w.label) + ": ")
-            w.cmdLine.setToolTip(_(w.toolTip))
-        for w in [self.textOriginalNames, self.textRenameResults]:
-            w.lblText.setText(_(w.label) + ":")
-            w.textBox.setToolTip(_(w.toolTip))
-            w.repaint()
-
     @Slot()
     def saveItems(self, comboType):
         """
@@ -306,6 +271,70 @@ class RenameWidget(pyqt.TabWidgetExtension, QWidget):
             self.outputOriginalFilesSignal.emit(str(f.name) + "\n", {})
             # save files
             self._outputFileNames.append(f)
+
+    @Slot(int)
+    def scrollRenameChanged(self, value):
+        self.textRenameResults.textBox.verticalScrollBar().valueChanged.disconnect(
+            self.scrollResultsChanged
+        )
+        self.textRenameResults.textBox.verticalScrollBar().setValue(value)
+        self.textRenameResults.textBox.verticalScrollBar().valueChanged.connect(
+            self.scrollResultsChanged
+        )
+
+    @Slot(int)
+    def scrollResultsChanged(self, value):
+        self.textOriginalNames.textBox.verticalScrollBar().valueChanged.disconnect(
+            self.scrollRenameChanged
+        )
+        self.textOriginalNames.textBox.verticalScrollBar().setValue(value)
+        self.textOriginalNames.textBox.verticalScrollBar().valueChanged.connect(
+            self.scrollRenameChanged
+        )
+
+    def clear(self):
+        """
+        clear reset widget working variables and widgets
+        """
+
+        self._outputFileNames = []
+        self._renameFileNames = []
+        self._bFilesDropped = False
+        self.textRegEx.cmdLine.lineEdit().clear()
+        self.textSubString.cmdLine.lineEdit().clear()
+        self.textOriginalNames.textBox.clear()
+        self.textRenameResults.textBox.clear()
+
+    def clearButtonState(self):
+        """Set clear button state"""
+
+        if self.textOriginalNames.textBox.toPlainText() != "":
+            self.btnGrid.itemAt(ButtonIndex.Clear).widget().setEnabled(True)
+        else:
+            self.btnGrid.itemAt(ButtonIndex.Clear).widget().setEnabled(False)
+
+    def connectToSetFiles(self, objSignal):
+
+        objSignal.connect(self.setFiles)
+
+    def setLanguage(self):
+        """
+        setLanguage set labels according to locale
+        """
+
+        for index in range(self.btnGrid.count()):
+            widget = self.btnGrid.itemAt(index).widget()
+            if isinstance(widget, pyqt.QPushButtonWidget):
+                widget.setLanguage()
+                #widget.setText("  " + _(widget.originalText) + "  ")
+                #widget.setToolTip(_(widget.toolTip))
+        for w in [self.textRegEx, self.textSubString]:
+            w.lblText.setText(_(w.label) + ": ")
+            w.cmdLine.setToolTip(_(w.toolTip))
+        for w in [self.textOriginalNames, self.textRenameResults]:
+            w.lblText.setText(_(w.label) + ":")
+            w.textBox.setToolTip(_(w.toolTip))
+            w.repaint()
 
     def _setFilesDropped(self, filesDropped):
 

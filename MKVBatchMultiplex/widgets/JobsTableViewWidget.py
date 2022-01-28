@@ -4,14 +4,14 @@ JobsTableWidget
 
 import logging
 
-try:
-    import cPickle as pickle
-except:
-    import pickle
-import zlib
+# try:
+#    import cPickle as pickle
+# except ImportError:
+#    import pickle
+# import zlib
 
 
-from PySide2.QtCore import QThreadPool, Qt, Slot
+from PySide2.QtCore import Qt, Slot
 from PySide2.QtWidgets import (
     QWidget,
     QHBoxLayout,
@@ -24,7 +24,7 @@ from vsutillib.pyqt import QPushButtonWidget, darkPalette, TabWidgetExtension
 from vsutillib.process import isThreadRunning
 
 from .. import config
-from ..jobs import JobStatus, JobKey, SqlJobsTable, JobsTableKey
+from ..jobs import JobStatus, JobKey  # , SqlJobsTable, JobsTableKey
 from ..delegates import StatusComboBoxDelegate
 from ..utils import populate, Text, yesNoDialog
 
@@ -72,30 +72,51 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
         self.grpGrid = QGridLayout()
         self.grpBox = QGroupBox(title)
 
+        btnPopulate = None
+
         if config.data.get(config.ConfigKey.SimulateRun):
             btnPopulate = QPushButtonWidget(
                 Text.txt0120,
                 function=lambda: populate(self.model),
+                margins="  ",
                 toolTip=Text.txt0121,
             )
 
         btnAddWaitingJobsToQueue = QPushButtonWidget(
-            Text.txt0122, function=self.addWaitingJobsToQueue, toolTip=Text.txt0123,
+            Text.txt0122,
+            function=self.addWaitingJobsToQueue,
+            margins="  ",
+            toolTip=Text.txt0123,
         )
         btnClearJobsQueue = QPushButtonWidget(
-            Text.txt0124, function=self.clearJobsQueue, toolTip=Text.txt0125,
+            Text.txt0124,
+            function=self.clearJobsQueue,
+            margins="  ",
+            toolTip=Text.txt0125,
         )
         btnStartQueue = QPushButtonWidget(
-            Text.txt0126, function=self.parent.jobsQueue.run, toolTip=Text.txt0127,
+            Text.txt0126,
+            function=self.parent.jobsQueue.run,
+            margins="  ",
+            toolTip=Text.txt0127,
         )
         btnPrintDataset = QPushButtonWidget(
-            Text.txt0128, function=self.printDataset, toolTip=Text.txt0129,
+            Text.txt0128,
+            function=self.printDataset,
+            margins="  ",
+            toolTip=Text.txt0129,
         )
         btnAbortCurrentJob = QPushButtonWidget(
-            Text.txt0134, function=self.abortCurrentJob, toolTip=Text.txt0135,
+            Text.txt0134,
+            function=self.abortCurrentJob,
+            margins="  ",
+            toolTip=Text.txt0135,
         )
         btnAbortJobs = QPushButtonWidget(
-            Text.txt0136, function=self.abortCurrentJob, toolTip=Text.txt0137,
+            Text.txt0136,
+            function=self.abortCurrentJob,
+            margins="  ",
+            toolTip=Text.txt0137,
         )
 
         self.btnGrid = QHBoxLayout()
@@ -218,21 +239,21 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
     def output(self, value):
         self.__output = value
 
-    @property
-    def tab(self):
-        return self.__tab
+    # @property
+    # def tab(self):
+    #    return self.__tab
 
-    @tab.setter
-    def tab(self, value):
-        self.__tab = value
+    # @tab.setter
+    # def tab(self, value):
+    #    self.__tab = value
 
-    @property
-    def tabWidget(self):
-        return self.__tabWidget
+    # @property
+    # def tabWidget(self):
+    #    return self.__tabWidget
 
-    @tabWidget.setter
-    def tabWidget(self, value):
-        self.__tabWidget = value
+    # @tabWidget.setter
+    # def tabWidget(self, value):
+    #    self.__tabWidget = value
 
     def abortCurrentJob(self):
         self.controlQueue.append(JobStatus.AbortJob)
@@ -269,8 +290,15 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
 
             if bAnswer:
                 while job := self.parent.jobsQueue.pop():
+                    self.parent.jobsQueue.statusUpdateSignal.emit(
+                        job, JobStatus.Waiting
+                    )
 
-                    self.model.setData(job.statusIndex, JobStatus.Waiting)
+                # self.parent.jobsQueue.clear()
+                # for row in range(self.model.rowCount()):
+                #    if self.model.dataset[row, JobKey.Status] == JobStatus.Queue:
+                #        self.model.dataset[row, JobKey.Status] = JobStatus.Waiting
+
             # else:
             #    print("Nothing here")
 
@@ -282,17 +310,31 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
         for index in range(self.btnGrid.count()):
             widget = self.btnGrid.itemAt(index).widget()
             if isinstance(widget, QPushButtonWidget):
-                widget.setText("  " + _(widget.originalText) + "  ")
-                widget.setToolTip(_(widget.toolTip))
+                widget.setLanguage()
+                # widget.setText("  " + _(widget.originalText) + "  ")
+                # widget.setToolTip(_(widget.toolTip))
 
         self.grpBox.setTitle(_(Text.txt0130))
+
         self.model.setHeaderData(
             JobKey.ID, Qt.Horizontal, "  " + _(Text.txt0131) + "  "
         )
         self.model.setHeaderData(
+            JobKey.ID, Qt.Horizontal, "  " + _(Text.txt0086) + "  ", role=Qt.ToolTipRole
+        )
+        self.model.setHeaderData(
             JobKey.Status, Qt.Horizontal, "  " + _(Text.txt0132) + "  "
         )
+        self.model.setHeaderData(
+            JobKey.Status,
+            Qt.Horizontal,
+            "  " + _(Text.txt0087) + "  ",
+            role=Qt.ToolTipRole,
+        )
         self.model.setHeaderData(JobKey.Command, Qt.Horizontal, _(Text.txt0133))
+        self.model.setHeaderData(
+            JobKey.Command, Qt.Horizontal, _(Text.txt0088), role=Qt.ToolTipRole
+        )
 
     def printDataset(self):
         """
@@ -334,6 +376,7 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
 
     @Slot(bool)
     def jobStatus(self, running):
+        """ Enable Abort related buttons """
 
         if running:
             self.jobStartQueueState(False)
@@ -343,7 +386,7 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
 
     @Slot(object)
     def jobStatusChangeCheck(self, index):
-
+        """ Check for Abort in Status column """
         row = index.row()
         column = index.column()
 
@@ -379,3 +422,11 @@ class _Button:
     ABORTCURRENTJOB = 3
     ABORTJOBS = 4
     FETCHJOBHISTORY = 6
+
+
+# This if for Pylance _() is not defined in PyLance
+def _(dummy: str) -> str:
+    return dummy
+
+
+del _

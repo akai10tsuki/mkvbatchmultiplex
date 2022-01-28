@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Mediainfo version="20.03">
+    <File>
+        <track type="General">
+            <Count>331</Count>
+            <Count_of_stream_of_this_kind>1</Count_of_stream_of_this_kind>
+            <Kind_of_stream>General</Kind_of_stream>
+            <Kind_of_stream>General</Kind_of_stream>
+            <Stream_identifier>0</Stream_identifier>
+            <Count_of_video_streams>1</Count_of_video_streams>
+            <Count_of_audio_streams>1</Count_of_audio_streams>
+            <Video_Format_List>MPEG-4 Visual</Video_Format_List>
+            <Video_Format_WithHint_List>MPEG-4 Visual</Video_Format_WithHint_List>
+            <Codecs_Video>MPEG-4 Visual</Codecs_Video>
+            <Audio_Format_List>MPEG Audio</Audio_Format_List>
+            <Audio_Format_WithHint_List>MPEG Audio (MP3)</Audio_Format_WithHint_List>
+            <Audio_codecs>MPEG Audio</Audio_codecs>
+            <Complete_name>C:\Projects\Python\PySide\mkvbatchmultiplex\tests/MediaFiles/avi/Show Title - S01E01.avi</Complete_name>
+            <Folder_name>C:\Projects\Python\PySide\mkvbatchmultiplex</Folder_name>
+            <File_name_extension>tests/MediaFiles/avi/Show Title - S01E01.avi</File_name_extension>
+            <File_name>tests/MediaFiles/avi/Show Title - S01E01</File_name>
+            <File_extension>avi</File_extension>
+            <Format>AVI</Format>
+            <Format>AVI</Format>
+            <Format_Info>Audio Video Interleave</Format_Info>
+            <Format_Extensions_usually_used>avi</Format_Extensions_usually_used>
+            <Commercial_name>AVI</Commercial_name>
+            <Internet_media_type>video/vnd.avi</Internet_media_type>
+            <Interleaved>Yes</Interleaved>
+            <File_size>320384</File_size>
+            <File_size>313 KiB</File_size>
+            <File_size>313 KiB</File_size>
+            <File_size>313 KiB</File_size>
+            <File_size>313 KiB</File_size>
+            <File_size>312.9 KiB</File_size>
+            <Duration>10052</Duration>
+            <Duration>10 s 52 ms</Duration>
+            <Duration>10 s 52 ms</Duration>
+            <Duration>10 s 52 ms</Duration>
+            <Duration>00:00:10.052</Duration>
+            <Duration>00:00:10;01</Duration>
+            <Duration>00:00:10.052 (00:00:10;01)</Duration>
+            <Overall_bit_rate_mode>VBR</Overall_bit_rate_mode>
+            <Overall_bit_rate_mode>Variable</Overall_bit_rate_mode>
+            <Overall_bit_rate>254981</Overall_bit_rate>
+            <Overall_bit_rate>255 kb/s</Overall_bit_rate>
+            <Frame_rate>23.976</Frame_rate>
+            <Frame_rate>23.976 FPS</Frame_rate>
+            <Frame_count>241</Frame_count>
+            <Stream_size>25458</Stream_size>
+            <Stream_size>24.9 KiB (8%)</Stream_size>
+            <Stream_size>25 KiB</Stream_size>
+            <Stream_size>25 KiB</Stream_size>
+            <Stream_size>24.9 KiB</Stream_size>
+            <Stream_size>24.86 KiB</Stream_size>
+            <Stream_size>24.9 KiB (8%)</Stream_size>
+            <Proportion_of_this_stream>0.07946</Proportion_of_this_stream>
+            <Title>Sample</Title>
+            <Movie_name>Sample</Movie_name>
+            <Part_Position>01</Part_Position>
+            <Director>Sample</Director>
+            <Genre>Soundtack</Genre>
+            <Recorded_date>2018</Recorded_date>
+            <File_creation_date>UTC 2020-09-04 01:49:27.770</File_creation_date>
+            <File_creation_date__local_>2020-09-03 21:49:27.770</File_creation_date__local_>
+            <File_last_modification_date>UTC 2020-09-04 01:49:28.680</File_last_modification_date>
+            <File_last_modification_date__local_>2020-09-03 21:49:28.680</File_last_modification_date__local_>
+            <Writing_application>Lavf57.83.100</Writing_application>
+            <Writing_application>Lavf57.83.100</Writing_application>
+            <Original_source_form_Name>Sample</Original_source_form_Name>
+            <Comment>Test file for mkvbatchremux</Comment>
+        </track>
+        <track type="Video">
+            <Count>377</Count>
+            <Count_of_stream_of_this_kind>1</Count_of_stream_of_this_kind>
+            <Kind_of_stream>Video</Kind_of_stream>
+            <Kind_of_stream>Video</Kind_of_stream>
+            <Stream_identifier>0</Stream_identifier>
+            <StreamOrder>0</StreamOrder>
+            <ID>0</ID>
+            <ID>0</ID>
+            <Format>MPEG-4 Visual</Format>
+            <Format>MPEG-4 Visual</Format>
+            <Commercial_name>MPEG-4 Visual</Commercial_name>
+            <Format_profile>Simple@L1</Format_profile>
+            <Format_settings__BVOP>No</Format_settings__BVOP>
+            <Format_settings__BVOP>No</Format_settings__BVOP>
+            <Format_settings__QPel>No</Format_settings__QPel>
+            <Format_settings__QPel>No</Format_settings__QPel>
+            <Format_settings__GMC>0</Format_settings__GMC>
+            <Format_settings__GMC>No warppoints</Format_settings__GMC>
+            <Format_settings__Matrix>Default (H.263)</Format_settings__Matrix>
+            <Format_settings__Matrix>Default (H.263)</Format_settings__Matrix>
+            <Internet_media_type>video/MP4V-ES</Internet_media_type>
+            <Codec_ID>FMP4</Codec_ID>
+            <Codec_ID_Url>http://ffdshow-tryout.sourceforge.net/</Codec_ID_Url>
+            <Duration>10052</Duration>
+            <Duration>10 s 52 ms</Duration>
+            <Duration>10 s 52 ms</Duration>
+            <Duration>10 s 52 ms</Duration>
+            <Duration>00:00:10.052</Duration>
+            <Duration>00:00:10;01</Duration>
+            <Duration>00:00:10.052 (00:00:10;01)</Duration>
+            <Bit_rate>168813</Bit_rate>
+            <Bit_rate>169 kb/s</Bit_rate>
+            <Width>640</Width>
+            <Width>640 pixels</Width>
+            <Height>360</Height>
+            <Height>360 pixels</Height>
+            <Sampled_Width>640</Sampled_Width>
+            <Sampled_Height>360</Sampled_Height>
+            <Pixel_aspect_ratio>1.000</Pixel_aspect_ratio>
+            <Display_aspect_ratio>1.778</Display_aspect_ratio>
+            <Display_aspect_ratio>16:9</Display_aspect_ratio>
+            <Frame_rate>23.976</Frame_rate>
+            <Frame_rate>23.976 (24000/1001) FPS</Frame_rate>
+            <FrameRate_Num>24000</FrameRate_Num>
+            <FrameRate_Den>1001</FrameRate_Den>
+            <Frame_count>241</Frame_count>
+            <Color_space>YUV</Color_space>
+            <Chroma_subsampling>4:2:0</Chroma_subsampling>
+            <Chroma_subsampling>4:2:0</Chroma_subsampling>
+            <Bit_depth>8</Bit_depth>
+            <Bit_depth>8 bits</Bit_depth>
+            <Scan_type>Progressive</Scan_type>
+            <Scan_type>Progressive</Scan_type>
+            <Compression_mode>Lossy</Compression_mode>
+            <Compression_mode>Lossy</Compression_mode>
+            <Bits__Pixel_Frame_>0.031</Bits__Pixel_Frame_>
+            <Delay>0</Delay>
+            <Delay>00:00:00.000</Delay>
+            <Stream_size>212108</Stream_size>
+            <Stream_size>207 KiB (66%)</Stream_size>
+            <Stream_size>207 KiB</Stream_size>
+            <Stream_size>207 KiB</Stream_size>
+            <Stream_size>207 KiB</Stream_size>
+            <Stream_size>207.1 KiB</Stream_size>
+            <Stream_size>207 KiB (66%)</Stream_size>
+            <Proportion_of_this_stream>0.66204</Proportion_of_this_stream>
+            <Writing_library>Lavc57.107.100</Writing_library>
+            <Writing_library>Lavc57.107.100</Writing_library>
+        </track>
+        <track type="Audio">
+            <Count>280</Count>
+            <Count_of_stream_of_this_kind>1</Count_of_stream_of_this_kind>
+            <Kind_of_stream>Audio</Kind_of_stream>
+            <Kind_of_stream>Audio</Kind_of_stream>
+            <Stream_identifier>0</Stream_identifier>
+            <StreamOrder>1</StreamOrder>
+            <ID>1</ID>
+            <ID>1</ID>
+            <Format>MPEG Audio</Format>
+            <Format>MPEG Audio</Format>
+            <Commercial_name>MPEG Audio</Commercial_name>
+            <Format_version>Version 1</Format_version>
+            <Format_profile>Layer 3</Format_profile>
+            <Format_settings>Joint stereo</Format_settings>
+            <Mode>Joint stereo</Mode>
+            <Internet_media_type>audio/mpeg</Internet_media_type>
+            <Codec_ID>55</Codec_ID>
+            <Codec_ID_Hint>MP3</Codec_ID_Hint>
+            <Codec_ID_Url>http://www.iis.fraunhofer.de/amm/index.html</Codec_ID_Url>
+            <Duration>10031</Duration>
+            <Duration>10 s 31 ms</Duration>
+            <Duration>10 s 31 ms</Duration>
+            <Duration>10 s 31 ms</Duration>
+            <Duration>00:00:10.031</Duration>
+            <Duration>00:00:10.031</Duration>
+            <Bit_rate_mode>VBR</Bit_rate_mode>
+            <Bit_rate_mode>Variable</Bit_rate_mode>
+            <Bit_rate>66376</Bit_rate>
+            <Bit_rate>66.4 kb/s</Bit_rate>
+            <Channel_s_>2</Channel_s_>
+            <Channel_s_>2 channels</Channel_s_>
+            <Sampling_rate>44100</Sampling_rate>
+            <Sampling_rate>44.1 kHz</Sampling_rate>
+            <Samples_count>442367</Samples_count>
+            <Compression_mode>Lossy</Compression_mode>
+            <Compression_mode>Lossy</Compression_mode>
+            <Delay>0</Delay>
+            <Delay>00:00:00.000</Delay>
+            <Delay__origin>Stream</Delay__origin>
+            <Delay__origin>Raw stream</Delay__origin>
+            <Delay_relative_to_video>0</Delay_relative_to_video>
+            <Delay_relative_to_video>00:00:00.000</Delay_relative_to_video>
+            <Stream_size>82818</Stream_size>
+            <Stream_size>80.9 KiB (26%)</Stream_size>
+            <Stream_size>81 KiB</Stream_size>
+            <Stream_size>81 KiB</Stream_size>
+            <Stream_size>80.9 KiB</Stream_size>
+            <Stream_size>80.88 KiB</Stream_size>
+            <Stream_size>80.9 KiB (26%)</Stream_size>
+            <Proportion_of_this_stream>0.25850</Proportion_of_this_stream>
+            <Alignment>Aligned</Alignment>
+            <Alignment>Aligned on interleaves</Alignment>
+            <Interleave__duration>0.63</Interleave__duration>
+            <Interleave__duration>26</Interleave__duration>
+            <Interleave__duration>26  ms (0.63 video frame)</Interleave__duration>
+            <Interleave__preload_duration>62</Interleave__preload_duration>
+            <Interleave__preload_duration>62  ms</Interleave__preload_duration>
+        </track>
+    </File>
+</Mediainfo>

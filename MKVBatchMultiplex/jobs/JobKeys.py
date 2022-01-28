@@ -37,6 +37,9 @@ class JobsTableKey:
 
 
 class JobKey:
+    """
+    Keys for a job row on Jobs Table
+    """
 
     ID = 0
     Status = 1
@@ -44,6 +47,9 @@ class JobKey:
 
 
 class JobHistoryKey:
+    """
+     Keys for a job in Saved Jobs Table
+    """
 
     ID = 0
     Date = 1
@@ -52,7 +58,50 @@ class JobHistoryKey:
 
 
 class JobStatus:
-    """Key values for job related work"""
+    """
+    Key values for job status and queue control
+
+    Keys:
+        **Abort** - abort job worker when running no more jobs on queue will be
+        executed can be manually set
+
+        **Aborted** - job has been aborted set by program
+
+        **AbortForced** - jobs has been aboted by program
+
+        **AbortJob** - request abort job by program
+
+        **AbortJobError** - request abort job do to error by program
+
+        **AddToQueue** - add job to queue set by program
+
+        **Blocked** - job is blocked from execution set by program
+
+        **Done** - job has finished execution set by program
+
+        **DoneWithError** - job finished with errors set by program
+
+        **Error** - error found when trying to execute job
+
+        **Queue** - job in queue waiting for execution
+
+        **Remove** - remove job from Jobs Table set in context menu
+
+        **Removed** - job removed from Jobs Table set by program
+
+        **Running** - job is running set by program
+
+        **Skip** - skip job when is time to execute can be set by user
+
+        **Skipped** - job skipped
+
+        **Stop** - stop running job  can be set by user if job is Running
+
+        **Stopped** - job stopped from execution set by program
+
+        **Waiting** - job waiting to be added to queue if removed from queue or no
+        job ID assigned
+    """
 
     Abort = "Abort"
     Aborted = "Aborted"
@@ -65,6 +114,8 @@ class JobStatus:
     DoneWithError = "DoneWithError"
     Error = "Error"
     Queue = "Queue"
+    Remove = "Remove"
+    Removed = "Removed"
     Running = "Running"
     Skip = "Skip"
     Skipped = "Skipped"
@@ -74,7 +125,9 @@ class JobStatus:
 
 
 def jobStatusTooltip(status):
-    """Tooltips for Status column"""
+    """
+    Tooltips for Status column
+    """
 
     if not isinstance(status, str):
         return ""

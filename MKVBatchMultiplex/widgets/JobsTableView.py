@@ -8,12 +8,13 @@ JobsTableView - View to display/manipulate jobs
 import csv
 import logging
 import io
-try:
-    import cPickle as pickle
-except:  # pylint: disable=bare-except
-    import pickle
-import sys
-import zlib
+
+#try:
+#    import cPickle as pickle
+#except:  # pylint: disable=bare-except
+#    import pickle
+#import sys
+#import zlib
 
 from PySide2.QtCore import Qt
 
@@ -28,8 +29,13 @@ from PySide2.QtWidgets import (
 
 from vsutillib.mkv import MKVCommandParser
 
-from .. import config
-from ..jobs import JobStatus, JobKey, JobInfo, JobsTableKey, SqlJobsTable
+#from .. import config
+#from ..jobs import JobStatus, JobKey, JobInfo, JobsTableKey, saveToDb, SqlJobsTable
+from ..jobs import JobStatus, JobKey, JobInfo, saveToDb
+#from ..utils import Text
+
+from .JobsViewHelpers import removeJob
+from .ProjectInfoDialogWidget import ProjectInfoDialogWidget
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -56,13 +62,14 @@ class JobsTableView(QTableView):
 
         self.parent = parent
         self.proxyModel = proxyModel
+        self.model = proxyModel.sourceModel()
         self.viewTitle = title
         self.log = log
 
         self.setModel(proxyModel)
         self.sortByColumn(0, Qt.AscendingOrder)
         self.setSortingEnabled(True)
-
+        self.infoDialog = ProjectInfoDialogWidget(self)
         self._initHelper()
 
     def _initHelper(self):
@@ -140,28 +147,49 @@ class JobsTableView(QTableView):
             self.setColumnHidden(i, hide)
 
     def contextMenuEvent(self, event):
-        """Context Menu"""
+        """
+        contextMenuEvent Menu when an item in the view is right clicked
 
-        row = self.rowAt(event.pos().y())
+        Args:
+            event (event): used to get the row/column right clicked
+        """
+
+        model = self.proxyModel.sourceModel()
+        index = self.indexAt(event.pos())
+        modelIndex = self.proxyModel.mapToSource(index)
+        row = modelIndex.row()
+        totalSelectedRows = len(self.selectedIndexes())
+        # row = self.rowAt(event.pos().y())
         totalRows = self.proxyModel.rowCount()
 
         if 0 <= row < totalRows:
 
             menu = QMenu()
             menu.setFont(self.parent.font())
-            menu.addAction("Copy")
-            menu.addAction("Remove")
-            menu.addAction("Save")
+            if totalSelectedRows == 1:
+                menu.addAction(_("Copy"))
+            if model.dataset[row, JobKey.Status] not in [
+                JobStatus.Running,
+                JobStatus.Skip,
+                JobStatus.Abort,
+            ]:
+                menu.addAction(_("Remove"))
+            menu.addAction(_("Save"))
 
             if action := menu.exec_(event.globalPos()):
                 result = action.text()
 
-                if result == "Copy":
+                if result == _("Copy"):
                     self.copySelection()
-                elif result == "Remove":
-                    self.proxyModel.filterConditions["Remove"].append(row)
-                    self.proxyModel.setFilterFixedString("")
-                elif result == "Save":
+                elif result == _("Remove"):
+                    ##
+                    # BUG #7
+                    #
+                    # Jobs still execute after been removed from list
+                    # validate before remove
+                    ##
+                    self.removeSelection()
+                elif result == _("Save"):
                     self.saveSelection()
 
     def contextMenuEventOriginal(self, event):
@@ -202,15 +230,12 @@ class JobsTableView(QTableView):
         # Adjust the width of Job Status column is specific to
         # current app
 
-
         header = self.horizontalHeader()
-        #header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
-
+        # header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
 
         width = header.sectionSize(2)
         header.setSectionResizeMode(2, QHeaderView.Interactive)
         header.resizeSection(2, width)
-
 
         header.setFont(self.parent.font())
 
@@ -224,6 +249,9 @@ class JobsTableView(QTableView):
         organization.
 
         Adapted from code provided by ekhumoro on StackOverflow
+        https://stackoverflow.com/questions/40469607/
+        how-to-copy-paste-multiple-items-form-qtableview-
+        created-by-qstandarditemmodel/40473855#40473855
         """
 
         selection = self.selectedIndexes()
@@ -244,7 +272,48 @@ class JobsTableView(QTableView):
             csv.writer(stream, delimiter="\t").writerows(table)
             QApplication.clipboard().setText(stream.getvalue())
 
+    def removeSelection(self):
+        """
+        removeSelection filter out selected rows
+        """
+
+        model = self.proxyModel.sourceModel()
+        selection = self.selectedIndexes()
+        remove = None
+        removeItems = []
+
+        if selection:
+            if len(selection) > 1:
+                remove = removeJob(self, None)
+                if not remove:
+                    return
+            # Get all map indexes before table update
+            # When one element is removed the map won't work
+            for index in selection:
+                modelIndex = self.proxyModel.mapToSource(index)
+                jobRow = modelIndex.row()
+                jobID = model.dataset[jobRow, JobKey.ID]
+                if model.dataset[jobRow, JobKey.Status] not in [
+                    JobStatus.Running,
+                    JobStatus.Skip,
+                    JobStatus.Abort,
+                ]:
+                    removeItems.append((jobID, jobRow))
+
+            for (jobID, jobRow) in removeItems:
+                if remove is None:
+                    remove = removeJob(self, str(jobID))
+                if remove:
+                    #print(f"Remove row {jobRow}")
+                    self.proxyModel.filterConditions["Remove"].append(jobRow)
+                    self.proxyModel.setFilterFixedString("")
+
+        return
+
     def saveSelection(self):
+        """
+        saveSelection save selected jobs
+        """
 
         model = self.proxyModel.sourceModel()
 
@@ -254,18 +323,31 @@ class JobsTableView(QTableView):
             for index in selection:
                 modelIndex = self.proxyModel.mapToSource(index)
                 jobRow = modelIndex.row()
+                jobID = model.dataset[jobRow, JobKey.ID]
+                rowID = model.dataset.data[jobRow][JobKey.ID].obj
+                job = model.dataset.data[jobRow][JobKey.Status].obj
+                #if job:
+                #    print(f"ID = {job.jobRow[JobKey.ID]} = {jobID}")
+                #if rowID:
+                #    print(f"Database row ID = {rowID}")
+                title = self.infoDialog.windowTitle()
+                self.infoDialog.setWindowTitle(title + ' - ' + str(jobID))
 
-                job = JobInfo(
-                    jobRow,
-                    model.dataset[jobRow,],
-                    model,
-                    log=False,
-                )
+                if self.infoDialog.getProjectInfo():
+                    name, info = self.infoDialog.info
 
-                print(job.jobRow[JobKey.ID])
-                print(job.oCommand.command)
+                    if job is None:
+                        job = JobInfo(
+                            jobRow,
+                            model.dataset[
+                                jobRow,
+                            ],
+                            model,
+                            log=False,
+                        )
+                    saveToDb(job, name=name, description=info)
 
-            #for row in rows:
+            # for row in rows:
 
     def supportedDropActions(self):  # pylint: disable=no-self-use
 
@@ -286,80 +368,3 @@ class JobsTableView(QTableView):
             totalJobs = tableModel.rowCount()
             data = [["", ""], [JobStatus.Waiting, "Status code"], [command, command]]
             tableModel.insertRows(totalJobs, 1, data=data)
-
-
-def addToDb(job, update=False):
-    """
-    addToDb add the job to the history database
-
-    Args:
-        database (SqlJobsTable): history database
-        job (JobInfo): running job information
-        update (bool, optional): update is true if record should exits.
-            Defaults to False.
-
-    Returns:
-        int: rowid if insert successful. 0 otherwise.
-    """
-
-    #
-    # Always open to start saving in mid of worker operating
-    #
-    database = SqlJobsTable(config.data.get(config.ConfigKey.SystemDB))
-
-
-    # Compress job information:
-    # compressed = zlib.compress(cPickle.dumps(obj))
-
-    # Get it back:
-    # obj = cPickle.loads(zlib.decompress(compressed))
-
-    # Key ID, startTime
-    #
-
-    bSimulateRun = config.data.get(config.ConfigKey.SimulateRun)
-    rc = 0
-
-    if not bSimulateRun:
-        cmpJob = zlib.compress(pickle.dumps(job))
-        if not update:
-            rowid = database.insert(
-                job.jobRow[JobKey.ID],
-                job.date.isoformat(),
-                job.addTime,
-                job.startTime,
-                job.endTime,
-                cmpJob,
-                job.oCommand.command,
-                "Saved",
-                "Save Info",
-                1,
-                0,
-            )
-            rc = rowid
-
-            if rowid > 0:
-                sqlSearchUpdate = """
-                    INSERT INTO jobsSearch(rowidKey, id, startTime, command)
-                        VALUES(?, ?, ?, ?); """
-                database.sqlExecute(
-                    sqlSearchUpdate,
-                    rowid,
-                    job.jobRow[JobKey.ID],
-                    job.startTime,
-                    job.oCommand.command,
-                )
-            if rowid == 0:
-                print("error", database.error)
-                sys.exit()
-        else:
-            # jobsDB.update(449, (JobsTableKey.startTime, ), 80)
-            database.update(
-                job.jobRow[JobKey.ID],
-                (JobsTableKey.startTime, JobsTableKey.endTime, JobsTableKey.job),
-                job.startTime,
-                job.endTime,
-                cmpJob,
-            )
-
-    return rc

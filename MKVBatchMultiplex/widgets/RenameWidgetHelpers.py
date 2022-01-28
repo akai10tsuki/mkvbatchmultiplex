@@ -86,8 +86,18 @@ class RegExFilesWidget(QWidget):
         vboxLayout.addWidget(self.textBox)
         self.setLayout(vboxLayout)
 
-
 def resolveIncrements(currentNames, newNames, subText):
+    """
+    resolveIncrements resolve <i: N> construction
+
+    Args:
+        currentNames (list): names
+        newNames (list): names with increments
+        subText (list): no idea
+
+    Returns:
+        bool: True if successful False otherwise
+    """
 
     reSearchIncEx = re.compile(r"<i\:.*?(\d+)>")
     match = reSearchIncEx.findall(subText)
@@ -139,6 +149,7 @@ def resolveIncrements(currentNames, newNames, subText):
 
 
 def matchGroups(strText, strMatch):
+    """matchGroups"""
 
     tmp = strText
     result = []
@@ -157,6 +168,7 @@ def matchGroups(strText, strMatch):
 
 
 def findDuplicates(fileNames):
+    """findDuplicates"""
 
     seen = {}
     duplicates = []

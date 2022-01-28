@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Mediainfo version="20.03">
+    <File>
+        <track type="General">
+            <Count>331</Count>
+            <Count_of_stream_of_this_kind>1</Count_of_stream_of_this_kind>
+            <Kind_of_stream>General</Kind_of_stream>
+            <Kind_of_stream>General</Kind_of_stream>
+            <Stream_identifier>0</Stream_identifier>
+            <Complete_name>J:\Example\TestMedia\Example 05\Subs\Show Title - S01E01.ENG.ass</Complete_name>
+            <Folder_name>J:\Example\TestMedia\Example 05\Subs</Folder_name>
+            <File_name_extension>Show Title - S01E01.ENG.ass</File_name_extension>
+            <File_name>Show Title - S01E01.ENG</File_name>
+            <File_extension>ass</File_extension>
+            <File_size>1022</File_size>
+            <File_size>1 022 Bytes</File_size>
+            <File_size>1 022 Bytes</File_size>
+            <File_size>1 022 Bytes</File_size>
+            <File_size>1 022 Bytes</File_size>
+            <File_size>1 022.0 Bytes</File_size>
+            <Stream_size>1022</Stream_size>
+            <Stream_size>1 022 Bytes (100%)</Stream_size>
+            <Stream_size>1 022 Bytes</Stream_size>
+            <Stream_size>1 022 Bytes</Stream_size>
+            <Stream_size>1 022 Bytes</Stream_size>
+            <Stream_size>1 022.0 Bytes</Stream_size>
+            <Stream_size>1 022 Bytes (100%)</Stream_size>
+            <Proportion_of_this_stream>1.00000</Proportion_of_this_stream>
+            <File_creation_date>UTC 2020-09-08 14:32:52.816</File_creation_date>
+            <File_creation_date__local_>2020-09-08 10:32:52.816</File_creation_date__local_>
+            <File_last_modification_date>UTC 2020-08-08 21:56:57.422</File_last_modification_date>
+            <File_last_modification_date__local_>2020-08-08 17:56:57.422</File_last_modification_date__local_>
+        </track>
+    </File>
+</Mediainfo>

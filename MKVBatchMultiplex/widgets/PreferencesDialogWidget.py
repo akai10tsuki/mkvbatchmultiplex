@@ -1,5 +1,5 @@
 """
- preferences dialog
+Preferences - Dialog with the various system configuration items
 """
 
 import platform
@@ -32,6 +32,7 @@ class PreferencesDialogWidget(QDialog):
         # remove ? help symbol from dialog header
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         self.ui.cmbBoxInterfaceLanguage.setDuplicatesEnabled(False)
+        self.radioButtons = [self.ui.rbZero, self.ui.rbOne, self.ui.rbTwo]
         self._initHelper()
 
     def _initUI(self):
@@ -81,14 +82,33 @@ class PreferencesDialogWidget(QDialog):
         #
         # Enable History
         #
+        # Temporalily disable History
+        #
+        if config.data.get(config.ConfigKey.JobHistoryDisabled):
+            self.ui.chkBoxEnableJobHistory.setEnabled(False)
+            self.ui.chkBoxAutoSaveJobHistory.setEnabled(False)
+            self.ui.chkBoxEnableJobHistory.hide()
+            self.ui.chkBoxAutoSaveJobHistory.hide()
+
         if config.data.get(config.ConfigKey.JobHistory) is not None:
             self.ui.chkBoxEnableJobHistory.setChecked(
                 config.data.get(config.ConfigKey.JobHistory)
             )
+        if config.data.get(config.ConfigKey.JobsAutoSave) is not None:
+            self.ui.chkBoxAutoSaveJobHistory.setChecked(
+                config.data.get(config.ConfigKey.JobsAutoSave)
+            )
+
         #
         # Restore Windows Size
         #
         self.ui.chkBoxRestoreWindowSize.setChecked(False)
+        #
+        # Algorithm
+        #
+        if config.data.get(config.ConfigKey.Algorithm) is not None:
+            currentAlgorithm = config.data.get(config.ConfigKey.Algorithm)
+            self.radioButtons[currentAlgorithm].setChecked(True)
 
     def _initHelper(self):
 
@@ -135,6 +155,18 @@ class PreferencesDialogWidget(QDialog):
         # Restore Defaults
         #
         self.ui.btnRestoreDefaults.clicked.connect(self.__pref.restoreDefaults)
+        #
+        # Algorithm radio buttons
+        #
+        self.ui.rbZero.toggled.connect(
+            lambda: self.__pref.toggledRadioButton(self.ui.rbZero)
+        )
+        self.ui.rbOne.toggled.connect(
+            lambda: self.__pref.toggledRadioButton(self.ui.rbOne)
+        )
+        self.ui.rbTwo.toggled.connect(
+            lambda: self.__pref.toggledRadioButton(self.ui.rbTwo)
+        )
 
     # @property
     # def parent(self):
@@ -213,9 +245,7 @@ class PreferencesDialogWidget(QDialog):
                         if self.parent.logViewerWidget.tab >= 0:
                             self.parent.logViewerWidget.hideTab()
             else:
-                config.data.set(
-                    config.ConfigKey.LogViewer, False
-                )
+                config.data.set(config.ConfigKey.LogViewer, False)
                 if self.parent.logViewerWidget.tab >= 0:
                     self.parent.logViewerWidget.hideTab()
             #
@@ -233,6 +263,13 @@ class PreferencesDialogWidget(QDialog):
                     else:
                         if self.parent.historyWidget.tab >= 0:
                             self.parent.historyWidget.hideTab()
+            #
+            # Algorithm
+            #
+            if config.data.get(config.ConfigKey.Algorithm) is not None:
+                for index, rb in enumerate(self.radioButtons):
+                    if rb.isChecked():
+                        config.data.set(config.ConfigKey.Algorithm, index)
             #
             # Restore window size
             #
@@ -257,6 +294,13 @@ class PreferencesDialogWidget(QDialog):
 
 
 class Preferences(QObject):
+    """
+    Preferences deals with the selection of preferences logic
+
+    Args:
+        QObject (QObject): generic PySide2 object
+    """
+
     def __init__(self, parent):
         super().__init__(parent)
 
@@ -280,6 +324,12 @@ class Preferences(QObject):
 
     @Slot(int)
     def interfaceLanguageChanged(self, index):
+        """
+        interfaceLanguageChanged interface language change signal
+
+        Args:
+            index (int): index in language combo box
+        """
 
         language = self.parent.ui.cmbBoxInterfaceLanguage.itemText(index)
         if language:
@@ -335,7 +385,19 @@ class Preferences(QObject):
             self.__changedData = True
 
     @Slot(object)
+    def toggledRadioButton(self, rButton):  # pylint: disable=unused-argument
+
+        if not self.__changedData:
+            self.__changedData = True
+
+    @Slot(object)
     def clickedButton(self, button):
+        """
+        clickedButton deals with the final button clicked
+
+        Args:
+            button (QPushButton): buttons for the Preferences Dialog
+        """
 
         buttonRole = self.parent.ui.btnBox.buttonRole(button)
 
@@ -350,6 +412,9 @@ class Preferences(QObject):
 
     @Slot(bool)
     def restoreDefaults(self):
+        """
+        restoreDefaults restore application defaults
+        """
 
         self.parent.ui.chkBoxRestoreWindowSize.setChecked(True)
         self.parent.ui.chkBoxEnableLogging.setChecked(False)
@@ -360,6 +425,8 @@ class Preferences(QObject):
         defaultFont.fromString(config.data.get(config.ConfigKey.SystemFont))
         self.parent.ui.fcmbBoxFontFamily.setCurrentFont(defaultFont.family())
         self.parent.ui.spinBoxFontSize.setValue(defaultFont.pointSize())
+        if config.data.get(config.ConfigKey.Algorithm) is not None:
+            self.parent.radioButtons[config.ALGORITHMDEFAULT].setChecked(True)
 
     def reset(self):
         self._initVars()

@@ -2,7 +2,7 @@
  deleage classes
 """
 
-# pylint: disable=unused-argument, bad-continuation
+# pylint: disable=unused-argument
 
 from PySide2.QtWidgets import (
     QStyledItemDelegate,
@@ -17,9 +17,150 @@ from PySide2.QtCore import Qt, QRect, QPoint, QEvent, Slot
 from ..jobs import JobStatus
 
 
-class FillColorDelegate(QStyledItemDelegate):
-    """FillColorDelegate
+class StatusComboBoxDelegate(QStyledItemDelegate):
+
     """
+    StatusComboBoxDelegate - activate a ComboBox in a Status cell of a
+    JobsTableViewWidget in order to edit the cell
+
+    Args:
+        model (TableDataModel): model used in a table model/view class
+    """
+
+    comboItems = ["Wait", "Wait..", "Wait..."]
+
+    def __init__(self, model):
+        super(StatusComboBoxDelegate, self).__init__()
+
+        self.model = model
+
+    def createEditor(self, parent, option, index):
+        """
+        createEditor edit item at index
+
+        Args:
+            parent (QWidget): editor parent object
+            option (QStyleOptionViewItem): item options
+            index (QModelIndex): index of item in table
+
+        Returns:
+            QComboBox: editor is a ComboBox. Defaults to None if no list of
+            items can be made.
+        """
+
+        sourceIndex = self.model.mapToSource(index)
+        row = sourceIndex.row()
+        column = sourceIndex.column()
+        status = self.model.sourceModel().dataset[row, column]
+        self.comboItems = _comboBoxItems(status)
+
+        if self.comboItems:
+            editor = QComboBox(parent)
+            editor.addItems(self.comboItems)
+            editor.currentIndexChanged.connect(self.currentIndexChanged)
+            editor.setEditable(True)
+            editor.lineEdit().setReadOnly(True)
+            editor.lineEdit().setAlignment(Qt.AlignCenter)
+
+            return editor
+
+        return None
+
+    def editorEvent(self, event, model, option, index):
+        """
+        editorEvent proccess events received by editor
+
+        Args:
+            **event** (QEvent): event received
+
+            **model** (TableDataModel): model/view used
+
+            **option** (QStyleOptionViewItem): item options
+
+            **index** (QModelIndex): index of item in table
+
+        Returns:
+            bool: True if event attended. False otherwise.
+        """
+
+        sourceIndex = model.mapToSource(index)
+        column = sourceIndex.column()
+
+        if column and event.type() == QEvent.MouseButtonRelease:
+            self.setModelData(None, model.sourceModel(), sourceIndex)
+
+            # return False
+
+        # if column and (event.type() == QEvent.KeyPress):
+        #    if event.key() in [Qt.Key_Enter, Qt.Key_Return]:
+        #        self.setModelData(None, model.sourceModel(), sourceIndex)
+        #        return True
+
+        return False
+
+    def setModelData(self, editor, model, index):
+        """
+        setModelData setup model data if editor for editor to use
+
+        Args:
+            **editor** (QWidget): current editor widget
+
+            **model** (TableDataModel): model in use for model/view
+
+            **index** (QModelIndex): index of item in table
+        """
+
+        if editor:
+            comboIndex = editor.currentIndex()
+            text = self.comboItems[comboIndex]
+            model.setData(index, text)
+
+    @Slot()
+    def currentIndexChanged(self):
+        """
+        currentIndexChanged emit commitData Signal when index is changed
+        """
+
+        self.commitData.emit(self.sender())
+
+
+def _comboBoxItems(status):
+    """
+    _comboBoxItems helper function to StatusComboBoxDelegate that construct
+    the list used in the ComboBox editor
+
+    Args:
+        status (string): current status in cell
+
+    Returns:
+        list: list with comboBox items. None depending of current status.
+    """
+
+    if status in [JobStatus.AbortJobError, JobStatus.Error]:
+        return None
+
+    if status in [
+        JobStatus.Skip,
+        JobStatus.Skipped,
+        JobStatus.Aborted,
+        JobStatus.Done,
+        JobStatus.Removed,
+    ]:
+        comboItems = [status, JobStatus.Waiting]
+    elif status in [JobStatus.Queue, JobStatus.Waiting]:
+        comboItems = [status, JobStatus.Skip]
+    elif status == JobStatus.Running:
+        comboItems = [status, JobStatus.Abort]
+    elif status == JobStatus.Abort:
+        return None
+    else:
+        return None
+
+    return comboItems
+
+
+class FillColorDelegate(QStyledItemDelegate):
+    """FillColorDelegate"""
 
     def __init__(self, model, color):
         """
@@ -114,99 +255,6 @@ class CheckBoxDelegate(QStyledItemDelegate):
         row = index.row()
         column = index.column()
         model.dataset[row][column] = not model.dataset[row][column]
-
-
-class StatusComboBoxDelegate(QStyledItemDelegate):
-    """
-    ComboBoxDelegate [summary]
-
-    Args:
-        QStyledItemDelegate ([type]): [description]
-
-    Returns:
-        [type]: [description]
-    """
-
-    comboItems = ["Wait", "Wait..", "Wait..."]
-
-    def __init__(self, model):
-        super(StatusComboBoxDelegate, self).__init__()
-
-        self.model = model
-
-    def createEditor(self, parent, option, index):
-
-        sourceIndex = self.model.mapToSource(index)
-        row = sourceIndex.row()
-        column = sourceIndex.column()
-        status = self.model.sourceModel().dataset[row, column]
-        self.comboItems = _comboBoxItems(status)
-
-        if self.comboItems:
-            editor = QComboBox(parent)
-            editor.addItems(self.comboItems)
-            editor.currentIndexChanged.connect(self.currentIndexChanged)
-            editor.setEditable(True)
-            editor.lineEdit().setReadOnly(True)
-            editor.lineEdit().setAlignment(Qt.AlignCenter)
-
-            return editor
-
-        return None
-
-    def editorEvent(self, event, model, option, index):
-
-        sourceIndex = model.mapToSource(index)
-        column = sourceIndex.column()
-
-        if column and event.type() == QEvent.MouseButtonRelease:
-            self.setModelData(None, model.sourceModel(), sourceIndex)
-
-            return False
-
-        # if column and (event.type() == QEvent.KeyPress):
-        #    if event.key() in [Qt.Key_Enter, Qt.Key_Return]:
-        #        self.setModelData(None, model.sourceModel(), sourceIndex)
-        #        return True
-
-        return False
-
-    def setModelData(self, editor, model, index):
-
-        if editor:
-            comboIndex = editor.currentIndex()
-            text = self.comboItems[comboIndex]
-            model.setData(index, text)
-
-    @Slot()
-    def currentIndexChanged(self):
-        self.commitData.emit(self.sender())
-
-
-def _comboBoxItems(status):
-
-    if status in [JobStatus.AbortJobError, JobStatus.Error]:
-        return None
-
-    elif status in [
-        JobStatus.Skip,
-        JobStatus.Skipped,
-        JobStatus.Abort,
-        JobStatus.Aborted,
-        JobStatus.Done,
-    ]:
-        comboItems = [status, JobStatus.Waiting]
-
-    elif status in [JobStatus.Queue, JobStatus.Waiting]:
-        comboItems = [status, JobStatus.Skip]
-
-    elif status in JobStatus.Running:
-        comboItems = [status, JobStatus.Abort]
-
-    else:
-        return None
-
-    return comboItems
 
 
 class ComboBoxDelegateNew(QStyledItemDelegate):
