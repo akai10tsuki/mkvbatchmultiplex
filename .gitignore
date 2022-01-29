@@ -62,7 +62,7 @@ docs/_build/
 target/
 
 # MKVBatchMultiplex
-MKVBatchMultiplex.PySide2/
+MKVBatchMultiplexPySide2/
 tests/NewFiles/
 tests/generatecommand.1.py
 .vscode/
@@ -78,3 +78,4 @@ test.py
 .gitchangelog.rc
 html
 *.code-workspace
+/runReference.py
