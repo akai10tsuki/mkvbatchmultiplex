@@ -61,7 +61,8 @@ docs/_build/
 # PyBuilder
 target/
 
-# regExpressions
+# MKVBatchMultiplex
+MKVBatchMultiplex.PySide2/
 tests/NewFiles/
 tests/generatecommand.1.py
 .vscode/
