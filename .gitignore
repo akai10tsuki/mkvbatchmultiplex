@@ -79,3 +79,4 @@ test.py
 html
 *.code-workspace
 /runReference.py
+images/
