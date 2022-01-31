@@ -28,7 +28,6 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0025 = S_("Force exit")
     txt0026 = S_("Ctrl+P")
 
-
     # 40
     txt0040 = S_("&Settings")
     txt0041 = S_("Enable logging")
@@ -52,6 +51,9 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0062 = S_("Using")
     txt0063 = S_("About")
     txt0064 = S_("About QT")
+    txt0065 = S_("Show the application's About box")
+    txt0066 = S_("Show the Qt library's About box")
+
 
     # Dialogs & others
     # 80
