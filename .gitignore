@@ -74,6 +74,7 @@ sources/
 *.nsi
 *.iss
 test.py
+teste.py
 .DS_Store
 .gitchangelog.rc
 html
