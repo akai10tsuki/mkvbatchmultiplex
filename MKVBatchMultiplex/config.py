@@ -2,6 +2,8 @@ r"""
 Configuration system
 """
 
+# CFGG005
+
 import logging
 import os
 import sys
@@ -225,9 +227,9 @@ def init(
     appName = name or APPNAME
     appVersion = version or VERSION
 
-    logging.info("CF0001: App Start.")
-    logging.info("CF0002: Python: %s", sys.version)
-    appName = "CF0003: " + appName
+    logging.info("CFG0001: App Start.")
+    logging.info("CFG0002: Python: %s", sys.version)
+    appName = "CFG0003: " + appName
     logging.info("%s-%s", appName, appVersion)
 
     #
@@ -387,7 +389,7 @@ def close() -> None:
     """exit accounting"""
 
     data.saveToFile()
-    logging.info("CF0004: App End.")
+    logging.info("CFG0004: App End.")
 
 
 def logTest(msg: str) -> None:
