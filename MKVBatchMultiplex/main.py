@@ -1,9 +1,11 @@
 """
 MKVBatchMultiplex entry point
-<a target="_blank" href="https://icons8.com/icon/mom72GctQGyD/close">Close</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
 """
 
+#MAI0004
+
 import logging
+import platform
 import sys
 
 from typing import Optional
@@ -17,27 +19,40 @@ from PySide6.QtCore import (
     QTextStream,
     Qt,
     Signal,
-    Slot
+    Slot,
 )
 
 from PySide6.QtCore import QEvent
-from PySide6.QtGui import QAction, QFont, QIcon, QKeySequence, QPixmap
+from PySide6.QtGui import (
+    QAction,
+    QColor,
+    QFont,
+    QIcon,
+    QKeySequence,
+    QPixmap,
+)
 from PySide6.QtWidgets import (
     QApplication,
     QFileDialog,
     QMainWindow,
     QMenuBar,
     QMessageBox,
+    QStatusBar,
     QStyle,
     QTextEdit,
     QToolTip,
-    QWidget
+    QWidget,
 )
 
 from vsutillib.pyside6 import (
     centerWidget,
+    checkColor,
+    darkPalette,
     QActionWidget,
-    QMenuWidget
+    QActivityIndicator,
+    QMenuWidget,
+    QOutputTextWidget,
+    VerticalLine,
 )
 
 from . import config
@@ -47,10 +62,10 @@ from .utils import (
     SetLocale,
     Text,
     UiSetLocale,
-    yesNoDialog
+    yesNoDialog,
 )
 from .widgets import (
-    PreferencesDialogWidget
+    PreferencesDialogWidget,
 )
 
 
@@ -62,7 +77,8 @@ class MainWindow(QMainWindow):
 
         self.parent = parent
 
-        self._intVars()
+        self._initVars()
+        self._initHelper()
 
         # Language setup
         configLanguage(self)
@@ -85,16 +101,29 @@ class MainWindow(QMainWindow):
         self.setUnifiedTitleAndToolBarOnMac(True)
         # self.show()
 
-    def _intVars(self) -> None:
+    # region Initialization
 
-        self.setLocale = SetLocale()
+    def _initVars(self) -> None:
+
+        self.setInterfaceLocale = SetLocale()
         self.uiSetLocale = UiSetLocale(self)
         self.setPreferences = PreferencesDialogWidget(self)
-        self.setLocale.addSlot(self.setPreferences.retranslateUi)
+        self.setInterfaceLocale.addSlot(self.setPreferences.retranslateUi)
+        self.activitySpinner = QActivityIndicator(self)
 
-    #
-    # Override events
-    #
+    def _initHelper(self) -> None:
+        # work in progress spin
+        self.activitySpinner.displayedWhenStopped = True
+        self.activitySpinner.color = checkColor(
+            QColor(42, 130, 218),
+            config.data.get(config.ConfigKey.DarkMode)
+        )
+        self.activitySpinner.delay = 60
+
+    # endregion
+
+    # region events
+
     def closeEvent(self, event: QEvent) -> None:
 
         language = config.data.get(config.ConfigKey.Language)
@@ -109,6 +138,8 @@ class MainWindow(QMainWindow):
             event.accept()
         else:
             event.ignore()
+
+    #endregion
 
     # region interface
 
@@ -135,7 +166,11 @@ class MainWindow(QMainWindow):
         )
 
         self.actAbort = QActionWidget(
-            Text.txt0024, self, statusTip=Text.txt0025)
+            Text.txt0024,
+            self,
+            statusTip=Text.txt0025
+        )
+        self.actAbort.triggered.connect(abort)
 
         self.actAbout = QActionWidget(
             Text.txt0063,
@@ -151,11 +186,11 @@ class MainWindow(QMainWindow):
             triggered=QApplication.aboutQt
         )
 
-        self.setLocale.addSlot(self.actPreferences.setLanguage)
-        self.setLocale.addSlot(self.actExit.setLanguage)
-        self.setLocale.addSlot(self.actAbort.setLanguage)
-        self.setLocale.addSlot(self.actAbout.setLanguage)
-        self.setLocale.addSlot(self.actAboutQt.setLanguage)
+        self.setInterfaceLocale.addSlot(self.actPreferences.setLanguage)
+        self.setInterfaceLocale.addSlot(self.actExit.setLanguage)
+        self.setInterfaceLocale.addSlot(self.actAbort.setLanguage)
+        self.setInterfaceLocale.addSlot(self.actAbout.setLanguage)
+        self.setInterfaceLocale.addSlot(self.actAboutQt.setLanguage)
 
     def createMenus(self) -> None:
         """Create the application menus"""
@@ -165,7 +200,6 @@ class MainWindow(QMainWindow):
         #
         # File menu
         #
-        #self.fileMenu = self.menuBar().addMenu("&File")
         self.fileMenu = QMenuWidget(Text.txt0020)
 
         self.fileMenu.addAction(self.actPreferences)
@@ -175,18 +209,17 @@ class MainWindow(QMainWindow):
         self.fileMenu.addAction(self.actAbort)
 
         menuBar.addMenu(self.fileMenu)
-        self.setLocale.addSlot(self.fileMenu.setLanguage)
+        self.setInterfaceLocale.addSlot(self.fileMenu.setLanguage)
 
         #
         # Help menu
         #
-        #self.helpMenu = self.menuBar().addMenu("&Help")
         self.helpMenu = QMenuWidget(Text.txt0060)
         self.helpMenu.addAction(self.actAbout)
         self.helpMenu.addAction(self.actAboutQt)
 
         menuBar.addMenu(self.helpMenu)
-        self.setLocale.addSlot(self.helpMenu.setLanguage)
+        self.setInterfaceLocale.addSlot(self.helpMenu.setLanguage)
 
         # Attach menu
         self.setMenuBar(menuBar)
@@ -196,7 +229,12 @@ class MainWindow(QMainWindow):
         self.fileToolbar.addAction(self.actExit)
 
     def createStatusbar(self) -> None:
-        self.statusBar().showMessage("Ready")
+
+        statusBar = QStatusBar()
+        statusBar.addPermanentWidget(VerticalLine())
+        statusBar.addPermanentWidget(self.activitySpinner)
+
+        self.setStatusBar(statusBar)
 
     # endregion
 
@@ -262,7 +300,7 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle(_(Text.txt0001))
 
-        self.setLocale.emitSignal()
+        self.setInterfaceLocale.emitSignal()
 
     def setAppFont(self, font):
         """
@@ -300,12 +338,26 @@ class MainWindow(QMainWindow):
         QMessageBox.about(self, config.APPNAME, aboutMsg)
 
 
+def abort():
+    """Force Quit"""
+
+    logging.warning(f"MAI0004: Application Aborted")
+    QApplication.exit(1)  # pylint: disable=E1101
+
+
 def mainApp():
     """Main function"""
 
     app = QApplication(sys.argv)
     config.init(app=app)
 
+    # Palette will change on macOS according to current theme
+    # will create a poor mans dark theme for windows
+    if platform.system() == "Windows":
+        # pass
+        darkPalette(app)
+        config.data.set(config.ConfigKey.DarkMode, True)
+        QOutputTextWidget.isDarkMode = True
     mw = MainWindow()
     mw.show()
     # MainWindow()
