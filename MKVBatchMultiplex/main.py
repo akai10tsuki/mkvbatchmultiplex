@@ -5,13 +5,18 @@ MKVBatchMultiplex entry point
 #MAI0004
 
 import logging
+import os
 import platform
 import sys
+
+from collections import deque
+from pathlib import Path
 
 from typing import Optional
 
 from PySide6.QtCore import (
     QByteArray,
+    QEvent,
     QFile,
     QFileInfo,
     QSaveFile,
@@ -21,8 +26,6 @@ from PySide6.QtCore import (
     Signal,
     Slot,
 )
-
-from PySide6.QtCore import QEvent
 from PySide6.QtGui import (
     QAction,
     QColor,
@@ -41,6 +44,7 @@ from PySide6.QtWidgets import (
     QStyle,
     QTextEdit,
     QToolTip,
+    QVBoxLayout,
     QWidget,
 )
 
@@ -52,6 +56,7 @@ from vsutillib.pyside6 import (
     QActivityIndicator,
     QMenuWidget,
     QOutputTextWidget,
+    TabWidget,
     VerticalLine,
 )
 
@@ -65,6 +70,7 @@ from .utils import (
     yesNoDialog,
 )
 from .widgets import (
+    CommandWidget,
     PreferencesDialogWidget,
 )
 
@@ -77,17 +83,20 @@ class MainWindow(QMainWindow):
 
         self.parent = parent
 
+        # Language setup has to be early so _() is defined
+        self.setInterfaceLocale = SetLocale()
+        self.uiSetLocale = UiSetLocale(self)
+        configLanguage(self)
+
         self._initVars()
         self._initHelper()
-
-        # Language setup
-        configLanguage(self)
+        self._initUI()
 
         self.setWindowTitle(Text.txt0001)
         self.setWindowIcon(QIcon(QPixmap(":/images/Itsue256x256.png")))
 
-        self._text_edit = QTextEdit()
-        self.setCentralWidget(self._text_edit)
+        #self._text_edit = QTextEdit()
+        #self.setCentralWidget(self._text_edit)
 
         self.createActions()
         self.createMenus()
@@ -99,17 +108,31 @@ class MainWindow(QMainWindow):
         self.setLanguage()
 
         self.setUnifiedTitleAndToolBarOnMac(True)
-        # self.show()
+        self.show()
 
     # region Initialization
 
     def _initVars(self) -> None:
 
-        self.setInterfaceLocale = SetLocale()
-        self.uiSetLocale = UiSetLocale(self)
+        #
+        # Where am I running from
+        #
+
+        # if getattr(sys, "frozen", False):
+        if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+            # Running in a pyinstaller bundle
+            self.appDirectory = Path(os.path.dirname(__file__))
+        else:
+            self.appDirectory = Path(os.path.realpath(__file__))
+
         self.setPreferences = PreferencesDialogWidget(self)
         self.setInterfaceLocale.addSlot(self.setPreferences.retranslateUi)
         self.activitySpinner = QActivityIndicator(self)
+        
+        self.commandWidget = CommandWidget(self)
+
+        self.controlQueue = deque()
+        self.tabs = TabWidget(self)
 
     def _initHelper(self) -> None:
         # work in progress spin
@@ -119,6 +142,29 @@ class MainWindow(QMainWindow):
             config.data.get(config.ConfigKey.DarkMode)
         )
         self.activitySpinner.delay = 60
+
+        self.setInterfaceLocale.addSlot(self.commandWidget.setLanguage)
+
+        # Tabs
+        tabsList = []
+        tabsList.append(
+            [
+                self.commandWidget,
+                _(Text.txt0133),
+                _(Text.txt0148),
+            ]
+        )
+
+        self.tabs.addTabs(tabsList)
+
+    def _initUI(self):
+
+        # Create Widgets
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+        layout.addWidget(self.tabs)
+        widget.setLayout(layout)
+        self.setCentralWidget(widget)
 
     # endregion
 
@@ -358,9 +404,9 @@ def mainApp():
         darkPalette(app)
         config.data.set(config.ConfigKey.DarkMode, True)
         QOutputTextWidget.isDarkMode = True
-    mw = MainWindow()
-    mw.show()
-    # MainWindow()
+    #mw = MainWindow()
+    #mw.show()
+    MainWindow()
     app.exec()
 
     config.close()
