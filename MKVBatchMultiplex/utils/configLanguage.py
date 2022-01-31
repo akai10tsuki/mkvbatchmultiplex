@@ -21,7 +21,7 @@ def configLanguage(app: QMainWindow, language: Optional[str] = None) -> None:
     lang = gettext.translation(
         config.NAME, localedir=str(config.LOCALE), languages=[language]
     )
-    #if app.uiSetLanguage.setLanguage(language):
-    #    pass
+    if app.uiSetLocale.setLanguage(language):
+        pass
     lang.install(names=("ngettext",))
     config.data.set(config.ConfigKey.Language, language)
