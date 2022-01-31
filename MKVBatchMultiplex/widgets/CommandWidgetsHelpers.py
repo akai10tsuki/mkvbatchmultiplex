@@ -23,12 +23,12 @@ def runAnalysis(**kwargs):
         for e in verify.analysis:
             if e.find(r"chk:") >= 0:
                 output.command.emit(
-                    "{}".format(e),
+                    f"{e}",
                     {LineOutput.Color: SvgColor.green, LineOutput.AppendEnd: True},
                 )
             else:
                 output.command.emit(
-                    "{}".format(e),
+                    f"{e}",
                     {LineOutput.Color: SvgColor.red, LineOutput.AppendEnd: True},
                 )
         output.command.emit("\n", {LineOutput.AppendEnd: True})
@@ -46,12 +46,12 @@ def runAnalysisOld(**kwargs):
     for e in verify.analysis:
         if e.find(r"chk:") >= 0:
             output.command.emit(
-                "{}".format(e),
+                f"{e}",
                 {LineOutput.Color: SvgColor.darkgreen, LineOutput.AppendEnd: True},
             )
         else:
             output.command.emit(
-                "{}".format(e),
+                f"{e}",
                 {LineOutput.Color: SvgColor.red, LineOutput.AppendEnd: True},
             )
 
@@ -73,7 +73,7 @@ def showCommands(**kwargs):
         return "No output callback function"
 
     output.command.emit(
-        "Shell:\n\n{}\n".format(oCommand.command), {LineOutput.AppendEnd: True}
+        f"Shell:\n\n{oCommand.command}\n", {LineOutput.AppendEnd: True}
     )
 
     if not oCommand.commandsGenerated:
@@ -81,14 +81,14 @@ def showCommands(**kwargs):
         oCommand.generateCommands()
 
     output.command.emit(
-        "Command Template:\n\n{}\n\nCommands:\n".format(str(oCommand.commandTemplate)),
+        f"Command Template:\n\n{str(oCommand.commandTemplate)}\n\nCommands:\n",
         {LineOutput.AppendEnd: True},
     )
 
     if oCommand:
         for command, _, _, _, _, _, _ in oCommand:
             output.command.emit(
-                "Command {}.\n{}".format(index, str(command)) + "\n",
+                f"Command {index}.\n{str(command)}\n",
                 {LineOutput.AppendEnd: True},
             )
             index += 1
@@ -190,7 +190,7 @@ def checkFiles(**kwargs):
     # for key in oCommand.filesInDirByKey:
     #    print(f"Key = {key}")
 
-    for key in oCommand.filesInDirByKey:
+    for key in oCommand.filesInDirByKey.items():
 
         if key == MKVParseKey.title:
             continue
