@@ -8,6 +8,7 @@ from .Text import Text
 
 # Functions
 from .configLanguage import configLanguage
-from .yesNoDialog import yesNoDialog
+from .OutputWindows import OutputWindows
 from .SetLocale import SetLocale
 from .UiSetLocale import UiSetLocale
+from .yesNoDialog import yesNoDialog
