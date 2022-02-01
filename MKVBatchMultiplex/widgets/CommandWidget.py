@@ -17,12 +17,15 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from vsutillib.process import isThreadRunning
 from vsutillib.pyside6 import (
+    QOutputTextWidget,
     QPushButtonWidget,
+    qtRunFunctionInThread,
 )
 
 from .. import config
-from ..utils import Text
+from ..utils import Text, yesNoDialog
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -35,7 +38,10 @@ class CommandWidget(QWidget):
     __log = False
 
     # signals
+    insertTextSignal = Signal(str, dict)
     updateCommandSignal = Signal(str)
+
+    # region initialization
 
     def __init__(
             self,
@@ -43,13 +49,18 @@ class CommandWidget(QWidget):
             log: Optional[bool] = None) -> None:
         super().__init__(parent=parent)
 
-        self.parent = parent
         self.__log = None
-        self.log = log
+        self.__output = None
+        self.__rename = None
+
+        self.parent = parent
 
         self._initVars()
         self._initHelper()
         self._initUI()
+
+        # log updates outputWindow.log
+        self.log = log
 
     def _initVars(self):
         #
@@ -59,12 +70,14 @@ class CommandWidget(QWidget):
         self.commandLine = QLineEdit()
         self.commandWidget = QWidget()
 
+        self.outputWindow = QOutputTextWidget()
+
     def _initHelper(self):
 
         # region command line
         btnPasteClipboard = QPushButtonWidget(
             Text.txt0164,
-            function=self.pasteClipboard,
+            function=lambda: qtRunFunctionInThread(self.pasteClipboard),
             margins="  ",
             toolTip=Text.txt0165,
         )
@@ -82,12 +95,18 @@ class CommandWidget(QWidget):
         self.updateCommandSignal.connect(self.updateCommand)
         # endregion
 
+        # map insertText signal to outputWidget one
+        #self.insertText = self.outputWindow.insertTextSignal
+
     def _initUI(self):
-        
+
         grid = QGridLayout()
         grid.addWidget(self.commandWidget, 0, 0, 1, 2)
+        grid.addWidget(self.outputWindow, 2, 1, 10, 1)
 
         self.setLayout(grid)
+
+    # endregion
 
     # region Logging setup
 
@@ -137,6 +156,7 @@ class CommandWidget(QWidget):
         """set instance log variable"""
         if isinstance(value, bool) or value is None:
             self.__log = value
+            self.outputWindow.log = value
 
     @Slot(bool)
     def setLog(self, bLogging: bool) -> None:
@@ -144,6 +164,8 @@ class CommandWidget(QWidget):
         self.log = bLogging
 
     # endregion Logging setup
+
+    # region buttons slots
 
     def pasteClipboard(self):
         """Paste clipboard to command QLineEdit"""
@@ -156,6 +178,25 @@ class CommandWidget(QWidget):
             # )
             self.update()
             self.updateCommandSignal.emit(clip)
+
+    def clearOutputWindow(self):
+        """
+        clearOutputWindow clear the command output window
+        """
+
+        language = config.data.get(config.ConfigKey.Language)
+        bAnswer = False
+
+        # Clear output window
+        title = _(Text.txt0180)
+        msg = "¿" if language == "es" else ""
+        msg += _(Text.txt0181) + "?"
+        bAnswer = yesNoDialog(self, msg, title)
+
+        if bAnswer:
+            self.outputWindow.clear()
+
+    # endregion
 
     @Slot(str)
     def updateCommand(self, command):
@@ -172,6 +213,32 @@ class CommandWidget(QWidget):
         """
 
         for index in range(self.frmCommandLine.rowCount()):
-            widget = self.frmCmdLine.itemAt(index, QFormLayout.LabelRole).widget()
+            widget = self.frmCommandLine.itemAt(
+                index, QFormLayout.LabelRole).widget()
             if isinstance(widget, QPushButtonWidget):
-                widget.setLanguage() 
+                widget.setLanguage()
+
+
+class _Button:
+
+    PASTE = 0
+
+    ADDCOMMAND = 0
+    RENAME = 1
+    ADDQUEUE = 2
+    STARTQUEUE = 3
+
+    ANALYSIS = 5
+    SHOWCOMMANDS = 6
+    CHECKFILES = 7
+
+    CLEAR = 9
+    RESET = 10
+
+
+# This if for Pylance _() is not defined
+def _(dummy):
+    return dummy
+
+
+del _
