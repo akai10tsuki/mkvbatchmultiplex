@@ -15,7 +15,7 @@ from PySide6.QtWidgets import QWidget
 from .. import config
 
 
-class UiSetLocale:
+class UiSetMessagesCatalog:
     """
     class to set the language for PySide2 ui dialogs
     """
@@ -46,7 +46,7 @@ class UiSetLocale:
         self.trBaseLast = None
         self.loadedTranslations = []
 
-    def setLanguage(self, language: str) -> bool:
+    def setMessagesCatalog(self, language: str) -> bool:
         """
         setLanguage set the language locale
 
