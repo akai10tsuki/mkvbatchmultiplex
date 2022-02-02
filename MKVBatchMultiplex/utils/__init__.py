@@ -7,8 +7,9 @@ utils package imports
 from .Text import Text
 
 # Functions
-from .configLanguage import configLanguage
+from .configMessagesCatalog import configMessagesCatalog
 from .OutputWindows import OutputWindows
-from .SetLocale import SetLocale
-from .UiSetLocale import UiSetLocale
+from .Translate import Translate
+from .UiSetMessagesCatalog import UiSetMessagesCatalog
+from .ValidateCommand import ValidateCommand
 from .yesNoDialog import yesNoDialog
