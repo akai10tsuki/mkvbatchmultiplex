@@ -4,7 +4,7 @@ Preferences - Dialog with the various system configuration items
 
 import platform
 
-from PySide6.QtCore import QObject, Qt, Slot
+from PySide6.QtCore import QObject, Qt, Signal, Slot
 from PySide6.QtGui import QFont, QPalette, QColor
 from PySide6.QtWidgets import QDialog, QDialogButtonBox, QWidget
 
@@ -18,6 +18,8 @@ class PreferencesDialogWidget(QDialog):
     """
     PreferencesDialogWidget change configuration parameters
     """
+
+    translateInterfaceSignal = Signal()
 
     def __init__(self, parent: QWidget):
         super().__init__(parent)
@@ -212,7 +214,7 @@ class PreferencesDialogWidget(QDialog):
             if self.preferences.language is not None:
                 config.data.set(config.ConfigKey.Language,
                                 self.preferences.language)
-                self.parent.setLanguage()
+                self.translateInterfaceSignal.emit()
             #
             # Font & Size
             #
