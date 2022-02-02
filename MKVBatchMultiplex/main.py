@@ -2,7 +2,9 @@
 MKVBatchMultiplex entry point
 """
 
-#MAI0004
+# MAI0004
+
+# region imports
 
 import logging
 import os
@@ -62,41 +64,43 @@ from vsutillib.pyside6 import (
 
 from . import config
 from .utils import (
-    configLanguage,
+    configMessagesCatalog,
     icons,
-    SetLocale,
+    OutputWindows,
+    Translate,
     Text,
-    UiSetLocale,
+    UiSetMessagesCatalog,
     yesNoDialog,
 )
 from .widgets import (
     CommandWidget,
+    JobsOutputErrorsWidget,
+    JobsOutputWidget,
     PreferencesDialogWidget,
 )
+
+# endregion imports
 
 
 class MainWindow(QMainWindow):
     """ Main window of application """
 
+    # region Initialization
     def __init__(self, parent: Optional[QWidget] = None) -> None:
         super().__init__(parent)
 
         self.parent = parent
 
         # Language setup has to be early so _() is defined
-        self.setInterfaceLocale = SetLocale()
-        self.uiSetLocale = UiSetLocale(self)
-        configLanguage(self)
+        self.translateInterface = Translate()
+        self.uiTranslateInterface = UiSetMessagesCatalog(self)
+        configMessagesCatalog(self)
 
         self._initVars()
         self._initHelper()
         self._initUI()
 
-        self.setWindowTitle(Text.txt0001)
         self.setWindowIcon(QIcon(QPixmap(":/images/Itsue256x256.png")))
-
-        #self._text_edit = QTextEdit()
-        #self.setCentralWidget(self._text_edit)
 
         self.createActions()
         self.createMenus()
@@ -105,12 +109,10 @@ class MainWindow(QMainWindow):
 
         self.configuration(action=config.Action.Restore)
 
-        self.setLanguage()
+        self.translate()
 
         self.setUnifiedTitleAndToolBarOnMac(True)
         self.show()
-
-    # region Initialization
 
     def _initVars(self) -> None:
 
@@ -126,12 +128,15 @@ class MainWindow(QMainWindow):
             self.appDirectory = Path(os.path.realpath(__file__))
 
         self.setPreferences = PreferencesDialogWidget(self)
-        self.setInterfaceLocale.addSlot(self.setPreferences.retranslateUi)
+        self.translateInterface.addSlot(self.setPreferences.retranslateUi)
         self.activitySpinner = QActivityIndicator(self)
-        
-        self.commandWidget = CommandWidget(self)
 
         self.controlQueue = deque()
+        self.commandEntry = CommandWidget(self)
+        self.jobsOutput = JobsOutputWidget(self)
+        self.errorOutput = JobsOutputErrorsWidget(self)
+        self.output = None
+
         self.tabs = TabWidget(self)
 
     def _initHelper(self) -> None:
@@ -143,15 +148,40 @@ class MainWindow(QMainWindow):
         )
         self.activitySpinner.delay = 60
 
-        self.setInterfaceLocale.addSlot(self.commandWidget.setLanguage)
+        self.translateInterface.addSlot(self.commandEntry.translate)
+
+        # Set output to contain output windows objects
+        self.output = OutputWindows(
+            self.commandEntry.outputWindow,
+            self.jobsOutput,
+            self.errorOutput,
+        )
+        self.commandEntry.output = self.output
+
+        self.jobsOutput.setReadOnly(True)
+        self.errorOutput.setReadOnly(True)
 
         # Tabs
         tabsList = []
         tabsList.append(
             [
-                self.commandWidget,
+                self.commandEntry,
                 _(Text.txt0133),
                 _(Text.txt0148),
+            ]
+        )
+        tabsList.append(
+            [
+                self.jobsOutput,
+                _(Text.txt0141),
+                _(Text.txt0145),
+            ]
+        )
+        tabsList.append(
+            [
+                self.errorOutput,
+                _(Text.txt0142),
+                _(Text.txt0146),
             ]
         )
 
@@ -166,9 +196,9 @@ class MainWindow(QMainWindow):
         widget.setLayout(layout)
         self.setCentralWidget(widget)
 
-    # endregion
+    # endregion Initialization
 
-    # region events
+    # region Events
 
     def closeEvent(self, event: QEvent) -> None:
 
@@ -185,9 +215,9 @@ class MainWindow(QMainWindow):
         else:
             event.ignore()
 
-    #endregion
+    # endregion Events
 
-    # region interface
+    # region Interface
 
     def createActions(self) -> None:
         """Actions to use in menu interface"""
@@ -218,25 +248,25 @@ class MainWindow(QMainWindow):
         )
         self.actAbort.triggered.connect(abort)
 
+        # No status tip statusTip=Text.txt0065,
         self.actAbout = QActionWidget(
             Text.txt0063,
             self,
-            statusTip=Text.txt0065,
             triggered=self.about
         )
 
+        # No status statusTip=Text.txt0066,
         self.actAboutQt = QActionWidget(
             Text.txt0064,
             self,
-            statusTip=Text.txt0066,
             triggered=QApplication.aboutQt
         )
 
-        self.setInterfaceLocale.addSlot(self.actPreferences.setLanguage)
-        self.setInterfaceLocale.addSlot(self.actExit.setLanguage)
-        self.setInterfaceLocale.addSlot(self.actAbort.setLanguage)
-        self.setInterfaceLocale.addSlot(self.actAbout.setLanguage)
-        self.setInterfaceLocale.addSlot(self.actAboutQt.setLanguage)
+        self.translateInterface.addSlot(self.actPreferences.translate)
+        self.translateInterface.addSlot(self.actExit.translate)
+        self.translateInterface.addSlot(self.actAbort.translate)
+        self.translateInterface.addSlot(self.actAbout.translate)
+        self.translateInterface.addSlot(self.actAboutQt.translate)
 
     def createMenus(self) -> None:
         """Create the application menus"""
@@ -255,7 +285,7 @@ class MainWindow(QMainWindow):
         self.fileMenu.addAction(self.actAbort)
 
         menuBar.addMenu(self.fileMenu)
-        self.setInterfaceLocale.addSlot(self.fileMenu.setLanguage)
+        self.translateInterface.addSlot(self.fileMenu.translate)
 
         #
         # Help menu
@@ -265,7 +295,7 @@ class MainWindow(QMainWindow):
         self.helpMenu.addAction(self.actAboutQt)
 
         menuBar.addMenu(self.helpMenu)
-        self.setInterfaceLocale.addSlot(self.helpMenu.setLanguage)
+        self.translateInterface.addSlot(self.helpMenu.translate)
 
         # Attach menu
         self.setMenuBar(menuBar)
@@ -282,7 +312,7 @@ class MainWindow(QMainWindow):
 
         self.setStatusBar(statusBar)
 
-    # endregion
+    # endregion Interface
 
     # region Configuration
 
@@ -334,7 +364,7 @@ class MainWindow(QMainWindow):
         logging.info(msg)
         config.data.set(config.ConfigKey.Logging, state)
 
-    def setLanguage(self, language: Optional[str] = None) -> None:
+    def translate(self, language: Optional[str] = None) -> None:
         """
         Set application language the scheme permits runtime changes
 
@@ -342,11 +372,11 @@ class MainWindow(QMainWindow):
             language (str) -- language selected (default: {"en"})
         """
 
-        configLanguage(self, language)
+        configMessagesCatalog(self, language)
 
         self.setWindowTitle(_(Text.txt0001))
 
-        self.setInterfaceLocale.emitSignal()
+        self.translateInterface.emitSignal()
 
     def setAppFont(self, font):
         """
@@ -398,22 +428,18 @@ def mainApp():
     config.init(app=app)
 
     # Palette will change on macOS according to current theme
-    # will create a poor mans dark theme for windows
     if platform.system() == "Windows":
-        # pass
+        # will create a poor mans dark theme for windows
         darkPalette(app)
         config.data.set(config.ConfigKey.DarkMode, True)
         QOutputTextWidget.isDarkMode = True
-    #mw = MainWindow()
-    #mw.show()
     MainWindow()
     app.exec()
 
     config.close()
 
+
 # This if for Pylance _() is not defined
-
-
 def _(dummy):
     return dummy
 
