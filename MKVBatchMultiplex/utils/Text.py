@@ -139,7 +139,7 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0173 = S_("Commands to be applied")
     txt0174 = S_("Check Files")
     txt0175 = S_("Check files for consistency")
-    txt0176 = S_("Clear Output")
+    txt0176 = S_("Reset Application")
     txt0177 = S_("Erase text in output window")
     txt0178 = S_("Reset")
     txt0179 = S_("Reset state completely to work with another batch")
@@ -147,7 +147,7 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0181 = S_("Clear output window")
     txt0182 = S_("Rename")
     txt0183 = S_("Rename output files")
-
+    
     # RenameWidget
     # 200
     txt0200 = S_("Regular Expression")
