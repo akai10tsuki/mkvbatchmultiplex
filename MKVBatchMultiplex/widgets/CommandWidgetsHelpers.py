@@ -2,22 +2,23 @@
 CommandWidget helper functions attach to buttons
 """
 
-
-from PySide2.QtCore import Qt
+from PySide6.QtCore import Qt
 
 import vsutillib.mkv as mkv
 from vsutillib.files import DisplayPath
-from vsutillib.pyqt import SvgColor, LineOutput
+from vsutillib.pyside6 import LineOutput, SvgColor
 
 
-def runAnalysis(**kwargs):
+def runAnalysis(**kwargs: str) -> None:
     """List the source files found"""
 
     output = kwargs.pop("output", None)
     command = kwargs.pop("command", None)
     log = kwargs.pop("log", False)
+
     if command:
-        output.command.emit("Analysis of command line:\n", {LineOutput.AppendEnd: True})
+        output.command.emit("Analysis of command line:\n",
+                            {LineOutput.AppendEnd: True})
         verify = mkv.MKVCommandParser(command, log=log)
         verify.generateCommands()
         for e in verify.analysis:
@@ -41,7 +42,8 @@ def runAnalysisOld(**kwargs):
     command = kwargs.pop("command", None)
     log = kwargs.pop("log", False)
     verify = mkv.VerifyMKVCommand(command, log=log)
-    output.command.emit("Analysis of command line:\n", {LineOutput.AppendEnd: True})
+    output.command.emit("Analysis of command line:\n",
+                        {LineOutput.AppendEnd: True})
 
     for e in verify.analysis:
         if e.find(r"chk:") >= 0:
@@ -58,7 +60,7 @@ def runAnalysisOld(**kwargs):
     output.command.emit("\n", {LineOutput.AppendEnd: True})
 
 
-def showCommands(**kwargs):
+def showCommands(**kwargs: str):
     """List the commands to be executed"""
 
     output = kwargs.pop("output", None)
@@ -77,7 +79,8 @@ def showCommands(**kwargs):
     )
 
     if not oCommand.commandsGenerated:
-        output.command.emit("Generating Commands...\n", {LineOutput.AppendEnd: True})
+        output.command.emit("Generating Commands...\n", {
+                            LineOutput.AppendEnd: True})
         oCommand.generateCommands()
 
     output.command.emit(
@@ -103,7 +106,7 @@ def showCommands(**kwargs):
     return None
 
 
-def checkFiles(**kwargs):
+def checkFiles(**kwargs: str) -> str:
     """Check file structure against primary source file"""
 
     output = kwargs.pop("output", None)
@@ -113,48 +116,53 @@ def checkFiles(**kwargs):
 
     oCommand = mkv.MKVCommandParser(command, log=log)
 
+    dictStats = {}
+    errorFound = False
+    errorMarker = False
+
     if output is None:
         return "No output callback function"
 
     output.command.emit("Checking files...\n", {LineOutput.AppendEnd: True})
 
     if not oCommand.commandsGenerated:
-        output.command.emit("Generating Commands...\n", {LineOutput.AppendEnd: True})
+        output.command.emit("Generating Commands...\n", {
+                            LineOutput.AppendEnd: True})
         oCommand.generateCommands()
 
     if oCommand:
 
         verify = mkv.VerifyStructure(log=log)
 
-        for index, (_, baseFiles, sourceFiles, destinationFile, _, _, _) in enumerate(
+        for n, (_, baseFiles, sourceFiles, destinationFile, _, _, _) in enumerate(
             oCommand
         ):
             verify.verifyStructure(baseFiles, sourceFiles)
             lstFile = []
-
+            index = n + 1
             for f in sourceFiles:
                 lstFile.append(str(f))
 
+            msg = (f"{index}. Source: {str(lstFile)}\nDestination: "
+                   f"{destinationFile}\n")
+
             if verify:
-                msg = "{}. Source: {}\nDestination: {}\nStructure looks Ok.\n"
-                msg = msg.format(index + 1, str(lstFile), destinationFile)
-                output.command.emit(
-                    msg, {LineOutput.Color: Qt.darkGreen, LineOutput.AppendEnd: True}
-                )
+                msg += "Structure looks Ok.\n"
+                dictStats[index] = (True, msg, {LineOutput.Color: Qt.darkGreen,
+                                                LineOutput.AppendEnd: True})
+
             else:
-                msg = "{}. Source: {}\nDestination: {}\nStructure Error.\n"
-                msg = msg.format(index + 1, str(lstFile), destinationFile)
-                output.command.emit(
+                errorFound = True
+                msg += "Structure Error.\n"
+                dictStats[index] = (
+                    False,
                     msg,
-                    {
-                        LineOutput.Color: SvgColor.yellowgreen,
-                        LineOutput.AppendEnd: True,
-                    },
-                )
+                    {LineOutput.Color: SvgColor.yellowgreen,
+                     LineOutput.AppendEnd: True})
 
                 for i, m in enumerate(verify.analysis):
                     if i == 0:
-                        output.command.emit(
+                        output.error.emit(
                             m.strip() + "\n",
                             {
                                 LineOutput.Color: SvgColor.orange,
@@ -162,7 +170,7 @@ def checkFiles(**kwargs):
                             },
                         )
                     else:
-                        output.command.emit(
+                        output.error.emit(
                             str(i) + " - " + m.strip(),
                             {
                                 LineOutput.Color: SvgColor.red,
@@ -170,34 +178,83 @@ def checkFiles(**kwargs):
                             },
                         )
 
-                # output.command.emit(
-                #    "HERE: " + str(verify.unmatched),
-                #    {
-                #        LineOutput.Color: SvgColor.red,
-                #        LineOutput.AppendEnd: True,
-                #    },
-                # )
+                output.error.emit("", {LineOutput.AppendEnd: True})
 
-                output.command.emit("", {LineOutput.AppendEnd: True})
+        startIndex = None
+        endIndex = None
+        status = None
+        bPrint = False
+        dictLen = len(dictStats)
+
+        for i, (valid, message, dictMessage) in dictStats.items():
+
+            if status is None:
+                status = valid
+                startIndex = i
+            else:
+                if status != valid:
+                    bPrint = True
+                    endIndex = (i - 1)  # if (i > 1) else None
+
+            if bPrint or (i == dictLen):
+                if endIndex is not None:
+                    (msg, dictMsg) = validMessage(status)
+                    output.command.emit(
+                        f"Commands from: {startIndex}-{endIndex} "
+                        f"- {msg}\n",
+                        dictMsg
+                    )
+                else:
+                    (msg, dictMsg) = validMessage(status)
+                    output.command.emit(
+                        f"Command: {startIndex} "
+                        f"- {msg}\n",
+                        dictMsg
+                    )
+                if (i == dictLen) and (i != endIndex):
+                    (msg, dictMsg) = validMessage(valid)
+                    output.command.emit(
+                        f"Command: {i} - {msg}\n",
+                        dictMsg
+                    )
+
+                bPrint = False
+                status = valid
+                startIndex = i
+                endIndex = None
 
         output.command.emit("", {LineOutput.AppendEnd: True})
 
     else:
 
-        output.command.emit("Cannot generate commands.\n", {LineOutput.AppendEnd: True})
+        output.command.emit("Cannot generate commands.\n",
+                            {LineOutput.AppendEnd: True})
+
+
+def sourceTree(**kwargs: str) -> None:
+    """Check file structure against primary source file"""
+
+    output = kwargs.pop("output", None)
+    command = kwargs.pop("command", None)
+    oCommand = kwargs.pop("oCommand", None)
+    log = kwargs.pop("log", False)
+
+    oCommand = mkv.MKVCommandParser(command, log=log)
+
+    if not oCommand.commandsGenerated:
+        output.command.emit("Generating Commands...\n", {
+                            LineOutput.AppendEnd: True})
+        oCommand.generateCommands()
 
     baseTotalFiles = 0
-    # for key in oCommand.filesInDirByKey:
-    #    print(f"Key = {key}")
-
-    for key in oCommand.filesInDirByKey.items():
+    for key in oCommand.filesInDirByKey.keys():
 
         if key == MKVParseKey.title:
             continue
 
         if baseTotalFiles == 0:
-            baseTotalFiles = len(oCommand.filesInDirByKey[key])
-        totalFiles = len(oCommand.filesInDirByKey[key])
+            baseTotalFiles = len(tuple(oCommand.filesInDirByKey[key]))
+        totalFiles = len(tuple(oCommand.filesInDirByKey[key]))
 
         color = SvgColor.green
 
@@ -247,7 +304,13 @@ def checkFiles(**kwargs):
         {LineOutput.Color: color, LineOutput.AppendEnd: True},
     )
 
-    return None
+
+def validMessage(ok: bool) -> tuple:
+    if ok:
+        return ("Structure looks Ok.", {LineOutput.Color: Qt.darkGreen,
+                                        LineOutput.AppendEnd: True})
+    return ("Structure Error.", {LineOutput.Color: SvgColor.yellowgreen,
+                                 LineOutput.AppendEnd: True})
 
 
 class MKVParseKey:
