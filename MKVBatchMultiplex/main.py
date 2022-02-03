@@ -6,78 +6,44 @@ MKVBatchMultiplex entry point
 
 # region imports
 
+import ctypes
+from ctypes import wintypes
+
+kernel32 = ctypes.WinDLL('kernel32', use_last_error=True)
+user32 = ctypes.WinDLL('user32', use_last_error=True)
+
+FLASHW_STOP = 0
+FLASHW_CAPTION = 0x00000001
+FLASHW_TRAY = 0x00000002
+FLASHW_ALL = 0x00000003
+FLASHW_TIMER = 0x00000004
+FLASHW_TIMERNOFG = 0x000000
+
+
 import logging
 import os
 import platform
 import sys
-
 from collections import deque
 from pathlib import Path
-
 from typing import Optional
 
-from PySide6.QtCore import (
-    QByteArray,
-    QEvent,
-    QFile,
-    QFileInfo,
-    QSaveFile,
-    QSettings,
-    QTextStream,
-    Qt,
-    Signal,
-    Slot,
-)
-from PySide6.QtGui import (
-    QAction,
-    QColor,
-    QFont,
-    QIcon,
-    QKeySequence,
-    QPixmap,
-)
-from PySide6.QtWidgets import (
-    QApplication,
-    QFileDialog,
-    QMainWindow,
-    QMenuBar,
-    QMessageBox,
-    QStatusBar,
-    QStyle,
-    QTextEdit,
-    QToolTip,
-    QVBoxLayout,
-    QWidget,
-)
-
-from vsutillib.pyside6 import (
-    centerWidget,
-    checkColor,
-    darkPalette,
-    QActionWidget,
-    QActivityIndicator,
-    QMenuWidget,
-    QOutputTextWidget,
-    TabWidget,
-    VerticalLine,
-)
+from PySide6.QtCore import (QByteArray, QEvent, QFile, QFileInfo, QSaveFile,
+                            QSettings, Qt, QTextStream, Signal, Slot)
+from PySide6.QtGui import QAction, QColor, QFont, QIcon, QKeySequence, QPixmap
+from PySide6.QtWidgets import (QApplication, QFileDialog, QMainWindow,
+                               QMenuBar, QMessageBox, QStatusBar, QStyle,
+                               QTextEdit, QToolTip, QVBoxLayout, QWidget)
+from vsutillib.pyside6 import (QActionWidget, QActivityIndicator, QMenuWidget,
+                               QOutputTextWidget, QSystemTrayIconWidget,
+                               TabWidget, VerticalLine, centerWidget,
+                               checkColor, darkPalette)
 
 from . import config
-from .utils import (
-    configMessagesCatalog,
-    icons,
-    OutputWindows,
-    Translate,
-    Text,
-    UiSetMessagesCatalog,
-    yesNoDialog,
-)
-from .widgets import (
-    CommandWidget,
-    JobsOutputErrorsWidget,
-    JobsOutputWidget,
-    PreferencesDialogWidget,
-)
+from .utils import (OutputWindows, Text, Translate, UiSetMessagesCatalog,
+                    configMessagesCatalog, icons, yesNoDialog)
+from .widgets import (CommandWidget, JobsOutputErrorsWidget, JobsOutputWidget,
+                      PreferencesDialogWidget)
 
 # endregion imports
 
@@ -85,11 +51,16 @@ from .widgets import (
 class MainWindow(QMainWindow):
     """ Main window of application """
 
+    trayIconMessageSignal = Signal(str, str, object)
+
     # region Initialization
+
     def __init__(self, parent: Optional[QWidget] = None) -> None:
         super().__init__(parent)
 
         self.parent = parent
+
+        self.setWindowIcon(QIcon(QPixmap(":/images/Itsue256x256.png")))
 
         # Language setup has to be early so _() is defined
         self.translateInterface = Translate()
@@ -99,8 +70,6 @@ class MainWindow(QMainWindow):
         self._initVars()
         self._initHelper()
         self._initUI()
-
-        self.setWindowIcon(QIcon(QPixmap(":/images/Itsue256x256.png")))
 
         self.createActions()
         self.createMenus()
@@ -112,7 +81,9 @@ class MainWindow(QMainWindow):
         self.translate()
 
         self.setUnifiedTitleAndToolBarOnMac(True)
+        self.trayIcon.show()
         self.show()
+        flash_console_icon(5)
 
     def _initVars(self) -> None:
 
@@ -126,6 +97,8 @@ class MainWindow(QMainWindow):
             self.appDirectory = Path(os.path.dirname(__file__))
         else:
             self.appDirectory = Path(os.path.realpath(__file__))
+
+        self.trayIcon = QSystemTrayIconWidget(self, self.windowIcon())
 
         self.setPreferences = PreferencesDialogWidget(self)
         self.translateInterface.addSlot(self.setPreferences.retranslateUi)
@@ -216,6 +189,16 @@ class MainWindow(QMainWindow):
             event.ignore()
 
     # endregion Events
+
+    # region Overrides
+
+    def setVisible(self, visible):
+        """ Override setVisible """
+
+        self.trayIcon.setMenuEnabled(visible)
+        super().setVisible(visible)
+
+    # endregion Overrides
 
     # region Interface
 
@@ -430,14 +413,53 @@ def mainApp():
     # Palette will change on macOS according to current theme
     if platform.system() == "Windows":
         # will create a poor mans dark theme for windows
+        import ctypes
+
         darkPalette(app)
         config.data.set(config.ConfigKey.DarkMode, True)
         QOutputTextWidget.isDarkMode = True
+
+        myAppID = "VergaraSoft.MKVBatchMultiplex.mkv.3.0.0"  # arbitrary string
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myAppID)
+        
+
+
     MainWindow()
     app.exec()
 
     config.close()
 
+
+class FLASHWINFO(ctypes.Structure):
+    _fields_ = (('cbSize', wintypes.UINT),
+                ('hwnd', wintypes.HWND),
+                ('dwFlags', wintypes.DWORD),
+                ('uCount', wintypes.UINT),
+                ('dwTimeout', wintypes.DWORD))
+    def __init__(self, hwnd, flags=FLASHW_TRAY, count=5, timeout_ms=0):
+        self.cbSize = ctypes.sizeof(self)
+        self.hwnd = hwnd
+        self.dwFlags = flags
+        self.uCount = count
+        self.dwTimeout = timeout_ms
+
+def flash_console_icon(count=5):
+    hwnd = kernel32.GetConsoleWindow()
+    if not hwnd:
+        raise ctypes.WinError(ctypes.get_last_error())
+    winfo = FLASHWINFO(hwnd, count=count)
+    previous_state = user32.FlashWindowEx(ctypes.byref(winfo))
+
+    kernel32.GetConsoleWindow.restype = wintypes.HWND
+    user32.FlashWindowEx.argtypes = (ctypes.POINTER(FLASHWINFO),)
+
+    lpBuffer = wintypes.LPWSTR()
+    AppUserModelID = ctypes.windll.shell32.GetCurrentProcessExplicitAppUserModelID
+    AppUserModelID(ctypes.cast(ctypes.byref(lpBuffer), wintypes.LPWSTR))
+    appid = lpBuffer.value
+    ctypes.windll.kernel32.LocalFree(lpBuffer)
+    
+    return previous_state
 
 # This if for Pylance _() is not defined
 def _(dummy):
