@@ -147,6 +147,7 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0181 = S_("Clear output window")
     txt0182 = S_("Rename")
     txt0183 = S_("Rename output files")
+    txt0184 = S_("Files Tree")
     
     # RenameWidget
     # 200
