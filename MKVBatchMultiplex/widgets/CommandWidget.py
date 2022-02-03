@@ -20,6 +20,8 @@ from vsutillib.pyside6 import (HorizontalLine, LineOutput, QLabelWidget,
 
 from .. import config
 from ..utils import OutputWindows, Text, ValidateCommand, yesNoDialog
+from .CommandWidgetsHelpers import (checkFiles, runAnalysis, showCommands,
+                                    sourceTree)
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -147,8 +149,8 @@ class CommandWidget(QWidget):
         btnAnalysis = QPushButtonWidget(
             Text.txt0170,
             function=lambda: qtRunFunctionInThread(
-                None,
-                command=self.cmdLine.text(),
+                runAnalysis,
+                command=self.commandLine.text(),
                 output=self.output,
                 log=self.log,
             ),
@@ -159,9 +161,9 @@ class CommandWidget(QWidget):
         btnShowCommands = QPushButtonWidget(
             Text.txt0172,
             function=lambda: qtRunFunctionInThread(
-                None,
+                showCommands,
                 output=self.output,
-                command=self.cmdLine.text(),
+                command=self.commandLine.text(),
                 oCommand=self.oCommand,
                 log=self.log,
             ),
@@ -172,15 +174,29 @@ class CommandWidget(QWidget):
         btnCheckFiles = QPushButtonWidget(
             Text.txt0174,
             function=lambda: qtRunFunctionInThread(
-                None,
+                checkFiles,
                 output=self.output,
-                command=self.cmdLine.text(),
+                command=self.commandLine.text(),
                 oCommand=self.oCommand,
                 log=self.log,
             ),
             margins=" ",
             toolTip=Text.txt0175,
         )
+        # source tree
+        btnFilesTree = QPushButtonWidget(
+            Text.txt0184,
+            function=lambda: qtRunFunctionInThread(
+                sourceTree,
+                output=self.output,
+                command=self.commandLine.text(),
+                oCommand=self.oCommand,
+                log=self.log,
+            ),
+            margins=" ",
+            toolTip=Text.txt0175,
+        )
+
         btnClear = QPushButtonWidget(
             Text.txt0162,
             function=self.clearOutputWindow,
@@ -202,6 +218,7 @@ class CommandWidget(QWidget):
         self.btnGrid.addWidget(btnAnalysis, 3, 0)
         self.btnGrid.addWidget(btnShowCommands, 3, 1)
         self.btnGrid.addWidget(btnCheckFiles, 4, 0)
+        self.btnGrid.addWidget(btnFilesTree, 4, 1)
         self.btnGrid.addWidget(HorizontalLine(), 5, 0, 1, 2)
         self.btnGrid.addWidget(btnClear, 6, 0)
         self.btnGrid.addWidget(btnReset, 6, 1)
@@ -269,7 +286,6 @@ class CommandWidget(QWidget):
         # Job Queue related
         self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(False)
 
-
     def _initUI(self):
 
         grid = QGridLayout()
@@ -285,7 +301,7 @@ class CommandWidget(QWidget):
     # region Logging setup
 
     @classmethod
-    def classLog(cls, setLogging=None):
+    def classLog(cls, setLogging: Optional[bool] = None) -> bool:
         """
         get/set logging at class level
         every class instance will log
@@ -326,7 +342,7 @@ class CommandWidget(QWidget):
         return CommandWidget.classLog()
 
     @log.setter
-    def log(self, value):
+    def log(self, value: bool) -> None:
         """set instance log variable"""
         if isinstance(value, bool) or value is None:
             self.__log = value
@@ -468,6 +484,7 @@ class CommandWidget(QWidget):
             _Button.ADDQUEUE,
             _Button.SHOWCOMMANDS,
             _Button.CHECKFILES,
+            _Button.FILESTREE,
         ]:
             if button := self.btnGrid.itemAt(b).widget():
                 button.setEnabled(validateOK)
@@ -546,9 +563,10 @@ class _Button:
     ANALYSIS = 5
     SHOWCOMMANDS = 6
     CHECKFILES = 7
+    FILESTREE = 8
 
-    CLEAR = 9
-    RESET = 10
+    CLEAR = 10
+    RESET = 11
 
 
 # This if for Pylance _() is not defined
