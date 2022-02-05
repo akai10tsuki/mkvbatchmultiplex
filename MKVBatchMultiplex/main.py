@@ -153,7 +153,7 @@ class MainWindow(QMainWindow):
         tabsList.append(
             [
                 self.errorOutput,
-                _(Text.txt0142),
+                _(Text.txt0152),
                 _(Text.txt0146),
             ]
         )
