@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  MKVBatchMultiplex\n"
 "Report-Msgid-Bugs-To: akait10tsuki@gmail.com\n"
-"POT-Creation-Date: 2022-02-01 16:38-0500\n"
+"POT-Creation-Date: 2022-02-04 17:56-0500\n"
 "PO-Revision-Date: 2020-05-22 15:57-0400\n"
 "Last-Translator: \n"
 "Language: es_PR\n"
@@ -225,7 +225,7 @@ msgstr "Eliminar tareas de la Cola"
 msgid "Start Worker"
 msgstr "Comenzar Tareas"
 
-#: MKVBatchMultiplex/utils/text.py:88 MKVBatchMultiplex/utils/text.py:135
+#: MKVBatchMultiplex/utils/text.py:88 MKVBatchMultiplex/utils/text.py:136
 msgid "Start processing jobs on Queue"
 msgstr "Comenzar a procesar tareas en la Cola"
 
@@ -347,240 +347,248 @@ msgstr "Mostrar entrada de registros"
 msgid "Messages registered in current running log"
 msgstr "Mensajes en el registro de ejecución corriente"
 
-#: MKVBatchMultiplex/utils/text.py:126
+#: MKVBatchMultiplex/utils/text.py:123
+msgid "Errors"
+msgstr "Errores"
+
+#: MKVBatchMultiplex/utils/text.py:127
 msgid "Add Command"
 msgstr "Añadir Commando"
 
-#: MKVBatchMultiplex/utils/text.py:127
+#: MKVBatchMultiplex/utils/text.py:128
 msgid "Add command to jobs table with Waiting status"
 msgstr "Agregar comando a la tabla de tareas con estado 'Waiting'"
 
-#: MKVBatchMultiplex/utils/text.py:128 MKVBatchMultiplex/utils/text.py:188
+#: MKVBatchMultiplex/utils/text.py:129 MKVBatchMultiplex/utils/text.py:190
 msgid "Clear Output"
 msgstr "Borrar texto"
 
-#: MKVBatchMultiplex/utils/text.py:129 MKVBatchMultiplex/utils/text.py:143
+#: MKVBatchMultiplex/utils/text.py:130 MKVBatchMultiplex/utils/text.py:144
 msgid "Erase text in output window"
 msgstr "Borrar el texto de la ventana de salida"
 
-#: MKVBatchMultiplex/utils/text.py:130
+#: MKVBatchMultiplex/utils/text.py:131
 msgid "Paste"
 msgstr "Pegar"
 
-#: MKVBatchMultiplex/utils/text.py:131
+#: MKVBatchMultiplex/utils/text.py:132
 msgid "Paste Clipboard contents in command line"
 msgstr "Pegar contenido del portapapeles en la linea de comando"
 
-#: MKVBatchMultiplex/utils/text.py:132
+#: MKVBatchMultiplex/utils/text.py:133
 msgid "Add Queue"
 msgstr "Añadir a Cola"
 
-#: MKVBatchMultiplex/utils/text.py:133
+#: MKVBatchMultiplex/utils/text.py:134
 msgid "Add command to jobs table and put on Queue"
 msgstr "Agregar comando a la tabla de tareas con estado 'Waiting'"
 
-#: MKVBatchMultiplex/utils/text.py:134
+#: MKVBatchMultiplex/utils/text.py:135
 msgid "Examine any saved jobs, copy and run again if needed"
 msgstr ""
 "Examine las tareas archivadas, cópielas y ejecútelas nuevamente si es "
 "necesario"
 
-#: MKVBatchMultiplex/utils/text.py:136
+#: MKVBatchMultiplex/utils/text.py:137
 msgid "Analysis"
 msgstr "Análisis"
 
-#: MKVBatchMultiplex/utils/text.py:137
+#: MKVBatchMultiplex/utils/text.py:138
 msgid "Print analysis of command line"
 msgstr "Imprimir analísis de comando"
 
-#: MKVBatchMultiplex/utils/text.py:138
+#: MKVBatchMultiplex/utils/text.py:139
 msgid "Commands"
 msgstr "Commandos"
 
-#: MKVBatchMultiplex/utils/text.py:139
+#: MKVBatchMultiplex/utils/text.py:140
 msgid "Commands to be applied"
 msgstr "Comandos a ejecutar"
 
-#: MKVBatchMultiplex/utils/text.py:140
+#: MKVBatchMultiplex/utils/text.py:141
 msgid "Check Files"
 msgstr "Verificar archivos"
 
-#: MKVBatchMultiplex/utils/text.py:141
+#: MKVBatchMultiplex/utils/text.py:142
 msgid "Check files for consistency"
 msgstr "Verificar archivos para consistencia"
 
-#: MKVBatchMultiplex/utils/text.py:142
+#: MKVBatchMultiplex/utils/text.py:143
 #, fuzzy
 msgid "Reset Application"
 msgstr "Reiniciar la applicación"
 
-#: MKVBatchMultiplex/utils/text.py:144
+#: MKVBatchMultiplex/utils/text.py:145
 msgid "Reset"
 msgstr "Reiniciar"
 
-#: MKVBatchMultiplex/utils/text.py:145
+#: MKVBatchMultiplex/utils/text.py:146
 msgid "Reset state completely to work with another batch"
 msgstr "Reinicializar por completo para comenzar nuevas tareas"
 
-#: MKVBatchMultiplex/utils/text.py:146
+#: MKVBatchMultiplex/utils/text.py:147
 #, fuzzy
 msgid "Clear output"
 msgstr "Borrar texto"
 
-#: MKVBatchMultiplex/utils/text.py:147 MKVBatchMultiplex/utils/text.py:190
+#: MKVBatchMultiplex/utils/text.py:148 MKVBatchMultiplex/utils/text.py:192
 msgid "Clear output window"
 msgstr "Borrar el texto en la ventana de salida"
 
-#: MKVBatchMultiplex/utils/text.py:148
+#: MKVBatchMultiplex/utils/text.py:149
 msgid "Rename"
 msgstr "Renombar"
 
-#: MKVBatchMultiplex/utils/text.py:149
+#: MKVBatchMultiplex/utils/text.py:150
 #, fuzzy
 msgid "Rename output files"
 msgstr "Renonmbrar archivos de salida"
 
-#: MKVBatchMultiplex/utils/text.py:153
+#: MKVBatchMultiplex/utils/text.py:151
+msgid "Files Tree"
+msgstr ""
+
+#: MKVBatchMultiplex/utils/text.py:155
 msgid "Regular Expression"
 msgstr "Expresión regular"
 
-#: MKVBatchMultiplex/utils/text.py:154
+#: MKVBatchMultiplex/utils/text.py:156
 msgid "Enter regular expression"
 msgstr "Ingrese expresión regular"
 
-#: MKVBatchMultiplex/utils/text.py:155
+#: MKVBatchMultiplex/utils/text.py:157
 msgid "Substitution String"
 msgstr "Cadena de sustitución"
 
-#: MKVBatchMultiplex/utils/text.py:156
+#: MKVBatchMultiplex/utils/text.py:158
 msgid "Enter substitution string"
 msgstr "Ingrese cadena de sustitución"
 
-#: MKVBatchMultiplex/utils/text.py:157
+#: MKVBatchMultiplex/utils/text.py:159
 msgid "Original names"
 msgstr "Nombres originales"
 
-#: MKVBatchMultiplex/utils/text.py:158
+#: MKVBatchMultiplex/utils/text.py:160
 msgid "Name generated base on parsed command"
 msgstr "Nombres generados basado en el comando analizado"
 
-#: MKVBatchMultiplex/utils/text.py:159
+#: MKVBatchMultiplex/utils/text.py:161
 msgid "Rename to"
 msgstr "Renombar a"
 
-#: MKVBatchMultiplex/utils/text.py:160
+#: MKVBatchMultiplex/utils/text.py:162
 msgid "Names that will be used for commands"
 msgstr "Nombres a ser utilizados para los comandos"
 
-#: MKVBatchMultiplex/utils/text.py:161
+#: MKVBatchMultiplex/utils/text.py:163
 msgid "Apply Rename"
 msgstr "Aplicar cambio de nombre"
 
-#: MKVBatchMultiplex/utils/text.py:162
+#: MKVBatchMultiplex/utils/text.py:164
 msgid "Replace the original names with the operation result"
 msgstr "Reemplazar los nombres originales con el resultado de la operación"
 
-#: MKVBatchMultiplex/utils/text.py:164
+#: MKVBatchMultiplex/utils/text.py:166
 msgid "Undo"
 msgstr "Anular"
 
-#: MKVBatchMultiplex/utils/text.py:165
+#: MKVBatchMultiplex/utils/text.py:167
 msgid "Undo rename operation"
 msgstr "Anular cambio de nombres"
 
-#: MKVBatchMultiplex/utils/text.py:166
+#: MKVBatchMultiplex/utils/text.py:168
 msgid "Clear"
 msgstr "Borrar"
 
-#: MKVBatchMultiplex/utils/text.py:167
+#: MKVBatchMultiplex/utils/text.py:169
 msgid "Clear names start over"
 msgstr "Borrar nombres y comenzar otra vez"
 
-#: MKVBatchMultiplex/utils/text.py:168
+#: MKVBatchMultiplex/utils/text.py:170
 msgid "Invalid regex"
 msgstr "Expresión regular no válida"
 
-#: MKVBatchMultiplex/utils/text.py:173
+#: MKVBatchMultiplex/utils/text.py:175
 msgid "Date"
 msgstr "Fecha"
 
-#: MKVBatchMultiplex/utils/text.py:174
+#: MKVBatchMultiplex/utils/text.py:176
 msgid "Saved Jobs"
 msgstr "Tareas Archivadas"
 
-#: MKVBatchMultiplex/utils/text.py:175
+#: MKVBatchMultiplex/utils/text.py:177
 msgid "Fetch Jobs"
 msgstr "Buscar Tareas"
 
-#: MKVBatchMultiplex/utils/text.py:176
+#: MKVBatchMultiplex/utils/text.py:178
 msgid "Search"
 msgstr "Buscar"
 
-#: MKVBatchMultiplex/utils/text.py:177
+#: MKVBatchMultiplex/utils/text.py:179
 msgid "Show Output"
 msgstr "Mostrar Registros"
 
-#: MKVBatchMultiplex/utils/text.py:178
+#: MKVBatchMultiplex/utils/text.py:180
 msgid "Show Errors"
 msgstr "Mostrar Errores"
 
-#: MKVBatchMultiplex/utils/text.py:179
+#: MKVBatchMultiplex/utils/text.py:181
 msgid "Print"
 msgstr "Impresión"
 
-#: MKVBatchMultiplex/utils/text.py:180
+#: MKVBatchMultiplex/utils/text.py:182
 msgid "Select All"
 msgstr "Seleccionar Todo"
 
-#: MKVBatchMultiplex/utils/text.py:181
+#: MKVBatchMultiplex/utils/text.py:183
 msgid "Clear Selection"
 msgstr "Deseleccionar Todo"
 
-#: MKVBatchMultiplex/utils/text.py:182
+#: MKVBatchMultiplex/utils/text.py:184
 msgid "Description"
 msgstr "Descripción"
 
-#: MKVBatchMultiplex/utils/text.py:183
+#: MKVBatchMultiplex/utils/text.py:185
 msgid "Display saved Job information"
 msgstr "Mostrar información de las tareas archivadas"
 
-#: MKVBatchMultiplex/utils/text.py:184
+#: MKVBatchMultiplex/utils/text.py:186
 msgid "Fetch and display saved jobs"
 msgstr "Buscar y mostrar tareas guardadas"
 
-#: MKVBatchMultiplex/utils/text.py:185
+#: MKVBatchMultiplex/utils/text.py:187
 msgid "Jobs History"
 msgstr "Historial Tareas"
 
-#: MKVBatchMultiplex/utils/text.py:186
+#: MKVBatchMultiplex/utils/text.py:188
 msgid "Fetch History"
 msgstr "Buscar Historial"
 
-#: MKVBatchMultiplex/utils/text.py:187
+#: MKVBatchMultiplex/utils/text.py:189
 msgid "Do full text search on commands"
 msgstr "Búsqueda de texto en los comandos"
 
-#: MKVBatchMultiplex/utils/text.py:189
+#: MKVBatchMultiplex/utils/text.py:191
 msgid "Clear selected rows"
 msgstr "Deseleccionar tareas de la lista"
 
-#: MKVBatchMultiplex/utils/text.py:191
+#: MKVBatchMultiplex/utils/text.py:193
 msgid "Display job project information"
 msgstr "Mostrar información de tarea"
 
-#: MKVBatchMultiplex/utils/text.py:192
+#: MKVBatchMultiplex/utils/text.py:194
 msgid "Select all rows"
 msgstr "Seleccionar todas las filas"
 
-#: MKVBatchMultiplex/utils/text.py:193
+#: MKVBatchMultiplex/utils/text.py:195
 msgid "List rows"
 msgstr "Listar filas"
 
-#: MKVBatchMultiplex/utils/text.py:194
+#: MKVBatchMultiplex/utils/text.py:196
 msgid "Show job output run"
 msgstr "Mostrar ejecución de salida de la tarea"
 
-#: MKVBatchMultiplex/utils/text.py:195
+#: MKVBatchMultiplex/utils/text.py:197
 msgid "Show job output errors"
 msgstr "Mostrar errores en ejecución de salida de la tarea"
 
