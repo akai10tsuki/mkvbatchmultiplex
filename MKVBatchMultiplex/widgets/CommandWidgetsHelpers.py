@@ -1,6 +1,7 @@
 """
 CommandWidget helper functions attach to buttons
 """
+from threading import Lock
 
 from PySide6.QtCore import Qt
 
@@ -113,6 +114,7 @@ def checkFiles(**kwargs: str) -> str:
     command = kwargs.pop("command", None)
     oCommand = kwargs.pop("oCommand", None)
     log = kwargs.pop("log", False)
+    lock = Lock()
 
     oCommand = mkv.MKVCommandParser(command, log=log)
 
@@ -160,25 +162,26 @@ def checkFiles(**kwargs: str) -> str:
                     {LineOutput.Color: SvgColor.yellowgreen,
                      LineOutput.AppendEnd: True})
 
-                for i, m in enumerate(verify.analysis):
-                    if i == 0:
-                        output.error.emit(
-                            m.strip() + "\n",
-                            {
-                                LineOutput.Color: SvgColor.orange,
-                                LineOutput.AppendEnd: True,
-                            },
-                        )
-                    else:
-                        output.error.emit(
-                            str(i) + " - " + m.strip(),
-                            {
-                                LineOutput.Color: SvgColor.red,
-                                LineOutput.AppendEnd: True,
-                            },
-                        )
+                with lock:
+                    for i, m in enumerate(verify.analysis):
+                        if i == 0:
+                            output.error.emit(
+                                m.strip() + "\n",
+                                {
+                                    LineOutput.Color: SvgColor.orange,
+                                    LineOutput.AppendEnd: True,
+                                },
+                            )
+                        else:
+                            output.error.emit(
+                                str(i) + " - " + m.strip(),
+                                {
+                                    LineOutput.Color: SvgColor.red,
+                                    LineOutput.AppendEnd: True,
+                                },
+                            )
 
-                output.error.emit("", {LineOutput.AppendEnd: True})
+                    output.error.emit("", {LineOutput.AppendEnd: True})
 
         startIndex = None
         endIndex = None
