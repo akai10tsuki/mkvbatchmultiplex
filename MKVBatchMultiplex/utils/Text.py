@@ -77,7 +77,7 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0095 = S_("Date of execution")
 
     # JobTableWidgets
-    # 120
+    # 120, 9000-9049
     txt0120 = S_("Populate")
     txt0121 = S_("Add test jobs to table")
     txt0122 = S_("Queue Waiting Jobs")
@@ -120,6 +120,7 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0149 = S_("Log Viewer")
     txt0150 = S_("Display log entries")
     txt0151 = S_("Messages registered in current running log")
+    txt0152 = S_("Errors")
 
     # CommandWidget
     # 160
