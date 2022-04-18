@@ -52,7 +52,7 @@ class CommandWidget(QWidget):
 
         # properties
         self.__log = None
-        self.__output = None
+        self.__output: OutputWindows = None
         self.__rename = None
 
         self.parent = parent
@@ -66,7 +66,7 @@ class CommandWidget(QWidget):
         # log updates outputWindow.log
         self.log = log
 
-    def _initVars(self):
+    def _initVars(self) -> None:
 
         #
         #
@@ -97,7 +97,7 @@ class CommandWidget(QWidget):
         self.rbOne = None
         self.rbTwo = None
 
-    def _initControls(self):
+    def _initControls(self) -> None:
 
         # region command line
         btnPasteClipboard = QPushButtonWidget(
@@ -252,7 +252,7 @@ class CommandWidget(QWidget):
         self.algorithmGroupBox.setLayout(self.algorithmHBox)
         # endregion Algorithm group
 
-    def _initHelper(self):
+    def _initHelper(self) -> None:
 
         # button at end of line to clear it
         self.commandLine.setClearButtonEnabled(True)
@@ -286,7 +286,7 @@ class CommandWidget(QWidget):
         # Job Queue related
         self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(False)
 
-    def _initUI(self):
+    def _initUI(self) -> None:
 
         grid = QGridLayout()
         grid.addWidget(self.commandWidget, 0, 0, 1, 2)
@@ -326,7 +326,7 @@ class CommandWidget(QWidget):
         return cls.__log
 
     @property
-    def log(self):
+    def log(self) -> bool:
         """
         class property can be used to override the class global
         logging setting
@@ -362,7 +362,7 @@ class CommandWidget(QWidget):
         return self.__rename
 
     @rename.setter
-    def rename(self, value):
+    def rename(self, value) -> None:
         if isinstance(value, object):
             self.__rename = value
 
@@ -371,7 +371,7 @@ class CommandWidget(QWidget):
         return self.__output
 
     @output.setter
-    def output(self, value: OutputWindows):
+    def output(self, value: OutputWindows) -> None:
         self.__output = value
 
     # endregion
@@ -381,7 +381,7 @@ class CommandWidget(QWidget):
     def addCommand(self, status: str) -> None:
         pass
 
-    def pasteClipboard(self):
+    def pasteClipboard(self) -> None:
         """Paste clipboard to command QLineEdit"""
 
         clip = QApplication.clipboard().text()
@@ -393,7 +393,7 @@ class CommandWidget(QWidget):
             self.update()
             self.updateCommandSignal.emit(clip)
 
-    def clearOutputWindow(self):
+    def clearOutputWindow(self) -> None:
         """
         clearOutputWindow clear the command output window
         """
@@ -410,7 +410,7 @@ class CommandWidget(QWidget):
         if bAnswer:
             self.outputWindow.clear()
 
-    def reset(self):
+    def reset(self) -> None:
         """
         reset program status
         """
@@ -438,7 +438,7 @@ class CommandWidget(QWidget):
         else:
             messageBox(self, _(Text.txt0178), f"{_(Text.txt0089)}..")
 
-    def setDefaultAlgorithm(self):
+    def setDefaultAlgorithm(self) -> None:
         #
         # Algorithm
         #
@@ -446,12 +446,12 @@ class CommandWidget(QWidget):
             currentAlgorithm = config.data.get(config.ConfigKey.Algorithm)
             self.radioButtons[currentAlgorithm].setChecked(True)
 
-    def toggledRadioButton(self):
+    def toggledRadioButton(self) -> None:
         for index, rb in enumerate(self.radioButtons):
             if rb.isChecked():
                 self.algorithm = index
 
-    def analysisButtonState(self):
+    def analysisButtonState(self) -> None:
         """Set clear button state"""
 
         if self.commandLine.text() != "":
@@ -459,7 +459,7 @@ class CommandWidget(QWidget):
         else:
             self.btnGrid.itemAt(_Button.ANALYSIS).widget().setEnabled(False)
 
-    def clearButtonState(self):
+    def clearButtonState(self) -> None:
         """Set clear button state"""
 
         if self.outputWindow.toPlainText() != "":
@@ -470,7 +470,7 @@ class CommandWidget(QWidget):
     # endregion buttons slots
 
     @Slot(bool)
-    def cliButtonsState(self, validateOK):
+    def cliButtonsState(self, validateOK: bool) -> None:
         """
         cliButtonsState change enabled status for buttons related with command line
 
@@ -491,7 +491,7 @@ class CommandWidget(QWidget):
 
     # Slot for the update commnad signal
     @Slot(bool)
-    def cliValidate(self, validateOK):
+    def cliValidate(self, validateOK: bool) -> None:
         """
         cliValidate Slot used by ValidateCommnad
 
@@ -526,7 +526,7 @@ class CommandWidget(QWidget):
                 self.rename.clear()
 
     @Slot(str)
-    def updateCommand(self, command):
+    def updateCommand(self, command: str) -> None:
         """
         Update command input widget
         """
@@ -536,7 +536,7 @@ class CommandWidget(QWidget):
         self.commandLine.setCursorPosition(0)
 
     @Slot()
-    def translate(self):
+    def translate(self) -> None:
         """
         Set language used in buttons/lables called in MainWindow
         """
