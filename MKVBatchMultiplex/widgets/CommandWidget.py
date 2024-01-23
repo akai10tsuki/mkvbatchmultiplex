@@ -4,24 +4,41 @@ CommandWidget Class: Class to read the mkvtoolnix-gui command
 """
 # Next Log ID: CMD0001
 
+# region imports
 import logging
 from collections import deque
 from typing import Optional
 
 from PySide6.QtCore import Signal, Slot
-from PySide6.QtWidgets import (QApplication, QFormLayout, QGridLayout,
-                               QGroupBox, QHBoxLayout, QLineEdit, QRadioButton,
-                               QWidget)
+from PySide6.QtWidgets import (
+    QApplication,
+    QFormLayout,
+    QGridLayout,
+    QGroupBox,
+    QHBoxLayout,
+    QLineEdit,
+    QRadioButton,
+    QWidget
+)
+
 from vsutillib.mkv import MKVCommandParser
 from vsutillib.process import isThreadRunning
-from vsutillib.pyside6 import (HorizontalLine, LineOutput, QLabelWidget,
-                               QOutputTextWidget, QPushButtonWidget,
-                               messageBox, qtRunFunctionInThread)
+from vsutillib.pyside6 import (
+    HorizontalLine,
+    LineOutput,
+    QLabelWidget,
+    QOutputTextWidget,
+    QPushButtonWidget,
+    messageBox,
+    qtRunFunctionInThread
+)
 
 from .. import config
+from ..jobs import JobStatus
 from ..utils import OutputWindows, Text, ValidateCommand, yesNoDialog
 from .CommandWidgetsHelpers import (checkFiles, runAnalysis, showCommands,
                                     sourceTree)
+# endregion imports
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -46,6 +63,7 @@ class CommandWidget(QWidget):
     def __init__(
             self,
             parent: Optional[QWidget] = None,
+            proxyModel: Optional[QWidget] = None,
             controlQueue: Optional[deque] = None,
             log: Optional[bool] = None) -> None:
         super().__init__(parent=parent)
@@ -56,6 +74,7 @@ class CommandWidget(QWidget):
         self.__rename = None
 
         self.parent = parent
+        self.proxyModel = proxyModel
         self.controlQueue = controlQueue
 
         self._initVars()
@@ -67,20 +86,22 @@ class CommandWidget(QWidget):
         self.log = log
 
     def _initVars(self) -> None:
-
         #
         #
         #
         self.algorithm = None
         self.oCommand = MKVCommandParser()
+        self.model = self.proxyModel.sourceModel()
+
         #
         # command line
         #
         self.frmCommandLine = QFormLayout()
         self.commandLine = QLineEdit()
-        # self.commandLine.setMaxLength(65536)
+        # Increase command line buffer to 64k default is 32k
+        self.commandLine.setMaxLength(65536)
         self.commandWidget = QWidget()
-        # print(f"Line max length{self.commandLine.maxLength}\n")
+        print(f"Line max length={self.commandLine.maxLength()}\n")
 
         self.outputWindow = QOutputTextWidget()
 
@@ -122,7 +143,7 @@ class CommandWidget(QWidget):
         # region Buttons
         btnAddCommand = QPushButtonWidget(
             Text.txt0160,
-            function=lambda: self.addCommand("JobStatus.Waiting"),
+            function=lambda: self.addCommand(JobStatus.Waiting),
             margins=" ",
             toolTip=Text.txt0161,
         )
@@ -136,7 +157,7 @@ class CommandWidget(QWidget):
         )
         btnAddQueue = QPushButtonWidget(
             Text.txt0166,
-            function=lambda: self.addCommand("JobStatus.AddToQueue"),
+            function=lambda: self.addCommand(JobStatus.AddToQueue),
             margins=" ",
             toolTip=Text.txt0167,
         )
@@ -379,9 +400,86 @@ class CommandWidget(QWidget):
     # endregion
 
     # region buttons slots
+    @Slot(bool)
+    def cliButtonsState(self, validateOK: bool) -> None:
+        """
+        cliButtonsState change enabled status for buttons related with command line
 
-    def addCommand(self, status: str) -> None:
-        pass
+        Args:
+            validateOK (bool): True to enable, False to disable
+        """
+
+        for b in [
+            _Button.ADDCOMMAND,
+            _Button.RENAME,
+            _Button.ADDQUEUE,
+            _Button.SHOWCOMMANDS,
+            _Button.CHECKFILES,
+            _Button.FILESTREE,
+        ]:
+            if button := self.btnGrid.itemAt(b).widget():
+                button.setEnabled(validateOK)
+
+    # Slot for the update commnad signal
+    @Slot(bool)
+    def cliValidate(self, validateOK: bool) -> None:
+        """
+        cliValidate Slot used by ValidateCommnad
+
+        Args:
+            validateOK (bool): True if command line is Ok.  False otherwise.
+        """
+
+        if validateOK:
+            self.output.command.emit(
+                "Command looks ok.\n", {LineOutput.AppendEnd: True}
+            )
+        else:
+            if self.commandLine.text() != "":
+                self.output.command.emit(
+                    "Bad command.\n", {LineOutput.AppendEnd: True})
+
+        self.cliButtonsState(validateOK)
+        self.updateObjCommnad(validateOK)
+
+    @Slot(bool)
+    def updateObjCommnad(self, valid):
+        """Update the command object"""
+
+        if valid:
+            self.oCommand.command = self.commandLine.text()
+            if self.rename is not None:
+                self.rename.setFilesSignal.emit(self.oCommand)
+                self.rename.applyFileRenameSignal.connect(self.applyRename)
+        else:
+            self.oCommand.command = ""
+            if self.rename is not None:
+                self.rename.clear()
+
+    @Slot(str)
+    def updateCommand(self, command: str) -> None:
+        """
+        Update command input widget
+        """
+
+        self.commandLine.clear()
+        self.commandLine.setText(command)
+        self.commandLine.setCursorPosition(0)
+
+    @Slot()
+    def translate(self) -> None:
+        """
+        Set language used in buttons/lables called in MainWindow
+        """
+
+        for index in range(self.frmCommandLine.rowCount()):
+            widget = self.frmCommandLine.itemAt(
+                index, QFormLayout.LabelRole).widget()
+            if isinstance(widget, QPushButtonWidget):
+                widget.translate()
+# endregion buttons slots
+
+    # region buttons
 
     def pasteClipboard(self) -> None:
         """Paste clipboard to command QLineEdit"""
@@ -394,6 +492,25 @@ class CommandWidget(QWidget):
             # )
             self.update()
             self.updateCommandSignal.emit(clip)
+
+    def addCommand(self, status: str) -> None:
+        """
+        addCommand add command row in jobs table
+
+        Args:
+            status (JobStatus): Status for job to be added should be either
+                                JobStatus.Waiting or JobStatus.AddToQueue
+        """
+
+        totalJobs = self.model.rowCount()
+        command = self.commandLine.text()
+        data = [
+            ["", "", self.algorithm],
+            [status, "Status code", None],
+            [command, command, self.oCommand],
+        ]
+        self.model.insertRows(totalJobs, 1, data=data)
+        self.commandLine.clear()
 
     def clearOutputWindow(self) -> None:
         """
@@ -469,85 +586,7 @@ class CommandWidget(QWidget):
         else:
             self.btnGrid.itemAt(_Button.CLEAR).widget().setEnabled(False)
 
-    # endregion buttons slots
-
-    @Slot(bool)
-    def cliButtonsState(self, validateOK: bool) -> None:
-        """
-        cliButtonsState change enabled status for buttons related with command line
-
-        Args:
-            validateOK (bool): True to enable, False to disable
-        """
-
-        for b in [
-            _Button.ADDCOMMAND,
-            _Button.RENAME,
-            _Button.ADDQUEUE,
-            _Button.SHOWCOMMANDS,
-            _Button.CHECKFILES,
-            _Button.FILESTREE,
-        ]:
-            if button := self.btnGrid.itemAt(b).widget():
-                button.setEnabled(validateOK)
-
-    # Slot for the update commnad signal
-    @Slot(bool)
-    def cliValidate(self, validateOK: bool) -> None:
-        """
-        cliValidate Slot used by ValidateCommnad
-
-        Args:
-            validateOK (bool): True if command line is Ok.  False otherwise.
-        """
-
-        if validateOK:
-            self.output.command.emit(
-                "Command looks ok.\n", {LineOutput.AppendEnd: True}
-            )
-        else:
-            if self.commandLine.text() != "":
-                self.output.command.emit(
-                    "Bad command.\n", {LineOutput.AppendEnd: True})
-
-        # self.cliButtonsState(validateOK)
-        # self.updateObjCommnad(validateOK)
-
-    @Slot(bool)
-    def updateObjCommnad(self, valid):
-        """Update the command object"""
-
-        if valid:
-            self.oCommand.command = self.commandLine.text()
-            if self.rename is not None:
-                self.rename.setFilesSignal.emit(self.oCommand)
-                self.rename.applyFileRenameSignal.connect(self.applyRename)
-        else:
-            self.oCommand.command = ""
-            if self.rename is not None:
-                self.rename.clear()
-
-    @Slot(str)
-    def updateCommand(self, command: str) -> None:
-        """
-        Update command input widget
-        """
-
-        self.commandLine.clear()
-        self.commandLine.setText(command)
-        self.commandLine.setCursorPosition(0)
-
-    @Slot()
-    def translate(self) -> None:
-        """
-        Set language used in buttons/lables called in MainWindow
-        """
-
-        for index in range(self.frmCommandLine.rowCount()):
-            widget = self.frmCommandLine.itemAt(
-                index, QFormLayout.LabelRole).widget()
-            if isinstance(widget, QPushButtonWidget):
-                widget.translate()
+    # endregion buttons
 
 
 class _Button:
