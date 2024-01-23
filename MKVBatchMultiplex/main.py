@@ -5,7 +5,6 @@ MKVBatchMultiplex entry point
 # MAI0004
 
 # region imports
-
 import ctypes
 from ctypes import wintypes
 
@@ -17,26 +16,74 @@ from collections import deque
 from pathlib import Path
 from typing import Optional
 
-from PySide6.QtCore import (QByteArray, QEvent, QFile, QFileInfo, QSaveFile,
-                            QSettings, Qt, QTextStream, Signal, Slot)
-from PySide6.QtGui import QAction, QColor, QFont, QIcon, QKeySequence, QPixmap
-from PySide6.QtWidgets import (QApplication, QFileDialog, QMainWindow,
-                               QMenuBar, QMessageBox, QStatusBar, QStyle,
-                               QTextEdit, QToolTip, QVBoxLayout, QWidget)
-from vsutillib.pyside6 import (DualProgressBar, QActionWidget, QActivityIndicator, QMenuWidget,
-                               QOutputTextWidget, QSystemTrayIconWidget,
-                               TabWidget, VerticalLine, centerWidget,
-                               checkColor, darkPalette)
+from PySide6.QtCore import (
+    QByteArray,
+    QEvent,
+    QFile,
+    QFileInfo,
+    QSaveFile,
+    QSettings,
+    Qt,
+    QTextStream,
+    Signal,
+    Slot
+)
+from PySide6.QtGui import(
+    QAction,
+    QColor,
+    QFont,
+    QIcon,
+    QKeySequence,
+    QPixmap
+)
+from PySide6.QtWidgets import (
+    QApplication,
+    QFileDialog,
+    QMainWindow,
+    QMenuBar,
+    QMessageBox,
+    QStatusBar,
+    QStyle,
+    QTextEdit,
+    QToolTip,
+    QVBoxLayout,
+    QWidget
+)
+
+from vsutillib.pyside6 import (
+    DualProgressBar,
+    QActionWidget,
+    QActivityIndicator,
+    QMenuWidget,
+    QOutputTextWidget,
+    QSystemTrayIconWidget,
+    TabWidget,
+    VerticalLine,
+    centerWidget,
+    checkColor,
+    darkPalette
+)
 
 from . import config
 from .dataset import TableData, tableHeaders
 from .jobs import JobQueue
 from .models import TableProxyModel, JobsTableModel
-from .utils import (OutputWindows, Text, Translate, UiSetMessagesCatalog,
-                    configMessagesCatalog, icons, yesNoDialog)
-from .widgets import (CommandWidget, JobsOutputErrorsWidget, JobsOutputWidget,
-                      JobsTableViewWidget, PreferencesDialogWidget)
-
+from .utils import (
+    OutputWindows,
+    Text,
+    Translate,
+    UiSetMessagesCatalog,
+    configMessagesCatalog,
+    icons,
+    yesNoDialog)
+from .widgets import (
+    CommandWidget,
+    JobsOutputErrorsWidget,
+    JobsOutputWidget,
+    JobsTableViewWidget,
+    PreferencesDialogWidget,
+    RenameWidget
+)
 # endregion imports
 
 
@@ -98,16 +145,19 @@ class MainWindow(QMainWindow):
         self.activitySpinner = QActivityIndicator(self)
 
         self.controlQueue = deque()
-        self.commandEntry = CommandWidget(self)
-        self.jobsOutput = JobsOutputWidget(self)
-        self.errorOutput = JobsOutputErrorsWidget(self)
 
         self.jobsQueue = JobQueue(self, controlQueue=self.controlQueue)
+
         # Model view
         headers = tableHeaders()
         self.tableData = TableData(headerList=headers, dataList=[])
         self.model = JobsTableModel(self.tableData, self.jobsQueue)
         self.proxyModel = TableProxyModel(self.model)
+
+        self.commandEntry = CommandWidget(self, self.proxyModel)
+        self.jobsOutput = JobsOutputWidget(self)
+        self.errorOutput = JobsOutputErrorsWidget(self)
+        self.renameWidget = RenameWidget(self)
 
         # Widgets for tabs
         self.jobsTableViewWidget = JobsTableViewWidget(
@@ -171,7 +221,13 @@ class MainWindow(QMainWindow):
                 _(Text.txt0146),
             ]
         )
-
+        tabsList.append(
+            [
+                self.renameWidget,
+                _(Text.txt0143),
+                _(Text.txt0147),
+            ]
+        )
         self.tabs.addTabs(tabsList)
 
     def _initUI(self):
