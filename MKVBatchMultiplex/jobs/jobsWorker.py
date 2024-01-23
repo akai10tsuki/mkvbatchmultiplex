@@ -23,7 +23,7 @@ import vsutillib.mkv as mkv
 
 from vsutillib.misc import staticVars, strFormatTimeDelta
 from vsutillib.process import RunCommand
-from vsutillib.pyqt import SvgColor
+from vsutillib.pyside6 import SvgColor
 
 from .. import config
 
