@@ -151,7 +151,7 @@ class CommandWidget(QWidget):
         #    function=self.parent.renameWidget.setAsCurrentTab,
         btnRename = QPushButtonWidget(
             Text.txt0182,
-            function=None,
+            function=self.parent.renameWidget.setAsCurrentTab,
             margins=" ",
             toolTip=Text.txt0183,
         )
@@ -164,7 +164,7 @@ class CommandWidget(QWidget):
         # function=self.parent.jobsQueue.run,
         btnStartQueue = QPushButtonWidget(
             Text.txt0126,
-            function=None,
+            function=self.parent.jobsQueue.run,
             margins=" ",
             toolTip=Text.txt0169,
         )
@@ -307,6 +307,9 @@ class CommandWidget(QWidget):
         self.commandLine.textChanged.connect(self.analysisButtonState)
 
         # Job Queue related
+        self.parent.jobsQueue.addQueueItemSignal.connect(
+            lambda: self.jobStartQueueState(True)
+        )
         self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(False)
 
     def _initUI(self) -> None:
@@ -441,6 +444,14 @@ class CommandWidget(QWidget):
 
         self.cliButtonsState(validateOK)
         self.updateObjCommnad(validateOK)
+
+    @Slot(bool)
+    def jobStartQueueState(self, state):
+
+        if state and not isThreadRunning(config.WORKERTHREADNAME):
+            self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(True)
+        else:
+            self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(False)
 
     @Slot(bool)
     def updateObjCommnad(self, valid):
