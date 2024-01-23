@@ -27,7 +27,7 @@ autodoc_mock_imports = ["vsutillib"]
 # -- Project information -----------------------------------------------------
 
 project = "mkvbatchmultiplex"
-copyright = "2018-2020, Efrain Vergara"
+copyright = "2018-2022, Efrain Vergara"
 author = "Efrain Vergara"
 
 # The short X.Y version

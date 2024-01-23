@@ -78,7 +78,9 @@ class CommandWidget(QWidget):
         #
         self.frmCommandLine = QFormLayout()
         self.commandLine = QLineEdit()
+        # self.commandLine.setMaxLength(65536)
         self.commandWidget = QWidget()
+        # print(f"Line max length{self.commandLine.maxLength}\n")
 
         self.outputWindow = QOutputTextWidget()
 

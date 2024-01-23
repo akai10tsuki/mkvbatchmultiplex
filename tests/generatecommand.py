@@ -14,7 +14,7 @@ import shlex
 
 from pathlib import Path, PurePath
 
-from PySide2.QtWidgets import (
+from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
     QTextEdit,
