@@ -101,11 +101,17 @@ Class for a table model with horizontal headers
 
 # pylint: disable=unused-argument
 
+# region imports
 from typing import Optional
 
-from PySide6.QtCore import (QAbstractTableModel, Qt, QSortFilterProxyModel,
-                            QModelIndex)
+from PySide6.QtCore import (
+    QAbstractTableModel,
+    Qt,
+    QSortFilterProxyModel,
+    QModelIndex
+)
 from PySide6.QtWidgets import QTableView, QWidget
+# endregion imports
 
 JOBID, JOBSTATUS, JOBCOMMAND = range(3)
 
