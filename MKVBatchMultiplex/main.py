@@ -51,17 +51,19 @@ from PySide6.QtWidgets import (
 )
 
 from vsutillib.pyside6 import (
+    centerWidget,
+    checkColor,
+    darkPalette,
     DualProgressBar,
     QActionWidget,
     QActivityIndicator,
+    QFormatLabel,
     QMenuWidget,
     QOutputTextWidget,
+    QProgressIndicator,
     QSystemTrayIconWidget,
     TabWidget,
     VerticalLine,
-    centerWidget,
-    checkColor,
-    darkPalette
 )
 
 from . import config
@@ -69,12 +71,13 @@ from .dataset import TableData, tableHeaders
 from .jobs import JobQueue
 from .models import TableProxyModel, JobsTableModel
 from .utils import (
+    icons,
+    configMessagesCatalog,
     OutputWindows,
+    Progress,
     Text,
     Translate,
     UiSetMessagesCatalog,
-    configMessagesCatalog,
-    icons,
     yesNoDialog)
 from .widgets import (
     CommandWidget,
@@ -154,13 +157,15 @@ class MainWindow(QMainWindow):
         self.model = JobsTableModel(self.tableData, self.jobsQueue)
         self.proxyModel = TableProxyModel(self.model)
 
+        # renameWidget is referenced in CommandWidget
+        self.renameWidget = RenameWidget(self)
+
         self.commandEntry = CommandWidget(self, self.proxyModel)
         self.jobsOutput = JobsOutputWidget(self)
         self.errorOutput = JobsOutputErrorsWidget(self)
-        self.renameWidget = RenameWidget(self)
 
         # Widgets for tabs
-        self.jobsTableViewWidget = JobsTableViewWidget(
+        self.jobsTableView = JobsTableViewWidget(
             self, self.proxyModel, self.controlQueue, _(Text.txt0130)
         )
 
@@ -174,6 +179,17 @@ class MainWindow(QMainWindow):
 
         self.tabs = TabWidget(self)
 
+        # Progress information setup
+        self.progressBar = DualProgressBar(self, align=Qt.Horizontal)
+        self.jobsLabel = QFormatLabel(
+            Text.txt0085,
+            init=[0, 0, 0, 0, 0],
+        )
+        self.progress = Progress(self, self.progressBar, self.jobsLabel)
+        self.jobsQueue.progress = self.progress
+        self.progressSpin = QProgressIndicator(self)
+
+
     def _initHelper(self) -> None:
         # work in progress spin
         self.activitySpinner.displayedWhenStopped = True
@@ -183,9 +199,21 @@ class MainWindow(QMainWindow):
         )
         self.activitySpinner.delay = 60
 
+        # Output references setup
+        self.commandEntry.output = self.output
+        self.jobsTableView.output = self.output
+        self.jobsQueue.output = self.output
+        self.commandEntry.outputWindow.setReadOnly(True)
+        self.jobsOutput.setReadOnly(True)
+        self.errorOutput.setReadOnly(True)
+        #self.historyWidget.output.setReadOnly(True)
+        self.jobsOutput.textChanged.connect(
+            self.commandEntry.clearButtonState)
+
+        # Translation
         self.translateInterface.addSlot(self.commandEntry.translate)
 
-        self.commandEntry.output = self.output
+        #self.commandEntry.output = self.output
         self.jobsQueue.proxyModel = self.proxyModel
 
         self.jobsOutput.setReadOnly(True)
@@ -202,7 +230,7 @@ class MainWindow(QMainWindow):
         )
         tabsList.append(
             [
-                self.jobsTableViewWidget,
+                self.jobsTableView,
                 _(Text.txt0140),
                 _(Text.txt0144),
             ]
