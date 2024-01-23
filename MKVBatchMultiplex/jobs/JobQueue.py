@@ -419,7 +419,7 @@ class JobQueue(QObject):
         self.runJobs.log = self.log
 
         if JobQueue.__firstRun:
-            self.parent.jobsOutputWidget.setAsCurrentTab()
+            self.parent.jobsOutput.setAsCurrentTab()
             JobQueue.__firstRun = False
 
         self.runJobs.run()
