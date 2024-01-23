@@ -11,4 +11,4 @@ from .JobsTableViewWidget import JobsTableViewWidget
 #from .LogViewerWidget import LogViewerWidget
 from .PreferencesDialogWidget import PreferencesDialogWidget
 from .ProjectInfoDialogWidget import ProjectInfoDialogWidget
-#from .RenameWidget import RenameWidget
+from .RenameWidget import RenameWidget
