@@ -44,7 +44,12 @@ class JobsTableView(QTableView):
     # Class logging state
     __log = False
 
-    def __init__(self, parent=None, proxyModel=None, title=None, log=None):
+    def __init__(
+            self,
+            parent=None,
+            proxyModel=None,
+            title=None,
+            log=None):
         super(JobsTableView, self).__init__()
 
         self.__log = None  # Instance logging state None = Class state prevails
