@@ -9,7 +9,7 @@ from PySide6.QtCore import QObject, Signal
 
 
 from vsutillib.process import ThreadWorker, isThreadRunning
-from vsutillib.pyqt import SvgColor
+from vsutillib.pyside6 import SvgColor
 
 from .. import config
 from ..models import TableProxyModel
