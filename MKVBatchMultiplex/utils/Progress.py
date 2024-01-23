@@ -7,7 +7,7 @@ from typing import Optional
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtWidgets import QWidget
 
-from vsutillib.pyqt import DualProgressBar, QFormatLabel
+from vsutillib.pyside6 import DualProgressBar, QFormatLabel
 
 
 class Progress(QObject):
@@ -54,7 +54,8 @@ class Progress(QObject):
 
         if initProgressBar:
 
-            self.pbReset.connect(self.pb.reset)
+            # reset was use for the taskbar button that is no longer available
+            #self.pbReset.connect(self.pb.clear)
             self.pbSetAlignment.connect(self.pb.setAlignment)
             self.pbSetValues.connect(self.pb.setValues)
             self.pbSetMaximum.connect(self.pb.setMaximum)
