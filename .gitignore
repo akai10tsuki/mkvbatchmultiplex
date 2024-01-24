@@ -65,6 +65,7 @@ target/
 MKVBatchMultiplexPySide2/
 tests/NewFiles/
 tests/generatecommand.1.py
+tests/crcTests.py
 .vscode/
 /locale
 tmp/
