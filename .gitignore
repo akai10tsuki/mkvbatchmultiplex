@@ -64,8 +64,6 @@ target/
 # regExpressions
 tests/NewFiles/
 tests/generatecommand.1.py
-tests/crcTests.py
-tests/teste.py
 .vscode/
 /locale
 tmp/
