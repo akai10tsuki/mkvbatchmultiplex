@@ -174,7 +174,8 @@ def jobsWorker(
             exitStatus = "ended"
 
             if log:
-                MODULELOG.debug("RJB0005: Job ID: %s started.", job.jobRow[JobKey.ID])
+                MODULELOG.debug("RJB0005: Job ID: %s started.",
+                                job.jobRow[JobKey.ID])
 
             updateStatus = True
 
@@ -232,7 +233,11 @@ def jobsWorker(
                         "Command: {}  Base Files: {} "
                         "Source Files: {} Destination File: {}"
                     )
-                    msg = msg.format(cmd, baseFiles, sourceFiles, destinationFile)
+                    msg = msg.format(
+                        cmd,
+                        baseFiles,
+                        sourceFiles,
+                        destinationFile)
                     MODULELOG.debug("RJB0006: %s", msg)
 
                 #
@@ -253,7 +258,8 @@ def jobsWorker(
                             originalCmd = cmd
                             cmd = shellCommand
                             msg = (
-                                f"Warning command adjusted - confidence {confidence}:\n\n"
+                                f"Warning command adjusted - confidence "
+                                f"{confidence}:\n\n"
                                 f"Original: {originalCmd}\n"
                                 f"     New: {cmd}\n"
                             )
@@ -388,7 +394,8 @@ def jobsWorker(
             if updateStatus:
                 jobsQueue.statusUpdateSignal.emit(job, JobStatus.Done)
             if log:
-                MODULELOG.debug("RJB0009: Job ID: %s finished.", job.jobRow[JobKey.ID])
+                MODULELOG.debug("RJB0009: Job ID: %s finished.",
+                                job.jobRow[JobKey.ID])
         else:
             totalErrors += 1
             funcProgress.lblSetValue.emit(4, totalErrors)
