@@ -186,9 +186,8 @@ class MainWindow(QMainWindow):
             init=[0, 0, 0, 0, 0],
         )
         self.progress = Progress(self, self.progressBar, self.jobsLabel)
-        self.jobsQueue.progress = self.progress
-        self.progressSpin = QProgressIndicator(self)
 
+        self.progressSpin = QProgressIndicator(self)
 
     def _initHelper(self) -> None:
         # work in progress spin
@@ -210,14 +209,12 @@ class MainWindow(QMainWindow):
         self.jobsOutput.textChanged.connect(
             self.commandEntry.clearButtonState)
 
-        # Translation
-        self.translateInterface.addSlot(self.commandEntry.translate)
-
-        #self.commandEntry.output = self.output
+        # Jobs Queue
+        self.jobsQueue.progress = self.progress
         self.jobsQueue.proxyModel = self.proxyModel
 
-        self.jobsOutput.setReadOnly(True)
-        self.errorOutput.setReadOnly(True)
+        # Translation
+        self.translateInterface.addSlot(self.commandEntry.translate)
 
         # Tabs
         tabsList = []
@@ -257,6 +254,29 @@ class MainWindow(QMainWindow):
             ]
         )
         self.tabs.addTabs(tabsList)
+
+        # Signal connections
+
+        # runJobs Start/Stop
+        self.jobsQueue.runJobs.startSignal.connect(
+            self.activitySpinner.startAnimation)
+        self.jobsQueue.runJobs.finishedSignal.connect(
+            self.activitySpinner.stopAnimation)
+
+        # Tabs change signal
+        self.tabs.currentChanged.connect(tabChange)
+
+        # tray Icon message
+        self.trayIconMessageSignal.connect(self.trayIcon.showMessage)
+
+        # connect log viewer
+        # config.logViewer.connect(self.logViewerWidget.logMessage)
+
+        # connect JobHistory and commandWidget may not implement
+        #self.historyWidget.pasteCommandSignal.connect(self.commandWidget.updateCommand)
+        #self.historyWidget.updateAlgorithmSignal.connect(
+        #    self.commandWidget.updateAlgorithm
+        #)
 
     def _initUI(self):
 
@@ -389,6 +409,9 @@ class MainWindow(QMainWindow):
 
         statusBar = QStatusBar()
         statusBar.addPermanentWidget(VerticalLine())
+        statusBar.addPermanentWidget(self.jobsLabel)
+        statusBar.addPermanentWidget(VerticalLine())
+        statusBar.addPermanentWidget(self.progressBar)
         statusBar.addPermanentWidget(self.activitySpinner)
 
         self.setStatusBar(statusBar)
@@ -494,6 +517,16 @@ class MainWindow(QMainWindow):
 
         QMessageBox.about(self, config.APPNAME, aboutMsg)
 
+@Slot(int)
+def tabChange(index):
+    """
+    tabChange take action when the tab change for save current tab index
+
+    Args:
+        index (int): index of current tab
+    """
+
+    config.data.set("Tab", index)
 
 def abort():
     """Force Quit"""
