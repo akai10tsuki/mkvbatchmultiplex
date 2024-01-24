@@ -72,7 +72,6 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
         self.grpGrid = QGridLayout()
         self.grpBox = QGroupBox(title)
 
-        
         btnAddWaitingJobsToQueue = QPushButtonWidget(
             Text.txt0122,
             function=self.addWaitingJobsToQueue,
@@ -229,22 +228,6 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
     @output.setter
     def output(self, value):
         self.__output = value
-
-    # @property
-    # def tab(self):
-    #    return self.__tab
-
-    # @tab.setter
-    # def tab(self, value):
-    #    self.__tab = value
-
-    # @property
-    # def tabWidget(self):
-    #    return self.__tabWidget
-
-    # @tabWidget.setter
-    # def tabWidget(self, value):
-    #    self.__tabWidget = value
 
     def abortCurrentJob(self):
         self.controlQueue.append(JobStatus.AbortJob)
