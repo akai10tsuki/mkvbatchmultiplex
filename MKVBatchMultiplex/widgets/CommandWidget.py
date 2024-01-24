@@ -36,8 +36,12 @@ from vsutillib.pyside6 import (
 from .. import config
 from ..jobs import JobStatus
 from ..utils import OutputWindows, Text, ValidateCommand, yesNoDialog
-from .CommandWidgetsHelpers import (checkFiles, runAnalysis, showCommands,
-                                    sourceTree)
+from .CommandWidgetsHelpers import (
+    checkFiles,
+    runAnalysis,
+    showCommands,
+    sourceTree
+)
 # endregion imports
 
 MODULELOG = logging.getLogger(__name__)
