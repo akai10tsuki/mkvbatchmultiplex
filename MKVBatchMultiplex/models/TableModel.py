@@ -101,9 +101,17 @@ Class for a table model with horizontal headers
 
 # pylint: disable=unused-argument
 
+# region imports
+from typing import Optional
 
-from PySide2.QtCore import QAbstractTableModel, Qt, QSortFilterProxyModel, QModelIndex
-from PySide2.QtWidgets import QTableView
+from PySide6.QtCore import (
+    QAbstractTableModel,
+    Qt,
+    QSortFilterProxyModel,
+    QModelIndex
+)
+from PySide6.QtWidgets import QTableView, QWidget
+# endregion imports
 
 JOBID, JOBSTATUS, JOBCOMMAND = range(3)
 
@@ -136,7 +144,10 @@ class TableModel(QAbstractTableModel):
         information
     """
 
-    def __init__(self, parent=None, tableData=None):
+    def __init__(
+        self,
+        parent: Optional[QWidget] = None,
+        tableData=None):
         super().__init__(parent)
 
         self.parent = parent
@@ -144,7 +155,6 @@ class TableModel(QAbstractTableModel):
         self._callRowCountChanged = False
         if isinstance(self.parent, QTableView):
             self._callRowCountChanged = True
-
 
     ####################
     # Item Data Handling
@@ -303,7 +313,6 @@ class TableModel(QAbstractTableModel):
             if orientation == Qt.Horizontal:
                 self.dataset.headers[section].attribute["ToolTip"] = value
                 self.headerDataChanged.emit(orientation, section, section)
-
 
     #
     # Used by Editable and Read-Only Items Models

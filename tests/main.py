@@ -5,6 +5,7 @@ MKVBatchMultiplex entry point
 # MAI0004
 
 # region imports
+
 import ctypes
 from ctypes import wintypes
 
@@ -16,78 +17,34 @@ from collections import deque
 from pathlib import Path
 from typing import Optional
 
-from PySide6.QtCore import (
-    QByteArray,
-    QEvent,
-    QFile,
-    QFileInfo,
-    QSaveFile,
-    QSettings,
-    Qt,
-    QTextStream,
-    Signal,
-    Slot
-)
-from PySide6.QtGui import(
-    QAction,
-    QColor,
-    QFont,
-    QIcon,
-    QKeySequence,
-    QPixmap
-)
-from PySide6.QtWidgets import (
-    QApplication,
-    QFileDialog,
-    QMainWindow,
-    QMenuBar,
-    QMessageBox,
-    QStatusBar,
-    QStyle,
-    QTextEdit,
-    QToolTip,
-    QVBoxLayout,
-    QWidget
-)
-
-from vsutillib.pyside6 import (
-    centerWidget,
-    checkColor,
-    darkPalette,
-    DualProgressBar,
-    QActionWidget,
-    QActivityIndicator,
-    QFormatLabel,
-    QMenuWidget,
-    QOutputTextWidget,
-    QProgressIndicator,
-    QSystemTrayIconWidget,
-    TabWidget,
-    VerticalLine,
-)
+from PySide6.QtCore import (QByteArray, QEvent, QFile, QFileInfo, QSaveFile,
+                            QSettings, Qt, QTextStream, Signal, Slot)
+from PySide6.QtGui import QAction, QColor, QFont, QIcon, QKeySequence, QPixmap
+from PySide6.QtWidgets import (QApplication, QFileDialog, QMainWindow,
+                               QMenuBar, QMessageBox, QStatusBar, QStyle,
+                               QTextEdit, QToolTip, QVBoxLayout, QWidget)
+from vsutillib.pyside6 import (QActionWidget, QActivityIndicator, QMenuWidget,
+                               QOutputTextWidget, QSystemTrayIconWidget,
+                               TabWidget, VerticalLine, centerWidget,
+                               checkColor, darkPalette)
 
 from . import config
-from .dataset import TableData, tableHeaders
-from .jobs import JobQueue
-from .models import TableProxyModel, JobsTableModel
-from .utils import (
-    icons,
-    configMessagesCatalog,
-    OutputWindows,
-    Progress,
-    Text,
-    Translate,
-    UiSetMessagesCatalog,
-    yesNoDialog)
-from .widgets import (
-    CommandWidget,
-    JobsOutputErrorsWidget,
-    JobsOutputWidget,
-    JobsTableViewWidget,
-    PreferencesDialogWidget,
-    RenameWidget
-)
+from .utils import (OutputWindows, Text, Translate, UiSetMessagesCatalog,
+                    configMessagesCatalog, icons, yesNoDialog)
+from .widgets import (CommandWidget, JobsOutputErrorsWidget, JobsOutputWidget,
+                      PreferencesDialogWidget)
+
 # endregion imports
+
+#kernel32 = ctypes.WinDLL('kernel32', use_last_error=True)
+#user32 = ctypes.WinDLL('user32', use_last_error=True)
+
+#FLASHW_STOP = 0
+#FLASHW_CAPTION = 0x00000001
+#FLASHW_TRAY = 0x00000002
+#FLASHW_ALL = 0x00000003
+#FLASHW_TIMER = 0x00000004
+#FLASHW_TIMERNOFG = 0x000000
 
 
 class MainWindow(QMainWindow):
@@ -125,6 +82,7 @@ class MainWindow(QMainWindow):
         self.setUnifiedTitleAndToolBarOnMac(True)
         self.trayIcon.show()
         self.show()
+        # flash_console_icon(5)
 
     def _initVars(self) -> None:
 
@@ -148,46 +106,12 @@ class MainWindow(QMainWindow):
         self.activitySpinner = QActivityIndicator(self)
 
         self.controlQueue = deque()
-
-        self.jobsQueue = JobQueue(self, controlQueue=self.controlQueue)
-
-        # Model view
-        headers = tableHeaders()
-        self.tableData = TableData(headerList=headers, dataList=[])
-        self.model = JobsTableModel(self.tableData, self.jobsQueue)
-        self.proxyModel = TableProxyModel(self.model)
-
-        # renameWidget is referenced in CommandWidget
-        self.renameWidget = RenameWidget(self)
-
-        self.commandEntry = CommandWidget(self, self.proxyModel)
+        self.commandEntry = CommandWidget(self)
         self.jobsOutput = JobsOutputWidget(self)
         self.errorOutput = JobsOutputErrorsWidget(self)
-
-        # Widgets for tabs
-        self.jobsTableView = JobsTableViewWidget(
-            self, self.proxyModel, self.controlQueue, _(Text.txt0130)
-        )
-
-        # self.output = None
-        # Set output to contain output windows objects
-        self.output = OutputWindows(
-            self.commandEntry.outputWindow,
-            self.jobsOutput,
-            self.errorOutput,
-        )
+        self.output = None
 
         self.tabs = TabWidget(self)
-
-        # Progress information setup
-        self.progressBar = DualProgressBar(self, align=Qt.Horizontal)
-        self.jobsLabel = QFormatLabel(
-            Text.txt0085,
-            init=[0, 0, 0, 0, 0],
-        )
-        self.progress = Progress(self, self.progressBar, self.jobsLabel)
-
-        self.progressSpin = QProgressIndicator(self)
 
     def _initHelper(self) -> None:
         # work in progress spin
@@ -198,23 +122,18 @@ class MainWindow(QMainWindow):
         )
         self.activitySpinner.delay = 60
 
-        # Output references setup
+        self.translateInterface.addSlot(self.commandEntry.translate)
+
+        # Set output to contain output windows objects
+        self.output = OutputWindows(
+            self.commandEntry.outputWindow,
+            self.jobsOutput,
+            self.errorOutput,
+        )
         self.commandEntry.output = self.output
-        self.jobsTableView.output = self.output
-        self.jobsQueue.output = self.output
-        self.commandEntry.outputWindow.setReadOnly(True)
+
         self.jobsOutput.setReadOnly(True)
         self.errorOutput.setReadOnly(True)
-        #self.historyWidget.output.setReadOnly(True)
-        self.jobsOutput.textChanged.connect(
-            self.commandEntry.clearButtonState)
-
-        # Jobs Queue
-        self.jobsQueue.progress = self.progress
-        self.jobsQueue.proxyModel = self.proxyModel
-
-        # Translation
-        self.translateInterface.addSlot(self.commandEntry.translate)
 
         # Tabs
         tabsList = []
@@ -223,13 +142,6 @@ class MainWindow(QMainWindow):
                 self.commandEntry,
                 _(Text.txt0133),
                 _(Text.txt0148),
-            ]
-        )
-        tabsList.append(
-            [
-                self.jobsTableView,
-                _(Text.txt0140),
-                _(Text.txt0144),
             ]
         )
         tabsList.append(
@@ -246,37 +158,8 @@ class MainWindow(QMainWindow):
                 _(Text.txt0146),
             ]
         )
-        tabsList.append(
-            [
-                self.renameWidget,
-                _(Text.txt0143),
-                _(Text.txt0147),
-            ]
-        )
+
         self.tabs.addTabs(tabsList)
-
-        # Signal connections
-
-        # runJobs Start/Stop
-        self.jobsQueue.runJobs.startSignal.connect(
-            self.activitySpinner.startAnimation)
-        self.jobsQueue.runJobs.finishedSignal.connect(
-            self.activitySpinner.stopAnimation)
-
-        # Tabs change signal
-        self.tabs.currentChanged.connect(tabChange)
-
-        # tray Icon message
-        self.trayIconMessageSignal.connect(self.trayIcon.showMessage)
-
-        # connect log viewer
-        # config.logViewer.connect(self.logViewerWidget.logMessage)
-
-        # connect JobHistory and commandWidget may not implement
-        #self.historyWidget.pasteCommandSignal.connect(self.commandWidget.updateCommand)
-        #self.historyWidget.updateAlgorithmSignal.connect(
-        #    self.commandWidget.updateAlgorithm
-        #)
 
     def _initUI(self):
 
@@ -409,9 +292,6 @@ class MainWindow(QMainWindow):
 
         statusBar = QStatusBar()
         statusBar.addPermanentWidget(VerticalLine())
-        statusBar.addPermanentWidget(self.jobsLabel)
-        statusBar.addPermanentWidget(VerticalLine())
-        statusBar.addPermanentWidget(self.progressBar)
         statusBar.addPermanentWidget(self.activitySpinner)
 
         self.setStatusBar(statusBar)
@@ -517,16 +397,6 @@ class MainWindow(QMainWindow):
 
         QMessageBox.about(self, config.APPNAME, aboutMsg)
 
-@Slot(int)
-def tabChange(index):
-    """
-    tabChange take action when the tab change for save current tab index
-
-    Args:
-        index (int): index of current tab
-    """
-
-    config.data.set("Tab", index)
 
 def abort():
     """Force Quit"""
@@ -558,6 +428,37 @@ def mainApp():
 
     config.close()
 
+
+# class FLASHWINFO(ctypes.Structure):
+#    _fields_ = (('cbSize', wintypes.UINT),
+#                ('hwnd', wintypes.HWND),
+#                ('dwFlags', wintypes.DWORD),
+#                ('uCount', wintypes.UINT),
+#                ('dwTimeout', wintypes.DWORD))
+#    def __init__(self, hwnd, flags=FLASHW_TRAY, count=5, timeout_ms=0):
+#        self.cbSize = ctypes.sizeof(self)
+#        self.hwnd = hwnd
+#        self.dwFlags = flags
+#        self.uCount = count
+#        self.dwTimeout = timeout_ms
+
+# def flash_console_icon(count=5):
+#    hwnd = kernel32.GetConsoleWindow()
+#    if not hwnd:
+#        raise ctypes.WinError(ctypes.get_last_error())
+#    winfo = FLASHWINFO(hwnd, count=count)
+#    previous_state = user32.FlashWindowEx(ctypes.byref(winfo))
+
+#    kernel32.GetConsoleWindow.restype = wintypes.HWND
+#    user32.FlashWindowEx.argtypes = (ctypes.POINTER(FLASHWINFO),)
+
+#    lpBuffer = wintypes.LPWSTR()
+#    AppUserModelID = ctypes.windll.shell32.GetCurrentProcessExplicitAppUserModelID
+#    AppUserModelID(ctypes.cast(ctypes.byref(lpBuffer), wintypes.LPWSTR))
+#    appid = lpBuffer.value
+#    ctypes.windll.kernel32.LocalFree(lpBuffer)
+
+#    return previous_state
 
 # This if for Pylance _() is not defined
 def _(dummy):

@@ -1,6 +1,5 @@
-"""
-Test application MKVBatchMultiplex
-"""
+
+# Test application MKVBatchMultiplex
 
 import sys
 

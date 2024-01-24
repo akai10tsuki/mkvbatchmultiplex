@@ -1,34 +1,26 @@
 
 """
-
-UiSetLanguage
-
+UiSetLocale set the language to use in designer generated code
+TODO: Maybe add to resource file
 """
 
-#from PySide2.QtCore import (
-#    QByteArray,
-#    QCoreApplication,
-#    QLibraryInfo,
-#    QLocale,
-#    QSize,
-#    QTranslator,
-#    Slot,
-#)
 
-from PySide2.QtCore import (
+from PySide6.QtCore import (
     QCoreApplication,
     QLibraryInfo,
     QTranslator,
 )
+from PySide6.QtWidgets import QWidget
 
 from .. import config
 
-class UiSetLanguage:
+
+class UiSetMessagesCatalog:
     """
     class to set the language for PySide2 ui dialogs
     """
 
-    def __init__(self, parent):
+    def __init__(self, parent: QWidget) -> None:
 
         self.__errorFound = False
 
@@ -54,7 +46,7 @@ class UiSetLanguage:
         self.trBaseLast = None
         self.loadedTranslations = []
 
-    def setLanguage(self, language):
+    def setMessagesCatalog(self, language: str) -> bool:
         """
         setLanguage set the language locale
 
@@ -101,7 +93,7 @@ class UiSetLanguage:
 
         return not self.__errorFound
 
-    def removeTranslators(self):
+    def removeTranslators(self) -> None:
 
         for translator in self.loadedTranslations:
             QCoreApplication.removeTranslator(translator)

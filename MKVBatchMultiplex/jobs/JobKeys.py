@@ -9,31 +9,31 @@ class JobsTableKey:
      keys representing the jobs table fields
     """
 
-    rowid = "rowid"
-    ID = "id"
-    addDate = "addDate"
-    addTime = "addTime"
-    startTime = "startTime"
-    endTime = "endTime"
-    job = "job"
-    command = "command"
-    projectName = "projectName"
-    projectInfo = "projectInfo"
-    saved = "saved"
-    deleteMark = "deleteMark"
+    rowid: str = "rowid"
+    ID: str = "id"
+    addDate: str = "addDate"
+    addTime: str = "addTime"
+    startTime: str = "startTime"
+    endTime: str = "endTime"
+    job: str = "job"
+    command: str = "command"
+    projectName: str = "projectName"
+    projectInfo: str = "projectInfo"
+    saved: str = "saved"
+    deleteMark: str = "deleteMark"
 
-    rowidIndex = 0
-    IDIndex = 1
-    addDateIndex = 2
-    addTimeIndex = 3
-    startTimeIndex = 4
-    endTimeIndex = 5
-    jobIndex = 6
-    commandIndex = 7
-    projectNameIndex = 8
-    projectInfoIndex = 9
-    savedIndex = 10
-    deleteMarkIndex = 11
+    rowidIndex: int = 0
+    IDIndex: int = 1
+    addDateIndex: int = 2
+    addTimeIndex: int = 3
+    startTimeIndex: int = 4
+    endTimeIndex: int = 5
+    jobIndex: int = 6
+    commandIndex: int = 7
+    projectNameIndex: int = 8
+    projectInfoIndex: int = 9
+    savedIndex: int = 10
+    deleteMarkIndex: int = 11
 
 
 class JobKey:
@@ -41,9 +41,9 @@ class JobKey:
     Keys for a job row on Jobs Table
     """
 
-    ID = 0
-    Status = 1
-    Command = 2
+    ID: int = 0
+    Status: int = 1
+    Command: int = 2
 
 
 class JobHistoryKey:
@@ -51,10 +51,10 @@ class JobHistoryKey:
      Keys for a job in Saved Jobs Table
     """
 
-    ID = 0
-    Date = 1
-    Status = 2
-    Command = 3
+    ID: int = 0
+    Date: int = 1
+    Status: int = 2
+    Command: int = 3
 
 
 class JobStatus:
@@ -100,31 +100,32 @@ class JobStatus:
         **Stopped** - job stopped from execution set by program
 
         **Waiting** - job waiting to be added to queue if removed from queue or no
+        
         job ID assigned
     """
 
-    Abort = "Abort"
-    Aborted = "Aborted"
-    AbortForced = "AbortForced"
-    AbortJob = "AbortJob"
-    AbortJobError = "AbortJobError"
-    AddToQueue = "AddToQueue"
-    Blocked = "Blocked"
-    Done = "Done"
-    DoneWithError = "DoneWithError"
-    Error = "Error"
-    Queue = "Queue"
-    Remove = "Remove"
-    Removed = "Removed"
-    Running = "Running"
-    Skip = "Skip"
-    Skipped = "Skipped"
-    Stop = "Stop"
-    Stopped = "Stopped"
-    Waiting = "Waiting"
+    Abort: str = "Abort"
+    Aborted: str = "Aborted"
+    AbortForced: str = "AbortForced"
+    AbortJob: str = "AbortJob"
+    AbortJobError: str = "AbortJobError"
+    AddToQueue: str = "AddToQueue"
+    Blocked: str = "Blocked"
+    Done: str = "Done"
+    DoneWithError: str = "DoneWithError"
+    Error: str = "Error"
+    Queue: str = "Queue"
+    Remove: str = "Remove"
+    Removed: str = "Removed"
+    Running: str = "Running"
+    Skip: str = "Skip"
+    Skipped: str = "Skipped"
+    Stop: str = "Stop"
+    Stopped: str = "Stopped"
+    Waiting: str = "Waiting"
 
 
-def jobStatusTooltip(status):
+def jobStatusTooltip(status: JobStatus) -> str:
     """
     Tooltips for Status column
     """
@@ -132,39 +133,40 @@ def jobStatusTooltip(status):
     if not isinstance(status, str):
         return ""
 
-    if JobStatus.Abort == status:
-        return "Job has signal to abort execution"
-    elif JobStatus.Aborted == status:
-        return "Job was aborted"
-    elif JobStatus.AbortForced == status:
-        return "Job was forced to stop"
-    elif JobStatus.AbortJob == status:
-        return "Job has signal to abort execution"
-    elif JobStatus.AbortJobError == status:
-        return "Job was aborted because of an Error"
-    elif JobStatus.AddToQueue == status:
-        return "Add the job to the Queue"
-    elif JobStatus.Blocked == status:
-        return "Job is blocked for execution"
-    elif JobStatus.Done == status:
-        return "Job has ended execution"
-    elif JobStatus.DoneWithError == status:
-        return "Job has ended execution with some errors"
-    elif JobStatus.Error == status:
-        return "Error trying to execute job"
-    elif JobStatus.Queue == status:
-        return "Job is the Queue waiting for execution"
-    elif JobStatus.Running == status:
-        return "Job is been process by worker"
-    elif JobStatus.Skip == status:
-        return "Job has a signal for the worker to skip execution"
-    elif JobStatus.Skipped == status:
-        return "Job was skipped by worker"
-    elif JobStatus.Stop == status:
-        return "Job has signal to stop execution"
-    elif JobStatus.Stopped == status:
-        return "Job has stopped execution"
-    elif JobStatus.Waiting == status:
-        return "Job is waiting to be assigned ID and put on Queue"
-
-    return ""
+    match status:
+        case JobStatus.Abort:
+            return "Job has signal to abort execution"
+        case JobStatus.Aborted:
+            return "Job was aborted"
+        case JobStatus.AbortForced:
+            return "Job was forced to stop"
+        case JobStatus.AbortJob:
+            return "Job has signal to abort execution"
+        case JobStatus.AbortJobError:
+            return "Job was aborted because of an Error"
+        case JobStatus.AddToQueue:
+            return "Add the job to the Queue"
+        case JobStatus.Blocked:
+            return "Job is blocked for execution"
+        case JobStatus.Done:
+            return "Job has ended execution"
+        case JobStatus.DoneWithError:
+            return "Job has ended execution with some errors"
+        case JobStatus.Error:
+            return "Error trying to execute job"
+        case JobStatus.Queue:
+            return "Job is the Queue waiting for execution"
+        case JobStatus.Running:
+            return "Job is been process by worker"
+        case JobStatus.Skip:
+            return "Job has a signal for the worker to skip execution"
+        case JobStatus.Skipped:
+            return "Job was skipped by worker"
+        case JobStatus.Stop:
+            return "Job has signal to stop execution"
+        case JobStatus.Stopped:
+            return "Job has stopped execution"
+        case JobStatus.Waiting:
+            return "Job is waiting to be assigned ID and put on Queue"
+        case _:
+            return ""

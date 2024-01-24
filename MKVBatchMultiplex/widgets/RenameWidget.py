@@ -13,8 +13,8 @@ import re
 
 from pathlib import Path
 
-from PySide2.QtCore import Signal, Qt, Slot
-from PySide2.QtWidgets import (
+from PySide6.QtCore import Signal, Qt, Slot
+from PySide6.QtWidgets import (
     QGridLayout,
     QWidget,
     QHBoxLayout,
@@ -22,7 +22,17 @@ from PySide2.QtWidgets import (
     QGroupBox,
 )
 
-import vsutillib.pyqt as pyqt
+from vsutillib.pyside6 import (
+    HorizontalLine,
+    LineOutput,
+    QLabelWidget,
+    QOutputTextWidget,
+    QPushButtonWidget,
+    TabWidgetExtension,
+    messageBox,
+    qtRunFunctionInThread
+)
+
 
 from .. import config
 from ..utils import Text
@@ -39,7 +49,7 @@ MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
 
-class RenameWidget(pyqt.TabWidgetExtension, QWidget):
+class RenameWidget(TabWidgetExtension, QWidget):
     """Central widget"""
 
     # pylint: disable=too-many-instance-attributes
@@ -115,18 +125,18 @@ class RenameWidget(pyqt.TabWidgetExtension, QWidget):
         self.textRenameResults.textBox.connectToInsertText(
             self.outputRenameResultsSignal
         )
-        btnApplyRename = pyqt.QPushButtonWidget(
+        btnApplyRename = QPushButtonWidget(
             Text.txt0208,
             function=self._applyRename,
             margins="  ",
             toolTip=Text.txt0209,
         )
         btnApplyRename.setEnabled(False)
-        btnUndoRename = pyqt.QPushButtonWidget(
+        btnUndoRename = QPushButtonWidget(
             Text.txt0210, function=self._undoRename, margins="  ", toolTip=Text.txt0211
         )
         btnUndoRename.setEnabled(False)
-        btnClear = pyqt.QPushButtonWidget(
+        btnClear = QPushButtonWidget(
             Text.txt0212, function=self.clear, margins="  ", toolTip=Text.txt0213
         )
         self.btnGrid = QHBoxLayout()
@@ -324,7 +334,7 @@ class RenameWidget(pyqt.TabWidgetExtension, QWidget):
 
         for index in range(self.btnGrid.count()):
             widget = self.btnGrid.itemAt(index).widget()
-            if isinstance(widget, pyqt.QPushButtonWidget):
+            if isinstance(widget, QPushButtonWidget):
                 widget.setLanguage()
                 #widget.setText("  " + _(widget.originalText) + "  ")
                 #widget.setToolTip(_(widget.toolTip))

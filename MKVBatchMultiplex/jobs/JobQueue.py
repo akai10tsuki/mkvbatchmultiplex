@@ -5,13 +5,12 @@
 
 import copy
 import logging
-
 from collections import deque
 from datetime import datetime
 from time import time
+from typing import Optional
 
-from PySide2.QtCore import QObject, Slot, Signal
-
+from PySide6.QtCore import QObject, Slot, Signal
 
 from vsutillib.mkv import MKVCommandParser
 
@@ -43,14 +42,14 @@ class JobInfo:  # pylint: disable=too-many-instance-attributes
 
     def __init__(
         self,
-        jobRowNumber,
-        jobRow,
-        tableModel,
-        algorithm=None,
-        errors=None,
-        output=None,
-        log=False,
-    ):
+        jobRowNumber: int,
+        jobRow: int,
+        tableModel: TableProxyModel,
+        algorithm: Optional[int] = None,
+        errors: Optional[list] = None,
+        output: Optional[list] = None,
+        log: Optional[bool] = False
+    ) -> None:
 
         self.__jobRow = []
         self.jobRowNumber = jobRowNumber
@@ -420,7 +419,7 @@ class JobQueue(QObject):
         self.runJobs.log = self.log
 
         if JobQueue.__firstRun:
-            self.parent.jobsOutputWidget.setAsCurrentTab()
+            self.parent.jobsOutput.setAsCurrentTab()
             JobQueue.__firstRun = False
 
         self.runJobs.run()

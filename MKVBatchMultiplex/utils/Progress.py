@@ -2,9 +2,12 @@
 Define different signals for progress updates
 """
 
-from PySide2.QtCore import QObject, Signal
+from typing import Optional
 
-from vsutillib.pyqt import DualProgressBar, QFormatLabel
+from PySide6.QtCore import QObject, Signal
+from PySide6.QtWidgets import QWidget
+
+from vsutillib.pyside6 import DualProgressBar, QFormatLabel
 
 
 class Progress(QObject):
@@ -28,7 +31,11 @@ class Progress(QObject):
     lblSetValues = Signal(list)
     lblSetValue = Signal(int, object)
 
-    def __init__(self, parent, progressBar, formatLabel=None):
+    def __init__(
+            self,
+            parent: QWidget,
+            progressBar: QWidget,
+            formatLabel: Optional[QWidget] = None) -> None:
         super(Progress, self).__init__()
 
         self.parent = parent
@@ -40,11 +47,15 @@ class Progress(QObject):
         else:
             self._initHelper(True, False)
 
-    def _initHelper(self, initProgressBar=False, initLabel=False):
+    def _initHelper(
+            self,
+            initProgressBar: Optional[bool] = False,
+            initLabel: Optional[bool] = False) -> None:
 
         if initProgressBar:
 
-            self.pbReset.connect(self.pb.reset)
+            # reset was use for the taskbar button that is no longer available
+            #self.pbReset.connect(self.pb.clear)
             self.pbSetAlignment.connect(self.pb.setAlignment)
             self.pbSetValues.connect(self.pb.setValues)
             self.pbSetMaximum.connect(self.pb.setMaximum)
@@ -57,17 +68,17 @@ class Progress(QObject):
             self.lblSetValues.connect(self.lbl.setValues)
 
     @property
-    def progressBar(self):
+    def progressBar(self) -> DualProgressBar:
         return self.pb
 
     @progressBar.setter
-    def progressBar(self, value):
+    def progressBar(self, value) -> None:
 
         if isinstance(value, DualProgressBar):
             self.pb = value
 
     @property
-    def formatLabel(self):
+    def formatLabel(self) -> QFormatLabel:
         return self.lbl
 
     @formatLabel.setter

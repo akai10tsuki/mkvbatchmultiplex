@@ -32,9 +32,13 @@ import re
 
 from pathlib import Path
 
-from PySide2.QtWidgets import QFormLayout, QLabel, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QFormLayout, QLabel, QVBoxLayout, QWidget
 
-from vsutillib.pyqt import QComboLineEdit, QOutputTextWidget, QFileListWidget
+from vsutillib.pyside6 import (
+    QComboLineEdit,
+    QOutputTextWidget,
+    QFileListWidget
+)
 
 class RegExLineInputWidget(QWidget):
     """Input line with text labels"""

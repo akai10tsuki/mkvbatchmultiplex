@@ -4,21 +4,13 @@ JobsTableView - View to display/manipulate jobs
 
 # JTV0001
 
-
 import csv
 import logging
 import io
 
-#try:
-#    import cPickle as pickle
-#except:  # pylint: disable=bare-except
-#    import pickle
-#import sys
-#import zlib
+from PySide6.QtCore import Qt
 
-from PySide2.QtCore import Qt
-
-from PySide2.QtWidgets import (
+from PySide6.QtWidgets import (
     QTableView,
     QAbstractItemView,
     QSizePolicy,
@@ -29,10 +21,7 @@ from PySide2.QtWidgets import (
 
 from vsutillib.mkv import MKVCommandParser
 
-#from .. import config
-#from ..jobs import JobStatus, JobKey, JobInfo, JobsTableKey, saveToDb, SqlJobsTable
 from ..jobs import JobStatus, JobKey, JobInfo, saveToDb
-#from ..utils import Text
 
 from .JobsViewHelpers import removeJob
 from .ProjectInfoDialogWidget import ProjectInfoDialogWidget
@@ -55,7 +44,12 @@ class JobsTableView(QTableView):
     # Class logging state
     __log = False
 
-    def __init__(self, parent=None, proxyModel=None, title=None, log=None):
+    def __init__(
+            self,
+            parent=None,
+            proxyModel=None,
+            title=None,
+            log=None):
         super(JobsTableView, self).__init__()
 
         self.__log = None  # Instance logging state None = Class state prevails
@@ -162,22 +156,29 @@ class JobsTableView(QTableView):
         # row = self.rowAt(event.pos().y())
         totalRows = self.proxyModel.rowCount()
 
-        if 0 <= row < totalRows:
+        print(f"Total current row={row} rows={totalRows}")
+
+        if 0 <= totalRows:
+
+            print(f"Enter to prepare menu")
 
             menu = QMenu()
             menu.setFont(self.parent.font())
             if totalSelectedRows == 1:
                 menu.addAction(_("Copy"))
+                print(f"Added Copy action")
             if model.dataset[row, JobKey.Status] not in [
                 JobStatus.Running,
                 JobStatus.Skip,
                 JobStatus.Abort,
             ]:
                 menu.addAction(_("Remove"))
-            menu.addAction(_("Save"))
+                print(f"Added Remove action")
+            #menu.addAction(_("Save"))
 
             if action := menu.exec_(event.globalPos()):
                 result = action.text()
+                print(f"Action ={result}")
 
                 if result == _("Copy"):
                     self.copySelection()
@@ -212,9 +213,11 @@ class JobsTableView(QTableView):
         for item in ["Copy", "Remove"]:  # Build menu first
             menuItems[item] = contextMenu.addAction(item)
 
-        selection = contextMenu.exec_(event.globalPos())  # Identify the selected item
+        # Identify the selected item
+        selection = contextMenu.exec_(event.globalPos())
 
-        if selection == menuItems["Copy"]:  # Specify what happens for each item
+        # Specify what happens for each item
+        if selection == menuItems["Copy"]:
             self.copySelection()
         elif selection == menuItems["Remove"]:
             self.proxyModel.filterConditions["Remove"].append(row)
@@ -326,9 +329,9 @@ class JobsTableView(QTableView):
                 jobID = model.dataset[jobRow, JobKey.ID]
                 rowID = model.dataset.data[jobRow][JobKey.ID].obj
                 job = model.dataset.data[jobRow][JobKey.Status].obj
-                #if job:
+                # if job:
                 #    print(f"ID = {job.jobRow[JobKey.ID]} = {jobID}")
-                #if rowID:
+                # if rowID:
                 #    print(f"Database row ID = {rowID}")
                 title = self.infoDialog.windowTitle()
                 self.infoDialog.setWindowTitle(title + ' - ' + str(jobID))
@@ -366,5 +369,6 @@ class JobsTableView(QTableView):
         if oCommand:
             tableModel = self.proxyModel.sourceModel()
             totalJobs = tableModel.rowCount()
-            data = [["", ""], [JobStatus.Waiting, "Status code"], [command, command]]
+            data = [["", ""], [JobStatus.Waiting,
+                               "Status code"], [command, command]]
             tableModel.insertRows(totalJobs, 1, data=data)

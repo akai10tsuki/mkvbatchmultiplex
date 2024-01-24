@@ -5,6 +5,16 @@ Module that defines the table data use in the model/view
 # pylint: disable=too-few-public-methods
 
 import itertools
+from typing import Any, ClassVar, List, Optional, TypedDict, Union
+
+
+class HeadersDict(TypedDict):
+    Alignment: str
+    CastFunction: object
+    Label: str
+    ToolTip: str
+    Type: str
+    Width: int
 
 
 class DataItem:
@@ -16,9 +26,9 @@ class DataItem:
         - obj (object) = python object
     """
 
-    cell = None
-    toolTip = None
-    obj = None
+    cell: ClassVar[object] = None
+    toolTip: ClassVar[str] = None
+    obj: ClassVar[object] = None
 
 
 class DataKey:
@@ -26,9 +36,9 @@ class DataKey:
     DataItem index names for when the DataItem is represented in a list.
     """
 
-    Cell = 0
-    ToolTip = 1
-    Obj = 2
+    Cell: ClassVar[int] = 0
+    ToolTip: ClassVar[int] = 1
+    Obj: ClassVar[int] = 2
 
 
 class HeaderAttributeKey:
@@ -36,12 +46,12 @@ class HeaderAttributeKey:
     Header Attribute dictionary keys.
     """
 
-    Alignment = "Alignment"
-    CastFunction = "CastFunction"
-    Label = "Label"
-    ToolTip = "ToolTip"
-    Type = "Type"
-    Width = "Width"
+    Alignment: ClassVar[str] = "Alignment"
+    CastFunction: ClassVar[str] = "CastFunction"
+    Label: ClassVar[str] = "Label"
+    ToolTip: ClassVar[str] = "ToolTip"
+    Type: ClassVar[str] = "Type"
+    Width: ClassVar[str] = "Width"
 
 
 class HeaderInfo:
@@ -53,9 +63,9 @@ class HeaderInfo:
         - toolTip (str) - toolTip to show
     """
 
-    header = None
-    attribute = None
-    toolTip = None
+    header: ClassVar[str] = None
+    attribute: ClassVar[dict] = None
+    toolTip: ClassVar[str] = None
 
 
 class Index:
@@ -66,7 +76,7 @@ class Index:
         Index: Dummy QModelIndex
     """
 
-    def __init__(self, row, column):
+    def __init__(self, row: int, column: int):
 
         self._row = row
         self._column = column
@@ -193,7 +203,10 @@ class TableData:
                 tableData[row, col] - element at position row, col on table
     """
 
-    def __init__(self, headerList=None, dataList=None):
+    def __init__(
+            self,
+            headerList: Optional[List[Union[str, HeadersDict]]] = None,
+            dataList: Optional[List[Union[object, str]]] = None):
 
         self.data = []  # 2 dimensional dataset of DataItem
         self.headers = []  # list of HeaderInfo objects
@@ -211,7 +224,7 @@ class TableData:
                     # data is expected to be 3 element list
                     self.insertRow(position, data)
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int):
 
         if isinstance(index, (int, slice)):
             # to access the elements in full dataset.data[row][column] for DataItem
@@ -247,7 +260,7 @@ class TableData:
 
         raise TypeError("Invalid index type")
 
-    def __setitem__(self, index, value):
+    def __setitem__(self, index: Union[int, tuple], value: Any):
 
         if isinstance(index, int):
             self.headers[index].attribute["Label"] = value
@@ -257,7 +270,7 @@ class TableData:
             if len(index) == 2:
                 row, col = index
             else:
-                raise IndexError("Bad index format: {}".format(index))
+                raise IndexError(f"Bad index format: {index}")
 
             index = Index(row, col)  # Simulate index
             self.setData(index, value)
@@ -267,7 +280,9 @@ class TableData:
     def __len__(self):
         return len(self.data)
 
-    def addHeader(self, header=None):
+    def addHeader(
+            self,
+            header: Optional[List[Union[str, HeadersDict]]] = None) -> None:
         """
         Add header information. header has the form = [str, dict]
 
@@ -282,7 +297,7 @@ class TableData:
             self.headerName.append(header[0])
             self.headers.append(oHeader)
 
-    def deleteColumn(self, index):
+    def deleteColumn(self, index: int) -> Any:
         """
         Delete a column from the table
 
@@ -305,7 +320,11 @@ class TableData:
 
         return deletedInfo
 
-    def insertColumn(self, position=0, columnHeader=None, columnData=None):
+    def insertColumn(
+            self,
+            position: Optional[int] = 0,
+            columnHeader: Optional[str] = None,
+            columnData: Optional[Union[str, Any]] = None) -> None:
         """
         Insert a data column
 
@@ -342,7 +361,10 @@ class TableData:
                 element.cell = columnData[0]
                 r.insert(position, columnData[1])
 
-    def insertRow(self, position, row=None):
+    def insertRow(
+            self,
+            position: int,
+            row: Optional[List[Union[str, Any]]] = None) -> None:
         """
         Insert a data row
 
@@ -371,7 +393,8 @@ class TableData:
                     self.setData(index, newItem)
                 else:
                     if value is not None:
-                        raise ValueError("Item at index {} is invalid".format(column))
+                        raise ValueError(
+                            "Item at index {} is invalid".format(column))
         else:
             totalColumns = len(self.headerName)
             emptyRow = []
@@ -379,7 +402,7 @@ class TableData:
                 emptyRow.append("")
             self.data.insert(position, emptyRow)
 
-    def removeRow(self, index):
+    def removeRow(self, index: int) -> List[Union[str, Any]]:
         """
         Delete a data row
 
@@ -393,7 +416,7 @@ class TableData:
 
         return element
 
-    def setData(self, index, value):
+    def setData(self, index: int, value: List[Union[str, Any]]) -> bool:
         """
         Insert row at the end of the data table
 
@@ -418,7 +441,7 @@ class TableData:
 
         return False
 
-    def setToolTip(self, index, value):
+    def setToolTip(self, index: Index, value: str) -> bool:
         """
         Insert row at the end of the data table
 

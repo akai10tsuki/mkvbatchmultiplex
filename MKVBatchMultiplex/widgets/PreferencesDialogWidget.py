@@ -4,11 +4,11 @@ Preferences - Dialog with the various system configuration items
 
 import platform
 
-from PySide2.QtCore import QObject, Qt, Slot
-from PySide2.QtGui import QFont, QPalette, QColor
-from PySide2.QtWidgets import QDialog, QDialogButtonBox
+from PySide6.QtCore import QObject, Qt, Signal, Slot
+from PySide6.QtGui import QFont, QPalette, QColor
+from PySide6.QtWidgets import QDialog, QDialogButtonBox, QWidget
 
-from vsutillib.pyqt import centerWidget
+from vsutillib.pyside6 import centerWidget
 
 from .. import config
 from ..ui import Ui_PreferencesDialog
@@ -19,30 +19,38 @@ class PreferencesDialogWidget(QDialog):
     PreferencesDialogWidget change configuration parameters
     """
 
-    def __init__(self, parent):
+    translateInterfaceSignal = Signal()
+
+    def __init__(self, parent: QWidget):
         super().__init__(parent)
 
         self.ui = Ui_PreferencesDialog()
         self.ui.setupUi(self)
 
-        self.__parent = None
+        #self.__parent = None
         self.parent = parent
         self.__pref = Preferences(self)
 
         # remove ? help symbol from dialog header
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(
+            self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         self.ui.cmbBoxInterfaceLanguage.setDuplicatesEnabled(False)
         self.radioButtons = [self.ui.rbZero, self.ui.rbOne, self.ui.rbTwo]
         self._initHelper()
 
     def _initUI(self):
+        """
+        Initialize widget members with systemconfiguration for the elements
+        """
         #
         # Interface Language
         #
         language = config.data.get(config.ConfigKey.Language)
         index = 0
         self.ui.cmbBoxInterfaceLanguage.clear()
-        for key, value in config.data.get(config.ConfigKey.InterfaceLanguages).items():
+        for key, value in config.data.get(
+                config.ConfigKey.InterfaceLanguages).items():
+
             self.ui.cmbBoxInterfaceLanguage.addItem(value)
             if key == language:
                 self.ui.cmbBoxInterfaceLanguage.setCurrentIndex(index)
@@ -111,6 +119,9 @@ class PreferencesDialogWidget(QDialog):
             self.radioButtons[currentAlgorithm].setChecked(True)
 
     def _initHelper(self):
+        """
+        Connect to change signals of widget elements
+        """
 
         #
         # Interface Language
@@ -124,7 +135,8 @@ class PreferencesDialogWidget(QDialog):
         self.ui.fcmbBoxFontFamily.currentFontChanged.connect(
             self.__pref.currentFontChanged
         )
-        self.ui.spinBoxFontSize.valueChanged.connect(self.__pref.currentFontSizeChanged)
+        self.ui.spinBoxFontSize.valueChanged.connect(
+            self.__pref.currentFontSizeChanged)
         #
         # Logging
         #
@@ -200,8 +212,9 @@ class PreferencesDialogWidget(QDialog):
             # Language
             #
             if self.preferences.language is not None:
-                config.data.set(config.ConfigKey.Language, self.preferences.language)
-                self.parent.setLanguage()
+                config.data.set(config.ConfigKey.Language,
+                                self.preferences.language)
+                self.translateInterfaceSignal.emit()
             #
             # Font & Size
             #
@@ -275,7 +288,8 @@ class PreferencesDialogWidget(QDialog):
             #
             if self.preferences.restoreWindowSize is not None:
 
-                defaultGeometry = config.data.get(config.ConfigKey.DefaultGeometry)
+                defaultGeometry = config.data.get(
+                    config.ConfigKey.DefaultGeometry)
                 self.parent.setGeometry(
                     defaultGeometry[0],
                     defaultGeometry[1],
@@ -304,7 +318,7 @@ class Preferences(QObject):
     def __init__(self, parent):
         super().__init__(parent)
 
-        self.__parent = None
+        #self.__parent = None
         self.parent = parent
 
         self._initVars()
@@ -333,7 +347,8 @@ class Preferences(QObject):
 
         language = self.parent.ui.cmbBoxInterfaceLanguage.itemText(index)
         if language:
-            languageDictionary = config.data.get(config.ConfigKey.InterfaceLanguages)
+            languageDictionary = config.data.get(
+                config.ConfigKey.InterfaceLanguages)
             key = list(languageDictionary.keys())[
                 list(languageDictionary.values()).index(language)
             ]
@@ -401,14 +416,18 @@ class Preferences(QObject):
 
         buttonRole = self.parent.ui.btnBox.buttonRole(button)
 
-        if buttonRole in [QDialogButtonBox.AcceptRole, QDialogButtonBox.ResetRole]:
+        if buttonRole in [QDialogButtonBox.AcceptRole,
+                          QDialogButtonBox.ResetRole]:
             if buttonRole == QDialogButtonBox.ResetRole:
                 self.parent.ui.chkBoxRestoreWindowSize.setChecked(True)
                 self.parent.ui.chkBoxEnableLogging.setChecked(False)
                 defaultFont = QFont()
-                defaultFont.fromString(config.data.get(config.ConfigKey.SystemFont))
-                self.parent.ui.fcmbBoxFontFamily.setCurrentFont(defaultFont.family())
-                self.parent.ui.spinBoxFontSize.setValue(defaultFont.pointSize())
+                defaultFont.fromString(
+                    config.data.get(config.ConfigKey.SystemFont))
+                self.parent.ui.fcmbBoxFontFamily.setCurrentFont(
+                    defaultFont.family())
+                self.parent.ui.spinBoxFontSize.setValue(
+                    defaultFont.pointSize())
 
     @Slot(bool)
     def restoreDefaults(self):

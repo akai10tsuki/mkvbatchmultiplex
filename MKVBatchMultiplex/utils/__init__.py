@@ -1,19 +1,17 @@
 """
 utils package imports
 """
-# UT0008
+# UT0001
 
 # Classes
-from .OutputMessage import OutputMessage
-from .OutputWindows import OutputWindows
-from .Progress import Progress
-from .QSystemTrayIconWidget import QSystemTrayIconWidget
-from .SetLanguage import SetLanguage
 from .Text import Text
-from .UiSetLanguage import UiSetLanguage
-from .ValidateCommand import ValidateCommand
 
 # Functions
-from .mainSetLanguage import setLanguageMenus
+from .configMessagesCatalog import configMessagesCatalog
+from .OutputWindows import OutputWindows
 from .populate import populate
+from .Progress import Progress
+from .Translate import Translate
+from .UiSetMessagesCatalog import UiSetMessagesCatalog
+from .ValidateCommand import ValidateCommand
 from .yesNoDialog import yesNoDialog

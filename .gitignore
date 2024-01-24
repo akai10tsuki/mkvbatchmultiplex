@@ -61,9 +61,11 @@ docs/_build/
 # PyBuilder
 target/
 
-# regExpressions
+# MKVBatchMultiplex
+MKVBatchMultiplexPySide2/
 tests/NewFiles/
 tests/generatecommand.1.py
+tests/crcTests.py
 .vscode/
 /locale
 tmp/
@@ -73,7 +75,10 @@ sources/
 *.nsi
 *.iss
 test.py
+teste.py
 .DS_Store
 .gitchangelog.rc
 html
 *.code-workspace
+/runReference.py
+images/

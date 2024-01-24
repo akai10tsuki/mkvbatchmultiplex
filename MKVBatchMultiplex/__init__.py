@@ -1,5 +1,5 @@
 """
-Import models module for entry point
+import for the entry point
 """
 
 from .main import mainApp
