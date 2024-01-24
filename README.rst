@@ -24,25 +24,12 @@ mkvbatchmultiplex: MKVMERGE batch multiplexing
   :target: https://mkvbatchmultiplex.readthedocs.io/en/latest/?badge=latest
   :alt: Documentation Status
 
-The hiatus will stop soon I will retake the project on January 2022.
+Re-start the development.
 
-This project went into a rewrite for version 2. Rename module was added to
-help maintain output file names Plex_ friendly.
+This project went into a heavy rewrite for version 3.  Working on some issues
+expect to start releases the weekend of 01/27/2024.  The only major changes are
+the use of Python 3.12 and PySide6.
 
-**New algorithm will try to solve some mismatches in file structure.**
-
-For release 2.1.0:
-
-Option o save Jobs when they need to be repeated with the source files in the
-same location.  Algorithm revisions to work in more cases.
-
-Development version
-===================
-
-2.1.0b1.dev4
-************
-
-`Windows 10 development version`_ (64-bit).
 
 Description
 ===========
@@ -67,9 +54,11 @@ Installation
     pip install mkvbatchmultiplex
 
 It is been developed on Windows the media server is Windows based.
-Made light testing on ubuntu and macOS 10.14 Mojave and ubuntu 18.04.
-On macOS MKVToolNix must be version 30.0.0 or higher if working with
-Dark Theme.
+Made light testing on ubuntu. Will try to do more testing in linux
+ubuntu at least. Many reports of not woriking on linux are solved
+by installing MediaInfo_ this is an external dependency.
+
+macOS will no longer be supported don't have harware to make tests.
 
 If working with the source to execute the application first create the
 locale files.  On the source directory execute:
@@ -81,17 +70,15 @@ locale files.  On the source directory execute:
 Dependencies
 ************
 
-  * Python_ 3.8.1 or greater
+  * Python_ 3.12.1 or greater
 
-    - lxml_ 4.5.2 or greater
-    - natsort_ 7.0.1 or greater
-    - pymediainfo_ 4.2.1 or greater
-    - PySide2_ 5.14 or greater
+    - lxml_ 5.1.0 or greater
+    - natsort_ 8.4.0 or greater
+    - pymediainfo_ 6.1.0 or greater
+    - PySide6_ 6.6.1 or greater
 
-  * MediaInfo_ tested with versions 17.10->20.08
+  * MediaInfo_ tested with versions 17.10->23.11.1
   * MKVToolNix_ tested with versions 17.00->51.0.0
-
-In macOS 10.14 Dark theme MKVToolNix has to be version 30.0.0+ to use it.
 
 Usage
 =====
