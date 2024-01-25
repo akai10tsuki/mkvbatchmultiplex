@@ -12,6 +12,7 @@ from typing import Optional
 from PySide6.QtCore import Signal, Slot
 from PySide6.QtWidgets import (
     QApplication,
+    QCheckBox,
     QFormLayout,
     QGridLayout,
     QGroupBox,
@@ -279,6 +280,15 @@ class CommandWidget(QWidget):
         self.algorithmGroupBox.setLayout(self.algorithmHBox)
         # endregion Algorithm group
 
+        # region CRC32
+        self.crcGroupBox = QGroupBox()
+        self.crcHBox = QHBoxLayout()
+
+        self.chkBoxCRC = QCheckBox(" " + Text.txt0185, self)
+        self.crcHBox.addWidget(self.chkBoxCRC)
+        self.crcGroupBox.setLayout(self.crcHBox)
+        # endregion CRC32
+
     def _initHelper(self) -> None:
 
         # button at end of line to clear it
@@ -295,6 +305,11 @@ class CommandWidget(QWidget):
         self.rbTwo.toggled.connect(lambda: self.toggledRadioButton)
 
         self.setDefaultAlgorithm()
+
+        # CRC check box
+        self.chkBoxCRC.stateChanged.connect(self.crcCheckBoxStateChanged)
+
+        self.setDefaultCRC()
 
         # Buttons state
         self.cliButtonsState(False)
@@ -321,6 +336,7 @@ class CommandWidget(QWidget):
         grid = QGridLayout()
         grid.addWidget(self.commandWidget, 0, 0, 1, 2)
         grid.addWidget(self.algorithmGroupBox, 1, 0)
+        grid.addWidget(self.crcGroupBox, 1, 1)
         grid.addWidget(self.btnGroup, 2, 0)
         grid.addWidget(self.outputWindow, 2, 1, 10, 1)
 
@@ -492,7 +508,7 @@ class CommandWidget(QWidget):
                 index, QFormLayout.LabelRole).widget()
             if isinstance(widget, QPushButtonWidget):
                 widget.translate()
-# endregion buttons slots
+    # endregion buttons slots
 
     # region buttons
 
@@ -573,9 +589,6 @@ class CommandWidget(QWidget):
             messageBox(self, _(Text.txt0178), f"{_(Text.txt0089)}..")
 
     def setDefaultAlgorithm(self) -> None:
-        #
-        # Algorithm
-        #
         if config.data.get(config.ConfigKey.Algorithm) is not None:
             currentAlgorithm = config.data.get(config.ConfigKey.Algorithm)
             self.radioButtons[currentAlgorithm].setChecked(True)
@@ -584,6 +597,15 @@ class CommandWidget(QWidget):
         for index, rb in enumerate(self.radioButtons):
             if rb.isChecked():
                 self.algorithm = index
+
+    def setDefaultCRC(self) -> None:
+        if config.data.get(config.ConfigKey.CRC32) is not None:
+            doCRC = config.data.get(config.ConfigKey.CRC32)
+            self.chkBoxCRC.setTristate(doCRC)
+
+    def crcCheckBoxStateChanged(self, state) -> None:
+        theType = type(state)
+        print(f"Type={theType} sate={state}")
 
     def analysisButtonState(self) -> None:
         """Set clear button state"""

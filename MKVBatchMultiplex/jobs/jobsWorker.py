@@ -22,12 +22,12 @@ from PySide6.QtWidgets import QSystemTrayIcon
 import vsutillib.mkv as mkv
 
 from vsutillib.misc import staticVars, strFormatTimeDelta
-from vsutillib.process import RunCommand
+from vsutillib.process import RunCommand, ThreadWorker
 from vsutillib.pyside6 import SvgColor
 
 from .. import config
 
-# from ..utils import adjustSources
+from ..utils import computeCRC32
 
 from .jobsDB import saveToDb
 from .JobKeys import JobStatus, JobKey
@@ -311,6 +311,8 @@ def jobsWorker(
                         # the RunCommand test current configuration
                         cli.command = cmd
                         cli.run()
+                        crc(destinationFile, output, log)
+
                 else:
                     job.errors.append(iVerify.analysis)
                     totalErrors += 1
@@ -443,6 +445,17 @@ def dummyRunCommand(funcProgress, indexTotal, controlQueue):
                 JobStatus.AbortJobError,
             ]:
                 break
+
+
+def crc(destinationFile, output, log):
+
+    crcWorker = ThreadWorker(
+        computeCRC32,
+        output=output,
+        sourceFile=destinationFile,
+        log=log
+    )
+    crcWorker.start()
 
 
 def markErrorOutput(job, output, start=True):

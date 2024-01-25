@@ -8,6 +8,7 @@ from .Text import Text
 
 # Functions
 from .configMessagesCatalog import configMessagesCatalog
+from .fileCRC32 import computeCRC32
 from .OutputWindows import OutputWindows
 from .populate import populate
 from .Progress import Progress
