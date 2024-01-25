@@ -1,15 +1,35 @@
 Changelog
 =========
 
-(Unreleased)
+3.0.0b1.dev0 - 2024-01-25
 ------------
 
-In order to retake development will migrate first to PySide6.
+Restart development.
 
-New Save Jobs tab ready for first release.  This is useful for saving test jobs.
-Also repetitive Jobs when source files stay on same location and go through
-modifications up to a final release.  Don't have to use mkvtoolix-gui for each
-iteration.
+The program now uses PySide6 also working on Python 3.12 release. Also
+there was a good amount of code rewritten and refactoring.
+
+In the queue:
+
+- working on a way to save the job in order to re-execute it when there
+  are problems and some work with the files is needed.
+
+Added
+~~~~~
+- Log viewer tab by default it won't show has to be enabled in Preferences
+  and Logging be enabled.
+
+- Optional add CRC-32 for the files at the end of the name.
+
+Changed
+~~~~~~~
+
+- Save Jobs tab removed not flexible enough working on another aproach
+
+Fixed
+~~~~~
+
+- Handling of status changes in the jobs table
 
 2.1.0a1.dev4 - 2021-01-10
 -------------------------
