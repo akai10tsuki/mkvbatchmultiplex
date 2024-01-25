@@ -269,6 +269,14 @@ class MainWindow(QMainWindow):
         # tray Icon message
         self.trayIconMessageSignal.connect(self.trayIcon.showMessage)
 
+        # Algorithm
+        self.setPreferences.stateChangedAlgorithm.connect(
+            self.commandEntry.setDefaultAlgorithm)
+
+        # CRC
+        self.setPreferences.stateChangedCRC.connect(
+            self.commandEntry.setDefaultCRC)
+
         # connect log viewer
         # config.logViewer.connect(self.logViewerWidget.logMessage)
 
@@ -402,8 +410,9 @@ class MainWindow(QMainWindow):
         self.setMenuBar(menuBar)
 
     def createToolbars(self) -> None:
-        self.fileToolbar = self.addToolBar("File")
-        self.fileToolbar.addAction(self.actExit)
+        pass
+        #self.fileToolbar = self.addToolBar("File")
+        #self.fileToolbar.addAction(self.actExit)
 
     def createStatusbar(self) -> None:
 
