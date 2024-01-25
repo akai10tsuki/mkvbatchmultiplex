@@ -4,7 +4,7 @@
 
 import sys
 
-from PySide2.QtWidgets import QApplication, QDialog, QDialogButtonBox
+from PySide6.QtWidgets import QApplication, QDialog, QDialogButtonBox
 from Ui_PreferencesDialog import Ui_PreferencesDialog
 from Ui_ProjectInfoDialog import Ui_ProjectInfoDialog
 from Ui_ProjectInfoOkDialog import Ui_ProjectInfoOkDialog
@@ -46,7 +46,7 @@ class SearchTextDialog(QDialog):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
-    window = ProjectInfoDialog()
+    window = PreferencesDialog()
     window.show()
 
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
