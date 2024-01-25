@@ -177,7 +177,8 @@ class JobQueue(QObject):
             self, self, controlQueue=self.controlQueue, log=self.log
         )  # progress function is a late bind
         self.statusUpdateSignal.connect(self.statusUpdate)
-        self.runSignal.connect(self.run)
+        # ? why
+        # self.runSignal.connect(self.run)
         jobID = config.data.get("JobID")
 
         if jobID:
