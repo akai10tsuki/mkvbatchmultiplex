@@ -367,7 +367,7 @@ def jobsWorker(
             dtStart = datetime.fromtimestamp(job.startTime)
             dtEnd = datetime.fromtimestamp(job.endTime)
             dtDuration = dtEnd - dtStart
-            msg = "Job ID: {} {} - date {} - running time {}.\n".format(
+            msg = "Job ID: {} {} - date {} - running time {}.".format(
                 job.jobRow[JobKey.ID],
                 exitStatus,
                 dtEnd.isoformat(),
@@ -448,14 +448,18 @@ def dummyRunCommand(funcProgress, indexTotal, controlQueue):
 
 
 def crc(destinationFile, output, log):
-
-    crcWorker = ThreadWorker(
-        computeCRC32,
-        output=output,
-        sourceFile=destinationFile,
-        log=log
-    )
-    crcWorker.start()
+    """
+    TODO: make this per job
+    """
+    if config.data.get(config.ConfigKey.CRC32) is not None:
+        doCRC = config.data.get(config.ConfigKey.CRC32)
+        crcWorker = ThreadWorker(
+            computeCRC32,
+            output=output,
+            sourceFile=destinationFile,
+            log=log
+        )
+        crcWorker.start()
 
 
 def markErrorOutput(job, output, start=True):
