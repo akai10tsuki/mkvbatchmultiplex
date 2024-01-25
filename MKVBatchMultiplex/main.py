@@ -84,6 +84,7 @@ from .widgets import (
     JobsOutputErrorsWidget,
     JobsOutputWidget,
     JobsTableViewWidget,
+    LogViewerWidget,
     PreferencesDialogWidget,
     RenameWidget
 )
@@ -169,6 +170,14 @@ class MainWindow(QMainWindow):
             self, self.proxyModel, self.controlQueue, _(Text.txt0130)
         )
 
+        # historyWidget and logViewerWidget cannot have parent declared
+        # They don't always display and create artifacts when not shown
+        # self.historyWidget = JobsHistoryViewWidget(self, groupTitle=_(Text.txt0130))
+        # self.historyWidget.tableView.sortByColumn(0, Qt.DescendingOrder)
+
+        # Log view
+        self.logViewer = LogViewerWidget()
+
         # self.output = None
         # Set output to contain output windows objects
         self.output = OutputWindows(
@@ -253,6 +262,18 @@ class MainWindow(QMainWindow):
                 _(Text.txt0147),
             ]
         )
+        if config.data.get(config.ConfigKey.LogViewer):
+            tabsList.append(
+                [
+                    self.logViewer,
+                    _(Text.txt0149),
+                    _(Text.txt0151),
+                ]
+            )
+        else:
+            self.logViewer.tab = -1
+            self.logViewer.tabWidget = self.tabs
+            self.logViewer.title = _(Text.txt0149)
         self.tabs.addTabs(tabsList)
 
         # Signal connections
@@ -278,7 +299,7 @@ class MainWindow(QMainWindow):
             self.commandEntry.setDefaultCRC)
 
         # connect log viewer
-        # config.logViewer.connect(self.logViewerWidget.logMessage)
+        config.logViewer.connect(self.logViewer.logMessage)
 
         # connect JobHistory and commandWidget may not implement
         #self.historyWidget.pasteCommandSignal.connect(self.commandWidget.updateCommand)
@@ -473,6 +494,11 @@ class MainWindow(QMainWindow):
         """Activate logging"""
 
         self.log = state
+        self.commandEntry.log = state
+        self.jobsOutput.log = state
+        self.errorOutput.log = state
+        self.jobsQueue.log = state
+        self.jobsTableView.log = state
         msg = "MAI0001: Start Logging." if state else "MAI0002: Stop Logging."
         logging.info(msg)
         config.data.set(config.ConfigKey.Logging, state)

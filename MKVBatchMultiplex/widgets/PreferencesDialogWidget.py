@@ -64,6 +64,7 @@ class PreferencesDialogWidget(QDialog):
         font.fromString(config.data.get(config.ConfigKey.Font))
         self.ui.fcmbBoxFontFamily.setCurrentFont(font.family())
         self.ui.spinBoxFontSize.setValue(font.pointSize())
+
         #
         # Logging is boolean value
         #
@@ -74,12 +75,24 @@ class PreferencesDialogWidget(QDialog):
 
         # region Log Viewer
         #
-        # Enable Log Viewer
+        # Log Viewer get configuration
         #
-        #self.ui.chkBoxEnableLogViewer.setChecked(
-        #    config.data.get(config.ConfigKey.LogViewer)
-        #)
+        self.ui.chkBoxEnableLogViewer.setChecked(
+            config.data.get(config.ConfigKey.LogViewer)
+        )
+
+        # Does not follow global palette fully
         #
+        if platform.system() == "Windows":
+            disabledColor = QColor(127, 127, 127)
+            chkBoxPalette = self.ui.chkBoxEnableLogViewer.palette()
+            chkBoxPalette.setColor(
+                QPalette.Disabled, QPalette.WindowText, disabledColor
+            )
+            self.ui.chkBoxEnableLogViewer.setPalette(chkBoxPalette)
+        if not isLogging:
+            self.ui.chkBoxEnableLogViewer.setEnabled(False)
+        # endregion Log Viewer
 
         #
         # CRC
@@ -91,18 +104,7 @@ class PreferencesDialogWidget(QDialog):
             else:
                 self.ui.chkBoxComputeCRC.setChecked(False)
 
-        # Does not follow global palette fully
-        #
-        #if platform.system() == "Windows":
-        #    disabledColor = QColor(127, 127, 127)
-        #    chkBoxPalette = self.ui.chkBoxEnableLogViewer.palette()
-        #    chkBoxPalette.setColor(
-        #        QPalette.Disabled, QPalette.WindowText, disabledColor
-        #    )
-        #    self.ui.chkBoxEnableLogViewer.setPalette(chkBoxPalette)
-        #if not isLogging:
-        #    self.ui.chkBoxEnableLogViewer.setEnabled(False)
-        # endregion Log Viewer
+
 
         # region History
         #
@@ -162,9 +164,9 @@ class PreferencesDialogWidget(QDialog):
         self.ui.chkBoxEnableLogging.stateChanged.connect(
             self.__pref.enableLoggingStateChanged
         )
-        #self.ui.chkBoxEnableLogViewer.stateChanged.connect(
-        #    self.__pref.enableLogViewerStateChanged
-        #)
+        self.ui.chkBoxEnableLogViewer.stateChanged.connect(
+            self.__pref.enableLogViewerStateChanged
+        )
 
         #
         # CRC
@@ -277,24 +279,23 @@ class PreferencesDialogWidget(QDialog):
             #
             # LogViewer
             #
-            #loggingOn = config.data.get(config.ConfigKey.Logging)
-            #if loggingOn:
-            #    if self.preferences.enableLogViewer is not None:
-            #        config.data.set(
-            #            config.ConfigKey.LogViewer, self.preferences.enableLogViewer
-            #        )
-            #        if self.preferences.enableLogViewer:
-            #            if self.parent.logViewerWidget.tab < 0:
-            #                self.parent.logViewerWidget.unHideTab()
-            #                self.parent.logViewerWidget.setAsCurrentTab()
-            #        else:
-            #            if self.parent.logViewerWidget.tab >= 0:
-            #                self.parent.logViewerWidget.hideTab()
-            #else:
-            #    config.data.set(config.ConfigKey.LogViewer, False)
-            #    if self.parent.logViewerWidget.tab >= 0:
-            #        self.parent.logViewerWidget.hideTab()
-
+            loggingOn = config.data.get(config.ConfigKey.Logging)
+            if loggingOn:
+                if self.preferences.enableLogViewer is not None:
+                    config.data.set(
+                        config.ConfigKey.LogViewer, self.preferences.enableLogViewer
+                    )
+                    if self.preferences.enableLogViewer:
+                        if self.parent.logViewer.tab < 0:
+                            self.parent.logViewer.unHideTab()
+                            self.parent.logViewer.setAsCurrentTab()
+                    else:
+                        if self.parent.logViewer.tab >= 0:
+                            self.parent.logViewer.hideTab()
+            else:
+                config.data.set(config.ConfigKey.LogViewer, False)
+                if self.parent.logViewer.tab >= 0:
+                    self.parent.logViewer.hideTab()
 
             #
             # CRC
@@ -375,7 +376,7 @@ class Preferences(QObject):
     def _initVars(self):
         #self.enableJobHistory = None
         self.enableLogging = None
-        #self.enableLogViewer = None
+        self.enableLogViewer = None
         self.enableCRCCompute = None
         self.font = None
         self.fontSize = None
@@ -426,7 +427,8 @@ class Preferences(QObject):
         self.enableLogging = bool(value)
         if not self.__changedData:
             self.__changedData = True
-        #self.parent.ui.chkBoxEnableLogViewer.setEnabled(self.enableLogging)
+        # Enable/Disable the Log Viewer checkbox
+        self.parent.ui.chkBoxEnableLogViewer.setEnabled(self.enableLogging)
 
     @Slot(int)
     def enableCRCComputeStateChanged(self, value):
@@ -434,12 +436,11 @@ class Preferences(QObject):
         if not self.__changedData:
             self.__changedData = True
 
-    #@Slot(int)
-    #def enableLogViewerStateChanged(self, value):
-
-    #    self.enableLogViewer = bool(value)
-    #    if not self.__changedData:
-    #        self.__changedData = True
+    @Slot(int)
+    def enableLogViewerStateChanged(self, value):
+        self.enableLogViewer = bool(value)
+        if not self.__changedData:
+            self.__changedData = True
 
     #@Slot(int)
     #def enableJobHistoryChanged(self, value):

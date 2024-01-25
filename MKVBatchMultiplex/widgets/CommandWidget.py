@@ -611,6 +611,7 @@ class CommandWidget(QWidget):
                 self.chkBoxCRC.setCheckState(Qt.CheckState.Unchecked)
 
     def crcCheckBoxStateChanged(self, state) -> None:
+        # Instead of a Qt.CheckState value state is a number
         if config.data.get(config.ConfigKey.CRC32) is not None:
             config.data.set(config.ConfigKey.CRC32, state)
 

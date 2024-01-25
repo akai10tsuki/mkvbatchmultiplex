@@ -200,6 +200,7 @@ def init(
         data.set(ConfigKey.Logging, True)
 
     data.set(ConfigKey.LogViewer, data.get(ConfigKey.LogViewer) or False)
+
     if logFile is None:
         loggingFile = Path(filesPath, LOGFILE)
     else:
