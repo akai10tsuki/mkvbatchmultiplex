@@ -169,7 +169,7 @@ class CommandWidget(QWidget):
         # function=self.parent.jobsQueue.run,
         btnStartQueue = QPushButtonWidget(
             Text.txt0126,
-            function=self.parent.jobsQueue.run,
+            function=self.startWorker,
             margins=" ",
             toolTip=Text.txt0169,
         )
@@ -328,6 +328,9 @@ class CommandWidget(QWidget):
         # Job Queue related
         self.parent.jobsQueue.addQueueItemSignal.connect(
             lambda: self.jobStartQueueState(True)
+        )
+        self.parent.jobsQueue.runJobs.startSignal.connect(
+            lambda: self.jobStartQueueState(False)
         )
         self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(False)
 
@@ -542,6 +545,10 @@ class CommandWidget(QWidget):
         ]
         self.model.insertRows(totalJobs, 1, data=data)
         self.commandLine.clear()
+
+    def startWorker(self) -> None:
+        self.jobStartQueueState(False)
+        self.parent.jobsQueue.run()
 
     def clearOutputWindow(self) -> None:
         """
