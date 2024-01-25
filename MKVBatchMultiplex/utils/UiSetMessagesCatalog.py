@@ -24,7 +24,7 @@ class UiSetMessagesCatalog:
 
         self.__errorFound = False
 
-        libPath = QLibraryInfo.location(QLibraryInfo.TranslationsPath)
+        libPath = QLibraryInfo.path(QLibraryInfo.LibraryPath.TranslationsPath)
 
         #
         # English
