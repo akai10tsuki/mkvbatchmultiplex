@@ -2,12 +2,14 @@
 JobsOutputWidget
 """
 
+import re
+
 from typing import Optional, Any
 
 from PySide6.QtCore import Slot
 from PySide6.QtWidgets import QTextEdit, QWidget
 
-from vsutillib.pyside6 import QOutputTextWidget, TabWidgetExtension
+from vsutillib.pyside6 import QOutputTextWidget, SvgColor, TabWidgetExtension
 
 
 class LogViewerWidget(TabWidgetExtension, QOutputTextWidget):
@@ -31,9 +33,24 @@ class LogViewerWidget(TabWidgetExtension, QOutputTextWidget):
 
         self.parent = parent
         self.setReadOnly(True)
-        self.setLineWrapColumnOrWidth(QTextEdit.LineWrapMode.NoWrap.value)
+        self.setLineWrapMode(QTextEdit.LineWrapMode.NoWrap)
+        self.reWords = re.compile(r"^(.*?) (.*?) (.*?) ")
 
     @Slot(object)
     def logMessage(self, msg):
 
-        self.insertTextSignal.emit(msg + "\n", {"log": False})
+        msgArgs = {"log": False}
+        if matchWords := self.reWords.match(msg):
+            logLevel = matchWords[3]
+            if (logLevel == "DEBUG"):
+                msgArgs = {"color": SvgColor.green, "log": False}
+            elif (logLevel == "INFO"):
+                msgArgs = {"color": SvgColor.white, "log": False}
+            elif (logLevel == "WARNING"):
+                msgArgs = {"color": SvgColor.yellow, "log": False}
+            elif (logLevel == "ERROR"):
+                msgArgs = {"color": SvgColor.red, "log": False}
+            elif (logLevel == "CRITICAL"):
+                msgArgs = {"color": SvgColor.orangered, "log": False}
+
+        self.insertTextSignal.emit(msg + "\n", msgArgs)
