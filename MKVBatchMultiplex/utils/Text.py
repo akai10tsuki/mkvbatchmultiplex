@@ -149,7 +149,8 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0182 = S_("Rename")
     txt0183 = S_("Rename output files")
     txt0184 = S_("Files Tree")
-    
+    txt0185 = S_("Append CRC to file name")
+
     # RenameWidget
     # 200
     txt0200 = S_("Regular Expression")
