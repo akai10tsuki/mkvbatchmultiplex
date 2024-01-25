@@ -106,7 +106,6 @@ class CommandWidget(QWidget):
         # Increase command line buffer to 64k default is 32k
         self.commandLine.setMaxLength(65536)
         self.commandWidget = QWidget()
-        print(f"Line max length={self.commandLine.maxLength()}\n")
 
         self.outputWindow = QOutputTextWidget()
 

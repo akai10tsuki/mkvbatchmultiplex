@@ -63,7 +63,7 @@ class ProjectInfoDialogWidget(QDialog):
 
         self._initUI()
 
-        rc = self.exec_()
+        rc = self.exec()
         if rc:
             self.__name = self.ui.leName.text()
             self.__info = self.ui.teDescription.toPlainText()

@@ -176,7 +176,7 @@ class JobsTableView(QTableView):
                 print(f"Added Remove action")
             #menu.addAction(_("Save"))
 
-            if action := menu.exec_(event.globalPos()):
+            if action := menu.exec(event.globalPos()):
                 result = action.text()
                 print(f"Action ={result}")
 
@@ -214,7 +214,7 @@ class JobsTableView(QTableView):
             menuItems[item] = contextMenu.addAction(item)
 
         # Identify the selected item
-        selection = contextMenu.exec_(event.globalPos())
+        selection = contextMenu.exec(event.globalPos())
 
         # Specify what happens for each item
         if selection == menuItems["Copy"]:

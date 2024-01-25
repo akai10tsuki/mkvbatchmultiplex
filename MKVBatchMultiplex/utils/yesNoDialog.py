@@ -23,7 +23,7 @@ def yesNoDialog(parent: QWidget, msg: str, title: str):
     m.setDefaultButton(noButton)
     m.setFont(parent.font())
     m.setWindowTitle(title)
-    m.exec_()
+    m.exec()
 
     if m.clickedButton() == yesButton:
         return True
