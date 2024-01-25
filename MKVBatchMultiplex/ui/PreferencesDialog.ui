@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>744</width>
-    <height>507</height>
+    <height>484</height>
    </rect>
   </property>
   <property name="font">
@@ -25,7 +25,7 @@
    <property name="geometry">
     <rect>
      <x>460</x>
-     <y>430</y>
+     <y>390</y>
      <width>241</width>
      <height>32</height>
     </rect>
@@ -43,7 +43,7 @@
      <x>30</x>
      <y>40</y>
      <width>681</width>
-     <height>361</height>
+     <height>321</height>
     </rect>
    </property>
    <property name="title">
@@ -75,8 +75,8 @@
    <widget class="QCheckBox" name="chkBoxRestoreWindowSize">
     <property name="geometry">
      <rect>
-      <x>21</x>
-      <y>274</y>
+      <x>20</x>
+      <y>260</y>
       <width>641</width>
       <height>27</height>
      </rect>
@@ -124,38 +124,6 @@
      <string>Font &amp; Size:</string>
     </property>
    </widget>
-   <widget class="QCheckBox" name="chkBoxEnableJobHistory">
-    <property name="geometry">
-     <rect>
-      <x>21</x>
-      <y>198</y>
-      <width>641</width>
-      <height>27</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Enable jobs history</string>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="chkBoxEnableLogViewer">
-    <property name="geometry">
-     <rect>
-      <x>45</x>
-      <y>160</y>
-      <width>611</width>
-      <height>27</height>
-     </rect>
-    </property>
-    <property name="baseSize">
-     <size>
-      <width>0</width>
-      <height>0</height>
-     </size>
-    </property>
-    <property name="text">
-     <string>Enable log viewer</string>
-    </property>
-   </widget>
    <widget class="QComboBox" name="cmbBoxInterfaceLanguage">
     <property name="geometry">
      <rect>
@@ -176,30 +144,11 @@
      </rect>
     </property>
    </widget>
-   <widget class="QCheckBox" name="chkBoxAutoSaveJobHistory">
-    <property name="geometry">
-     <rect>
-      <x>45</x>
-      <y>236</y>
-      <width>611</width>
-      <height>27</height>
-     </rect>
-    </property>
-    <property name="baseSize">
-     <size>
-      <width>0</width>
-      <height>0</height>
-     </size>
-    </property>
-    <property name="text">
-     <string>Automatically save jobs</string>
-    </property>
-   </widget>
    <widget class="QFrame" name="frame">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>310</y>
+      <x>10</x>
+      <y>202</y>
       <width>621</width>
       <height>41</height>
      </rect>
@@ -263,12 +212,25 @@
      </property>
     </widget>
    </widget>
+   <widget class="QCheckBox" name="chkBoxComputeCRC">
+    <property name="geometry">
+     <rect>
+      <x>21</x>
+      <y>162</y>
+      <width>641</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Append CRC to file name</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QPushButton" name="btnRestoreDefaults">
    <property name="geometry">
     <rect>
-     <x>50</x>
-     <y>430</y>
+     <x>30</x>
+     <y>390</y>
      <width>351</width>
      <height>34</height>
     </rect>
@@ -283,9 +245,6 @@
   <tabstop>fcmbBoxFontFamily</tabstop>
   <tabstop>spinBoxFontSize</tabstop>
   <tabstop>chkBoxEnableLogging</tabstop>
-  <tabstop>chkBoxEnableLogViewer</tabstop>
-  <tabstop>chkBoxEnableJobHistory</tabstop>
-  <tabstop>chkBoxAutoSaveJobHistory</tabstop>
   <tabstop>chkBoxRestoreWindowSize</tabstop>
   <tabstop>rbZero</tabstop>
   <tabstop>rbOne</tabstop>
