@@ -98,6 +98,11 @@ class Action:
     Restore: ClassVar[str] = "Restore"
     Update: ClassVar[str] = "Update"
 
+class CheckBoxState:
+
+    UnChecked: ClassVar[int] = 0
+    NoChaneg: ClassVar[int] = 1
+    Checked: ClassVar[int] = 2
 
 class ConfigKey:  # pylint: disable=too-few-public-methods
     """
@@ -242,7 +247,7 @@ def init(
              data.get(ConfigKey.Algorithm) or 1)
 
     data.set(ConfigKey.CRC32,
-             data.get(ConfigKey.CRC32) or False)
+             data.get(ConfigKey.CRC32) or CheckBoxState.UnChecked)
 
     data.set(ConfigKey.DbVersion,
              data.get(ConfigKey.DbVersion) or DATABASEVERSION)
