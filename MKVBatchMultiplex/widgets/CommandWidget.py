@@ -9,7 +9,7 @@ import logging
 from collections import deque
 from typing import Optional
 
-from PySide6.QtCore import Signal, Slot
+from PySide6.QtCore import Qt, Signal, Slot
 from PySide6.QtWidgets import (
     QApplication,
     QCheckBox,
@@ -588,6 +588,7 @@ class CommandWidget(QWidget):
         else:
             messageBox(self, _(Text.txt0178), f"{_(Text.txt0089)}..")
 
+    @Slot()
     def setDefaultAlgorithm(self) -> None:
         if config.data.get(config.ConfigKey.Algorithm) is not None:
             currentAlgorithm = config.data.get(config.ConfigKey.Algorithm)
@@ -598,14 +599,20 @@ class CommandWidget(QWidget):
             if rb.isChecked():
                 self.algorithm = index
 
+    @Slot()
     def setDefaultCRC(self) -> None:
         if config.data.get(config.ConfigKey.CRC32) is not None:
             doCRC = config.data.get(config.ConfigKey.CRC32)
-            self.chkBoxCRC.setTristate(doCRC)
+            if (doCRC == 2):
+                self.chkBoxCRC.setCheckState(Qt.CheckState.Checked)
+            elif (doCRC == 1):
+                self.chkBoxCRC.setCheckState(Qt.CheckState.PartiallyChecked)
+            else:
+                self.chkBoxCRC.setCheckState(Qt.CheckState.Unchecked)
 
     def crcCheckBoxStateChanged(self, state) -> None:
-        theType = type(state)
-        print(f"Type={theType} sate={state}")
+        if config.data.get(config.ConfigKey.CRC32) is not None:
+            config.data.set(config.ConfigKey.CRC32, state)
 
     def analysisButtonState(self) -> None:
         """Set clear button state"""

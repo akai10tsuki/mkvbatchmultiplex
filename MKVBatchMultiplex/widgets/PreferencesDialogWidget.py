@@ -20,6 +20,8 @@ class PreferencesDialogWidget(QDialog):
     """
 
     translateInterfaceSignal = Signal()
+    stateChangedAlgorithm = Signal()
+    stateChangedCRC = Signal()
 
     def __init__(self, parent: QWidget):
         super().__init__(parent)
@@ -69,43 +71,60 @@ class PreferencesDialogWidget(QDialog):
         self.ui.chkBoxEnableLogging.setChecked(
             config.data.get(config.ConfigKey.Logging)
         )
+
+        # region Log Viewer
         #
         # Enable Log Viewer
         #
-        self.ui.chkBoxEnableLogViewer.setChecked(
-            config.data.get(config.ConfigKey.LogViewer)
-        )
+        #self.ui.chkBoxEnableLogViewer.setChecked(
+        #    config.data.get(config.ConfigKey.LogViewer)
+        #)
         #
+
+        #
+        # CRC
+        #
+        if config.data.get(config.ConfigKey.CRC32) is not None:
+            doCRC = config.data.get(config.ConfigKey.CRC32)
+            if (doCRC == 2):
+                self.ui.chkBoxComputeCRC.setChecked(True)
+            else:
+                self.ui.chkBoxComputeCRC.setChecked(False)
+
         # Does not follow global palette fully
         #
-        if platform.system() == "Windows":
-            disabledColor = QColor(127, 127, 127)
-            chkBoxPalette = self.ui.chkBoxEnableLogViewer.palette()
-            chkBoxPalette.setColor(
-                QPalette.Disabled, QPalette.WindowText, disabledColor
-            )
-            self.ui.chkBoxEnableLogViewer.setPalette(chkBoxPalette)
-        if not isLogging:
-            self.ui.chkBoxEnableLogViewer.setEnabled(False)
+        #if platform.system() == "Windows":
+        #    disabledColor = QColor(127, 127, 127)
+        #    chkBoxPalette = self.ui.chkBoxEnableLogViewer.palette()
+        #    chkBoxPalette.setColor(
+        #        QPalette.Disabled, QPalette.WindowText, disabledColor
+        #    )
+        #    self.ui.chkBoxEnableLogViewer.setPalette(chkBoxPalette)
+        #if not isLogging:
+        #    self.ui.chkBoxEnableLogViewer.setEnabled(False)
+        # endregion Log Viewer
+
+        # region History
         #
         # Enable History
         #
         # Temporalily disable History
         #
-        if config.data.get(config.ConfigKey.JobHistoryDisabled):
-            self.ui.chkBoxEnableJobHistory.setEnabled(False)
-            self.ui.chkBoxAutoSaveJobHistory.setEnabled(False)
-            self.ui.chkBoxEnableJobHistory.hide()
-            self.ui.chkBoxAutoSaveJobHistory.hide()
+        #if config.data.get(config.ConfigKey.JobHistoryDisabled):
+        #    self.ui.chkBoxEnableJobHistory.setEnabled(False)
+        #    self.ui.chkBoxAutoSaveJobHistory.setEnabled(False)
+        #    self.ui.chkBoxEnableJobHistory.hide()
+        #    self.ui.chkBoxAutoSaveJobHistory.hide()
 
-        if config.data.get(config.ConfigKey.JobHistory) is not None:
-            self.ui.chkBoxEnableJobHistory.setChecked(
-                config.data.get(config.ConfigKey.JobHistory)
-            )
-        if config.data.get(config.ConfigKey.JobsAutoSave) is not None:
-            self.ui.chkBoxAutoSaveJobHistory.setChecked(
-                config.data.get(config.ConfigKey.JobsAutoSave)
-            )
+        #if config.data.get(config.ConfigKey.JobHistory) is not None:
+        #    self.ui.chkBoxEnableJobHistory.setChecked(
+        #        config.data.get(config.ConfigKey.JobHistory)
+        #    )
+        #if config.data.get(config.ConfigKey.JobsAutoSave) is not None:
+        #    self.ui.chkBoxAutoSaveJobHistory.setChecked(
+        #        config.data.get(config.ConfigKey.JobsAutoSave)
+        #    )
+        # endregion History
 
         #
         # Restore Windows Size
@@ -143,30 +162,37 @@ class PreferencesDialogWidget(QDialog):
         self.ui.chkBoxEnableLogging.stateChanged.connect(
             self.__pref.enableLoggingStateChanged
         )
-        self.ui.chkBoxEnableLogViewer.stateChanged.connect(
-            self.__pref.enableLogViewerStateChanged
+        #self.ui.chkBoxEnableLogViewer.stateChanged.connect(
+        #    self.__pref.enableLogViewerStateChanged
+        #)
+
+        #
+        # CRC
+        #
+        self.ui.chkBoxComputeCRC.stateChanged.connect(
+            self.__pref.enableCRCComputeStateChanged
         )
+
         #
         # Job History
         #
-        if config.data.get(config.ConfigKey.JobHistory) is not None:
-            self.ui.chkBoxEnableJobHistory.stateChanged.connect(
-                self.__pref.enableJobHistoryChanged
-            )
+        #if config.data.get(config.ConfigKey.JobHistory) is not None:
+        #    self.ui.chkBoxEnableJobHistory.stateChanged.connect(
+        #        self.__pref.enableJobHistoryChanged
+        #    )
+
         #
         # Window size
         #
         self.ui.chkBoxRestoreWindowSize.stateChanged.connect(
             self.__pref.restoreWindowSizeStateChanged
         )
+
         #
         # Buttons
         #
         self.ui.btnBox.clicked.connect(self.__pref.clickedButton)
-        #
-        # Restore Defaults
-        #
-        self.ui.btnRestoreDefaults.clicked.connect(self.__pref.restoreDefaults)
+
         #
         # Algorithm radio buttons
         #
@@ -179,6 +205,12 @@ class PreferencesDialogWidget(QDialog):
         self.ui.rbTwo.toggled.connect(
             lambda: self.__pref.toggledRadioButton(self.ui.rbTwo)
         )
+
+        #
+        # Restore Defaults
+        #
+        self.ui.btnRestoreDefaults.clicked.connect(self.__pref.restoreDefaults)
+
 
     # @property
     # def parent(self):
@@ -198,7 +230,7 @@ class PreferencesDialogWidget(QDialog):
         self._initUI()
         self.preferences.reset()
 
-        rc = self.exec_()
+        rc = self.exec()
         if rc:
             self.applyChanges()
 
@@ -241,41 +273,56 @@ class PreferencesDialogWidget(QDialog):
                     config.ConfigKey.Logging, self.preferences.enableLogging
                 )
                 self.parent.enableLogging(self.preferences.enableLogging)
+
             #
             # LogViewer
             #
-            loggingOn = config.data.get(config.ConfigKey.Logging)
-            if loggingOn:
-                if self.preferences.enableLogViewer is not None:
-                    config.data.set(
-                        config.ConfigKey.LogViewer, self.preferences.enableLogViewer
-                    )
-                    if self.preferences.enableLogViewer:
-                        if self.parent.logViewerWidget.tab < 0:
-                            self.parent.logViewerWidget.unHideTab()
-                            self.parent.logViewerWidget.setAsCurrentTab()
+            #loggingOn = config.data.get(config.ConfigKey.Logging)
+            #if loggingOn:
+            #    if self.preferences.enableLogViewer is not None:
+            #        config.data.set(
+            #            config.ConfigKey.LogViewer, self.preferences.enableLogViewer
+            #        )
+            #        if self.preferences.enableLogViewer:
+            #            if self.parent.logViewerWidget.tab < 0:
+            #                self.parent.logViewerWidget.unHideTab()
+            #                self.parent.logViewerWidget.setAsCurrentTab()
+            #        else:
+            #            if self.parent.logViewerWidget.tab >= 0:
+            #                self.parent.logViewerWidget.hideTab()
+            #else:
+            #    config.data.set(config.ConfigKey.LogViewer, False)
+            #    if self.parent.logViewerWidget.tab >= 0:
+            #        self.parent.logViewerWidget.hideTab()
+
+
+            #
+            # CRC
+            #
+            if self.preferences.enableCRCCompute is not None:
+                if config.data.get(config.ConfigKey.CRC32) is not None:
+                    if (self.preferences.enableCRCCompute):
+                        config.data.set(config.ConfigKey.CRC32, 2)
                     else:
-                        if self.parent.logViewerWidget.tab >= 0:
-                            self.parent.logViewerWidget.hideTab()
-            else:
-                config.data.set(config.ConfigKey.LogViewer, False)
-                if self.parent.logViewerWidget.tab >= 0:
-                    self.parent.logViewerWidget.hideTab()
+                        config.data.set(config.ConfigKey.CRC32, 0)
+                    self.stateChangedCRC.emit()
+
             #
             # Job History
             #
-            if config.data.get(config.ConfigKey.JobHistory) is not None:
-                if self.preferences.enableJobHistory is not None:
-                    config.data.set(
-                        config.ConfigKey.JobHistory, self.preferences.enableJobHistory
-                    )
-                    if self.preferences.enableJobHistory:
-                        if self.parent.historyWidget.tab < 0:
-                            self.parent.historyWidget.unHideTab()
-                            self.parent.historyWidget.setAsCurrentTab()
-                    else:
-                        if self.parent.historyWidget.tab >= 0:
-                            self.parent.historyWidget.hideTab()
+            #if config.data.get(config.ConfigKey.JobHistory) is not None:
+            #    if self.preferences.enableJobHistory is not None:
+            #        config.data.set(
+            #            config.ConfigKey.JobHistory, self.preferences.enableJobHistory
+            #        )
+            #        if self.preferences.enableJobHistory:
+            #            if self.parent.historyWidget.tab < 0:
+            #                self.parent.historyWidget.unHideTab()
+            #                self.parent.historyWidget.setAsCurrentTab()
+            #        else:
+            #            if self.parent.historyWidget.tab >= 0:
+            #                self.parent.historyWidget.hideTab()
+
             #
             # Algorithm
             #
@@ -283,6 +330,8 @@ class PreferencesDialogWidget(QDialog):
                 for index, rb in enumerate(self.radioButtons):
                     if rb.isChecked():
                         config.data.set(config.ConfigKey.Algorithm, index)
+                self.stateChangedAlgorithm.emit()
+
             #
             # Restore window size
             #
@@ -324,9 +373,10 @@ class Preferences(QObject):
         self._initVars()
 
     def _initVars(self):
-        self.enableJobHistory = None
+        #self.enableJobHistory = None
         self.enableLogging = None
-        self.enableLogViewer = None
+        #self.enableLogViewer = None
+        self.enableCRCCompute = None
         self.font = None
         self.fontSize = None
         self.language = None
@@ -376,21 +426,27 @@ class Preferences(QObject):
         self.enableLogging = bool(value)
         if not self.__changedData:
             self.__changedData = True
-        self.parent.ui.chkBoxEnableLogViewer.setEnabled(self.enableLogging)
+        #self.parent.ui.chkBoxEnableLogViewer.setEnabled(self.enableLogging)
 
     @Slot(int)
-    def enableLogViewerStateChanged(self, value):
-
-        self.enableLogViewer = bool(value)
+    def enableCRCComputeStateChanged(self, value):
+        self.enableCRCCompute = bool(value)
         if not self.__changedData:
             self.__changedData = True
 
-    @Slot(int)
-    def enableJobHistoryChanged(self, value):
+    #@Slot(int)
+    #def enableLogViewerStateChanged(self, value):
 
-        self.enableJobHistory = bool(value)
-        if not self.__changedData:
-            self.__changedData = True
+    #    self.enableLogViewer = bool(value)
+    #    if not self.__changedData:
+    #        self.__changedData = True
+
+    #@Slot(int)
+    #def enableJobHistoryChanged(self, value):
+
+    #    self.enableJobHistory = bool(value)
+    #    if not self.__changedData:
+    #        self.__changedData = True
 
     @Slot(int)
     def restoreWindowSizeStateChanged(self, value):
@@ -437,6 +493,7 @@ class Preferences(QObject):
 
         self.parent.ui.chkBoxRestoreWindowSize.setChecked(True)
         self.parent.ui.chkBoxEnableLogging.setChecked(False)
+        self.parent.ui.chkBoxComputeCRC.setChecked(False)
         if config.data.get(config.ConfigKey.JobHistory) is not None:
             self.parent.ui.chkBoxEnableJobHistory.setChecked(False)
         self.parent.ui.chkBoxEnableLogViewer.setChecked(False)
