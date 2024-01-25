@@ -121,6 +121,7 @@ class ConfigKey:  # pylint: disable=too-few-public-methods
     #
 
     Algorithm: ClassVar[str] = "Algorithm"
+    CRC32: ClassVar[str] = "CRC32"
     DbVersion: ClassVar[str] = "DbVersion"
     JobsAutoSave: ClassVar[str] = "JobsAutoSave"
     JobHistory: ClassVar[str] = "JobHistory"
@@ -158,13 +159,13 @@ def init(
         **configFile** (str, optional): name of configuration file. Defaults to
              [config.xml].
 
-        **logFile** (str, optional): name of logging file. Defaults to 
+        **logFile** (str, optional): name of logging file. Defaults to
             [MKVMultiplex.log].
 
-        **name** (str, optional): name of application. Defaults to 
+        **name** (str, optional): name of application. Defaults to
         [MKVBatchMultiplex].
 
-        **version** (str, optional): appplication version . Defaults to 
+        **version** (str, optional): appplication version . Defaults to
         [vsutillib version].
     """
 
@@ -239,6 +240,9 @@ def init(
 
     data.set(ConfigKey.Algorithm,
              data.get(ConfigKey.Algorithm) or 1)
+
+    data.set(ConfigKey.CRC32,
+             data.get(ConfigKey.CRC32) or False)
 
     data.set(ConfigKey.DbVersion,
              data.get(ConfigKey.DbVersion) or DATABASEVERSION)
