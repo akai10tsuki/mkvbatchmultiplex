@@ -169,8 +169,8 @@ def jobsWorker(
                 QSystemTrayIcon.Information,
             )
             msgArgs = {"color": SvgColor.cyan}
-            output.job.emit(msg, dict(msgArgs))
-            job.output.append([msg, dict(msgArgs)])
+            output.job.emit(msg, msgArgs)
+            job.output.append([msg, msgArgs])
             exitStatus = "ended"
 
             if log:
@@ -275,13 +275,13 @@ def jobsWorker(
                             errorOutputOpen = True
 
                         msgArgs = {"color": SvgColor.yellowgreen, "appendEnd": True}
-                        output.job.emit(msg, dict(msgArgs))
+                        output.job.emit(msg, msgArgs)
                         output.error.emit(
-                            msg + "\n", dict(msgArgs)
+                            msg + "\n", msgArgs
                         )  # hack making it work
-                        job.output.append([msg, dict(msgArgs)])
+                        job.output.append([msg, msgArgs])
                         job.errors.append(
-                            [msg + "\n", dict(msgArgs)]
+                            [msg + "\n", msgArgs]
                         )  # hack making it work
                         if rc:
                             if log:
@@ -299,7 +299,7 @@ def jobsWorker(
                     )
                     msg = msg.format(cmd, baseFiles, sourceFiles, destinationFile)
                     msgArgs = {"appendEnd": True}
-                    output.job.emit(msg, dict(msgArgs))
+                    output.job.emit(msg, msgArgs)
 
                     if log:
                         MODULELOG.debug("RJB0007: Structure checks ok")
@@ -324,8 +324,8 @@ def jobsWorker(
                         destinationFile
                     )
                     msgArgs = {"color": SvgColor.red, "appendEnd": True}
-                    output.job.emit(msg, dict(msgArgs))
-                    job.output.append([msg, dict(msgArgs)])
+                    output.job.emit(msg, msgArgs)
+                    job.output.append([msg, msgArgs])
                     for i, m in enumerate(iVerify.analysis):
                         if i == 0:
                             lines = m.split("\n")
@@ -340,14 +340,14 @@ def jobsWorker(
                                         findSource = False
                                 msg = line + "\n"
                                 msgArgs = {"color": color}
-                                output.job.emit(msg, dict(msgArgs))
-                                output.error.emit(msg, dict(msgArgs))
-                                job.output.append([msg, dict(msgArgs)])
+                                output.job.emit(msg, msgArgs)
+                                output.error.emit(msg, msgArgs)
+                                job.output.append([msg, msgArgs])
                         else:
                             msgArgs = {"color": SvgColor.red}
-                            output.job.emit(m, dict(msgArgs))
-                            output.error.emit(m, dict(msgArgs))
-                            job.output.append([m, dict(msgArgs)])
+                            output.job.emit(m, msgArgs)
+                            output.error.emit(m, msgArgs)
+                            job.output.append([m, msgArgs])
                     output.job.emit("\n", {})
                     output.error.emit("\n", {})
                     job.output.append(["\n", {}])
@@ -375,8 +375,8 @@ def jobsWorker(
             )
             msg += "*******************\n\n\n"
             msgArgs = {"color": SvgColor.cyan, "appendEnd": True}
-            output.job.emit(msg, dict(msgArgs))
-            job.output.append([msg, dict(msgArgs)])
+            output.job.emit(msg, msgArgs)
+            job.output.append([msg, msgArgs])
             msg = "Job ID: {} {}\nruntime {}"
             msg = msg.format(
                 job.jobRow[JobKey.ID],
@@ -404,8 +404,8 @@ def jobsWorker(
             msg = "Job ID: {} cannot execute command.\n\nCommand: {}\n"
             msg = msg.format(job.jobRow[JobKey.ID], job.oCommand.command)
             msgArgs = {"color": SvgColor.red}
-            output.error.emit(msg, dict(msgArgs))
-            job.errors.append([msg, dict(msgArgs)])
+            output.error.emit(msg, msgArgs)
+            job.errors.append([msg, msgArgs])
             jobsQueue.statusUpdateSignal.emit(job, JobStatus.Error)
             if log:
                 MODULELOG.debug(
@@ -485,8 +485,8 @@ def markErrorOutput(job, output, start=True):
         msg += "---------------------\n"
 
     msgArgs = {"color": SvgColor.yellow, "appendEnd": True}
-    output.error.emit(msg, dict(msgArgs))
-    job.errors.append([msg, dict(msgArgs)])
+    output.error.emit(msg, msgArgs)
+    job.errors.append([msg, msgArgs])
 
 
 def errorMsg(output, msg, kwargs):
