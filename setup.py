@@ -56,7 +56,6 @@ setup(
         # Trove classifiers
         # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
         "Development Status :: 5 - Production/Stable",
-        "Environment :: MacOS X",
         "Environment :: Win32 (MS Windows)",
         "Environment :: X11 Applications :: Qt",
         # Indicate who your project is intended for
@@ -66,15 +65,14 @@ setup(
         # Pick your license as you wish
         "License :: OSI Approved :: MIT License",
         # Operating Systems
-        "Operating System :: MacOS :: MacOS X",
-        "Operating System :: Microsoft :: Windows :: Windows 7",
-        "Operating System :: Microsoft :: Windows :: Windows 8",
-        "Operating System :: Microsoft :: Windows :: Windows 8.1",
         "Operating System :: Microsoft :: Windows :: Windows 10",
+        "Operating System :: Microsoft :: Windows :: Windows 1",
         "Operating System :: POSIX :: Linux",
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
-        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
         # Implementation
         "Programming Language :: Python :: Implementation :: CPython",
     ],

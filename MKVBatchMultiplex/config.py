@@ -45,12 +45,20 @@ PROJECTURLS: Dict[str, str] = {
     "Bug Reports": "https://github.com/akai10tsuki/mkvbatchmultiplex/issues",
     "Source": "https://github.com/akai10tsuki/mkvbatchmultiplex/",
 }
-PYTHONVERSIONS: str = ">=3.10.1, <4.0"
+PYTHONVERSIONS: str = ">=3.10.1, <3.13"
 PYSIDE6_VERSION: str = ">=6.2"
 PYSIDE_VERSION: PYSIDE6_VERSION
 REQUIRED: List[str] = [
-    "PySide2>=6.2"
+    "PySide2>=6.2",
+    "vsutillib-files>=1.7.0",
+    "vsutillib-log>=1.7.0",
+    "vsutillib-media>=1.7.0",
+    "vsutillib-mkv>=1.7.00",
+    "vsutillib-process>=1.7.0",
+    "vsutillib-pyside6>=1.7.0",
+    "vsutillib-sql>=1.7.0",
 ]
+
 # endregion
 
 # region configuration for files in ~/.MKVBatchMultiplex
