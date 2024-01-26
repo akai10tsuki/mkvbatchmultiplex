@@ -237,9 +237,7 @@ class SqlJobsTable(SqlDb):
         return 0
 
     def fetchJob(
-        self, jobID, *args, fetchAll=False, whereClause=None, orderClause=None
-    ):
-        # pylint: disable=anomalous-backslash-in-string
+        self, jobID, *args, fetchAll=False, whereClause=None, orderClause=None):
         """
         fetchJob fetch information from database it will always read the rowid
         as first field.
@@ -262,7 +260,7 @@ class SqlJobsTable(SqlDb):
             **jobID** (int, dict)**: WHERE clause AND members and integer implies
             WHERE id = ?
 
-            **\*args** (tuple, optional): tuple with fields. Defaults to None.
+            ***args** (tuple, optional): tuple with fields. Defaults to None.
 
             **fetchAll** (bool, optional): fetch all records in query.
             Defaults to False.
@@ -359,7 +357,6 @@ class SqlJobsTable(SqlDb):
         pass
 
     def update(self, jobID, fields, *args, whereClause=None):
-        # pylint: disable=anomalous-backslash-in-string
         """
         update job information on database
 
@@ -370,7 +367,7 @@ class SqlJobsTable(SqlDb):
 
             **fields** (tuple): fields to update
 
-            **\*args** (tuple): values to update
+            ***args** (tuple): values to update
         """
 
         self.__lastError = None
