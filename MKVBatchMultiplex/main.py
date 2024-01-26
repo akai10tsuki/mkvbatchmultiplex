@@ -335,6 +335,10 @@ class MainWindow(QMainWindow):
         else:
             event.ignore()
 
+    #def moveEvent(self, event):
+    #    print("x=`{}`, y=`{}`".format(event.pos().x(), event.pos().y()))
+    #    super(MainWindow, self).moveEvent(event)
+
     # endregion Events
 
     # region Overrides
@@ -467,7 +471,7 @@ class MainWindow(QMainWindow):
             self.enableLogging(bLogging)
 
             self.setGeometry(0, 0, 1280, 70)
-            #centerWidget(self)
+            centerWidget(self)
         elif action == config.Action.Restore:
             if strFont := config.data.get(config.ConfigKey.Font, defaultFont):
                 restoreFont = QFont()
@@ -483,7 +487,7 @@ class MainWindow(QMainWindow):
                     QByteArray.fromBase64(QByteArray(byteGeometry)))
             else:
                 self.setGeometry(0, 0, 1280, 720)
-                #centerWidget(self)
+                centerWidget(self)
         elif action == config.Action.Save:
             # Update geometry includes position
             base64Geometry = self.saveGeometry().toBase64()
