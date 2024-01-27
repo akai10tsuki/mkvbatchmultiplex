@@ -6,13 +6,14 @@ MKVBatchMultiplex entry point
 
 # region imports
 import ctypes
-from ctypes import wintypes
-
 import logging
 import os
 import platform
+import re
 import sys
+
 from collections import deque
+from ctypes import wintypes
 from pathlib import Path
 from typing import Optional
 
@@ -50,6 +51,7 @@ from PySide6.QtWidgets import (
     QWidget
 )
 
+from vsutillib.mkv import getMKVMerge
 from vsutillib.pyside6 import (
     centerWidget,
     checkColor,
@@ -549,10 +551,18 @@ class MainWindow(QMainWindow):
     def about(self) -> None:
         """About"""
 
+        rePythonVersion = re.compile(r"^(.*?) (.*?) (.*?) ")
+        pythonVersion = sys.version
+        if tmpMatch := rePythonVersion.match(sys.version):
+            pythonVersion = tmpMatch[1]
+
+        mkvmergeVersion = getMKVMerge()
+
         aboutMsg = (f"{config.APPNAME}: {config.VERSION}\n\n"
                     f"{_(Text.txt0002)}: {config.AUTHOR}\n"
                     f"{_(Text.txt0003)}: {config.EMAIL}\n\n"
-                    f"{_(Text.txt0004)}:\n{sys.version}\n\n")
+                    f"{_(Text.txt0004)}: {pythonVersion}\n\n"
+                    f"{_(Text.txt0067)}: {mkvmergeVersion}           \n")
 
         QMessageBox.about(self, config.APPNAME, aboutMsg)
 
