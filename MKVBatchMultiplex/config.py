@@ -49,7 +49,7 @@ PYTHONVERSIONS: str = ">=3.10.1, <3.13"
 PYSIDE6_VERSION: str = ">=6.2"
 PYSIDE_VERSION: PYSIDE6_VERSION
 REQUIRED: List[str] = [
-    "PySide2>=6.2",
+    "PySide6>=6.2",
     "vsutillib-files>=1.7.0",
     "vsutillib-log>=1.7.0",
     "vsutillib-media>=1.7.0",
