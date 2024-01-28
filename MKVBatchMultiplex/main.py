@@ -590,14 +590,16 @@ def mainApp():
     app = QApplication(sys.argv)
     config.init(app=app)
 
-    # Palette will change on macOS according to current theme
-    if platform.system() == "Windows":
-        # will create a poor mans dark theme for windows
-        # import ctypes
+    # will create a poor mans dark theme for the app enable it for Linux
+    # and Windows for now won't look for an option to switch to light
+    # dark according to the os no clear way of changing tho font size
+    # TODO: lightPalette
+    darkPalette(app)
+    config.data.set(config.ConfigKey.DarkMode, True)
+    QOutputTextWidget.isDarkMode = True
 
-        darkPalette(app)
-        config.data.set(config.ConfigKey.DarkMode, True)
-        QOutputTextWidget.isDarkMode = True
+    if platform.system() == "Windows":
+        # import ctypes
 
         myAppID = "VergaraSoft.MKVBatchMultiplex.mkv.3.0.0"  # arbitrary string
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myAppID)
