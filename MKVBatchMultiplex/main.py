@@ -68,6 +68,8 @@ from vsutillib.pyside6 import (
     VerticalLine,
 )
 
+import qdarktheme
+
 from . import config
 from .dataset import TableData, tableHeaders
 from .jobs import JobQueue
@@ -467,8 +469,8 @@ class MainWindow(QMainWindow):
         bLogging = False
 
         if action == config.Action.Reset:
-            self.setFont(defaultFont)
-            self.setAppFont(defaultFont)
+            #self.setFont(defaultFont)
+            #self.setAppFont(defaultFont)
 
             self.enableLogging(bLogging)
 
@@ -587,8 +589,10 @@ def abort():
 def mainApp():
     """Main function"""
 
+    #qdarktheme.enable_hi_dpi()
     app = QApplication(sys.argv)
     config.init(app=app)
+    #qdarktheme.setup_theme("auto")
 
     # Palette will change on macOS according to current theme
     if platform.system() == "Windows":
