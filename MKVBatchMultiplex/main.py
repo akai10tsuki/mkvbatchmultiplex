@@ -51,6 +51,8 @@ from PySide6.QtWidgets import (
     QWidget
 )
 
+import qtvscodestyle as qtvsc
+
 from vsutillib.mkv import getMKVMerge
 from vsutillib.pyside6 import (
     centerWidget,
@@ -568,6 +570,7 @@ class MainWindow(QMainWindow):
 
         QMessageBox.about(self, config.APPNAME, aboutMsg)
 
+
 @Slot(int)
 def tabChange(index):
     """
@@ -578,6 +581,7 @@ def tabChange(index):
     """
 
     config.data.set("Tab", index)
+
 
 def abort():
     """Force Quit"""
@@ -599,13 +603,18 @@ def mainApp():
         # will create a poor mans dark theme for windows
         # import ctypes
 
-        darkPalette(app)
-        config.data.set(config.ConfigKey.DarkMode, True)
-        QOutputTextWidget.isDarkMode = True
+        #darkPalette(app)
+        #config.data.set(config.ConfigKey.DarkMode, True)
+        #QOutputTextWidget.isDarkMode = True
 
         myAppID = "VergaraSoft.MKVBatchMultiplex.mkv.3.0.0"  # arbitrary string
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myAppID)
 
+    #stylesheet = qtvsc.load_stylesheet(qtvsc.Theme.)
+    #app.setStyleSheet(stylesheet)
+    theme_file = r"themes\OneDark-Pro.json"
+    stylesheet = qtvsc.load_stylesheet(theme_file)
+    app.setStyleSheet(stylesheet)
     MainWindow()
     app.exec()
 
