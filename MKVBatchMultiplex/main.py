@@ -599,9 +599,9 @@ def mainApp():
     QOutputTextWidget.isDarkMode = True
 
     if platform.system() == "Windows":
-        # import ctypes
-
-        myAppID = "VergaraSoft.MKVBatchMultiplex.mkv.3.0.0"  # arbitrary string
+        # with this the icon in the task bar will change to the one set
+        # for the application myAppID is an arbitrary string
+        myAppID = "akai10tsuki.MKVBatchMultiplex.mkv.3.0.0"
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myAppID)
 
     MainWindow()
