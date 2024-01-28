@@ -28,7 +28,6 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0025 = S_("Force exit")
     txt0026 = S_("Ctrl+P")
 
-
     # 40
     txt0040 = S_("&Settings")
     txt0041 = S_("Enable logging")
@@ -52,6 +51,9 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0062 = S_("Using")
     txt0063 = S_("About")
     txt0064 = S_("About QT")
+    txt0065 = S_("Show the application's About box")
+    txt0066 = S_("Show the Qt library's About box")
+    txt0067 = S_("MKVMERGE")
 
     # Dialogs & others
     # 80
@@ -75,7 +77,7 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0095 = S_("Date of execution")
 
     # JobTableWidgets
-    # 120
+    # 120, 9000-9049
     txt0120 = S_("Populate")
     txt0121 = S_("Add test jobs to table")
     txt0122 = S_("Queue Waiting Jobs")
@@ -118,6 +120,7 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0149 = S_("Log Viewer")
     txt0150 = S_("Display log entries")
     txt0151 = S_("Messages registered in current running log")
+    txt0152 = S_("Errors")
 
     # CommandWidget
     # 160
@@ -137,7 +140,7 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0173 = S_("Commands to be applied")
     txt0174 = S_("Check Files")
     txt0175 = S_("Check files for consistency")
-    txt0176 = S_("Clear Output")
+    txt0176 = S_("Reset Application")
     txt0177 = S_("Erase text in output window")
     txt0178 = S_("Reset")
     txt0179 = S_("Reset state completely to work with another batch")
@@ -145,6 +148,8 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0181 = S_("Clear output window")
     txt0182 = S_("Rename")
     txt0183 = S_("Rename output files")
+    txt0184 = S_("Files Tree")
+    txt0185 = S_("Append CRC to file name")
 
     # RenameWidget
     # 200

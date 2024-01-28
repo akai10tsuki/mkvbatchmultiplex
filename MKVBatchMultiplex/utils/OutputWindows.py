@@ -2,21 +2,28 @@
 OutputWindows class
 """
 
-from PySide2.QtCore import QObject, Signal
+from PySide6.QtCore import QObject, Signal
+
+from vsutillib.pyside6 import QOutputTextWidget
 
 class OutputWindows(QObject):
     """
     OutputWindow class contain pointers to output windows inertText slots
 
     Args:
-        QObject ([type]): [description]
+        outCommand 
     """
 
     command = Signal(str, dict)
     job = Signal(str, dict)
     error = Signal(str, dict)
 
-    def __init__(self, outCommand, outJobs, outError):
+    def __init__(
+        self, 
+        outCommand: QOutputTextWidget, 
+        outJobs: QOutputTextWidget, 
+        outError: QOutputTextWidget) -> None:
+
         super(OutputWindows, self).__init__()
 
         self.commandOutput = outCommand

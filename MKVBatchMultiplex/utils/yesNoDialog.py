@@ -2,12 +2,12 @@
 QMessageBox Yes/No dialog.
 """
 
-from PySide2.QtWidgets import QMessageBox
+from PySide6.QtWidgets import QMessageBox, QWidget
 
 from .Text import Text
 
 
-def yesNoDialog(parent, msg, title):
+def yesNoDialog(parent: QWidget, msg: str, title: str):
     """
     Convenience function to display a Yes/No dialog
 
@@ -23,7 +23,7 @@ def yesNoDialog(parent, msg, title):
     m.setDefaultButton(noButton)
     m.setFont(parent.font())
     m.setWindowTitle(title)
-    m.exec_()
+    m.exec()
 
     if m.clickedButton() == yesButton:
         return True

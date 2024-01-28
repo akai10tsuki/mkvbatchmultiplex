@@ -3,21 +3,28 @@
 ################################################################################
 ## Form generated from reading UI file 'PreferencesDialog.ui'
 ##
-## Created by: Qt User Interface Compiler version 5.15.2
+## Created by: Qt User Interface Compiler version 6.6.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide2.QtCore import *
-from PySide2.QtGui import *
-from PySide2.QtWidgets import *
-
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QAbstractButton, QApplication, QCheckBox, QComboBox,
+    QDialog, QDialogButtonBox, QFontComboBox, QFrame,
+    QGroupBox, QLabel, QPushButton, QRadioButton,
+    QSizePolicy, QSpinBox, QWidget)
 
 class Ui_PreferencesDialog(object):
     def setupUi(self, PreferencesDialog):
         if not PreferencesDialog.objectName():
             PreferencesDialog.setObjectName(u"PreferencesDialog")
-        PreferencesDialog.resize(744, 507)
+        PreferencesDialog.resize(744, 510)
         font = QFont()
         font.setPointSize(14)
         PreferencesDialog.setFont(font)
@@ -38,7 +45,7 @@ class Ui_PreferencesDialog(object):
         self.fcmbBoxFontFamily.setGeometry(QRect(199, 82, 381, 29))
         self.chkBoxRestoreWindowSize = QCheckBox(self.grpBox)
         self.chkBoxRestoreWindowSize.setObjectName(u"chkBoxRestoreWindowSize")
-        self.chkBoxRestoreWindowSize.setGeometry(QRect(21, 274, 641, 27))
+        self.chkBoxRestoreWindowSize.setGeometry(QRect(20, 288, 641, 27))
         self.label = QLabel(self.grpBox)
         self.label.setObjectName(u"label")
         self.label.setGeometry(QRect(203, 46, 16, 23))
@@ -48,26 +55,15 @@ class Ui_PreferencesDialog(object):
         self.lblFontAndSize = QLabel(self.grpBox)
         self.lblFontAndSize.setObjectName(u"lblFontAndSize")
         self.lblFontAndSize.setGeometry(QRect(21, 82, 102, 23))
-        self.chkBoxEnableJobHistory = QCheckBox(self.grpBox)
-        self.chkBoxEnableJobHistory.setObjectName(u"chkBoxEnableJobHistory")
-        self.chkBoxEnableJobHistory.setGeometry(QRect(21, 198, 641, 27))
-        self.chkBoxEnableLogViewer = QCheckBox(self.grpBox)
-        self.chkBoxEnableLogViewer.setObjectName(u"chkBoxEnableLogViewer")
-        self.chkBoxEnableLogViewer.setGeometry(QRect(45, 160, 611, 27))
-        self.chkBoxEnableLogViewer.setBaseSize(QSize(0, 0))
         self.cmbBoxInterfaceLanguage = QComboBox(self.grpBox)
         self.cmbBoxInterfaceLanguage.setObjectName(u"cmbBoxInterfaceLanguage")
         self.cmbBoxInterfaceLanguage.setGeometry(QRect(199, 42, 461, 29))
         self.spinBoxFontSize = QSpinBox(self.grpBox)
         self.spinBoxFontSize.setObjectName(u"spinBoxFontSize")
         self.spinBoxFontSize.setGeometry(QRect(590, 82, 71, 29))
-        self.chkBoxAutoSaveJobHistory = QCheckBox(self.grpBox)
-        self.chkBoxAutoSaveJobHistory.setObjectName(u"chkBoxAutoSaveJobHistory")
-        self.chkBoxAutoSaveJobHistory.setGeometry(QRect(45, 236, 611, 27))
-        self.chkBoxAutoSaveJobHistory.setBaseSize(QSize(0, 0))
         self.frame = QFrame(self.grpBox)
         self.frame.setObjectName(u"frame")
-        self.frame.setGeometry(QRect(20, 310, 621, 41))
+        self.frame.setGeometry(QRect(10, 236, 621, 41))
         self.frame.setFrameShape(QFrame.StyledPanel)
         self.frame.setFrameShadow(QFrame.Raised)
         self.lblAlgorithm = QLabel(self.frame)
@@ -82,16 +78,19 @@ class Ui_PreferencesDialog(object):
         self.rbTwo = QRadioButton(self.frame)
         self.rbTwo.setObjectName(u"rbTwo")
         self.rbTwo.setGeometry(QRect(230, 0, 41, 41))
+        self.chkBoxComputeCRC = QCheckBox(self.grpBox)
+        self.chkBoxComputeCRC.setObjectName(u"chkBoxComputeCRC")
+        self.chkBoxComputeCRC.setGeometry(QRect(21, 198, 641, 27))
+        self.chkBoxEnableLogViewer = QCheckBox(self.grpBox)
+        self.chkBoxEnableLogViewer.setObjectName(u"chkBoxEnableLogViewer")
+        self.chkBoxEnableLogViewer.setGeometry(QRect(45, 160, 611, 27))
         self.btnRestoreDefaults = QPushButton(PreferencesDialog)
         self.btnRestoreDefaults.setObjectName(u"btnRestoreDefaults")
-        self.btnRestoreDefaults.setGeometry(QRect(50, 430, 351, 34))
+        self.btnRestoreDefaults.setGeometry(QRect(30, 430, 351, 34))
         QWidget.setTabOrder(self.cmbBoxInterfaceLanguage, self.fcmbBoxFontFamily)
         QWidget.setTabOrder(self.fcmbBoxFontFamily, self.spinBoxFontSize)
         QWidget.setTabOrder(self.spinBoxFontSize, self.chkBoxEnableLogging)
-        QWidget.setTabOrder(self.chkBoxEnableLogging, self.chkBoxEnableLogViewer)
-        QWidget.setTabOrder(self.chkBoxEnableLogViewer, self.chkBoxEnableJobHistory)
-        QWidget.setTabOrder(self.chkBoxEnableJobHistory, self.chkBoxAutoSaveJobHistory)
-        QWidget.setTabOrder(self.chkBoxAutoSaveJobHistory, self.chkBoxRestoreWindowSize)
+        QWidget.setTabOrder(self.chkBoxEnableLogging, self.chkBoxRestoreWindowSize)
         QWidget.setTabOrder(self.chkBoxRestoreWindowSize, self.rbZero)
         QWidget.setTabOrder(self.rbZero, self.rbOne)
         QWidget.setTabOrder(self.rbOne, self.rbTwo)
@@ -112,13 +111,12 @@ class Ui_PreferencesDialog(object):
         self.label.setText("")
         self.chkBoxEnableLogging.setText(QCoreApplication.translate("PreferencesDialog", u"Enable Logging", None))
         self.lblFontAndSize.setText(QCoreApplication.translate("PreferencesDialog", u"Font & Size:", None))
-        self.chkBoxEnableJobHistory.setText(QCoreApplication.translate("PreferencesDialog", u"Enable jobs history", None))
-        self.chkBoxEnableLogViewer.setText(QCoreApplication.translate("PreferencesDialog", u"Enable log viewer", None))
-        self.chkBoxAutoSaveJobHistory.setText(QCoreApplication.translate("PreferencesDialog", u"Automatically save jobs", None))
         self.lblAlgorithm.setText(QCoreApplication.translate("PreferencesDialog", u"Algorithm:", None))
         self.rbZero.setText(QCoreApplication.translate("PreferencesDialog", u"0", None))
         self.rbOne.setText(QCoreApplication.translate("PreferencesDialog", u"1", None))
         self.rbTwo.setText(QCoreApplication.translate("PreferencesDialog", u"2", None))
+        self.chkBoxComputeCRC.setText(QCoreApplication.translate("PreferencesDialog", u"Append CRC to file name", None))
+        self.chkBoxEnableLogViewer.setText(QCoreApplication.translate("PreferencesDialog", u"Enable log viewer", None))
         self.btnRestoreDefaults.setText(QCoreApplication.translate("PreferencesDialog", u"Restore Defaults", None))
     # retranslateUi
 

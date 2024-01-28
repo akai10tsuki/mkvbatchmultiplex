@@ -14,7 +14,7 @@ import shlex
 
 from pathlib import Path, PurePath
 
-from PySide2.QtWidgets import (
+from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
     QTextEdit,
@@ -291,7 +291,7 @@ def main():
     app = QApplication(sys.argv)
     win = GenCommandApp()
     win.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
 
 
 if __name__ == "__main__":

@@ -2,14 +2,23 @@
 JobsOutputWidget
 """
 
-from vsutillib.pyqt import QOutputTextWidget, TabWidgetExtension
+from typing import Optional, Any
+
+from PySide6.QtWidgets import QWidget
+
+from vsutillib.pyside6 import QOutputTextWidget, TabWidgetExtension
 
 
 class JobsOutputErrorsWidget(TabWidgetExtension, QOutputTextWidget):
 
-    def __init__(self, parent, log=None, **kwargs):
+    def __init__(
+        self, 
+        parent: QWidget, 
+        log: Optional[bool] = None, 
+        **kwargs: Any):
         super().__init__(parent=parent, log=log, **kwargs)
 
+"""
         self.parent = parent
 
     def clear(self):
@@ -17,3 +26,4 @@ class JobsOutputErrorsWidget(TabWidgetExtension, QOutputTextWidget):
         self.parent.progress.lblSetValue.emit(4, 0)
 
         super().clear()
+"""

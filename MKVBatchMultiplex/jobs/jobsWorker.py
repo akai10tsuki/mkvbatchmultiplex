@@ -17,17 +17,17 @@ import re
 from datetime import datetime
 from time import time, sleep
 
-from PySide2.QtWidgets import QSystemTrayIcon
+from PySide6.QtWidgets import QSystemTrayIcon
 
 import vsutillib.mkv as mkv
 
 from vsutillib.misc import staticVars, strFormatTimeDelta
-from vsutillib.process import RunCommand
-from vsutillib.pyqt import SvgColor
+from vsutillib.process import RunCommand, ThreadWorker
+from vsutillib.pyside6 import SvgColor
 
 from .. import config
 
-# from ..utils import adjustSources
+from ..utils import computeCRC32
 
 from .jobsDB import saveToDb
 from .JobKeys import JobStatus, JobKey
@@ -169,12 +169,13 @@ def jobsWorker(
                 QSystemTrayIcon.Information,
             )
             msgArgs = {"color": SvgColor.cyan}
-            output.job.emit(msg, dict(msgArgs))
-            job.output.append([msg, dict(msgArgs)])
+            output.job.emit(msg, msgArgs)
+            job.output.append([msg, msgArgs])
             exitStatus = "ended"
 
             if log:
-                MODULELOG.debug("RJB0005: Job ID: %s started.", job.jobRow[JobKey.ID])
+                MODULELOG.debug("RJB0005: Job ID: %s started.",
+                                job.jobRow[JobKey.ID])
 
             updateStatus = True
 
@@ -232,7 +233,11 @@ def jobsWorker(
                         "Command: {}  Base Files: {} "
                         "Source Files: {} Destination File: {}"
                     )
-                    msg = msg.format(cmd, baseFiles, sourceFiles, destinationFile)
+                    msg = msg.format(
+                        cmd,
+                        baseFiles,
+                        sourceFiles,
+                        destinationFile)
                     MODULELOG.debug("RJB0006: %s", msg)
 
                 #
@@ -253,7 +258,8 @@ def jobsWorker(
                             originalCmd = cmd
                             cmd = shellCommand
                             msg = (
-                                f"Warning command adjusted - confidence {confidence}:\n\n"
+                                f"Warning command adjusted - confidence "
+                                f"{confidence}:\n\n"
                                 f"Original: {originalCmd}\n"
                                 f"     New: {cmd}\n"
                             )
@@ -269,13 +275,13 @@ def jobsWorker(
                             errorOutputOpen = True
 
                         msgArgs = {"color": SvgColor.yellowgreen, "appendEnd": True}
-                        output.job.emit(msg, dict(msgArgs))
+                        output.job.emit(msg, msgArgs)
                         output.error.emit(
-                            msg + "\n", dict(msgArgs)
+                            msg + "\n", msgArgs
                         )  # hack making it work
-                        job.output.append([msg, dict(msgArgs)])
+                        job.output.append([msg, msgArgs])
                         job.errors.append(
-                            [msg + "\n", dict(msgArgs)]
+                            [msg + "\n", msgArgs]
                         )  # hack making it work
                         if rc:
                             if log:
@@ -293,7 +299,7 @@ def jobsWorker(
                     )
                     msg = msg.format(cmd, baseFiles, sourceFiles, destinationFile)
                     msgArgs = {"appendEnd": True}
-                    output.job.emit(msg, dict(msgArgs))
+                    output.job.emit(msg, msgArgs)
 
                     if log:
                         MODULELOG.debug("RJB0007: Structure checks ok")
@@ -305,6 +311,8 @@ def jobsWorker(
                         # the RunCommand test current configuration
                         cli.command = cmd
                         cli.run()
+                        crc(destinationFile, output, log)
+
                 else:
                     job.errors.append(iVerify.analysis)
                     totalErrors += 1
@@ -316,8 +324,8 @@ def jobsWorker(
                         destinationFile
                     )
                     msgArgs = {"color": SvgColor.red, "appendEnd": True}
-                    output.job.emit(msg, dict(msgArgs))
-                    job.output.append([msg, dict(msgArgs)])
+                    output.job.emit(msg, msgArgs)
+                    job.output.append([msg, msgArgs])
                     for i, m in enumerate(iVerify.analysis):
                         if i == 0:
                             lines = m.split("\n")
@@ -332,14 +340,14 @@ def jobsWorker(
                                         findSource = False
                                 msg = line + "\n"
                                 msgArgs = {"color": color}
-                                output.job.emit(msg, dict(msgArgs))
-                                output.error.emit(msg, dict(msgArgs))
-                                job.output.append([msg, dict(msgArgs)])
+                                output.job.emit(msg, msgArgs)
+                                output.error.emit(msg, msgArgs)
+                                job.output.append([msg, msgArgs])
                         else:
                             msgArgs = {"color": SvgColor.red}
-                            output.job.emit(m, dict(msgArgs))
-                            output.error.emit(m, dict(msgArgs))
-                            job.output.append([m, dict(msgArgs)])
+                            output.job.emit(m, msgArgs)
+                            output.error.emit(m, msgArgs)
+                            job.output.append([m, msgArgs])
                     output.job.emit("\n", {})
                     output.error.emit("\n", {})
                     job.output.append(["\n", {}])
@@ -359,7 +367,7 @@ def jobsWorker(
             dtStart = datetime.fromtimestamp(job.startTime)
             dtEnd = datetime.fromtimestamp(job.endTime)
             dtDuration = dtEnd - dtStart
-            msg = "Job ID: {} {} - date {} - running time {}.\n".format(
+            msg = "Job ID: {} {} - date {} - running time {}.".format(
                 job.jobRow[JobKey.ID],
                 exitStatus,
                 dtEnd.isoformat(),
@@ -367,8 +375,8 @@ def jobsWorker(
             )
             msg += "*******************\n\n\n"
             msgArgs = {"color": SvgColor.cyan, "appendEnd": True}
-            output.job.emit(msg, dict(msgArgs))
-            job.output.append([msg, dict(msgArgs)])
+            output.job.emit(msg, msgArgs)
+            job.output.append([msg, msgArgs])
             msg = "Job ID: {} {}\nruntime {}"
             msg = msg.format(
                 job.jobRow[JobKey.ID],
@@ -388,15 +396,16 @@ def jobsWorker(
             if updateStatus:
                 jobsQueue.statusUpdateSignal.emit(job, JobStatus.Done)
             if log:
-                MODULELOG.debug("RJB0009: Job ID: %s finished.", job.jobRow[JobKey.ID])
+                MODULELOG.debug("RJB0009: Job ID: %s finished.",
+                                job.jobRow[JobKey.ID])
         else:
             totalErrors += 1
             funcProgress.lblSetValue.emit(4, totalErrors)
             msg = "Job ID: {} cannot execute command.\n\nCommand: {}\n"
             msg = msg.format(job.jobRow[JobKey.ID], job.oCommand.command)
             msgArgs = {"color": SvgColor.red}
-            output.error.emit(msg, dict(msgArgs))
-            job.errors.append([msg, dict(msgArgs)])
+            output.error.emit(msg, msgArgs)
+            job.errors.append([msg, msgArgs])
             jobsQueue.statusUpdateSignal.emit(job, JobStatus.Error)
             if log:
                 MODULELOG.debug(
@@ -438,6 +447,21 @@ def dummyRunCommand(funcProgress, indexTotal, controlQueue):
                 break
 
 
+def crc(destinationFile, output, log):
+    """
+    TODO: make this per job
+    """
+    if config.data.get(config.ConfigKey.CRC32) is not None:
+        doCRC = config.data.get(config.ConfigKey.CRC32)
+        crcWorker = ThreadWorker(
+            computeCRC32,
+            output=output,
+            sourceFile=destinationFile,
+            log=log
+        )
+        crcWorker.start()
+
+
 def markErrorOutput(job, output, start=True):
     """
     markErrorOutput start/stop messages for error output
@@ -465,8 +489,8 @@ def markErrorOutput(job, output, start=True):
         msg += "---------------------\n"
 
     msgArgs = {"color": SvgColor.yellow, "appendEnd": True}
-    output.error.emit(msg, dict(msgArgs))
-    job.errors.append([msg, dict(msgArgs)])
+    output.error.emit(msg, msgArgs)
+    job.errors.append([msg, msgArgs])
 
 
 def errorMsg(output, msg, kwargs):

@@ -5,12 +5,15 @@ Class for a table model with horizontal headers
 
 """
 
-from PySide2.QtCore import Qt, QModelIndex
+from typing import Optional
 
-from vsutillib.pyqt import SvgColor
+from PySide6.QtCore import Qt, QModelIndex
+
+from vsutillib.pyside6 import SvgColor
 
 #from ..dataset import TableData, tableHeaders
-from ..jobs import JobStatus, JobKey, jobStatusTooltip
+from ..dataset import TableData
+from ..jobs import JobKey, JobQueue, JobStatus, jobStatusTooltip
 from .TableModel import TableModel
 
 # JOBID, JOBSTATUS, JOBCOMMAND = range(3)
@@ -35,7 +38,7 @@ class JobsTableModel(TableModel):
         **jobQueue** (deque): job queue
     """
 
-    def __init__(self, tableData, jobQueue):
+    def __init__(self, tableData: TableData, jobQueue: JobQueue):
         super().__init__(parent=None, tableData=tableData)
 
         self.jobQueue = jobQueue
@@ -44,7 +47,7 @@ class JobsTableModel(TableModel):
     # Read-Only
     #
 
-    def data(self, index, role):
+    def data(self, index: QModelIndex, role: int) -> str | int:
         """
         TableModel.data() override.
 
@@ -70,7 +73,7 @@ class JobsTableModel(TableModel):
                     value = self.dataset.data[row][column].cell
                     if value == JobStatus.Done:
                         return SvgColor.cyan
-                    elif value == JobStatus.Running:
+                    if value == JobStatus.Running:
                         return SvgColor.green
                     elif value in [
                         JobStatus.Abort,
@@ -132,7 +135,8 @@ class JobsTableModel(TableModel):
 
         # print(f"Algorithm in JobsTableModel {algorithm}")
 
-        rc = super(JobsTableModel, self).insertRows(position, rows, index, data=data)
+        rc = super(JobsTableModel, self).insertRows(
+            position, rows, index, data=data)
 
         if rc:
             for r in range(0, rows):
@@ -145,7 +149,7 @@ class JobsTableModel(TableModel):
     #
     # Editable
     #
-    def setData(self, index, value, role=Qt.EditRole):
+    def setData(self, index, value, role=Qt.EditRole) -> bool:
         """
         TableDataModel.setData() override
 

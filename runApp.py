@@ -1,8 +1,5 @@
-"""
-Test application MKVBatchMultiplex
-"""
 
-import sys
+# Test application MKVBatchMultiplex
 
 from MKVBatchMultiplex import mainApp
 
@@ -16,4 +13,4 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()

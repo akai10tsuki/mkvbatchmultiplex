@@ -3,10 +3,13 @@ QValidator for command line
 """
 
 import logging
+from typing import Optional
 
-from PySide2.QtGui import QValidator
+from PySide6.QtCore import Signal, Slot
+from PySide6.QtGui import QValidator
+from PySide6.QtWidgets import QWidget
 
-from vsutillib import mkv
+from vsutillib.mkv import VerifyMKVCommand
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -24,6 +27,20 @@ class ValidateCommand(QValidator):
     """
 
     __log = False
+
+    def __init__(
+            self,
+            parent: QWidget,
+            resultSignal: Signal,
+            log: Optional[bool] = None):
+        super().__init__(parent)
+
+        self.parent = parent
+        self.resultSignal = resultSignal
+        self.__log = None
+        self.log = log
+
+    # region Logging setup
 
     @classmethod
     def classLog(cls, setLogging=None):
@@ -49,14 +66,6 @@ class ValidateCommand(QValidator):
                 cls.__log = setLogging
 
         return cls.__log
-
-    def __init__(self, parent, resultSignal, log=None):
-        super().__init__(parent)
-
-        self.parent = parent
-        self.resultSignal = resultSignal
-        self.__log = None
-        self.log = log
 
     @property
     def log(self):
@@ -85,6 +94,13 @@ class ValidateCommand(QValidator):
         if isinstance(value, bool) or value is None:
             self.__log = value
 
+    @Slot(bool)
+    def setLog(self, bLogging: bool) -> None:
+        """Slot for setting loggin through signal"""
+        self.log = bLogging
+
+    # endregion Logging setup
+
     def validate(self, inputStr, pos):
         """Check regex in VerifyMKVCommand"""
 
@@ -93,7 +109,7 @@ class ValidateCommand(QValidator):
         if strTmp.find(r'^""') >= 0:
             strTmp = strTmp.strip()[1:-1].replace(r'""', r'"')
 
-        verify = mkv.VerifyMKVCommand(strTmp, log=self.log)
+        verify = VerifyMKVCommand(strTmp, log=self.log)
 
         if verify:
 

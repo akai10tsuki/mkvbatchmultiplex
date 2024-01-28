@@ -4,14 +4,14 @@
 
 # pylint: disable=unused-argument
 
-from PySide2.QtWidgets import (
+from PySide6.QtWidgets import (
     QStyledItemDelegate,
     QStyleOptionButton,
     QApplication,
     QStyle,
     QComboBox,
 )
-from PySide2.QtCore import Qt, QRect, QPoint, QEvent, Slot
+from PySide6.QtCore import Qt, QRect, QPoint, QEvent, Slot
 
 
 from ..jobs import JobStatus

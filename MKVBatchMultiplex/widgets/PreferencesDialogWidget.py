@@ -4,11 +4,11 @@ Preferences - Dialog with the various system configuration items
 
 import platform
 
-from PySide2.QtCore import QObject, Qt, Slot
-from PySide2.QtGui import QFont, QPalette, QColor
-from PySide2.QtWidgets import QDialog, QDialogButtonBox
+from PySide6.QtCore import QObject, Qt, Signal, Slot
+from PySide6.QtGui import QFont, QPalette, QColor
+from PySide6.QtWidgets import QDialog, QDialogButtonBox, QWidget
 
-from vsutillib.pyqt import centerWidget
+from vsutillib.pyside6 import centerWidget
 
 from .. import config
 from ..ui import Ui_PreferencesDialog
@@ -19,30 +19,40 @@ class PreferencesDialogWidget(QDialog):
     PreferencesDialogWidget change configuration parameters
     """
 
-    def __init__(self, parent):
+    translateInterfaceSignal = Signal()
+    stateChangedAlgorithm = Signal()
+    stateChangedCRC = Signal()
+
+    def __init__(self, parent: QWidget):
         super().__init__(parent)
 
         self.ui = Ui_PreferencesDialog()
         self.ui.setupUi(self)
 
-        self.__parent = None
+        #self.__parent = None
         self.parent = parent
         self.__pref = Preferences(self)
 
         # remove ? help symbol from dialog header
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(
+            self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         self.ui.cmbBoxInterfaceLanguage.setDuplicatesEnabled(False)
         self.radioButtons = [self.ui.rbZero, self.ui.rbOne, self.ui.rbTwo]
         self._initHelper()
 
     def _initUI(self):
+        """
+        Initialize widget members with systemconfiguration for the elements
+        """
         #
         # Interface Language
         #
         language = config.data.get(config.ConfigKey.Language)
         index = 0
         self.ui.cmbBoxInterfaceLanguage.clear()
-        for key, value in config.data.get(config.ConfigKey.InterfaceLanguages).items():
+        for key, value in config.data.get(
+                config.ConfigKey.InterfaceLanguages).items():
+
             self.ui.cmbBoxInterfaceLanguage.addItem(value)
             if key == language:
                 self.ui.cmbBoxInterfaceLanguage.setCurrentIndex(index)
@@ -54,6 +64,7 @@ class PreferencesDialogWidget(QDialog):
         font.fromString(config.data.get(config.ConfigKey.Font))
         self.ui.fcmbBoxFontFamily.setCurrentFont(font.family())
         self.ui.spinBoxFontSize.setValue(font.pointSize())
+
         #
         # Logging is boolean value
         #
@@ -61,13 +72,15 @@ class PreferencesDialogWidget(QDialog):
         self.ui.chkBoxEnableLogging.setChecked(
             config.data.get(config.ConfigKey.Logging)
         )
+
+        # region Log Viewer
         #
-        # Enable Log Viewer
+        # Log Viewer get configuration
         #
         self.ui.chkBoxEnableLogViewer.setChecked(
             config.data.get(config.ConfigKey.LogViewer)
         )
-        #
+
         # Does not follow global palette fully
         #
         if platform.system() == "Windows":
@@ -79,25 +92,41 @@ class PreferencesDialogWidget(QDialog):
             self.ui.chkBoxEnableLogViewer.setPalette(chkBoxPalette)
         if not isLogging:
             self.ui.chkBoxEnableLogViewer.setEnabled(False)
+        # endregion Log Viewer
+
+        #
+        # CRC
+        #
+        if config.data.get(config.ConfigKey.CRC32) is not None:
+            doCRC = config.data.get(config.ConfigKey.CRC32)
+            if (doCRC == 2):
+                self.ui.chkBoxComputeCRC.setChecked(True)
+            else:
+                self.ui.chkBoxComputeCRC.setChecked(False)
+
+
+
+        # region History
         #
         # Enable History
         #
         # Temporalily disable History
         #
-        if config.data.get(config.ConfigKey.JobHistoryDisabled):
-            self.ui.chkBoxEnableJobHistory.setEnabled(False)
-            self.ui.chkBoxAutoSaveJobHistory.setEnabled(False)
-            self.ui.chkBoxEnableJobHistory.hide()
-            self.ui.chkBoxAutoSaveJobHistory.hide()
+        #if config.data.get(config.ConfigKey.JobHistoryDisabled):
+        #    self.ui.chkBoxEnableJobHistory.setEnabled(False)
+        #    self.ui.chkBoxAutoSaveJobHistory.setEnabled(False)
+        #    self.ui.chkBoxEnableJobHistory.hide()
+        #    self.ui.chkBoxAutoSaveJobHistory.hide()
 
-        if config.data.get(config.ConfigKey.JobHistory) is not None:
-            self.ui.chkBoxEnableJobHistory.setChecked(
-                config.data.get(config.ConfigKey.JobHistory)
-            )
-        if config.data.get(config.ConfigKey.JobsAutoSave) is not None:
-            self.ui.chkBoxAutoSaveJobHistory.setChecked(
-                config.data.get(config.ConfigKey.JobsAutoSave)
-            )
+        #if config.data.get(config.ConfigKey.JobHistory) is not None:
+        #    self.ui.chkBoxEnableJobHistory.setChecked(
+        #        config.data.get(config.ConfigKey.JobHistory)
+        #    )
+        #if config.data.get(config.ConfigKey.JobsAutoSave) is not None:
+        #    self.ui.chkBoxAutoSaveJobHistory.setChecked(
+        #        config.data.get(config.ConfigKey.JobsAutoSave)
+        #    )
+        # endregion History
 
         #
         # Restore Windows Size
@@ -111,6 +140,9 @@ class PreferencesDialogWidget(QDialog):
             self.radioButtons[currentAlgorithm].setChecked(True)
 
     def _initHelper(self):
+        """
+        Connect to change signals of widget elements
+        """
 
         #
         # Interface Language
@@ -124,7 +156,8 @@ class PreferencesDialogWidget(QDialog):
         self.ui.fcmbBoxFontFamily.currentFontChanged.connect(
             self.__pref.currentFontChanged
         )
-        self.ui.spinBoxFontSize.valueChanged.connect(self.__pref.currentFontSizeChanged)
+        self.ui.spinBoxFontSize.valueChanged.connect(
+            self.__pref.currentFontSizeChanged)
         #
         # Logging
         #
@@ -134,27 +167,34 @@ class PreferencesDialogWidget(QDialog):
         self.ui.chkBoxEnableLogViewer.stateChanged.connect(
             self.__pref.enableLogViewerStateChanged
         )
+
+        #
+        # CRC
+        #
+        self.ui.chkBoxComputeCRC.stateChanged.connect(
+            self.__pref.enableCRCComputeStateChanged
+        )
+
         #
         # Job History
         #
-        if config.data.get(config.ConfigKey.JobHistory) is not None:
-            self.ui.chkBoxEnableJobHistory.stateChanged.connect(
-                self.__pref.enableJobHistoryChanged
-            )
+        #if config.data.get(config.ConfigKey.JobHistory) is not None:
+        #    self.ui.chkBoxEnableJobHistory.stateChanged.connect(
+        #        self.__pref.enableJobHistoryChanged
+        #    )
+
         #
         # Window size
         #
         self.ui.chkBoxRestoreWindowSize.stateChanged.connect(
             self.__pref.restoreWindowSizeStateChanged
         )
+
         #
         # Buttons
         #
         self.ui.btnBox.clicked.connect(self.__pref.clickedButton)
-        #
-        # Restore Defaults
-        #
-        self.ui.btnRestoreDefaults.clicked.connect(self.__pref.restoreDefaults)
+
         #
         # Algorithm radio buttons
         #
@@ -167,6 +207,12 @@ class PreferencesDialogWidget(QDialog):
         self.ui.rbTwo.toggled.connect(
             lambda: self.__pref.toggledRadioButton(self.ui.rbTwo)
         )
+
+        #
+        # Restore Defaults
+        #
+        self.ui.btnRestoreDefaults.clicked.connect(self.__pref.restoreDefaults)
+
 
     # @property
     # def parent(self):
@@ -186,7 +232,7 @@ class PreferencesDialogWidget(QDialog):
         self._initUI()
         self.preferences.reset()
 
-        rc = self.exec_()
+        rc = self.exec()
         if rc:
             self.applyChanges()
 
@@ -200,8 +246,9 @@ class PreferencesDialogWidget(QDialog):
             # Language
             #
             if self.preferences.language is not None:
-                config.data.set(config.ConfigKey.Language, self.preferences.language)
-                self.parent.setLanguage()
+                config.data.set(config.ConfigKey.Language,
+                                self.preferences.language)
+                self.translateInterfaceSignal.emit()
             #
             # Font & Size
             #
@@ -228,6 +275,7 @@ class PreferencesDialogWidget(QDialog):
                     config.ConfigKey.Logging, self.preferences.enableLogging
                 )
                 self.parent.enableLogging(self.preferences.enableLogging)
+
             #
             # LogViewer
             #
@@ -238,31 +286,44 @@ class PreferencesDialogWidget(QDialog):
                         config.ConfigKey.LogViewer, self.preferences.enableLogViewer
                     )
                     if self.preferences.enableLogViewer:
-                        if self.parent.logViewerWidget.tab < 0:
-                            self.parent.logViewerWidget.unHideTab()
-                            self.parent.logViewerWidget.setAsCurrentTab()
+                        if self.parent.logViewer.tab < 0:
+                            self.parent.logViewer.unHideTab()
+                            self.parent.logViewer.setAsCurrentTab()
                     else:
-                        if self.parent.logViewerWidget.tab >= 0:
-                            self.parent.logViewerWidget.hideTab()
+                        if self.parent.logViewer.tab >= 0:
+                            self.parent.logViewer.hideTab()
             else:
                 config.data.set(config.ConfigKey.LogViewer, False)
-                if self.parent.logViewerWidget.tab >= 0:
-                    self.parent.logViewerWidget.hideTab()
+                if self.parent.logViewer.tab >= 0:
+                    self.parent.logViewer.hideTab()
+
+            #
+            # CRC
+            #
+            if self.preferences.enableCRCCompute is not None:
+                if config.data.get(config.ConfigKey.CRC32) is not None:
+                    if (self.preferences.enableCRCCompute):
+                        config.data.set(config.ConfigKey.CRC32, 2)
+                    else:
+                        config.data.set(config.ConfigKey.CRC32, 0)
+                    self.stateChangedCRC.emit()
+
             #
             # Job History
             #
-            if config.data.get(config.ConfigKey.JobHistory) is not None:
-                if self.preferences.enableJobHistory is not None:
-                    config.data.set(
-                        config.ConfigKey.JobHistory, self.preferences.enableJobHistory
-                    )
-                    if self.preferences.enableJobHistory:
-                        if self.parent.historyWidget.tab < 0:
-                            self.parent.historyWidget.unHideTab()
-                            self.parent.historyWidget.setAsCurrentTab()
-                    else:
-                        if self.parent.historyWidget.tab >= 0:
-                            self.parent.historyWidget.hideTab()
+            #if config.data.get(config.ConfigKey.JobHistory) is not None:
+            #    if self.preferences.enableJobHistory is not None:
+            #        config.data.set(
+            #            config.ConfigKey.JobHistory, self.preferences.enableJobHistory
+            #        )
+            #        if self.preferences.enableJobHistory:
+            #            if self.parent.historyWidget.tab < 0:
+            #                self.parent.historyWidget.unHideTab()
+            #                self.parent.historyWidget.setAsCurrentTab()
+            #        else:
+            #            if self.parent.historyWidget.tab >= 0:
+            #                self.parent.historyWidget.hideTab()
+
             #
             # Algorithm
             #
@@ -270,12 +331,15 @@ class PreferencesDialogWidget(QDialog):
                 for index, rb in enumerate(self.radioButtons):
                     if rb.isChecked():
                         config.data.set(config.ConfigKey.Algorithm, index)
+                self.stateChangedAlgorithm.emit()
+
             #
             # Restore window size
             #
             if self.preferences.restoreWindowSize is not None:
 
-                defaultGeometry = config.data.get(config.ConfigKey.DefaultGeometry)
+                defaultGeometry = config.data.get(
+                    config.ConfigKey.DefaultGeometry)
                 self.parent.setGeometry(
                     defaultGeometry[0],
                     defaultGeometry[1],
@@ -304,15 +368,16 @@ class Preferences(QObject):
     def __init__(self, parent):
         super().__init__(parent)
 
-        self.__parent = None
+        #self.__parent = None
         self.parent = parent
 
         self._initVars()
 
     def _initVars(self):
-        self.enableJobHistory = None
+        #self.enableJobHistory = None
         self.enableLogging = None
         self.enableLogViewer = None
+        self.enableCRCCompute = None
         self.font = None
         self.fontSize = None
         self.language = None
@@ -333,7 +398,8 @@ class Preferences(QObject):
 
         language = self.parent.ui.cmbBoxInterfaceLanguage.itemText(index)
         if language:
-            languageDictionary = config.data.get(config.ConfigKey.InterfaceLanguages)
+            languageDictionary = config.data.get(
+                config.ConfigKey.InterfaceLanguages)
             key = list(languageDictionary.keys())[
                 list(languageDictionary.values()).index(language)
             ]
@@ -361,21 +427,27 @@ class Preferences(QObject):
         self.enableLogging = bool(value)
         if not self.__changedData:
             self.__changedData = True
+        # Enable/Disable the Log Viewer checkbox
         self.parent.ui.chkBoxEnableLogViewer.setEnabled(self.enableLogging)
 
     @Slot(int)
-    def enableLogViewerStateChanged(self, value):
+    def enableCRCComputeStateChanged(self, value):
+        self.enableCRCCompute = bool(value)
+        if not self.__changedData:
+            self.__changedData = True
 
+    @Slot(int)
+    def enableLogViewerStateChanged(self, value):
         self.enableLogViewer = bool(value)
         if not self.__changedData:
             self.__changedData = True
 
-    @Slot(int)
-    def enableJobHistoryChanged(self, value):
+    #@Slot(int)
+    #def enableJobHistoryChanged(self, value):
 
-        self.enableJobHistory = bool(value)
-        if not self.__changedData:
-            self.__changedData = True
+    #    self.enableJobHistory = bool(value)
+    #    if not self.__changedData:
+    #        self.__changedData = True
 
     @Slot(int)
     def restoreWindowSizeStateChanged(self, value):
@@ -401,14 +473,18 @@ class Preferences(QObject):
 
         buttonRole = self.parent.ui.btnBox.buttonRole(button)
 
-        if buttonRole in [QDialogButtonBox.AcceptRole, QDialogButtonBox.ResetRole]:
+        if buttonRole in [QDialogButtonBox.AcceptRole,
+                          QDialogButtonBox.ResetRole]:
             if buttonRole == QDialogButtonBox.ResetRole:
                 self.parent.ui.chkBoxRestoreWindowSize.setChecked(True)
                 self.parent.ui.chkBoxEnableLogging.setChecked(False)
                 defaultFont = QFont()
-                defaultFont.fromString(config.data.get(config.ConfigKey.SystemFont))
-                self.parent.ui.fcmbBoxFontFamily.setCurrentFont(defaultFont.family())
-                self.parent.ui.spinBoxFontSize.setValue(defaultFont.pointSize())
+                defaultFont.fromString(
+                    config.data.get(config.ConfigKey.SystemFont))
+                self.parent.ui.fcmbBoxFontFamily.setCurrentFont(
+                    defaultFont.family())
+                self.parent.ui.spinBoxFontSize.setValue(
+                    defaultFont.pointSize())
 
     @Slot(bool)
     def restoreDefaults(self):
@@ -418,6 +494,7 @@ class Preferences(QObject):
 
         self.parent.ui.chkBoxRestoreWindowSize.setChecked(True)
         self.parent.ui.chkBoxEnableLogging.setChecked(False)
+        self.parent.ui.chkBoxComputeCRC.setChecked(False)
         if config.data.get(config.ConfigKey.JobHistory) is not None:
             self.parent.ui.chkBoxEnableJobHistory.setChecked(False)
         self.parent.ui.chkBoxEnableLogViewer.setChecked(False)

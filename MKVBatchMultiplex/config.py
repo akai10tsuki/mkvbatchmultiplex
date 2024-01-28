@@ -1,11 +1,8 @@
+r"""
+Configuration system
 """
-mkvbatchmultiplex config file
-"""
-# CF0005
 
-# for app
-__VERSION__: tuple = (2, 1, "0b1", "dev5")
-__version__: str = ".".join(map(str, __VERSION__))
+# CFGG005
 
 import logging
 import os
@@ -14,20 +11,23 @@ import sys
 from typing import Callable, ClassVar, Dict, List, Optional
 from pathlib import Path
 
-from PySide2.QtGui import QFont
-from PySide2.QtWidgets import QApplication
+from PySide6.QtGui import QFont
+from PySide6.QtWidgets import QApplication
 
 from vsutillib.files import ConfigurationSettings
 from vsutillib.log import LogRotateFileHandler
-from vsutillib.pyqt import QSignalLogHandler
+from vsutillib.pyside6 import QSignalLogHandler
 
+__VERSION__: tuple = (3, 0, "0b1", "dev0")
+__version__: str = ".".join(map(str, __VERSION__))
 
 APPNAME: str = "MKVBatchMultiplex"
-VERSION: str = ".".join(map(str, __VERSION__))
+VERSION: str = __version__
 
 AUTHOR: str = "Efrain Vergara"
 EMAIL: str = "akai10tsuki@gmail.com"
 
+# region setup.py
 # for setup.py
 COPYRIGHT: str = "2018-2021, Efrain Vergara"
 LICENSE: str = "MIT"
@@ -45,28 +45,23 @@ PROJECTURLS: Dict[str, str] = {
     "Bug Reports": "https://github.com/akai10tsuki/mkvbatchmultiplex/issues",
     "Source": "https://github.com/akai10tsuki/mkvbatchmultiplex/",
 }
-PYTHONVERSIONS: str = ">=3.8.1, <4.0"
-QT_VERSION: str = "PYSIDE2"
-PYSIDE2_VERSION: str = ">=5.15.2"
-PYSIDE6_VERSION: str = ">=6.0.0"
+PYTHONVERSIONS: str = ">=3.10.1, <3.13"
+PYSIDE6_VERSION: str = ">=6.2"
+PYSIDE_VERSION: PYSIDE6_VERSION
 REQUIRED: List[str] = [
-    "PySide2>=5.15",
-    "vsutillib-files>=1.6.5",
-    "vsutillib-log>=1.6.0",
-    "vsutillib-media>=1.6.5",
-    "vsutillib-mkv>=1.6.5",
-    "vsutillib-process>=1.6.5",
-    "vsutillib-pyqt>=1.6.2",
-    "vsutillib-sql>=1.6.5",
+    "PySide6>=6.2",
+    "vsutillib-files>=1.7.0",
+    "vsutillib-log>=1.7.0",
+    "vsutillib-media>=1.7.0",
+    "vsutillib-mkv>=1.7.00",
+    "vsutillib-process>=1.7.0",
+    "vsutillib-pyside6>=1.7.0",
+    "vsutillib-sql>=1.7.0",
 ]
 
-# REQUIRED = [
-#    "vsutillib-macos>=1.6.1", # pulls process
-# ]
+# endregion
 
-
-# label
-
+# region configuration for files in ~/.MKVBatchMultiplex
 CONFIGFILE: str = "config.xml"
 FILESROOT: str = "." + APPNAME
 LOGFILE: str = APPNAME + ".log"
@@ -88,6 +83,9 @@ logViewer: Callable[
 ] = QSignalLogHandler()  # pylint: disable=invalid-name
 
 FORCELOG: bool = True
+# endregion
+
+# region Application Specific
 
 ######################
 # Application specific
@@ -98,17 +96,21 @@ SYSTEMDATABASE: str = "itsue.db"
 ALGORITHMDEFAULT: int = 1
 DATABASEVERSION: str = "2.1.0"
 
-#######################
-#######################
+# endregion
 
 
-class Action:  # pylint: disable=too-few-public-methods
+class Action:
 
     Save: ClassVar[str] = "Save"
     Reset: ClassVar[str] = "Reset"
     Restore: ClassVar[str] = "Restore"
     Update: ClassVar[str] = "Update"
 
+class CheckBoxState:
+
+    UnChecked: ClassVar[int] = 0
+    NoChaneg: ClassVar[int] = 1
+    Checked: ClassVar[int] = 2
 
 class ConfigKey:  # pylint: disable=too-few-public-methods
     """
@@ -132,6 +134,7 @@ class ConfigKey:  # pylint: disable=too-few-public-methods
     #
 
     Algorithm: ClassVar[str] = "Algorithm"
+    CRC32: ClassVar[str] = "CRC32"
     DbVersion: ClassVar[str] = "DbVersion"
     JobsAutoSave: ClassVar[str] = "JobsAutoSave"
     JobHistory: ClassVar[str] = "JobHistory"
@@ -157,21 +160,26 @@ def init(
     logFile: Optional[str] = None,
     name: Optional[str] = None,
     version: Optional[str] = None,
-    app: Optional[str] = None,
+    app: Optional[QApplication] = None,
 ):
     """
     configures the system to save application configuration to xml file
 
     Args:
-        **filesRoot** (str, optional): root folder on ~ for files. Defaults to [.vsutillib].
+        **filesRoot** (str, optional): root folder on HOME directory for files.
+             Defaults to [.MKVBatchMultiplex].
 
-        **configFile** (str, optional): name of configuration file. Defaults to [config.xml].
+        **configFile** (str, optional): name of configuration file. Defaults to
+             [config.xml].
 
-        **logFile** (str, optional): name of logging file. Defaults to [vsutillib.log].
+        **logFile** (str, optional): name of logging file. Defaults to
+            [MKVMultiplex.log].
 
-        **name** (str, optional): name of application. Defaults to [vsutillib].
+        **name** (str, optional): name of application. Defaults to
+        [MKVBatchMultiplex].
 
-        **version** (str, optional): appplication version . Defaults to [vsutillib version].
+        **version** (str, optional): appplication version . Defaults to
+        [vsutillib version].
     """
 
     if filesRoot is None:
@@ -201,51 +209,66 @@ def init(
 
     data.set(ConfigKey.LogViewer, data.get(ConfigKey.LogViewer) or False)
 
-    data.set(ConfigKey.Language, data.get(ConfigKey.Language) or DEFAULTLANGUAGE)
-
     if logFile is None:
         loggingFile = Path(filesPath, LOGFILE)
     else:
         loggingFile = Path(filesPath, logFile)
 
-    loghandler = LogRotateFileHandler(loggingFile, backupCount=10, encoding="utf-8")
-    formatter = logging.Formatter("%(asctime)s %(levelname)-8s %(name)s %(message)s")
+    loghandler = LogRotateFileHandler(
+        loggingFile, backupCount=10, encoding="utf-8")
+    formatter = logging.Formatter(
+        "%(asctime)s %(levelname)-8s %(name)s %(message)s")
     loghandler.setFormatter(formatter)
     logViewer.setFormatter(formatter)
     logging.getLogger("").addHandler(loghandler)
     logging.getLogger("").addHandler(logViewer)
     logging.getLogger("").setLevel(logging.DEBUG)
 
-    appName = name or APPNAME
-    appVersion = version or VERSION
-
-    logging.info("CF0001: App Start.")
-    logging.info("CF0002: Python: %s", sys.version)
-    appName = "CF0003: " + appName
-    logging.info("%s-%s", appName, appVersion)
-
+    data.set(ConfigKey.Language,
+             data.get(ConfigKey.Language) or DEFAULTLANGUAGE)
     setInterfaceLanguage()
+
+    #
+    # Position app window
+    #
     setDefaultGeometry()
 
     db = Path(filesPath, SYSTEMDATABASE)
     data.set(ConfigKey.SystemDB, str(db))
 
     #
-    # App Specific
+    # Log start of app
+    #
+    appName = name or APPNAME
+    appVersion = version or VERSION
+
+    logging.info("CFG0001: App Start.")
+    logging.info("CFG0002: Python: %s", sys.version)
+    appName = "CFG0003: " + appName
+    logging.info("%s-%s", appName, appVersion)
+
+    #
+    # App specific
     #
     setRegEx()
 
-    data.set(ConfigKey.Algorithm, data.get(ConfigKey.Algorithm) or 1)
+    data.set(ConfigKey.Algorithm,
+             data.get(ConfigKey.Algorithm) or 1)
 
-    data.set(ConfigKey.DbVersion, data.get(ConfigKey.DbVersion) or DATABASEVERSION)
+    data.set(ConfigKey.CRC32,
+             data.get(ConfigKey.CRC32) or CheckBoxState.UnChecked)
 
-    data.set(ConfigKey.JobsAutoSave, data.get(ConfigKey.JobsAutoSave) or False)
+    data.set(ConfigKey.DbVersion,
+             data.get(ConfigKey.DbVersion) or DATABASEVERSION)
 
-    data.set(ConfigKey.JobHistory, data.get(ConfigKey.JobHistory) or False)
+    data.set(ConfigKey.JobsAutoSave,
+             data.get(ConfigKey.JobsAutoSave) or False)
 
-    data.set(
-        ConfigKey.JobHistoryDisabled, data.get(ConfigKey.JobHistoryDisabled) or False
-    )
+    data.set(ConfigKey.JobHistory,
+             data.get(ConfigKey.JobHistory) or False)
+
+    data.set(ConfigKey.JobHistoryDisabled,
+             data.get(ConfigKey.JobHistoryDisabled) or False)
     # data.set(ConfigKey.JobHistoryDisabled, False)
 
     data.set(Key.MaxRegExCount, data.get(Key.MaxRegExCount) or 20)
@@ -384,7 +407,7 @@ def close() -> None:
     """exit accounting"""
 
     data.saveToFile()
-    logging.info("CF0004: App End.")
+    logging.info("CFG0004: App End.")
 
 
 def logTest(msg: str) -> None:
