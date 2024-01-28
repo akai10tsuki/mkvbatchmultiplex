@@ -68,7 +68,6 @@ tests/generatecommand.1.py
 tests/crcTests.py
 tests/NewFiles.7z
 .vscode/
-/locale
 tmp/
 docs2/
 _build/
