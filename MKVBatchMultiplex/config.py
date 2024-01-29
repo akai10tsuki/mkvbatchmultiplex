@@ -2,7 +2,7 @@ r"""
 Configuration system
 """
 
-# CFGG005
+# Logging 005
 
 import logging
 import os
@@ -109,7 +109,7 @@ class Action:
 class CheckBoxState:
 
     UnChecked: ClassVar[int] = 0
-    NoChaneg: ClassVar[int] = 1
+    NoChange: ClassVar[int] = 1
     Checked: ClassVar[int] = 2
 
 class ConfigKey:  # pylint: disable=too-few-public-methods
@@ -178,7 +178,7 @@ def init(
         **name** (str, optional): name of application. Defaults to
         [MKVBatchMultiplex].
 
-        **version** (str, optional): appplication version . Defaults to
+        **version** (str, optional): application version . Defaults to
         [vsutillib version].
     """
 
@@ -214,13 +214,14 @@ def init(
     else:
         loggingFile = Path(filesPath, logFile)
 
-    loghandler = LogRotateFileHandler(
+    logHandler = LogRotateFileHandler(
         loggingFile, backupCount=10, encoding="utf-8")
     formatter = logging.Formatter(
         "%(asctime)s %(levelname)-8s %(name)s %(message)s")
-    loghandler.setFormatter(formatter)
+    logHandler.setFormatter(formatter)
+    # logViewer will be use with LogViewerWidget
     logViewer.setFormatter(formatter)
-    logging.getLogger("").addHandler(loghandler)
+    logging.getLogger("").addHandler(logHandler)
     logging.getLogger("").addHandler(logViewer)
     logging.getLogger("").setLevel(logging.DEBUG)
 
@@ -291,7 +292,7 @@ def init(
     )
 
     #
-    # Temporalily disable uncomment statements
+    # Temporarily disable uncomment statements
     #
     # data.set(ConfigKey.JobHistoryDisabled, True)
     # data.set(ConfigKey.JobHistory, False)
