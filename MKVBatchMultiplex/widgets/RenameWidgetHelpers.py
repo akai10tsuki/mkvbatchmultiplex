@@ -1,31 +1,8 @@
 """
- convenience classes and functions used by RenameWidget
+Rename files for the command output
 
-Returns:
-    [type]: [description]
-
-import logging
-import re
-import time
-
-from pathlib import Path
-
-from PySide2.QtCore import Signal, Qt, Slot
-from PySide2.QtWidgets import (
-    QFormLayout,
-    QGridLayout,
-    QLabel,
-    QWidget,
-    QHBoxLayout,
-    QVBoxLayout,
-    QSizePolicy,
-    QGroupBox,
-)
-
-import vsutillib.pyqt as pyqt
-from vsutillib.process import isThreadRunning
-
-from .. import config
++ It can rename files in your system dragging them to the source files
++ It can calculate the crc-32 for files in your system
 """
 
 import re

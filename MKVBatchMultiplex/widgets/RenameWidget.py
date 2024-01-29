@@ -33,9 +33,11 @@ from vsutillib.pyside6 import (
     qtRunFunctionInThread
 )
 
+from vsutillib.process import ThreadWorker
+from vsutillib.files import crc32
 
 from .. import config
-from ..utils import Text
+from ..utils import computeCRC32, Text
 
 from .RenameWidgetHelpers import (
     findDuplicates,
@@ -63,6 +65,7 @@ class RenameWidget(TabWidgetExtension, QWidget):
     applyFileRenameSignal = Signal(list)
     setFilesSignal = Signal(object)
     setCurrentIndexSignal = Signal()
+    appendCRCSignal = Signal(int, Path)
 
     @classmethod
     def classLog(cls, setLogging=None):
@@ -93,19 +96,22 @@ class RenameWidget(TabWidgetExtension, QWidget):
 
         self.__log = None
         self.__output = None
-        self.__tab = None
         self.parent = parent
         self.controlQueue = controlQueue
-        self._outputFileNames = []
-        self._renameFileNames = []
-        self._initControls()
-        self._initUI()
+        self._initVars()
         self._initHelper()
-        self._bFilesDropped = False
-        self._bDuplicateRename = False
+        self._initUI()
         self.log = log
 
-    def _initControls(self):
+    def _initVars(self):
+
+        #
+        # Control variables
+        #
+        self._outputFileNames = []
+        self._renameFileNames = []
+        self._bFilesDropped = False
+        self._bDuplicateRename = False
 
         #
         # Input Lines
@@ -139,37 +145,18 @@ class RenameWidget(TabWidgetExtension, QWidget):
         btnClear = QPushButtonWidget(
             Text.txt0212, function=self.clear, margins="  ", toolTip=Text.txt0213
         )
+        btnCalculateCRC = QPushButtonWidget(
+            "Calculate CRC", function=self._crc, margins=" ", toolTip="Calculate the CRC 32 for the files"
+        )
+        btnCalculateCRC.setEnabled(False)
         self.btnGrid = QHBoxLayout()
         self.btnGrid.addWidget(btnApplyRename)
         self.btnGrid.addWidget(btnUndoRename)
+        self.btnGrid.addWidget(btnCalculateCRC)
         self.btnGrid.addStretch()
         self.btnGrid.addWidget(btnClear)
         self.btnGroup = QGroupBox()
         self.btnGroup.setLayout(self.btnGrid)
-
-    def _initUI(self):
-
-        inputGrid = QGridLayout()
-        #
-        # Input lines
-        #
-        inputGrid.addWidget(self.textRegEx, 0, 0, 1, 2)
-        inputGrid.addWidget(self.textSubString, 1, 0, 1, 2)
-        # buttons
-        inputGrid.addWidget(self.btnGroup, 2, 0, 1, 2)
-        gridWidget = QWidget()
-        gridWidget.setLayout(inputGrid)
-        gridWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        boxWidget = QWidget()
-        hboxLayout = QHBoxLayout()
-        hboxLayout.addWidget(self.textOriginalNames)
-        hboxLayout.addWidget(self.textRenameResults)
-        boxWidget.setLayout(hboxLayout)
-        grid = QGridLayout()
-        grid.setSpacing(5)
-        grid.addWidget(gridWidget, 0, 0, 2, 0, Qt.AlignTop)
-        grid.addWidget(boxWidget, 2, 0)
-        self.setLayout(grid)
 
     def _initHelper(self):
 
@@ -177,6 +164,7 @@ class RenameWidget(TabWidgetExtension, QWidget):
         # local signals
         # self.setCurrentIndexSignal.connect(self._setCurrentIndex)
         self.setFilesSignal.connect(self.setFiles)
+        self.appendCRCSignal.connect(self.appendCRC)
         self.textRegEx.cmdLine.currentTextChanged.connect(self._updateRegEx)
         self.textSubString.cmdLine.currentTextChanged.connect(self._updateRegEx)
         self.textOriginalNames.textBox.textChanged.connect(self.clearButtonState)
@@ -204,6 +192,30 @@ class RenameWidget(TabWidgetExtension, QWidget):
             self.textSubString.cmdLine.addItems(items)
             self.textSubString.cmdLine.clearEditText()
         self.btnGrid.itemAt(ButtonIndex.Clear).widget().setEnabled(False)
+
+    def _initUI(self):
+
+        inputGrid = QGridLayout()
+        #
+        # Input lines
+        #
+        inputGrid.addWidget(self.textRegEx, 0, 0, 1, 2)
+        inputGrid.addWidget(self.textSubString, 1, 0, 1, 2)
+        # buttons
+        inputGrid.addWidget(self.btnGroup, 2, 0, 1, 2)
+        gridWidget = QWidget()
+        gridWidget.setLayout(inputGrid)
+        gridWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        boxWidget = QWidget()
+        hboxLayout = QHBoxLayout()
+        hboxLayout.addWidget(self.textOriginalNames)
+        hboxLayout.addWidget(self.textRenameResults)
+        boxWidget.setLayout(hboxLayout)
+        grid = QGridLayout()
+        grid.setSpacing(5)
+        grid.addWidget(gridWidget, 0, 0, 2, 0, Qt.AlignTop)
+        grid.addWidget(boxWidget, 2, 0)
+        self.setLayout(grid)
 
     def __bool__(self):
         for n, r in zip(self._outputFileNames, self._renameFileNames):
@@ -302,6 +314,11 @@ class RenameWidget(TabWidgetExtension, QWidget):
             self.scrollRenameChanged
         )
 
+    @Slot(int, Path)
+    def appendCRC(self, index, name):
+        print(f"appendCRC index={index} "
+              f"old Nme={self._outputFileNames[index]} name={name}")
+
     def clear(self):
         """
         clear reset widget working variables and widgets
@@ -315,13 +332,18 @@ class RenameWidget(TabWidgetExtension, QWidget):
         self.textOriginalNames.textBox.clear()
         self.textRenameResults.textBox.clear()
 
+    def calculateCRCButtonState(self, state):
+        self.btnGrid.itemAt(ButtonIndex.CalculateCRC).widget().setEnabled(state)
+
     def clearButtonState(self):
         """Set clear button state"""
 
         if self.textOriginalNames.textBox.toPlainText() != "":
             self.btnGrid.itemAt(ButtonIndex.Clear).widget().setEnabled(True)
+            self.btnGrid.itemAt(ButtonIndex.CalculateCRC).widget().setEnabled(True)
         else:
             self.btnGrid.itemAt(ButtonIndex.Clear).widget().setEnabled(False)
+            self.btnGrid.itemAt(ButtonIndex.CalculateCRC).widget().setEnabled(False)
 
     def connectToSetFiles(self, objSignal):
 
@@ -355,6 +377,7 @@ class RenameWidget(TabWidgetExtension, QWidget):
             if not self._bFilesDropped:
                 self._bFilesDropped = True
             self._updateRegEx()
+            self.calculateCRCButtonState(True)
         else:
             # receive when clear issued to FilesListWidget
             self._outputFileNames = []
@@ -430,6 +453,7 @@ class RenameWidget(TabWidgetExtension, QWidget):
         else:
             self.applyFileRenameSignal.emit(self._renameFileNames)
         self.btnGrid.itemAt(ButtonIndex.ApplyRename).widget().setEnabled(False)
+        self.btnGrid.itemAt(ButtonIndex.CalculateCRC).widget().setEnabled(False)
         self.btnGrid.itemAt(ButtonIndex.Undo).widget().setEnabled(True)
 
     def _undoRename(self):
@@ -444,16 +468,59 @@ class RenameWidget(TabWidgetExtension, QWidget):
         else:
             self.applyFileRenameSignal.emit(self._outputFileNames)
         self.btnGrid.itemAt(ButtonIndex.ApplyRename).widget().setEnabled(True)
+        self.btnGrid.itemAt(ButtonIndex.CalculateCRC).widget().setEnabled(True)
         self.btnGrid.itemAt(ButtonIndex.Undo).widget().setEnabled(False)
+
+    def _crc(self, log):
+        if self._bFilesDropped:
+            for index, fileName in enumerate(self._outputFileNames):
+                #print(f"index={index} file={fileName}")
+                crcWorker = ThreadWorker(
+                    computeCRC,
+                    updateName=self.appendCRCSignal,
+                    index=index,
+                    fileName=fileName,
+                    log=log
+                )
+                crcWorker.start()
+
+def computeCRC(**kwargs: str) -> None:
+
+    updateName = kwargs.pop("updateName", None)
+    index = kwargs.pop("index", None)
+    sourceFile = kwargs.pop("fileName", None)
+    log = kwargs.pop("log", False)
+
+    print("computeCRC someone is calling\n")
+    if sourceFile:
+        #print(f"computeCRC index={index} sourceFile={sourceFile}\n")
+        fileName = Path(sourceFile)
+        if fileName.is_file():
+            #print(f"computeCRC ready to work index={index} fileName={fileName}\n")
+            crc = crc32(fileName.resolve())
+            newName = (str(fileName.parent.resolve()) + "/" +
+                fileName.stem + r" [" + crc + r"]" + fileName.suffix)
+            oName = Path(newName)
+            updateName.emit(index, oName)
+        else:
+            print(f"computeCRC file not found index={index} fileName={fileName}\n")
+    else:
+        print("Failed file source pop.")
+
 
 
 class ButtonIndex:
 
     ApplyRename = 0
     Undo = 1
-    Clear = 3
+    CalculateCRC = 2
+    Clear = 4
 
+class fileUnit:
 
+    originalName = ""
+    newName = ""
+    crc = ""
 class Key:
 
     RegEx = "RegEx"

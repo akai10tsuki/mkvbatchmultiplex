@@ -260,7 +260,7 @@ class MainWindow(QMainWindow):
         tabsList.append(
             [
                 self.renameWidget,
-                _(Text.txt0143),
+                _(Text.txt0143) + "+",
                 _(Text.txt0147),
             ]
         )
@@ -588,15 +588,15 @@ def mainApp():
     """Main function"""
 
     app = QApplication(sys.argv)
-    config.init(app=app)
+    #config.init(app=app)
 
     # will create a poor mans dark theme for the app enable it for Linux
     # and Windows for now won't look for an option to switch to light
     # dark according to the os no clear way of changing tho font size
     # TODO: lightPalette
-    darkPalette(app)
-    config.data.set(config.ConfigKey.DarkMode, True)
-    QOutputTextWidget.isDarkMode = True
+    #darkPalette(app)
+    #config.data.set(config.ConfigKey.DarkMode, True)
+    #QOutputTextWidget.isDarkMode = True
 
     if platform.system() == "Windows":
         # with this the icon in the task bar will change to the one set
@@ -604,7 +604,12 @@ def mainApp():
         myAppID = "akai10tsuki.MKVBatchMultiplex.mkv.3.0.0"
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myAppID)
 
+    config.init(app=app)
     MainWindow()
+
+    darkPalette(app)
+    config.data.set(config.ConfigKey.DarkMode, True)
+    QOutputTextWidget.isDarkMode = True
     app.exec()
 
     config.close()
