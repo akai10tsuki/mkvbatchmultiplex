@@ -316,8 +316,11 @@ class RenameWidget(TabWidgetExtension, QWidget):
 
     @Slot(int, Path)
     def appendCRC(self, index, name):
-        print(f"appendCRC index={index} "
-              f"old Nme={self._outputFileNames[index]} name={name}")
+        try:
+            self._renameFileNames[index] = name
+        except IndexError:
+            # Later log this
+            pass
 
     def clear(self):
         """
@@ -473,40 +476,42 @@ class RenameWidget(TabWidgetExtension, QWidget):
 
     def _crc(self, log):
         if self._bFilesDropped:
-            for index, fileName in enumerate(self._outputFileNames):
-                #print(f"index={index} file={fileName}")
+
+            for index, (currentName, newName) in \
+                enumerate(zip(self._outputFileNames, self._renameFileNames)):
+
                 crcWorker = ThreadWorker(
                     computeCRC,
                     updateName=self.appendCRCSignal,
                     index=index,
-                    fileName=fileName,
+                    fileName=currentName,
+                    newName=newName,
                     log=log
                 )
                 crcWorker.start()
+
 
 def computeCRC(**kwargs: str) -> None:
 
     updateName = kwargs.pop("updateName", None)
     index = kwargs.pop("index", None)
     sourceFile = kwargs.pop("fileName", None)
+    newName = kwargs.pop("newName", None)
     log = kwargs.pop("log", False)
 
     print("computeCRC someone is calling\n")
-    if sourceFile:
-        #print(f"computeCRC index={index} sourceFile={sourceFile}\n")
+    if sourceFile and newName:
         fileName = Path(sourceFile)
         if fileName.is_file():
-            #print(f"computeCRC ready to work index={index} fileName={fileName}\n")
             crc = crc32(fileName.resolve())
-            newName = (str(fileName.parent.resolve()) + "/" +
+            newNameCRC = (str(fileName.parent.resolve()) + "/" +
                 fileName.stem + r" [" + crc + r"]" + fileName.suffix)
-            oName = Path(newName)
+            oName = Path(newNameCRC)
             updateName.emit(index, oName)
         else:
             print(f"computeCRC file not found index={index} fileName={fileName}\n")
     else:
         print("Failed file source pop.")
-
 
 
 class ButtonIndex:
