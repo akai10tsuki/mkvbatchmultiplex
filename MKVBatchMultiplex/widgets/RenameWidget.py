@@ -67,6 +67,8 @@ class RenameWidget(TabWidgetExtension, QWidget):
     setCurrentIndexSignal = Signal()
     appendCRCSignal = Signal(int, Path)
 
+    reCrcChars = re.compile('^[0123456789ABCDEF]+$', flags=re.IGNORECASE)
+
     @classmethod
     def classLog(cls, setLogging=None):
         """
@@ -316,8 +318,13 @@ class RenameWidget(TabWidgetExtension, QWidget):
 
     @Slot(int, Path)
     def appendCRC(self, index, name):
+        #print(f"parameters: index={index} name={name}")
         try:
-            self._renameFileNames[index] = name
+            print(f"update rename index={index} to {name}")
+            #self._renameFileNames[index] = name
+            #self.textRenameResults.textBox.clear()
+            #self._displayRenames()
+            pass
         except IndexError:
             # Later log this
             pass
@@ -499,19 +506,48 @@ def computeCRC(**kwargs: str) -> None:
     newName = kwargs.pop("newName", None)
     log = kwargs.pop("log", False)
 
-    print("computeCRC someone is calling\n")
     if sourceFile and newName:
         fileName = Path(sourceFile)
+        newFileName = Path(newName)
         if fileName.is_file():
             crc = crc32(fileName.resolve())
-            newNameCRC = (str(fileName.parent.resolve()) + "/" +
-                fileName.stem + r" [" + crc + r"]" + fileName.suffix)
-            oName = Path(newNameCRC)
-            updateName.emit(index, oName)
+            newNameWithCRC = appendCRC(newFileName, crc)
+            updateName.emit(index, newNameWithCRC)
         else:
-            print(f"computeCRC file not found index={index} fileName={fileName}\n")
+            if log:
+                MODULELOG.error("[RenameWidget.computeCRC] File not found index={index} fileName={fileName}", index, fileName)
     else:
         print("Failed file source pop.")
+
+
+def appendCRC(fileName, crc) -> Path:
+
+    name = str(fileName.resolve().stem)
+    newNameCRC = None
+    possibleCRC = False
+    if len(name) >= 11:
+        leftBracket = name[-10:-9]
+        rightBracket = name[-1:]
+        if (leftBracket == "[") and (rightBracket == "]"):
+            testCRC = name[-9:-1]
+            possibleCRC = bool(RenameWidget.reCrcChars.match(testCRC))
+
+    if possibleCRC:
+        # Already has crc
+        newNameCRC = name[:-10] + crc
+        #print(f"New Name CRC sub {newNameCRC}\n")
+    else:
+        # no crc detected
+        newNameCRC = (str(fileName.parent.resolve()) + "/" +
+            fileName.stem + r" [" + crc + r"]" + fileName.suffix)
+        #print(f"New Name CRC normal {newNameCRC}\n")
+
+    #print(f"appendCRC work is {newNameCRC}\n")
+    result = None
+    if newNameCRC is not None:
+        result = Path(newNameCRC)
+
+    return result
 
 
 class ButtonIndex:
@@ -521,11 +557,14 @@ class ButtonIndex:
     CalculateCRC = 2
     Clear = 4
 
+
 class fileUnit:
 
     originalName = ""
     newName = ""
     crc = ""
+
+
 class Key:
 
     RegEx = "RegEx"
