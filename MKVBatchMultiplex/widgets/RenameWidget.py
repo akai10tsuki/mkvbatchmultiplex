@@ -318,16 +318,22 @@ class RenameWidget(TabWidgetExtension, QWidget):
 
     @Slot(int, Path)
     def appendCRC(self, index, name):
-        #print(f"parameters: index={index} name={name}")
+
         try:
-            print(f"update rename index={index} to {name}")
-            #self._renameFileNames[index] = name
-            #self.textRenameResults.textBox.clear()
-            #self._displayRenames()
-            pass
+            self._renameFileNames[index] = name
+            self.textRenameResults.textBox.clear()
+            self._displayRenames()
+            if self.log:
+                MODULELOG.debug(
+                    f"[RenameWidget.appendCRC] Update rename name "
+                    f"index={index} to {name}"
+                )
         except IndexError:
-            # Later log this
-            pass
+            if self.log:
+                MODULELOG.debug(
+                    f"[RenameWidget.appendCRC] Index out of bound "
+                    f"index={index}."
+                )
 
     def clear(self):
         """
@@ -515,9 +521,12 @@ def computeCRC(**kwargs: str) -> None:
             updateName.emit(index, newNameWithCRC)
         else:
             if log:
-                MODULELOG.error("[RenameWidget.computeCRC] File not found index={index} fileName={fileName}", index, fileName)
+                MODULELOG.error(f"[RenameWidget.computeCRC] File not found "
+                        f"index={index} fileName={fileName}", index, fileName)
     else:
-        print("Failed file source pop.")
+        if log:
+            MODULELOG.debug(
+                "[RenameWidget.computeCRC] Failed to get parameters.")
 
 
 def appendCRC(fileName, crc) -> Path:
@@ -525,6 +534,7 @@ def appendCRC(fileName, crc) -> Path:
     name = str(fileName.resolve().stem)
     newNameCRC = None
     possibleCRC = False
+
     if len(name) >= 11:
         leftBracket = name[-10:-9]
         rightBracket = name[-1:]
@@ -533,16 +543,15 @@ def appendCRC(fileName, crc) -> Path:
             possibleCRC = bool(RenameWidget.reCrcChars.match(testCRC))
 
     if possibleCRC:
-        # Already has crc
-        newNameCRC = name[:-10] + crc
-        #print(f"New Name CRC sub {newNameCRC}\n")
+        # Already has crc remove it from name name[:-10]
+        newName = name[:-10]
     else:
-        # no crc detected
-        newNameCRC = (str(fileName.parent.resolve()) + "/" +
-            fileName.stem + r" [" + crc + r"]" + fileName.suffix)
-        #print(f"New Name CRC normal {newNameCRC}\n")
+        # no crc detected use current name filename.stem
+        newName = fileName.stem + ' '
 
-    #print(f"appendCRC work is {newNameCRC}\n")
+    newNameCRC = (str(fileName.parent.resolve()) + "/" +
+        newName + r"[" + crc + r"]" + fileName.suffix)
+
     result = None
     if newNameCRC is not None:
         result = Path(newNameCRC)
