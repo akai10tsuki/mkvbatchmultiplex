@@ -494,7 +494,6 @@ class CommandWidget(QWidget):
         """
         Set language used in buttons/lables called in MainWindow
         """
-        print("CommandWidget.translate")
 
         for index in range(self.frmCommandLine.rowCount()):
             widget = self.frmCommandLine.itemAt(

@@ -394,7 +394,6 @@ class Preferences(QObject):
         Args:
             index (int): index in language combo box
         """
-        print("interfaceLanguageChange")
         language = self.parent.ui.cmbBoxInterfaceLanguage.itemText(index)
         if language:
             languageDictionary = config.data.get(

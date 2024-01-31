@@ -156,29 +156,29 @@ class JobsTableView(QTableView):
         # row = self.rowAt(event.pos().y())
         totalRows = self.proxyModel.rowCount()
 
-        print(f"Total current row={row} rows={totalRows}")
+        #print(f"Total current row={row} rows={totalRows}")
 
         if 0 <= totalRows:
 
-            print(f"Enter to prepare menu")
+            #print(f"Enter to prepare menu")
 
             menu = QMenu()
             menu.setFont(self.parent.font())
             if totalSelectedRows == 1:
                 menu.addAction(_("Copy"))
-                print(f"Added Copy action")
+                #print(f"Added Copy action")
             if model.dataset[row, JobKey.Status] not in [
                 JobStatus.Running,
                 JobStatus.Skip,
                 JobStatus.Abort,
             ]:
                 menu.addAction(_("Remove"))
-                print(f"Added Remove action")
+                #print(f"Added Remove action")
             #menu.addAction(_("Save"))
 
             if action := menu.exec(event.globalPos()):
                 result = action.text()
-                print(f"Action ={result}")
+                #print(f"Action ={result}")
 
                 if result == _("Copy"):
                     self.copySelection()

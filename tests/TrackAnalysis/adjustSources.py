@@ -103,7 +103,7 @@ def adjustSources(oCommand, index, algorithm=1, update=True):
                         else:
                             savedScore = score
                     else:
-                        print("Not suppose to show..")
+                        #print("Not suppose to show..")
                         if algorithm == 2:
                             translate[track] = str(
                                 200 + i
