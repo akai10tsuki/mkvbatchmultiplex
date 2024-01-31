@@ -169,6 +169,8 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0212 = S_("Clear")
     txt0213 = S_("Clear names start over")
     txt0214 = S_("Invalid regex")
+    txt0215 = S_("Calculate CRC")
+    txt0216 = S_("Calculate the CRC 32 for the files")
 
 
     # JobHistoryWidget
