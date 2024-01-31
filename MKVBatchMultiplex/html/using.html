@@ -1,0 +1,685 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Using mkvbatchmultiplex &mdash; mkvbatchmultiplex 2.1.0b1.dev5 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Changelog" href="CHANGELOG.html" />
+    <link rel="prev" title="Getting Started" href="gettingstarted.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> mkvbatchmultiplex
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">mkvbatchmultiplex Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gettingstarted.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Using mkvbatchmultiplex</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#functionality">Functionality</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#source-file-naming">Source File Naming</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#settings">Settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tabs">Tabs</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#know-issues">Know Issues</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="CHANGELOG.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CONTRIBUTING.html">Contributing to MKVBatchMultiplex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CODE_OF_CONDUCT.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgements.html">Acknowledgements</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">mkvbatchmultiplex</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Using mkvbatchmultiplex</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="using-mkvbatchmultiplex">
+<h1>Using mkvbatchmultiplex<a class="headerlink" href="#using-mkvbatchmultiplex" title="Permalink to this headline">¶</a></h1>
+<p>The application has a very simple interface:</p>
+<div class="figure align-center" id="id1">
+<img alt="_images/mkvbatchmultiplex.png" src="_images/mkvbatchmultiplex.png" />
+<p class="caption"><span class="caption-text">mkvbatchmultiplex</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</div>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<p>In order for mkvbatchmultiplex to work as intended there are certain
+conditions in the structure of the files in the source directories
+that need to be met. This has to be this way because we are working
+with group of files not one file.  Also is a batch process there should
+not be any user input requested when working of a job. For the job
+to succeed the corresponding file have to be equal in the internal
+structure tracks have to be in the same order and same type.</p>
+<p>Structure for directories:</p>
+<blockquote>
+<div><ul>
+<li><p>The media files in the directory have to be of the same type.
+The program will read the directory taking information form the
+template so it will apply instruction to the same type of file.</p></li>
+<li><p>The files have to be consistent that’s to say the same number of tracks,
+same type and order.  Files found different from template
+will not be processed.</p></li>
+<li><p>If more than one file are involved in the operation there have to
+be one of each for the resulting tracks.
+For example:</p>
+<blockquote>
+<div><p>The instruction if for a video file and a subtitle file to be
+multiplexed and there are 13 video files then there have to be
+13 subtitle files.</p>
+<blockquote>
+<div><p>One source directory:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>/source1</p></th>
+<th class="head"><p>/Destination</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>video - S01E01.avi</p></td>
+<td><p>video - S01E01.mkv</p></td>
+</tr>
+<tr class="row-odd"><td><p>video - S01E01.srt</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>video - S01E02.avi</p></td>
+<td><p>video - S01E02.mkv</p></td>
+</tr>
+<tr class="row-odd"><td><p>video - S01E02.srt</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>…</p></td>
+<td><p>…</p></td>
+</tr>
+<tr class="row-odd"><td><p>…</p></td>
+<td><p>…</p></td>
+</tr>
+<tr class="row-even"><td><p>video - S01E13.avi</p></td>
+<td><p>video - S01E13.mkv</p></td>
+</tr>
+<tr class="row-odd"><td><p>video - S01E13.srt</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div></blockquote>
+</li>
+<li><p>For attachments the same files will be use for every operation.  If the
+attachments are per file the files have to be on a directory with
+one directory per file.  If a file does not have attachments the directory
+still has to exists but empty.</p>
+<ul class="simple">
+<li><p>If more than one directory is used to get the attachments then the same
+attachments will be use for all the files.  The directory per file will
+not be check or used.</p></li>
+</ul>
+</li>
+<li><p>Files of the same type in the command have to be in different
+directories.  To process the files names are not used to pair
+the sources in alphabetical position is:</p>
+<blockquote>
+<div><p>Source1 AVI container source2 lang1.srt source3 lan2.srt:</p>
+<blockquote>
+<div><p>Two source directory:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>/directory1</p></th>
+<th class="head"><p>/directory2</p></th>
+<th class="head"><p>/destination</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>video - S01E01.avi</p></td>
+<td><p>video - S01E01.srt</p></td>
+<td><p>video - S01E01.mkv</p></td>
+</tr>
+<tr class="row-odd"><td><p>video - S01E02.avi</p></td>
+<td><p>video - S01E02.srt</p></td>
+<td><p>video - S01E02.mkv</p></td>
+</tr>
+<tr class="row-even"><td><p>…</p></td>
+<td><p>…</p></td>
+<td><p>…</p></td>
+</tr>
+<tr class="row-odd"><td><p>video - S01E13.avi</p></td>
+<td><p>video - S01E13.srt</p></td>
+<td><p>video - S01E13.mkv</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div></blockquote>
+<p>This the best option for the working directories.</p>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="functionality">
+<h2>Functionality<a class="headerlink" href="#functionality" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="source-file-naming">
+<h3>Source File Naming<a class="headerlink" href="#source-file-naming" title="Permalink to this headline">¶</a></h3>
+<p>The source and destination directories are taken from the template.
+The resulting name in the directory is taken from the first media file
+selected for the multiplexing.  The name for the subsequent files is
+not used what is use is the order read.  The program will pair the files
+by order found in the directory:</p>
+<blockquote>
+<div><table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>/directory1</p></th>
+<th class="head"><p>/directory2</p></th>
+<th class="head"><p>/destination</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>video - S01E01.avi</p></td>
+<td><p>sub01.srt</p></td>
+<td><p>video - S01E01.mkv</p></td>
+</tr>
+<tr class="row-odd"><td><p>video - S01E02.avi</p></td>
+<td><p>sub02.srt</p></td>
+<td><p>video - S01E02.mkv</p></td>
+</tr>
+<tr class="row-even"><td><p>…</p></td>
+<td><p>…</p></td>
+<td><p>…</p></td>
+</tr>
+<tr class="row-odd"><td><p>video - S01E13.avi</p></td>
+<td><p>sub03.srt</p></td>
+<td><p>video - S01E13.mkv</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>If the destination directory already have a file with the destination
+name a prefix <strong>new-</strong> will be used.  The job operation is not destructive
+no file will be overwritten.</p>
+</div>
+<div class="section" id="settings">
+<h3>Settings<a class="headerlink" href="#settings" title="Permalink to this headline">¶</a></h3>
+<div class="figure align-center" id="id2">
+<img alt="_images/mkvbatchmultiplex-preferences.png" src="_images/mkvbatchmultiplex-preferences.png" />
+<p class="caption"><span class="caption-text">Settings.</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+</div>
+<p>The available settings:</p>
+<blockquote>
+<div><ul>
+<li><p>Interface Language:</p>
+<ul class="simple">
+<li><p>English</p></li>
+<li><p>Español</p></li>
+</ul>
+</li>
+<li><p>Enable logging.  If enable logging is set the log will be saved on:</p>
+<ul class="simple">
+<li><p>~/.mkvbatchmultiplex/mkvBatchMultiplex.log</p></li>
+</ul>
+<p>with a rotation of 10 log files.</p>
+<ul class="simple">
+<li><p>Enable log viewer. If enabled there will be a tab where the log can be
+seen as the program runs.</p></li>
+</ul>
+</li>
+<li><p>Font &amp; Size. Change the font use by the interface.</p></li>
+<li><p>Interface Language.  Change the language use by the interface.  English and
+Spanish are available.</p></li>
+<li><p>Restore Defaults.  Restore default settings.</p></li>
+</ul>
+</div></blockquote>
+<div class="figure align-center" id="id3">
+<img alt="_images/mkvbatchmultiplex-logviewer.png" src="_images/mkvbatchmultiplex-logviewer.png" />
+<p class="caption"><span class="caption-text">Log viewer.</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+</div>
+</div>
+<div class="section" id="tabs">
+<h3>Tabs<a class="headerlink" href="#tabs" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p><strong>Command</strong></p>
+<p>This is the main tab where the command is registered</p>
+<div class="figure align-center" id="id4">
+<img alt="_images/mkvbatchmultiplex-tabcommand.png" src="_images/mkvbatchmultiplex-tabcommand.png" />
+<p class="caption"><span class="caption-text">Command tab.</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+</div>
+<p><strong>Command Tab buttons:</strong></p>
+<div class="figure align-center" id="id5">
+<img alt="_images/mkvbatchmultiplex-commandbuttons.png" src="_images/mkvbatchmultiplex-commandbuttons.png" />
+<p class="caption"><span class="caption-text">Command.</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+</div>
+<ul>
+<li><p>Paste</p>
+<p>Paste command line from system Clipboard is expected to be from
+a copy to clipboard from MKVToolnix.</p>
+</li>
+<li><p>Add Command</p>
+<p>Add the command to the jobs table with a <strong>Waiting</strong> status</p>
+</li>
+<li><p>Rename</p>
+<p>Go to the <strong>Rename</strong> tab</p>
+</li>
+<li><p>Add Queue</p>
+<p>Add command to the jobs table and the work Queue.   If the job worker is
+running the job will be processed</p>
+</li>
+<li><p>Start Worker</p>
+<p>Start working on the jobs in the queue.  While the jobs are being process
+more can be added to the queue.</p>
+</li>
+</ul>
+<p>The following buttons are for troubleshooting:</p>
+<ul>
+<li><p>Analysis</p>
+<p>Shows some information the command line parsing this can help
+solving problems as to why the command is not been accepted</p>
+</li>
+<li><p>Commands</p>
+<p>Show commands to be executed as lists to be submitted to a subprocess</p>
+</li>
+<li><p>Check Files</p>
+<p>Verify the files to be worked on and signals any command that don’t
+pass consistency test.  Flagged commands will not be processed.</p>
+</li>
+<li><p>Clear Output</p>
+<p>Clear the output of the command window</p>
+</li>
+<li><p>Reset</p>
+<p>Clear contents of all output windows</p>
+</li>
+</ul>
+<p>When a command is entered it will be check for it to see if it is in the
+format the application can handle.  A message <strong>Command looks ok.</strong> does not
+necessarily means it will work.  There are other checks that are done when
+the job is executed.  For example the number of input files does not match
+this will fail the entire job.  This is done like this because the operation
+is time consuming and the GUI will seems to be frozen.  When some files don’t
+meet criteria those   files won’t be processed but the ones that match will.
+When the job fails use  the buttons for troubleshooting to see if the problem
+is revealed.  If still cannot find the problem post an issue to get help.</p>
+<p>Before adding the job to the queue you have the option to push <strong>&lt;Rename&gt;</strong> to
+go to the <strong>Rename</strong> tab and rename the output files.</p>
+</li>
+<li><p><strong>Jobs</strong></p>
+<p>Displays a table with the jobs added for current session.</p>
+<div class="figure align-center" id="id6">
+<img alt="_images/mkvbatchmultiplex-tabjobs.png" src="_images/mkvbatchmultiplex-tabjobs.png" />
+<p class="caption"><span class="caption-text">Jobs.</span><a class="headerlink" href="#id6" title="Permalink to this image">¶</a></p>
+</div>
+<p>Jobs <strong>Status</strong> column.  The jobs can be manipulated using this column:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Waiting</strong>: the job has to be added to the queue for processing.
+While the job is waiting double click it can be changed to <strong>Skip</strong>,
+meaning don’t process the job.  Or using the push button
+<strong>&lt;Queue Waiting Jobs&gt;</strong> it will add the job to the job
+queue.</p></li>
+<li><p><strong>Running</strong>: this is the current running job.</p></li>
+<li><p><strong>Done</strong>: job already processed.</p></li>
+<li><p><strong>Skip</strong>: job will not be processed.
+While in Skip status the job can be changed back to previous status of
+<strong>Waiting</strong> or <strong>Queue</strong> if the worker is active
+it will be processed automatically.</p></li>
+<li><p><strong>Aborted</strong>: the job was stopped while it was running.</p></li>
+<li><p><strong>Error</strong>: and error ocurred while running.  A full destination disk can
+cause this.</p></li>
+</ul>
+</div></blockquote>
+<p>Jobs tab buttons:</p>
+<blockquote>
+<div><div class="figure align-center" id="id7">
+<img alt="_images/mkvbatchmultiplex-tabjobsbuttons.png" src="_images/mkvbatchmultiplex-tabjobsbuttons.png" />
+<p class="caption"><span class="caption-text">Jobs buttons.</span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
+</div>
+<ul>
+<li><p>Queue Waiting Jobs</p>
+<p>Put all <strong>Waiting</strong> jobs on the Queue for processing</p>
+</li>
+<li><p>Clear Queue</p>
+<p>Set all jobs in the Queue to a Waiting status.  The Worker will not
+process them.</p>
+</li>
+<li><p>Star Worker</p>
+<p>Start the Worker and process all jobs on the Queue.</p>
+</li>
+<li><p>Abort Current Jobs</p>
+<p>Abort the current job immediately only the current file been processed
+will be deleted.  All finished files will not.</p>
+</li>
+<li><p>Abort Jobs</p>
+<p>Abort running jobs and all jobs on the Queue.</p>
+</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>Jobs Output</strong></p>
+<p>Displays output messages generated by the running jobs.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkvmerge v30.0.0 <span class="o">(</span><span class="s1">&#39;Interstellar&#39;</span><span class="o">)</span> <span class="m">64</span>-bit
+<span class="s1">&#39;\video&#39;</span>S01E05.avi<span class="s1">&#39;: Using the demultiplexer for the format &#39;</span>AVI<span class="s1">&#39;.</span>
+<span class="s1">&#39;</span><span class="se">\V</span>ideo<span class="s1">&#39;S01E05.ass&#39;</span>: Using the demultiplexer <span class="k">for</span> the format <span class="s1">&#39;SSA/ASS subtitles&#39;</span>.
+<span class="s1">&#39;\video&#39;</span>S01E05.avi<span class="s1">&#39; track 0: Using the output module for the format &#39;</span>MPEG-4<span class="s1">&#39;.</span>
+<span class="s1">&#39;</span><span class="se">\v</span>ideo<span class="s1">&#39;S01E05.avi&#39;</span> track <span class="m">1</span>: Using the output module <span class="k">for</span> the format <span class="s1">&#39;MP3&#39;</span>.
+<span class="s1">&#39;\Video&#39;</span>S01E05.ass<span class="s1">&#39; track 0: Using the output module for the format &#39;</span>text subtitles<span class="s1">&#39;.</span>
+<span class="s1">The file &#39;</span>C:<span class="se">\t</span>ests<span class="se">\N</span>ewFiles<span class="se">\n</span>ew-video<span class="s1">&#39;S01E05 (15).mkv&#39;</span> has been opened <span class="k">for</span> writing.
+Progress: <span class="m">100</span>%
+
+The cue entries <span class="o">(</span>the index<span class="o">)</span> are being written...
+Multiplexing took <span class="m">0</span> seconds.
+</pre></div>
+</div>
+</li>
+<li><p><strong>Jobs Errors</strong></p>
+<p>Display any errors found generally this means
+any files with inconsistent with original files
+track order or type don’t match.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>Error Job ID: <span class="m">286</span> ---------------------
+
+Destination File: C:<span class="se">\t</span>ests<span class="se">\N</span>ewFiles<span class="se">\v</span>ideo - S01E04.mkv
+
+Error: In structure
+
+Source:
+File Nme: C:<span class="se">\t</span>ests<span class="se">\V</span>ideoFiles<span class="se">\v</span>ideo - S01E04.avi
+File Format: -AVI-
+
+Track: <span class="m">1</span>
+Order: <span class="m">0</span> - Video
+Codec: None
+Language: None
+Format: MPEG-4 Visual
+
+Base Source:
+File Nme: C:<span class="se">\t</span>ests<span class="se">\V</span>ideoFiles<span class="se">\v</span>ideo-S01E01.avi
+File Format: -AVI-
+
+Track: <span class="m">1</span>
+Order: <span class="m">0</span> - Video
+Codec: None
+Language: None
+Format: MPEG-4 Visual
+Track: <span class="m">2</span>
+Order: <span class="m">1</span> - Audio
+Codec: None
+Language: None
+Format: MPEG Audio
+
+Number of tracks mismatched video - S01E04.avi: <span class="m">1</span> - video-S01E01.avi: <span class="m">2</span>
+
+Error Job ID: <span class="m">286</span> ---------------------
+</pre></div>
+</div>
+</li>
+<li><p><strong>Rename Files</strong></p>
+<p>The Rename module uses python regular expressions witch is considered to be
+for advance users.  In order to help and make it as easy as possible regular
+expressions that cover a great number of the cases presented to me for
+downloaded series provided.  Also using ‘*’ (asterisk) by itself as the
+regular expression a new name can be easily assigned.</p>
+<p>For the majority of media servers a good naming scheme for the episodes of
+a series is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Series</span> <span class="n">Name</span> <span class="o">-</span> <span class="n">S01E01</span><span class="o">.</span><span class="n">mkv</span>
+</pre></div>
+</div>
+<p>The part S01E01 represents season 1 episode 1.  If the files been process
+don’t follow this scheme the system provides the ability to rename the
+output files. Using regular expressions you can rename the output file
+names.  Also if regular expressions are to difficult a new name with and
+index in the form:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Series</span> <span class="n">Name</span> <span class="o">-</span> <span class="n">S01E</span><span class="o">&lt;</span><span class="n">i</span><span class="p">:</span> <span class="n">NN</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>&lt;i: NN&gt; where NN is a number can be 0 padded. It will be substituted by a
+number starting with the value NN.</p>
+<div class="figure align-left" id="id8">
+<img alt="_images/mkvbatchmultiplex-renameindex.png" src="_images/mkvbatchmultiplex-renameindex.png" />
+<p class="caption"><span class="caption-text">Rename with incremental index.</span><a class="headerlink" href="#id8" title="Permalink to this image">¶</a></p>
+</div>
+<p>As shown in the figure to rename using and index set the regex to * (asterisk,
+and invalid regex to use).  Then enter the new name with the increment mark
+in the desired position.  Once satisfied push button Apply Rename</p>
+<p>Example:</p>
+<div class="figure align-left" id="id9">
+<img alt="_images/mkvbatchmultiplex-renameseriesepisode.png" src="_images/mkvbatchmultiplex-renameseriesepisode.png" />
+<p class="caption"><span class="caption-text">Rename with regex.</span><a class="headerlink" href="#id9" title="Permalink to this image">¶</a></p>
+<div class="legend">
+<p>Here is an example where the name contains the series name and the episode
+number only.</p>
+<p>The regular expression is::</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(\\[.*\\]\\W*|)(.*?)(\\W*-|)\\W*(\\d+).*
+</pre></div>
+</div>
+<p>The substitution string is::</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>\\<span class="mi">2</span> <span class="o">-</span> <span class="n">S01E</span>\\<span class="mi">4</span>
+</pre></div>
+</div>
+<p>For regular expressions the order is not important the episode number is
+taken from the name.  Also missing episodes won’t affect the rename of the
+files.  What the regular expression is doing is creating 4 groups::</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>1. (\\[.*\\]\\W*|) - this will match the group name if Analysis
+2. (.*?) - this will match the series name
+3. (\\W*-|) - this will match a &#39;-&#39; hyphen witch normally
+   separates the name from the episode number
+4. (\\d+) - this will match the episode number
+</pre></div>
+</div>
+<p>In the substitution string \N represent the group number \2 for series name
+\4 for episode number.  The other characters are literals.</p>
+</div>
+</div>
+<p>The operation can be undone with the <strong>Undo</strong> pushbutton before starting the
+execution of the batch operation.</p>
+<p>If it proves to difficult use the ‘*’ with Series Name S01E&lt;i: 01&gt; for
+renaming.  Also I can help creating the regex by sending me the list of the
+original names and a template of the desired new name.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="know-issues">
+<h2>Know Issues<a class="headerlink" href="#know-issues" title="Permalink to this headline">¶</a></h2>
+<p>Work on documentation.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="CHANGELOG.html" class="btn btn-neutral float-right" title="Changelog" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="gettingstarted.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2018-2020, Efrain Vergara
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

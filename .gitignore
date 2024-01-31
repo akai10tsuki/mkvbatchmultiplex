@@ -79,7 +79,7 @@ test.py
 teste.py
 .DS_Store
 .gitchangelog.rc
-html
+#html
 *.code-workspace
 /runReference.py
 images/
