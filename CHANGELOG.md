@@ -12,6 +12,7 @@
 
 ### Fixed
 
+- Translation of interface on the fly seems ok now
 
 ## <ins>3.0.0b1.dev0 - 2024-01-25</ins>
 
