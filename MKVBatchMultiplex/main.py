@@ -42,6 +42,7 @@ from PySide6.QtWidgets import (
 )
 
 from vsutillib.mkv import getMKVMerge
+from vsutillib.process import RunCommand
 from vsutillib.pyside6 import (
     centerWidget,
     checkColor,
@@ -130,9 +131,9 @@ class MainWindow(QMainWindow):
         # if getattr(sys, "frozen", False):
         if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
             # Running in a pyinstaller bundle
-            self.appDirectory = Path(os.path.dirname(__file__))
+            self.appDirectory = Path(os.path.dirname(__file__)).parent
         else:
-            self.appDirectory = Path(os.path.realpath(__file__))
+            self.appDirectory = Path(os.path.realpath(__file__)).parent
 
         self.trayIcon = QSystemTrayIconWidget(self, self.windowIcon())
 
@@ -577,6 +578,29 @@ def abort():
     logging.warning("MAI0004: Application Aborted")
     QApplication.exit(1)  # pylint: disable=E1101
 
+def testEmbed():
+
+    appDir = Path(".")
+
+    if platform.system() == "Windows":
+        mkvMerge = appDir.joinpath("embed/mkvtoolnix/mkvmerge.exe")
+    else:
+        mkvMerge = appDir.joinpath("embed/mkvtoolnix/mkvmerge")
+
+    print(appDir.resolve())
+    print(f"is Ok={mkvMerge.is_file()} path={mkvMerge.resolve()}")
+    print(f"str={mkvMerge.resolve()}")
+
+    strTmp = str(mkvMerge.resolve()).replace("\\","/")
+
+    cmd = RunCommand(strTmp, universalNewLines=True)
+
+    if cmd.run():
+        for e in cmd.output:
+            print(e.strip())
+    else:
+        print("can't run")
+
 
 def mainApp():
     """Main function"""
@@ -604,6 +628,7 @@ def mainApp():
     darkPalette(app)
     config.data.set(config.ConfigKey.DarkMode, True)
     QOutputTextWidget.isDarkMode = True
+    testEmbed()
     app.exec()
 
     config.close()

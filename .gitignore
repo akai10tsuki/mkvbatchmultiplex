@@ -62,6 +62,7 @@ docs/_build/
 target/
 
 # MKVBatchMultiplex
+embed/
 MKVBatchMultiplexPySide2/
 tests/NewFiles/
 tests/generatecommand.1.py
