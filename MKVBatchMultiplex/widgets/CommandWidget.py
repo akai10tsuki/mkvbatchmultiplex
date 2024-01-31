@@ -12,7 +12,6 @@ from typing import Optional
 from PySide6.QtCore import Qt, Signal, Slot
 from PySide6.QtWidgets import (
     QApplication,
-    QCheckBox,
     QFormLayout,
     QGridLayout,
     QGroupBox,
@@ -27,6 +26,7 @@ from vsutillib.process import isThreadRunning
 from vsutillib.pyside6 import (
     HorizontalLine,
     LineOutput,
+    QCheckBoxWidget,
     QLabelWidget,
     QOutputTextWidget,
     QPushButtonWidget,
@@ -124,6 +124,11 @@ class CommandWidget(QWidget):
         self.rbOne = None
         self.rbTwo = None
 
+        self.crcGroupBox = QGroupBox()
+        self.crcHBox = QHBoxLayout()
+
+        self.chkBoxCRC = None
+
     def _initControls(self) -> None:
 
         # region command line
@@ -151,7 +156,6 @@ class CommandWidget(QWidget):
             margins=" ",
             toolTip=Text.txt0161,
         )
-
         #    function=self.parent.renameWidget.setAsCurrentTab,
         btnRename = QPushButtonWidget(
             Text.txt0182,
@@ -253,8 +257,8 @@ class CommandWidget(QWidget):
         # endregion buttons
 
         # region Algorithm group
-        self.algorithmGroupBox = QGroupBox()
-        self.algorithmHBox = QHBoxLayout()
+        #self.algorithmGroupBox = QGroupBox()
+        #self.algorithmHBox = QHBoxLayout()
         self.lblAlgorithm = QLabelWidget(
             Text.txt0094,
             textSuffix=":  ",
@@ -280,10 +284,8 @@ class CommandWidget(QWidget):
         # endregion Algorithm group
 
         # region CRC32
-        self.crcGroupBox = QGroupBox()
-        self.crcHBox = QHBoxLayout()
 
-        self.chkBoxCRC = QCheckBox(" " + Text.txt0185, self)
+        self.chkBoxCRC = QCheckBoxWidget(Text.txt0185, textPrefix=" ")
         self.crcHBox.addWidget(self.chkBoxCRC)
         self.crcGroupBox.setLayout(self.crcHBox)
         # endregion CRC32
@@ -296,7 +298,7 @@ class CommandWidget(QWidget):
         self.updateCommandSignal.connect(self.updateCommand)
         self.cliValidateSignal.connect(self.cliValidate)
         self.cliValidateSignal.connect(self.cliButtonsState)
-        self.cliValidateSignal.connect(self.updateObjCommnad)
+        self.cliValidateSignal.connect(self.updateObjCommand)
 
         # Algorithm radio buttons
         self.rbZero.toggled.connect(lambda: self.toggledRadioButton)
@@ -343,11 +345,9 @@ class CommandWidget(QWidget):
         grid.addWidget(self.outputWindow, 2, 1, 10, 1)
 
         self.setLayout(grid)
-
     # endregion Initialization
 
     # region Logging setup
-
     @classmethod
     def classLog(cls, setLogging: Optional[bool] = None) -> bool:
         """
@@ -400,11 +400,9 @@ class CommandWidget(QWidget):
     def setLog(self, bLogging: bool) -> None:
         """Slot for setting loggin through signal"""
         self.log = bLogging
-
     # endregion Logging setup
 
     # region properties
-
     @property
     def rename(self):
         return self.__rename
@@ -421,8 +419,7 @@ class CommandWidget(QWidget):
     @output.setter
     def output(self, value: OutputWindows) -> None:
         self.__output = value
-
-    # endregion
+    # endregion properties
 
     # region buttons slots
     @Slot(bool)
@@ -445,7 +442,7 @@ class CommandWidget(QWidget):
             if button := self.btnGrid.itemAt(b).widget():
                 button.setEnabled(validateOK)
 
-    # Slot for the update commnad signal
+    # Slot for the update command signal
     @Slot(bool)
     def cliValidate(self, validateOK: bool) -> None:
         """
@@ -465,7 +462,7 @@ class CommandWidget(QWidget):
                     "Bad command.\n", {LineOutput.AppendEnd: True})
 
         self.cliButtonsState(validateOK)
-        self.updateObjCommnad(validateOK)
+        self.updateObjCommand(validateOK)
 
     @Slot(bool)
     def jobStartQueueState(self, state):
@@ -475,8 +472,80 @@ class CommandWidget(QWidget):
         else:
             self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(False)
 
+    @Slot()
+    def setDefaultAlgorithm(self) -> None:
+        if config.data.get(config.ConfigKey.Algorithm) is not None:
+            currentAlgorithm = config.data.get(config.ConfigKey.Algorithm)
+            self.radioButtons[currentAlgorithm].setChecked(True)
+
+    @Slot()
+    def setDefaultCRC(self) -> None:
+        if config.data.get(config.ConfigKey.CRC32) is not None:
+            doCRC = config.data.get(config.ConfigKey.CRC32)
+            if (doCRC == 2):
+                self.chkBoxCRC.setCheckState(Qt.CheckState.Checked)
+            elif (doCRC == 1):
+                self.chkBoxCRC.setCheckState(Qt.CheckState.PartiallyChecked)
+            else:
+                self.chkBoxCRC.setCheckState(Qt.CheckState.Unchecked)
+
+    @Slot()
+    def translate(self) -> None:
+        """
+        Set language used in buttons/lables called in MainWindow
+        """
+        print("CommandWidget.translate")
+
+        for index in range(self.frmCommandLine.rowCount()):
+            widget = self.frmCommandLine.itemAt(
+                index, QFormLayout.LabelRole).widget()
+            if isinstance(widget, QPushButtonWidget):
+                widget.translate()
+
+        widgetGroups = [self.btnGrid, self.algorithmHBox, self.crcHBox]
+        for gWidget in widgetGroups:
+            for index in range(gWidget.count()):
+                widget = gWidget.itemAt(index).widget()
+                if isinstance(
+                    widget,
+                    (
+                        QCheckBoxWidget,
+                        QLabelWidget,
+                        QPushButtonWidget,
+                    ),
+                ):
+                    widget.translate()
+
+        #for index in range(self.btnGrid.count()):
+        #    widget = self.btnGrid.itemAt(index).widget()
+        #    if isinstance(widget, QPushButtonWidget):
+        #        widget.translate()
+
+        #for index in range(self.algorithmHBox.count()):
+        #    widget = self.algorithmHBox.itemAt(index).widget()
+        #    if isinstance(
+        #        widget,
+        #        (
+        #            QLabelWidget,
+        #            QPushButtonWidget,
+        #        ),
+        #    ):
+        #        widget.translate()
+
+        #for index in range(self.crcHBox.count()):
+        #    widget = self.crcHBox.itemAt(index).widget()
+        #    if isinstance(
+        #        widget,
+        #        (
+        #            QCheckBoxWidget,
+        #            QLabelWidget,
+        #            QPushButtonWidget,
+        #        ),
+        #    ):
+        #        widget.translate()
+
     @Slot(bool)
-    def updateObjCommnad(self, valid):
+    def updateObjCommand(self, valid):
         """Update the command object"""
 
         if valid:
@@ -498,21 +567,7 @@ class CommandWidget(QWidget):
         self.commandLine.clear()
         self.commandLine.setText(command)
         self.commandLine.setCursorPosition(0)
-
-    @Slot()
-    def translate(self) -> None:
-        """
-        Set language used in buttons/lables called in MainWindow
-        """
-
-        for index in range(self.frmCommandLine.rowCount()):
-            widget = self.frmCommandLine.itemAt(
-                index, QFormLayout.LabelRole).widget()
-            if isinstance(widget, QPushButtonWidget):
-                widget.translate()
-    # endregion buttons slots
-
-    # region buttons
+    # endregion button slots
 
     def pasteClipboard(self) -> None:
         """Paste clipboard to command QLineEdit"""
@@ -594,27 +649,10 @@ class CommandWidget(QWidget):
         else:
             messageBox(self, _(Text.txt0178), f"{_(Text.txt0089)}..")
 
-    @Slot()
-    def setDefaultAlgorithm(self) -> None:
-        if config.data.get(config.ConfigKey.Algorithm) is not None:
-            currentAlgorithm = config.data.get(config.ConfigKey.Algorithm)
-            self.radioButtons[currentAlgorithm].setChecked(True)
-
     def toggledRadioButton(self) -> None:
         for index, rb in enumerate(self.radioButtons):
             if rb.isChecked():
                 self.algorithm = index
-
-    @Slot()
-    def setDefaultCRC(self) -> None:
-        if config.data.get(config.ConfigKey.CRC32) is not None:
-            doCRC = config.data.get(config.ConfigKey.CRC32)
-            if (doCRC == 2):
-                self.chkBoxCRC.setCheckState(Qt.CheckState.Checked)
-            elif (doCRC == 1):
-                self.chkBoxCRC.setCheckState(Qt.CheckState.PartiallyChecked)
-            else:
-                self.chkBoxCRC.setCheckState(Qt.CheckState.Unchecked)
 
     def crcCheckBoxStateChanged(self, state) -> None:
         # Instead of a Qt.CheckState value state is a number

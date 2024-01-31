@@ -141,14 +141,20 @@ class RenameWidget(TabWidgetExtension, QWidget):
         )
         btnApplyRename.setEnabled(False)
         btnUndoRename = QPushButtonWidget(
-            Text.txt0210, function=self._undoRename, margins="  ", toolTip=Text.txt0211
+            Text.txt0210,
+            function=self._undoRename,
+            margins="  ",
+            toolTip=Text.txt0211
         )
         btnUndoRename.setEnabled(False)
         btnClear = QPushButtonWidget(
-            Text.txt0212, function=self.clear, margins="  ", toolTip=Text.txt0213
+            Text.txt0212,
+            function=self.clear,
+            margins="  ",
+            toolTip=Text.txt0213
         )
         btnCalculateCRC = QPushButtonWidget(
-            "Calculate CRC", function=self._crc, margins=" ", toolTip="Calculate the CRC 32 for the files"
+            Text.txt0215, function=self._crc, margins=" ", toolTip=Text.txt0216
         )
         btnCalculateCRC.setEnabled(False)
         self.btnGrid = QHBoxLayout()
@@ -365,7 +371,7 @@ class RenameWidget(TabWidgetExtension, QWidget):
 
         objSignal.connect(self.setFiles)
 
-    def setLanguage(self):
+    def translate(self):
         """
         setLanguage set labels according to locale
         """
@@ -373,7 +379,7 @@ class RenameWidget(TabWidgetExtension, QWidget):
         for index in range(self.btnGrid.count()):
             widget = self.btnGrid.itemAt(index).widget()
             if isinstance(widget, QPushButtonWidget):
-                widget.setLanguage()
+                widget.translate()
                 #widget.setText("  " + _(widget.originalText) + "  ")
                 #widget.setToolTip(_(widget.toolTip))
         for w in [self.textRegEx, self.textSubString]:

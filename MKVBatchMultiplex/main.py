@@ -20,32 +20,22 @@ from typing import Optional
 from PySide6.QtCore import (
     QByteArray,
     QEvent,
-    QFile,
-    QFileInfo,
-    QSaveFile,
-    QSettings,
     Qt,
-    QTextStream,
     Signal,
     Slot
 )
 from PySide6.QtGui import(
-    QAction,
     QColor,
     QFont,
     QIcon,
-    QKeySequence,
     QPixmap
 )
 from PySide6.QtWidgets import (
     QApplication,
-    QFileDialog,
     QMainWindow,
     QMenuBar,
     QMessageBox,
     QStatusBar,
-    QStyle,
-    QTextEdit,
     QToolTip,
     QVBoxLayout,
     QWidget
@@ -226,6 +216,9 @@ class MainWindow(QMainWindow):
 
         # Translation
         self.translateInterface.addSlot(self.commandEntry.translate)
+        self.translateInterface.addSlot(self.jobsTableView.translate)
+        self.translateInterface.addSlot(self.renameWidget.translate)
+        self.translateInterface.addSlot(self.tabs.translate)
 
         # Tabs
         tabsList = []
@@ -521,7 +514,7 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle(_(Text.txt0001))
 
-        self.translateInterface.emitSignal()
+        self.translateInterface.signal()
 
     def setAppFont(self, font):
         """
@@ -546,7 +539,7 @@ class MainWindow(QMainWindow):
         QToolTip.setFont(font)
         config.data.set(config.ConfigKey.Font, font.toString())
 
-    # endregion
+    # endregion Configuration
 
     def about(self) -> None:
         """About"""
@@ -576,6 +569,7 @@ def tabChange(index):
     """
 
     config.data.set("Tab", index)
+
 
 def abort():
     """Force Quit"""

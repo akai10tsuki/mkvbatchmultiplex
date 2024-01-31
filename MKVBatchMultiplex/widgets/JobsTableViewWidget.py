@@ -276,7 +276,7 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
             # else:
             #    print("Nothing here")
 
-    def setLanguage(self):
+    def translate(self):
         """
         setLanguage set labels according to locale
         """
@@ -284,7 +284,7 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
         for index in range(self.btnGrid.count()):
             widget = self.btnGrid.itemAt(index).widget()
             if isinstance(widget, QPushButtonWidget):
-                widget.setLanguage()
+                widget.translate()
                 # widget.setText("  " + _(widget.originalText) + "  ")
                 # widget.setToolTip(_(widget.toolTip))
 

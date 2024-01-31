@@ -248,7 +248,7 @@ class PreferencesDialogWidget(QDialog):
             if self.preferences.language is not None:
                 config.data.set(config.ConfigKey.Language,
                                 self.preferences.language)
-                self.translateInterfaceSignal.emit()
+                self.parent.translate()
             #
             # Font & Size
             #
@@ -275,7 +275,6 @@ class PreferencesDialogWidget(QDialog):
                     config.ConfigKey.Logging, self.preferences.enableLogging
                 )
                 self.parent.enableLogging(self.preferences.enableLogging)
-
             #
             # LogViewer
             #
@@ -395,7 +394,7 @@ class Preferences(QObject):
         Args:
             index (int): index in language combo box
         """
-
+        print("interfaceLanguageChange")
         language = self.parent.ui.cmbBoxInterfaceLanguage.itemText(index)
         if language:
             languageDictionary = config.data.get(
