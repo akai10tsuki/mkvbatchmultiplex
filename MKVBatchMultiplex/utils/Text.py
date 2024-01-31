@@ -54,6 +54,7 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0065 = S_("Show the application's About box")
     txt0066 = S_("Show the Qt library's About box")
     txt0067 = S_("MKVMERGE")
+    txt0068 = S_("MKVMERGE Embedded")
 
     # Dialogs & others
     # 80

@@ -41,7 +41,7 @@ from PySide6.QtWidgets import (
     QWidget
 )
 
-from vsutillib.mkv import getMKVMerge
+from vsutillib.mkv import getMKVMerge, getMKVMergeEmbedded, getMKVMergeVersion
 from vsutillib.process import RunCommand
 from vsutillib.pyside6 import (
     centerWidget,
@@ -132,6 +132,9 @@ class MainWindow(QMainWindow):
         if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
             # Running in a pyinstaller bundle
             self.appDirectory = Path(os.path.dirname(__file__)).parent
+        elif "__compiled__" in globals():
+            # Running in a Nuitka bundle
+            self.appDirectory = Path(os.path.dirname(__file__)).parent
         else:
             self.appDirectory = Path(os.path.realpath(__file__)).parent
 
@@ -144,6 +147,11 @@ class MainWindow(QMainWindow):
         self.controlQueue = deque()
 
         self.jobsQueue = JobQueue(self, controlQueue=self.controlQueue)
+
+        # mkvmerge executables
+
+        self.mkvmerge = getMKVMerge()
+        self.mkvmergeEmbedded = getMKVMergeEmbedded(self.appDirectory)
 
         # Model view
         headers = tableHeaders()
@@ -547,16 +555,19 @@ class MainWindow(QMainWindow):
 
         rePythonVersion = re.compile(r"^(.*?) (.*?) (.*?) ")
         pythonVersion = sys.version
+
         if tmpMatch := rePythonVersion.match(sys.version):
             pythonVersion = tmpMatch[1]
 
-        mkvmergeVersion = getMKVMerge()
+        mkvSystem = getMKVMergeVersion(self.mkvmerge)
+        mkvEmbedded = getMKVMergeVersion(self.mkvmergeEmbedded)
 
-        aboutMsg = (f"{config.APPNAME}: {config.VERSION}\n\n"
+        aboutMsg = (f"{config.APPNAME}: {config.VERSION}                   \n\n"
                     f"{_(Text.txt0002)}: {config.AUTHOR}\n"
                     f"{_(Text.txt0003)}: {config.EMAIL}\n\n"
                     f"{_(Text.txt0004)}: {pythonVersion}\n\n"
-                    f"{_(Text.txt0067)}: {mkvmergeVersion}           \n")
+                    f"{_(Text.txt0067)}: {mkvSystem}\n"
+                    f"{_(Text.txt0068)}: {mkvEmbedded}\n")
 
         QMessageBox.about(self, config.APPNAME, aboutMsg)
 
@@ -577,29 +588,6 @@ def abort():
 
     logging.warning("MAI0004: Application Aborted")
     QApplication.exit(1)  # pylint: disable=E1101
-
-def testEmbed():
-
-    appDir = Path(".")
-
-    if platform.system() == "Windows":
-        mkvMerge = appDir.joinpath("embed/mkvtoolnix/mkvmerge.exe")
-    else:
-        mkvMerge = appDir.joinpath("embed/mkvtoolnix/mkvmerge")
-
-    print(appDir.resolve())
-    print(f"is Ok={mkvMerge.is_file()} path={mkvMerge.resolve()}")
-    print(f"str={mkvMerge.resolve()}")
-
-    strTmp = str(mkvMerge.resolve()).replace("\\","/")
-
-    cmd = RunCommand(strTmp, universalNewLines=True)
-
-    if cmd.run():
-        for e in cmd.output:
-            print(e.strip())
-    else:
-        print("can't run")
 
 
 def mainApp():
@@ -628,7 +616,7 @@ def mainApp():
     darkPalette(app)
     config.data.set(config.ConfigKey.DarkMode, True)
     QOutputTextWidget.isDarkMode = True
-    testEmbed()
+
     app.exec()
 
     config.close()
