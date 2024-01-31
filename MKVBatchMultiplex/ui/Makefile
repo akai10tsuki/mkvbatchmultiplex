@@ -19,9 +19,11 @@ Ui_ProjectInfoOkDialog.py: ProjectInfoOkDialog.ui
 Ui_SearchTextDialog.py: SearchTextDialog.ui
 	$(UI2PY) SearchTextDialog.ui > Ui_SearchTextDialog.py
 
-translate:
+translation:
 	$(I18N) -extensions ui . -ts i18n/ui_en.ts  i18n/ui_es.ts
 
 release:
 	$(I18NR) i18n/ui_en.ts  i18n/ui_es.ts
+	cp i18n/ui_es.qm ../locale/es/LC_MESSAGES/
+	cp i18n/ui_en.qm ../locale/en/LC_MESSAGES/
 	

@@ -10,13 +10,13 @@
         <location filename="../Backup/PreferencesDialog.3.0.Beta0.ui" line="22"/>
         <location filename="../PreferencesDialog.ui" line="22"/>
         <source>Preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>Preferencias</translation>
     </message>
     <message>
         <location filename="../Backup/PreferencesDialog-2.0.0.ui" line="50"/>
         <location filename="../Backup/PreferencesDialog-2.0.0a.ui" line="50"/>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opciones</translation>
     </message>
     <message>
         <location filename="../Backup/PreferencesDialog-2.0.0.ui" line="62"/>
@@ -25,7 +25,7 @@
         <location filename="../Backup/PreferencesDialog.3.0.Beta0.ui" line="62"/>
         <location filename="../PreferencesDialog.ui" line="62"/>
         <source>Interface Language:</source>
-        <translation type="unfinished"></translation>
+        <translation>Idioma del interfaz:</translation>
     </message>
     <message>
         <location filename="../Backup/PreferencesDialog-2.0.0.ui" line="85"/>
@@ -34,7 +34,7 @@
         <location filename="../Backup/PreferencesDialog.3.0.Beta0.ui" line="85"/>
         <location filename="../PreferencesDialog.ui" line="85"/>
         <source>Restore original window size</source>
-        <translation type="unfinished"></translation>
+        <translation>Restaurar tamaño de ventana original</translation>
     </message>
     <message>
         <location filename="../Backup/PreferencesDialog-2.0.0.ui" line="111"/>
@@ -43,7 +43,7 @@
         <location filename="../Backup/PreferencesDialog.3.0.Beta0.ui" line="111"/>
         <location filename="../PreferencesDialog.ui" line="111"/>
         <source>Enable Logging</source>
-        <translation type="unfinished"></translation>
+        <translation>Habilitar Registro</translation>
     </message>
     <message>
         <location filename="../Backup/PreferencesDialog-2.0.0.ui" line="124"/>
@@ -52,73 +52,78 @@
         <location filename="../Backup/PreferencesDialog.3.0.Beta0.ui" line="124"/>
         <location filename="../PreferencesDialog.ui" line="124"/>
         <source>Font &amp; Size:</source>
-        <translation type="unfinished"></translation>
+        <translation>Fuente y tamaño:</translation>
     </message>
     <message>
         <location filename="../Backup/PreferencesDialog-2.0.0.ui" line="137"/>
         <location filename="../Backup/PreferencesDialog-3.0.ui" line="137"/>
         <source>Enable jobs history</source>
-        <translation type="unfinished"></translation>
+        <translation>Habilitar historial de tareas</translation>
     </message>
     <message>
         <location filename="../Backup/PreferencesDialog-2.0.0.ui" line="156"/>
         <location filename="../Backup/PreferencesDialog-3.0.ui" line="156"/>
         <location filename="../PreferencesDialog.ui" line="238"/>
         <source>Enable log viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>Habilitar el visor de registros</translation>
     </message>
     <message>
         <location filename="../Backup/PreferencesDialog-2.0.0.ui" line="195"/>
         <location filename="../Backup/PreferencesDialog-3.0.ui" line="195"/>
         <source>Automatically save jobs</source>
-        <translation type="unfinished"></translation>
+        <translation>Guardar tareas automáticamente</translation>
     </message>
     <message>
         <location filename="../Backup/PreferencesDialog-2.0.0.ui" line="209"/>
         <location filename="../Backup/PreferencesDialog-2.0.0a.ui" line="177"/>
         <location filename="../Backup/PreferencesDialog-3.0.ui" line="277"/>
         <location filename="../Backup/PreferencesDialog.3.0.Beta0.ui" line="226"/>
-        <location filename="../PreferencesDialog.ui" line="252"/>
+        <location filename="../PreferencesDialog.ui" line="265"/>
         <source>Restore Defaults</source>
-        <translation type="unfinished"></translation>
+        <translation>Restaurar los valores predeterminados</translation>
     </message>
     <message>
         <location filename="../Backup/PreferencesDialog-2.0.0a.ui" line="143"/>
         <source>Enable Log Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>Habilitar el visor de registros</translation>
     </message>
     <message>
         <location filename="../Backup/PreferencesDialog-3.0.ui" line="223"/>
         <location filename="../Backup/PreferencesDialog.3.0.Beta0.ui" line="172"/>
         <location filename="../PreferencesDialog.ui" line="172"/>
         <source>Algorithm:</source>
-        <translation type="unfinished"></translation>
+        <translation>Algoritmo:</translation>
     </message>
     <message>
         <location filename="../Backup/PreferencesDialog-3.0.ui" line="236"/>
         <location filename="../Backup/PreferencesDialog.3.0.Beta0.ui" line="185"/>
         <location filename="../PreferencesDialog.ui" line="185"/>
         <source>0</source>
-        <translation type="unfinished"></translation>
+        <translation>0</translation>
     </message>
     <message>
         <location filename="../Backup/PreferencesDialog-3.0.ui" line="249"/>
         <location filename="../Backup/PreferencesDialog.3.0.Beta0.ui" line="198"/>
         <location filename="../PreferencesDialog.ui" line="198"/>
         <source>1</source>
-        <translation type="unfinished"></translation>
+        <translation>1</translation>
     </message>
     <message>
         <location filename="../Backup/PreferencesDialog-3.0.ui" line="262"/>
         <location filename="../Backup/PreferencesDialog.3.0.Beta0.ui" line="211"/>
         <location filename="../PreferencesDialog.ui" line="211"/>
         <source>2</source>
-        <translation type="unfinished"></translation>
+        <translation>2</translation>
     </message>
     <message>
         <location filename="../PreferencesDialog.ui" line="225"/>
         <source>Append CRC to file name</source>
-        <translation type="unfinished"></translation>
+        <translation>Añadir CRC al nombre del archivo</translation>
+    </message>
+    <message>
+        <location filename="../PreferencesDialog.ui" line="251"/>
+        <source>Use embedded mkvmerge</source>
+        <translation>Utilizar mkvmerge incorporado</translation>
     </message>
 </context>
 <context>
@@ -126,17 +131,17 @@
     <message>
         <location filename="../ProjectInfoOkDialog.ui" line="19"/>
         <source>Project Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Información del proyecto</translation>
     </message>
     <message>
         <location filename="../ProjectInfoOkDialog.ui" line="47"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nombre</translation>
     </message>
     <message>
         <location filename="../ProjectInfoOkDialog.ui" line="70"/>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Descripción</translation>
     </message>
 </context>
 <context>
@@ -144,18 +149,18 @@
     <message>
         <location filename="../SearchTextDialog.ui" line="19"/>
         <source>Search Text</source>
-        <translation type="unfinished"></translation>
+        <translation>Búsqueda en el texto</translation>
     </message>
     <message>
         <location filename="../SearchTextDialog.ui" line="47"/>
         <location filename="../SearchTextDialog.ui" line="92"/>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Buscar</translation>
     </message>
     <message>
         <location filename="../SearchTextDialog.ui" line="65"/>
         <source>Text to search:</source>
-        <translation type="unfinished"></translation>
+        <translation>Texto a buscar:</translation>
     </message>
 </context>
 </TS>

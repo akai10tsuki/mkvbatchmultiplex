@@ -78,7 +78,7 @@
         <location filename="../Backup/PreferencesDialog-2.0.0a.ui" line="177"/>
         <location filename="../Backup/PreferencesDialog-3.0.ui" line="277"/>
         <location filename="../Backup/PreferencesDialog.3.0.Beta0.ui" line="226"/>
-        <location filename="../PreferencesDialog.ui" line="252"/>
+        <location filename="../PreferencesDialog.ui" line="265"/>
         <source>Restore Defaults</source>
         <translation type="unfinished"></translation>
     </message>
@@ -118,6 +118,11 @@
     <message>
         <location filename="../PreferencesDialog.ui" line="225"/>
         <source>Append CRC to file name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../PreferencesDialog.ui" line="251"/>
+        <source>Use embedded mkvmerge</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
