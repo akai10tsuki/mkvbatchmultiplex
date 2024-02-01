@@ -104,6 +104,16 @@ class PreferencesDialogWidget(QDialog):
             else:
                 self.ui.chkBoxComputeCRC.setChecked(False)
 
+        #
+        # Use embedded mkvmerge
+        #
+        if config.data.get(config.ConfigKey.UseEmbedded) is not None;
+            useEmbedded = config.data.get(config.ConfigKey.UseEmbedded)
+            if (useEmbedded == 2):
+                self.ui.chkBoxUseEmbedded.setChecked(True)
+            else:
+                self.ui.chkBoxUseEmbedded.setChecked(False)
+
 
 
         # region History
@@ -132,6 +142,7 @@ class PreferencesDialogWidget(QDialog):
         # Restore Windows Size
         #
         self.ui.chkBoxRestoreWindowSize.setChecked(False)
+
         #
         # Algorithm
         #
@@ -173,6 +184,13 @@ class PreferencesDialogWidget(QDialog):
         #
         self.ui.chkBoxComputeCRC.stateChanged.connect(
             self.__pref.enableCRCComputeStateChanged
+        )
+
+        #
+        # useEmbedded
+        #
+        self.ui.chkBoxUseEmbedded.stateChanged.connect(
+            self.__pref.useEmbeddedStateChange
         )
 
         #
@@ -306,6 +324,15 @@ class PreferencesDialogWidget(QDialog):
                     else:
                         config.data.set(config.ConfigKey.CRC32, 0)
                     self.stateChangedCRC.emit()
+            #
+            # useEmbedded
+            #
+            if self.preferences.useEmbedded is not None:
+                if config.data.get(config.ConfigKey.UseEmbedded) is not None:
+                    if self.preferences.useEmbedded:
+                        config.data.set(config.ConfigKey.UseEmbedded, 2)
+                    else:
+                        config.data.set(config.ConfigKey.)
 
             #
             # Job History
@@ -381,6 +408,7 @@ class Preferences(QObject):
         self.fontSize = None
         self.language = None
         self.restoreWindowSize = None
+        self.useEmbedded = None
         self.__changedData = False
 
     def __bool__(self):
@@ -446,6 +474,10 @@ class Preferences(QObject):
     #    self.enableJobHistory = bool(value)
     #    if not self.__changedData:
     #        self.__changedData = True
+
+    @Slot(int)
+    def useEmbeddedStateChange(self, value):
+        self.
 
     @Slot(int)
     def restoreWindowSizeStateChanged(self, value):
