@@ -42,7 +42,7 @@ class PreferencesDialogWidget(QDialog):
 
     def _initUI(self):
         """
-        Initialize widget members with systemconfiguration for the elements
+        Initialize widget members with systemConfiguration for the elements
         """
         #
         # Interface Language
@@ -107,7 +107,7 @@ class PreferencesDialogWidget(QDialog):
         #
         # Use embedded mkvmerge
         #
-        if config.data.get(config.ConfigKey.UseEmbedded) is not None;
+        if config.data.get(config.ConfigKey.UseEmbedded) is not None:
             useEmbedded = config.data.get(config.ConfigKey.UseEmbedded)
             if (useEmbedded == 2):
                 self.ui.chkBoxUseEmbedded.setChecked(True)
@@ -120,7 +120,7 @@ class PreferencesDialogWidget(QDialog):
         #
         # Enable History
         #
-        # Temporalily disable History
+        # Temporarily disable History
         #
         #if config.data.get(config.ConfigKey.JobHistoryDisabled):
         #    self.ui.chkBoxEnableJobHistory.setEnabled(False)
@@ -332,7 +332,7 @@ class PreferencesDialogWidget(QDialog):
                     if self.preferences.useEmbedded:
                         config.data.set(config.ConfigKey.UseEmbedded, 2)
                     else:
-                        config.data.set(config.ConfigKey.)
+                        config.data.set(config.ConfigKey.UseEmbedded, 0)
 
             #
             # Job History
@@ -477,7 +477,9 @@ class Preferences(QObject):
 
     @Slot(int)
     def useEmbeddedStateChange(self, value):
-        self.
+        self.useEmbedded = bool(value)
+        if not self.__changedData:
+            self.__changedData = True
 
     @Slot(int)
     def restoreWindowSizeStateChanged(self, value):
