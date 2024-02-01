@@ -145,6 +145,7 @@ class ConfigKey:  # pylint: disable=too-few-public-methods
     Tab: ClassVar[str] = "Tab"
     TabText: ClassVar[str] = "TabText"
     TextSuffix: ClassVar[str] = "TextSuffix"
+    UseEmbedded: ClassVar[str] = "UseEmbedded"
 
 
 class Key:
@@ -291,6 +292,8 @@ def init(
         ),
     )
 
+    data.set(ConfigKey.UseEmbedded,
+             data.get(ConfigKey.UseEmbedded) or False)
     #
     # Temporarily disable uncomment statements
     #
