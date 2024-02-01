@@ -6,6 +6,7 @@ CommandWidget Class: Class to read the mkvtoolnix-gui command
 
 # region imports
 import logging
+
 from collections import deque
 from typing import Optional
 
@@ -94,8 +95,13 @@ class CommandWidget(QWidget):
         #
         #
         #
+        useEmbedded = config.data.get(config.ConfigKey.UseEmbedded)
+
         self.algorithm = None
-        self.oCommand = MKVCommandParser(appDir=self.parent.appDirectory)
+        self.oCommand = MKVCommandParser(
+            appDir=self.parent.appDirectory,
+            useEmbedded=useEmbedded,
+            log=self.log)
         self.model = self.proxyModel.sourceModel()
 
         #
@@ -182,7 +188,9 @@ class CommandWidget(QWidget):
             function=lambda: qtRunFunctionInThread(
                 runAnalysis,
                 command=self.commandLine.text(),
+                oCommand=self.oCommand,
                 output=self.output,
+                appDir=self.parent.appDirectory,
                 log=self.log,
             ),
             margins=" ",
@@ -196,6 +204,7 @@ class CommandWidget(QWidget):
                 output=self.output,
                 command=self.commandLine.text(),
                 oCommand=self.oCommand,
+                appDir=self.parent.appDirectory,
                 log=self.log,
             ),
             margins=" ",
@@ -209,6 +218,7 @@ class CommandWidget(QWidget):
                 output=self.output,
                 command=self.commandLine.text(),
                 oCommand=self.oCommand,
+                appDir=self.parent.appDirectory,
                 log=self.log,
             ),
             margins=" ",
@@ -222,6 +232,7 @@ class CommandWidget(QWidget):
                 output=self.output,
                 command=self.commandLine.text(),
                 oCommand=self.oCommand,
+                appDir=self.parent.appDirectory,
                 log=self.log,
             ),
             margins=" ",
@@ -398,7 +409,7 @@ class CommandWidget(QWidget):
 
     @Slot(bool)
     def setLog(self, bLogging: bool) -> None:
-        """Slot for setting loggin through signal"""
+        """Slot for setting logging through signal"""
         self.log = bLogging
     # endregion Logging setup
 
@@ -446,7 +457,7 @@ class CommandWidget(QWidget):
     @Slot(bool)
     def cliValidate(self, validateOK: bool) -> None:
         """
-        cliValidate Slot used by ValidateCommnad
+        cliValidate Slot used by ValidateCommand
 
         Args:
             validateOK (bool): True if command line is Ok.  False otherwise.
@@ -492,7 +503,7 @@ class CommandWidget(QWidget):
     @Slot()
     def translate(self) -> None:
         """
-        Set language used in buttons/lables called in MainWindow
+        Set language used in buttons/labels called in MainWindow
         """
 
         for index in range(self.frmCommandLine.rowCount()):
