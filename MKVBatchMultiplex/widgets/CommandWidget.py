@@ -95,7 +95,7 @@ class CommandWidget(QWidget):
         #
         #
         self.algorithm = None
-        self.oCommand = MKVCommandParser()
+        self.oCommand = MKVCommandParser(appDir=self.parent.appDirectory)
         self.model = self.proxyModel.sourceModel()
 
         #
@@ -552,6 +552,7 @@ class CommandWidget(QWidget):
             if self.rename is not None:
                 self.rename.setFilesSignal.emit(self.oCommand)
                 self.rename.applyFileRenameSignal.connect(self.applyRename)
+            print(self.oCommand.bashCommand)
         else:
             self.oCommand.command = ""
             if self.rename is not None:
