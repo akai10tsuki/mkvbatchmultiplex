@@ -8,7 +8,7 @@ import csv
 import logging
 import io
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Signal
 
 from PySide6.QtWidgets import (
     QTableView,
@@ -21,6 +21,7 @@ from PySide6.QtWidgets import (
 
 from vsutillib.mkv import MKVCommandParser
 
+from .. import config
 from ..jobs import JobStatus, JobKey, JobInfo, saveToDb
 
 from .JobsViewHelpers import removeJob
@@ -44,11 +45,14 @@ class JobsTableView(QTableView):
     # Class logging state
     __log = False
 
+    jobRemovedSignal = Signal()
+
     def __init__(
             self,
             parent=None,
             proxyModel=None,
             title=None,
+            appDir=None,
             log=None):
         super(JobsTableView, self).__init__()
 
@@ -58,6 +62,7 @@ class JobsTableView(QTableView):
         self.proxyModel = proxyModel
         self.model = proxyModel.sourceModel()
         self.viewTitle = title
+        self.appDir = appDir
         self.log = log
 
         self.setModel(proxyModel)
@@ -284,6 +289,7 @@ class JobsTableView(QTableView):
         selection = self.selectedIndexes()
         remove = None
         removeItems = []
+        jobRemoved = False
 
         if selection:
             if len(selection) > 1:
@@ -310,6 +316,10 @@ class JobsTableView(QTableView):
                     #print(f"Remove row {jobRow}")
                     self.proxyModel.filterConditions["Remove"].append(jobRow)
                     self.proxyModel.setFilterFixedString("")
+                    if not jobRemoved:
+                        jobRemoved = True
+            if jobRemoved:
+                self.jobRemovedSignal.emit()
 
         return
 
@@ -346,6 +356,7 @@ class JobsTableView(QTableView):
                                 jobRow,
                             ],
                             model,
+                            appDir=self.appDir,
                             log=False,
                         )
                     saveToDb(job, name=name, description=info)
@@ -364,6 +375,9 @@ class JobsTableView(QTableView):
 
     def _addCommand(self, command):
 
+        print("JobsTableView adding a command")
+        # TODO: Better way to test for a valid command
+
         oCommand = MKVCommandParser(command)
 
         if oCommand:
@@ -372,3 +386,11 @@ class JobsTableView(QTableView):
             data = [["", ""], [JobStatus.Waiting,
                                "Status code"], [command, command]]
             tableModel.insertRows(totalJobs, 1, data=data)
+
+
+# This if for Pylance _() is not defined in PyLance
+def _(dummy: str) -> str:
+    return dummy
+
+
+del _

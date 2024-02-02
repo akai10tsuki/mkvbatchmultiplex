@@ -11,7 +11,7 @@ import logging
 # import zlib
 
 
-from PySide6.QtCore import Qt, Slot
+from PySide6.QtCore import Qt, Signal, Slot
 from PySide6.QtWidgets import (
     QWidget,
     QHBoxLayout,
@@ -46,8 +46,10 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
     # Class logging state
     __log = False
 
-    def __init__(self, parent, proxyModel, controlQueue, title=None, log=None):
-        super(JobsTableViewWidget, self).__init__(parent=parent, tabWidgetChild=self)
+    jobRemovedSignal = Signal()
+
+    def __init__(self, parent, proxyModel, controlQueue, title=None, appDir=None, log=None):
+        super().__init__(parent=parent)
 
         self.__output = None
         self.__log = None
@@ -57,7 +59,8 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
         self.proxyModel = proxyModel
         self.model = proxyModel.sourceModel()
         self.controlQueue = controlQueue
-        self.tableView = JobsTableView(self, proxyModel, title)
+        self.appDir = appDir
+        self.tableView = JobsTableView(self, proxyModel, title, appDir=appDir)
         self.delegates = {}
 
         self._initUI(title)
@@ -167,6 +170,7 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
         self.parent.jobsQueue.runJobs.finishedSignal.connect(
             lambda: self.jobStatus(False)
         )
+        self.tableView.jobRemovedSignal.connect()
 
         # Default button state
         self.btnGrid.itemAt(_Button.ADDWAITING).widget().setEnabled(False)
@@ -228,6 +232,10 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
     @output.setter
     def output(self, value):
         self.__output = value
+
+    @property
+    def hasWaiting(self):
+        return hasWaiting(self.model)
 
     def abortCurrentJob(self):
         self.controlQueue.append(JobStatus.AbortJob)
@@ -369,6 +377,12 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
         if rowStatus == JobStatus.Abort:
             self.controlQueue.append(JobStatus.AbortJob)
 
+    @Slot()
+    def jobStatusCheck(self):
+        if self.hasWaiting:
+            self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(False)
+        else:
+            self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(True)
 
 def hasWaiting(model):
     """

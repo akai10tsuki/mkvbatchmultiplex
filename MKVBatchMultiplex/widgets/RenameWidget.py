@@ -10,6 +10,7 @@ Also if files are drop from directories in the OS it will rename them.
 
 import logging
 import re
+import sys
 
 from pathlib import Path
 
@@ -42,8 +43,8 @@ from ..utils import computeCRC32, Text
 from .RenameWidgetHelpers import (
     findDuplicates,
     RegExFilesWidget,
-    RegExLineInputWidget,
     RegExInputWidget,
+    RegExLineInputWidget,
     resolveIncrements,
 )
 
@@ -110,7 +111,7 @@ class RenameWidget(TabWidgetExtension, QWidget):
         #
         # Control variables
         #
-        self._outputFileNames = []
+        self._originalFileNames = []
         self._renameFileNames = []
         self._bFilesDropped = False
         self._bDuplicateRename = False
@@ -226,7 +227,7 @@ class RenameWidget(TabWidgetExtension, QWidget):
         self.setLayout(grid)
 
     def __bool__(self):
-        for n, r in zip(self._outputFileNames, self._renameFileNames):
+        for n, r in zip(self._originalFileNames, self._renameFileNames):
             if n != r:
                 return True
         return False
@@ -296,11 +297,17 @@ class RenameWidget(TabWidgetExtension, QWidget):
 
         self.textOriginalNames.textBox.clear()
         self.textRenameResults.textBox.clear()
+        self._originalFileNames = []
+        self._bFilesDropped = False
+        self.btnGrid.itemAt(ButtonIndex.CalculateCRC).widget().setEnabled(False)
+
         for f in objCommand.destinationFiles:
             # show files
             self.outputOriginalFilesSignal.emit(str(f.name) + "\n", {})
             # save files
-            self._outputFileNames.append(f)
+            self._originalFileNames.append(f)
+
+        self._updateRegEx()
 
     @Slot(int)
     def scrollRenameChanged(self, value):
@@ -346,7 +353,7 @@ class RenameWidget(TabWidgetExtension, QWidget):
         clear reset widget working variables and widgets
         """
 
-        self._outputFileNames = []
+        self._originalFileNames = []
         self._renameFileNames = []
         self._bFilesDropped = False
         self.textRegEx.cmdLine.lineEdit().clear()
@@ -362,10 +369,14 @@ class RenameWidget(TabWidgetExtension, QWidget):
 
         if self.textOriginalNames.textBox.toPlainText() != "":
             self.btnGrid.itemAt(ButtonIndex.Clear).widget().setEnabled(True)
-            self.btnGrid.itemAt(ButtonIndex.CalculateCRC).widget().setEnabled(True)
+            #self.btnGrid.itemAt(ButtonIndex.CalculateCRC).widget().setEnabled(True)
         else:
             self.btnGrid.itemAt(ButtonIndex.Clear).widget().setEnabled(False)
             self.btnGrid.itemAt(ButtonIndex.CalculateCRC).widget().setEnabled(False)
+    @Slot()
+    def undoButtonState(self):
+        if not self._bFilesDropped:
+            self.btnGrid.itemAt(ButtonIndex.Undo).widget().setEnabled(False)
 
     def connectToSetFiles(self, objSignal):
 
@@ -393,8 +404,8 @@ class RenameWidget(TabWidgetExtension, QWidget):
     def _setFilesDropped(self, filesDropped):
 
         if filesDropped:
-            self._outputFileNames = []
-            self._outputFileNames.extend(filesDropped)
+            self._originalFileNames = []
+            self._originalFileNames.extend(filesDropped)
             self.textRenameResults.textBox.clear()
             if not self._bFilesDropped:
                 self._bFilesDropped = True
@@ -402,13 +413,14 @@ class RenameWidget(TabWidgetExtension, QWidget):
             self.calculateCRCButtonState(True)
         else:
             # receive when clear issued to FilesListWidget
-            self._outputFileNames = []
+            self._originalFileNames = []
             self.textRenameResults.textBox.clear()
             self.btnGrid.itemAt(ButtonIndex.Undo).widget().setEnabled(False)
             self._bFilesDropped = False
 
     def _displayRenames(self):
 
+        i = 0
         duplicateNames = findDuplicates(self._renameFileNames)
         if duplicateNames:
             self._bDuplicateRename = True
@@ -424,6 +436,7 @@ class RenameWidget(TabWidgetExtension, QWidget):
                 else:
                     # check theme
                     self.outputRenameResultsSignal.emit(str(f.name) + "\n", {})
+                i = i + 1
             except OSError:
                 self.outputRenameResultsSignal.emit(str(f.name) + "\n", {})
 
@@ -437,7 +450,7 @@ class RenameWidget(TabWidgetExtension, QWidget):
         self._renameFileNames = []
         try:
             regEx = re.compile(rg)
-            for f in self._outputFileNames:
+            for f in self._originalFileNames:
                 strFile = f.stem
                 matchRegEx = regEx.sub(subText, strFile)
                 if matchRegEx:
@@ -445,7 +458,7 @@ class RenameWidget(TabWidgetExtension, QWidget):
                 else:
                     objName = f
                 self._renameFileNames.append(objName)
-            resolveIncrements(self._outputFileNames, self._renameFileNames, subText)
+            resolveIncrements(self._originalFileNames, self._renameFileNames, subText)
             self._displayRenames()
             if self:
                 self.btnGrid.itemAt(ButtonIndex.ApplyRename).widget().setEnabled(True)
@@ -455,7 +468,7 @@ class RenameWidget(TabWidgetExtension, QWidget):
             self.textRenameResults.textBox.clear()
             statusBar.showMessage(Text.txt0214)
 
-        if resolveIncrements(self._outputFileNames, self._renameFileNames, subText):
+        if resolveIncrements(self._originalFileNames, self._renameFileNames, subText):
             self._displayRenames()
             if self:
                 self.btnGrid.itemAt(ButtonIndex.ApplyRename).widget().setEnabled(True)
@@ -466,7 +479,7 @@ class RenameWidget(TabWidgetExtension, QWidget):
 
         if self._bFilesDropped:
             # self.applyFileRenameSignal.emit(self._renameFileNames)
-            filesPair = zip(self._outputFileNames, self._renameFileNames)
+            filesPair = zip(self._originalFileNames, self._renameFileNames)
             for oldName, newName in filesPair:
                 try:
                     oldName.rename(newName)
@@ -481,14 +494,14 @@ class RenameWidget(TabWidgetExtension, QWidget):
     def _undoRename(self):
 
         if self._bFilesDropped:
-            filesPair = zip(self._renameFileNames, self._outputFileNames)
+            filesPair = zip(self._renameFileNames, self._originalFileNames)
             for oldName, newName in filesPair:
                 try:
                     oldName.rename(newName)
                 except FileExistsError:
                     pass
         else:
-            self.applyFileRenameSignal.emit(self._outputFileNames)
+            self.applyFileRenameSignal.emit(self._originalFileNames)
         self.btnGrid.itemAt(ButtonIndex.ApplyRename).widget().setEnabled(True)
         self.btnGrid.itemAt(ButtonIndex.CalculateCRC).widget().setEnabled(True)
         self.btnGrid.itemAt(ButtonIndex.Undo).widget().setEnabled(False)
@@ -497,7 +510,7 @@ class RenameWidget(TabWidgetExtension, QWidget):
         if self._bFilesDropped:
 
             for index, (currentName, newName) in \
-                enumerate(zip(self._outputFileNames, self._renameFileNames)):
+                enumerate(zip(self._originalFileNames, self._renameFileNames)):
 
                 crcWorker = ThreadWorker(
                     computeCRC,
@@ -585,3 +598,11 @@ class Key:
     RegEx = "RegEx"
     SubString = "SubString"
     MaxRegExCount = "MaxRegExCount"
+
+
+# This if for Pylance _() is not defined
+def _(dummy):
+    return dummy
+
+
+del _
