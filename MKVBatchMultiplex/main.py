@@ -146,7 +146,7 @@ class MainWindow(QMainWindow):
 
         self.controlQueue = deque()
 
-        self.jobsQueue = JobQueue(self, controlQueue=self.controlQueue)
+        self.jobsQueue = JobQueue(self, controlQueue=self.controlQueue, appDir=self.appDirectory)
 
         # mkvmerge executables
 
@@ -160,9 +160,9 @@ class MainWindow(QMainWindow):
         self.proxyModel = TableProxyModel(self.model)
 
         # renameWidget is referenced in CommandWidget
-        self.renameWidget = RenameWidget(self)
+        self.rename = RenameWidget(self)
 
-        self.commandEntry = CommandWidget(self, self.proxyModel)
+        self.commandEntry = CommandWidget(self, self.proxyModel, self.rename)
         self.jobsOutput = JobsOutputWidget(self)
         self.errorOutput = JobsOutputErrorsWidget(self)
 
@@ -226,7 +226,7 @@ class MainWindow(QMainWindow):
         # Translation
         self.translateInterface.addSlot(self.commandEntry.translate)
         self.translateInterface.addSlot(self.jobsTableView.translate)
-        self.translateInterface.addSlot(self.renameWidget.translate)
+        self.translateInterface.addSlot(self.rename.translate)
         self.translateInterface.addSlot(self.tabs.translate)
 
         # Tabs
@@ -261,7 +261,7 @@ class MainWindow(QMainWindow):
         )
         tabsList.append(
             [
-                self.renameWidget,
+                self.rename,
                 _(Text.txt0143) + "+",
                 _(Text.txt0147),
             ]
