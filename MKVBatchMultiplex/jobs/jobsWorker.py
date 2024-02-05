@@ -367,12 +367,18 @@ def jobsWorker(
             dtStart = datetime.fromtimestamp(job.startTime)
             dtEnd = datetime.fromtimestamp(job.endTime)
             dtDuration = dtEnd - dtStart
-            msg = "Job ID: {} {} - date {} - running time {}.".format(
-                job.jobRow[JobKey.ID],
-                exitStatus,
-                dtEnd.isoformat(),
-                strFormatTimeDelta(dtDuration),
+            #msg = "Job ID: {} {} - date {} - running time {}.\n".format(
+            #    job.jobRow[JobKey.ID],
+            #    exitStatus,
+            #    dtEnd.isoformat(),
+            #    strFormatTimeDelta(dtDuration),
+            #)
+            msg = (
+                f"Job ID: {job.jobRow[JobKey.ID]} {exitStatus} - "
+                f"date {dtEnd.isoformat()} - "
+                f"running time {strFormatTimeDelta(dtDuration)}.\n"
             )
+
             msg += "*******************\n\n\n"
             msgArgs = {"color": SvgColor.cyan, "appendEnd": True}
             output.job.emit(msg, msgArgs)
@@ -432,9 +438,12 @@ def dummyRunCommand(funcProgress, indexTotal, controlQueue):
     funcProgress.lblSetValue.emit(2, indexTotal[0] + 1)
     i = 0
 
-    while i < 100:
+    iterations = config.data.get(config.ConfigKey.SimulateRunIterations)
+
+    while i < iterations:
         i += 0.5
-        funcProgress.pbSetValues.emit(i, indexTotal[1] + i)
+        percent = (i/iterations) * 100
+        funcProgress.pbSetValues.emit(percent, indexTotal[1] + percent)
         sleep(0.0001)
         if controlQueue:
             queueStatus = controlQueue.popleft()
@@ -563,7 +572,7 @@ def displayRunJobs(
         # job.output.append(["\n\n", {}]) hack cannot find the read difference
         job.output.append(["\n", {}])
 
-    # clear proccessed line
+    # clear processed line
     line = displayRunJobs.line
     displayRunJobs.line = ""
 

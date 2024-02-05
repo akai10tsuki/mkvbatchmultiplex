@@ -138,7 +138,7 @@ class JobQueue(QObject):
         Some status conditions are routed through here to Stop, Skip or Abort Jobs.
         Defaults to None.
 
-        **log** (bool, optional): Logging can be cotrolled using this parameter.
+        **log** (bool, optional): Logging can be controlled using this parameter.
         Defaults to None.
     """
 
@@ -318,17 +318,13 @@ class JobQueue(QObject):
             bool: True if append successful False otherwise
         """
 
-        status = self.model.dataset[
-            jobRow,
-        ][JobKey.Status]
+        status = self.model.dataset[jobRow, ][JobKey.Status]
         if status != JobStatus.AddToQueue:
             if status == JobStatus.Waiting:
                 self.addWaitingItemSignal.emit()
             return False
 
-        jobID = self.model.dataset[
-            jobRow,
-        ][JobKey.ID]
+        jobID = self.model.dataset[jobRow, ][JobKey.ID]
 
         jobIndex = self.model.index(jobRow, JobKey.ID)
 

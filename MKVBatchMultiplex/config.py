@@ -126,6 +126,7 @@ class ConfigKey:  # pylint: disable=too-few-public-methods
     Language: ClassVar[str] = "Language"
     Logging: ClassVar[str] = "Logging"
     SimulateRun: ClassVar[str] = "SimulateRun"
+    SimulateRunIterations: ClassVar[str] = "SimulateRunIterations"
     SystemDB: ClassVar[str] = "SystemDB"
     SystemFont: ClassVar[str] = "SystemFont"
 
@@ -294,6 +295,11 @@ def init(
 
     data.set(ConfigKey.UseEmbedded,
              data.get(ConfigKey.UseEmbedded) or False)
+
+    # For fast testing of interface
+    data.set(ConfigKey.SimulateRun, True)
+    data.set(ConfigKey.SimulateRunIterations, 5000)
+
     #
     # Temporarily disable uncomment statements
     #

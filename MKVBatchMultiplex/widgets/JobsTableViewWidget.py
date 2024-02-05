@@ -170,7 +170,7 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
         self.parent.jobsQueue.runJobs.finishedSignal.connect(
             lambda: self.jobStatus(False)
         )
-        self.tableView.jobRemovedSignal.connect()
+        #self.tableView.jobRemovedSignal.connect()
 
         # Default button state
         self.btnGrid.itemAt(_Button.ADDWAITING).widget().setEnabled(False)
@@ -236,6 +236,12 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
     @property
     def hasWaiting(self):
         return hasWaiting(self.model)
+
+    def hasQueueStatus(self):
+        return hasQueueStatus(self.model)
+
+    def hasWaitingStatus(self):
+        return hasWaitingStatus(self.model)
 
     def abortCurrentJob(self):
         self.controlQueue.append(JobStatus.AbortJob)
@@ -384,6 +390,29 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
         else:
             self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(True)
 
+    def checkButtonsState(self):
+
+        # Status of Start Worker button
+        if checkForStatus(self.model, JobStatus.Queue):
+            self.jobStartQueueState(True)
+        else:
+            self.jobStartQueueState(False)
+
+        # Status of Clear Queue button
+        if checkForStatus(self.model, JobStatus.Queue):
+            self.jobClearQueueState(True)
+        else:
+            self.jobClearQueueState(False)
+
+        # Status Queue Waiting Jobs
+        if checkForStatus(self.model, JobStatus.Waiting):
+            self.jobAddWaitingState(True)
+        else:
+            self.jobAddWaitingState(False)
+
+
+        # Abort
+
 def hasWaiting(model):
     """
     hasWaiting looks for a Waiting status
@@ -397,6 +426,79 @@ def hasWaiting(model):
 
     for r in range(0, len(model.dataset)):
         if model.dataset[r, JobKey.Status] == JobStatus.Waiting:
+            return True
+
+    return False
+
+
+def hasWaitingStatus(model):
+    """
+    hasWaiting looks for a Waiting status
+
+    Args:
+        model (TableModel): a table model
+
+    Returns:
+        bool: True if Waiting status found. False otherwise.
+    """
+
+    for r in range(0, len(model.dataset)):
+        if model.dataset[r, JobKey.Status] == JobStatus.Waiting:
+            return True
+
+    return False
+
+
+def hasQueueStatus(model):
+    """
+    hasWaiting looks for a Waiting status
+
+    Args:
+        model (TableModel): a table model
+
+    Returns:
+        bool: True if Waiting status found. False otherwise.
+    """
+
+    for r in range(0, len(model.dataset)):
+        if model.dataset[r, JobKey.Status] == JobStatus.Queue:
+            return True
+
+    return False
+
+
+def hasAbortStatus(model):
+    """
+    hasWaiting looks for a Waiting status
+
+    Args:
+        model (TableModel): a table model
+
+    Returns:
+        bool: True if Waiting status found. False otherwise.
+    """
+
+    for r in range(0, len(model.dataset)):
+        if model.dataset[r, JobKey.Status] == JobStatus.Abort:
+            return True
+
+    return False
+
+
+def checkForStatus(model, status):
+    """
+    hasWaiting looks for a Waiting status
+
+    Args:
+        model (TableModel): a table model
+        status (JobStatus): a possible status of a job
+
+    Returns:
+        bool: True if specified status found. False otherwise.
+    """
+
+    for r in range(0, len(model.dataset)):
+        if model.dataset[r, JobKey.Status] == status:
             return True
 
     return False
