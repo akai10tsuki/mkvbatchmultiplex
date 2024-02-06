@@ -298,7 +298,7 @@ def init(
 
     # For fast testing of interface
     data.set(ConfigKey.SimulateRun, True)
-    data.set(ConfigKey.SimulateRunIterations, 5000)
+    data.set(ConfigKey.SimulateRunIterations, 500)
 
     #
     # Temporarily disable uncomment statements
