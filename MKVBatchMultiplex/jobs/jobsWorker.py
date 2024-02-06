@@ -274,15 +274,17 @@ def jobsWorker(
                             markErrorOutput(job, output, start=True)
                             errorOutputOpen = True
 
-                        msgArgs = {"color": SvgColor.yellowgreen, "appendEnd": True}
+                        msgArgs = {
+                            "color": SvgColor.yellowgreen,
+                            "appendEnd": True}
                         output.job.emit(msg, msgArgs)
                         output.error.emit(
                             msg + "\n", msgArgs
-                        )  # hack making it work
+                        )
                         job.output.append([msg, msgArgs])
                         job.errors.append(
                             [msg + "\n", msgArgs]
-                        )  # hack making it work
+                        )
                         if rc:
                             if log:
                                 MODULELOG.warning("RJB0011: %s", msg)
@@ -492,7 +494,7 @@ def markErrorOutput(job, output, start=True):
             job.jobRow[JobKey.ID], dt.isoformat()
         )
     else:
-        msg = "Messages for Job ID: {} ended at {}.\n\n".format(
+        msg = "Messages for Job ID: {} ended at {}.\n".format(
             job.jobRow[JobKey.ID], dt.isoformat()
         )
         msg += "---------------------\n"
@@ -502,10 +504,10 @@ def markErrorOutput(job, output, start=True):
     job.errors.append([msg, msgArgs])
 
 
-def errorMsg(output, msg, kwargs):
+#def errorMsg(output, msg, kwargs):
 
-    output.error.emit(msg, kwargs)
-    output.job.emit(msg, kwargs)
+    #output.error.emit(msg, kwargs)
+    #output.job.emit(msg, kwargs)
 
 
 @staticVars(printPercent=False, counting=False, count=0, line="")
