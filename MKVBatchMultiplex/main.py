@@ -164,7 +164,7 @@ class MainWindow(QMainWindow):
 
         self.commandEntry = CommandWidget(self, self.proxyModel, self.rename)
         self.jobsOutput = JobsOutputWidget(self)
-        self.errorOutput = JobsOutputErrorsWidget(self)
+        self.errorOutput = JobsOutputErrorsWidget(self, log=False)
 
         # Widgets for tabs
         self.jobsTableView = JobsTableViewWidget(
@@ -504,7 +504,6 @@ class MainWindow(QMainWindow):
         self.log = state
         self.commandEntry.log = state
         self.jobsOutput.log = state
-        self.errorOutput.log = state
         self.jobsQueue.log = state
         self.jobsTableView.log = state
         msg = "MAI0001: Start Logging." if state else "MAI0002: Stop Logging."
