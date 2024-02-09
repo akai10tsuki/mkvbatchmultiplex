@@ -13,7 +13,6 @@ import re
 import sys
 
 from collections import deque
-from ctypes import wintypes
 from pathlib import Path
 from typing import Optional
 
@@ -42,12 +41,12 @@ from PySide6.QtWidgets import (
 )
 
 from vsutillib.mkv import getMKVMerge, getMKVMergeEmbedded, getMKVMergeVersion
-from vsutillib.process import RunCommand
 from vsutillib.pyside6 import (
     centerWidget,
     checkColor,
     darkPalette,
     DualProgressBar,
+    HorizontalLine,
     QActionWidget,
     QActivityIndicator,
     QFormatLabel,
@@ -415,6 +414,16 @@ class MainWindow(QMainWindow):
         # File menu
         #
         self.fileMenu = QMenuWidget(Text.txt0020)
+
+        #self.fileMenu.setStyleSheet(
+        #    """
+        #    QMenuWidget::item-line:separator {
+
+        #        color: white;
+
+        #    }
+        #    """
+        #)
 
         self.fileMenu.addAction(self.actPreferences)
         self.fileMenu.addSeparator()
