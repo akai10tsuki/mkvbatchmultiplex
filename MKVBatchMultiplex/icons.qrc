@@ -9,5 +9,7 @@
         <file>images/paste.png</file>
         <file>images/save.png</file>
         <file>images/exit.png</file>
+		<file>images/cross.png</file>
+		<file>images/mkvtoolnix_logo.png</file>
     </qresource>
 </RCC>
