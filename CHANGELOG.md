@@ -7,8 +7,10 @@
 - On rename tab dropping files in the Original files box you can rename and
   add CRC labels to files in the system
 
-### Changed
+- MKVToolnix is embedded to help on some Linux distributions that have problems with
+  shared library version.
 
+### Changed
 
 ### Fixed
 
