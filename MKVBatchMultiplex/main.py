@@ -65,6 +65,7 @@ from .models import TableProxyModel, JobsTableModel
 from .utils import (
     icons,
     configMessagesCatalog,
+    executeMKVToolnix,
     OutputWindows,
     Progress,
     Text,
@@ -367,7 +368,8 @@ class MainWindow(QMainWindow):
             triggered=self.setPreferences.getPreferences
         )
 
-        icon = QIcon(QPixmap(":/images/exit.png"))
+        icon = QIcon(QPixmap(":/images/cross.png"))
+        #icon = QIcon(QPixmap(":/images/exit.png"))
         # exitIcon = self.style().standardIcon(QStyle.SP_DialogCloseButton)
         self.actExit = QActionWidget(
             icon,
@@ -376,6 +378,15 @@ class MainWindow(QMainWindow):
             shortcut=Text.txt0022,
             statusTip=Text.txt0023,
             triggered=self.close
+        )
+
+        icon = QIcon(QPixmap(":/images/mkvtoolnix_logo.png"))
+        self.actMKVToolnix = QActionWidget(
+            icon,
+            " ",
+            self,
+            statusTip=_("Execute embedded mkvtoolnix-gui."),
+            triggered=lambda: executeMKVToolnix(self.appDirectory, output=self.output, log=self.log)
         )
 
         self.actAbort = QActionWidget(
@@ -448,8 +459,8 @@ class MainWindow(QMainWindow):
         self.setMenuBar(menuBar)
 
     def createToolbars(self) -> None:
-        pass
-        #self.fileToolbar = self.addToolBar("File")
+        self.fileToolbar = self.addToolBar("File")
+        self.fileToolbar.addAction(self.actMKVToolnix)
         #self.fileToolbar.addAction(self.actExit)
 
     def createStatusbar(self) -> None:
