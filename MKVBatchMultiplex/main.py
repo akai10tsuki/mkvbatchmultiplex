@@ -21,13 +21,14 @@ from PySide6.QtCore import (
     QEvent,
     Qt,
     Signal,
-    Slot
+    Slot,
 )
 from PySide6.QtGui import(
     QColor,
     QFont,
     QIcon,
-    QPixmap
+    QPalette,
+    QPixmap,
 )
 from PySide6.QtWidgets import (
     QApplication,
@@ -37,7 +38,7 @@ from PySide6.QtWidgets import (
     QStatusBar,
     QToolTip,
     QVBoxLayout,
-    QWidget
+    QWidget,
 )
 
 from vsutillib.mkv import getMKVMerge, getMKVMergeEmbedded, getMKVMergeVersion
@@ -71,7 +72,8 @@ from .utils import (
     Text,
     Translate,
     UiSetMessagesCatalog,
-    yesNoDialog)
+    yesNoDialog,
+)
 from .widgets import (
     CommandWidget,
     JobsOutputErrorsWidget,
@@ -79,7 +81,7 @@ from .widgets import (
     JobsTableViewWidget,
     LogViewerWidget,
     PreferencesDialogWidget,
-    RenameWidget
+    RenameWidget,
 )
 # endregion imports
 
@@ -612,34 +614,62 @@ def abort():
 def mainApp():
     """Main function"""
 
-    app = QApplication(sys.argv)
+
+    #app = QApplication(sys.argv)
     #config.init(app=app)
 
     # will create a poor mans dark theme for the app enable it for Linux
     # and Windows for now won't look for an option to switch to light
     # dark according to the os no clear way of changing tho font size
     # TODO: lightPalette
-    #darkPalette(app)
-    #config.data.set(config.ConfigKey.DarkMode, True)
-    #QOutputTextWidget.isDarkMode = True
 
     if platform.system() == "Windows":
         # with this the icon in the task bar will change to the one set
         # for the application myAppID is an arbitrary string
         myAppID = "akai10tsuki.MKVBatchMultiplex.mkv.3.0.0"
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myAppID)
+        sys.argv += ['-platform', 'windows:darkmode=2']
 
+    app = QApplication(sys.argv)
     config.init(app=app)
     MainWindow()
 
-    darkPalette(app)
-    config.data.set(config.ConfigKey.DarkMode, True)
-    QOutputTextWidget.isDarkMode = True
+    app.setStyle("Fusion")
+    #app.setPalette( get_darkModePalette( app ) )
+    #darkPalette(app)
+    #config.data.set(config.ConfigKey.DarkMode, True)
+    #QOutputTextWidget.isDarkMode = True
 
     app.exec()
 
     config.close()
 
+
+def get_darkModePalette( app=None ) :
+
+    darkPalette = app.palette()
+    #darkPalette.setColor( QPalette.Window, QColor( 53, 53, 53 ) )
+    #darkPalette.setColor( QPalette.WindowText, Qt.white )
+    #darkPalette.setColor( QPalette.Disabled, QPalette.WindowText, QColor( 127, 127, 127 ) )
+    #darkPalette.setColor( QPalette.Base, QColor( 42, 42, 42 ) )
+    #darkPalette.setColor( QPalette.AlternateBase, QColor( 66, 66, 66 ) )
+    #darkPalette.setColor( QPalette.ToolTipBase, QColor( 53, 53, 53 ) )
+    #darkPalette.setColor( QPalette.ToolTipText, Qt.white )
+    #darkPalette.setColor( QPalette.Text, Qt.white )
+    #darkPalette.setColor( QPalette.Disabled, QPalette.Text, QColor( 127, 127, 127 ) )
+    #darkPalette.setColor( QPalette.Dark, QColor( 35, 35, 35 ) )
+    #darkPalette.setColor( QPalette.Shadow, QColor( 20, 20, 20 ) )
+    darkPalette.setColor( QPalette.Button, QColor( 53, 53, 53 ) )
+    darkPalette.setColor( QPalette.ButtonText, Qt.white )
+    darkPalette.setColor( QPalette.Disabled, QPalette.ButtonText, QColor( 127, 127, 127 ) )
+    #darkPalette.setColor( QPalette.BrightText, Qt.red )
+    #darkPalette.setColor( QPalette.Link, QColor( 42, 130, 218 ) )
+    #darkPalette.setColor( QPalette.Highlight, QColor( 42, 130, 218 ) )
+    #darkPalette.setColor( QPalette.Disabled, QPalette.Highlight, QColor( 80, 80, 80 ) )
+    #darkPalette.setColor( QPalette.HighlightedText, Qt.white )
+    #darkPalette.setColor( QPalette.Disabled, QPalette.HighlightedText, QColor( 127, 127, 127 ), )
+
+    return darkPalette
 
 # This if for Pylance _() is not defined
 def _(dummy):
