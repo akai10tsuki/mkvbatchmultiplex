@@ -146,6 +146,7 @@ class CommandWidget(QWidget):
             margins="  ",
             toolTip=Text.txt0165,
         )
+
         self.frmCommandLine.addRow(btnPasteClipboard, self.commandLine)
         self.frmCommandLine.setFieldGrowthPolicy(
             QFormLayout.AllNonFixedFieldsGrow)
@@ -342,12 +343,12 @@ class CommandWidget(QWidget):
 
         # Job Queue related
         self.parent.jobsQueue.addQueueItemSignal.connect(
-            lambda: self.jobStartQueueState(True)
+            lambda: self.jobStartWorkerState(True)
         )
         self.parent.jobsQueue.runJobs.startSignal.connect(
-            lambda: self.jobStartQueueState(False)
+            lambda: self.jobStartWorkerState(False)
         )
-        self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(False)
+        self.btnGrid.itemAt(_Button.STARTWORKER).widget().setEnabled(False)
 
     def _initUI(self) -> None:
 
@@ -455,6 +456,12 @@ class CommandWidget(QWidget):
         ]:
             if button := self.btnGrid.itemAt(b).widget():
                 button.setEnabled(validateOK)
+                if b == _Button.ADDQUEUE:
+                    if validateOK:
+                        button.setFocus(Qt.FocusReason.OtherFocusReason)
+                        button.setDefault(True)
+                    else:
+                        button.setDefault(False)
 
     # Slot for the update command signal
     @Slot(bool)
@@ -479,12 +486,14 @@ class CommandWidget(QWidget):
         self.updateObjCommand(validateOK)
 
     @Slot(bool)
-    def jobStartQueueState(self, state):
+    def jobStartWorkerState(self, state):
 
         if state and not isThreadRunning(config.WORKERTHREADNAME):
-            self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(True)
+            self.btnGrid.itemAt(_Button.STARTWORKER).widget().setEnabled(True)
+            self.btnGrid.itemAt(_Button.STARTWORKER).widget().setDefault(True)
         else:
-            self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(False)
+            self.btnGrid.itemAt(_Button.STARTWORKER).widget().setEnabled(False)
+            self.btnGrid.itemAt(_Button.STARTWORKER).widget().setDefault(False)
 
     @Slot()
     def setDefaultAlgorithm(self) -> None:
@@ -623,7 +632,7 @@ class CommandWidget(QWidget):
         self.commandLine.clear()
 
     def startWorker(self) -> None:
-        self.jobStartQueueState(False)
+        self.jobStartWorkerState(False)
         self.parent.jobsQueue.run()
 
     def clearOutputWindow(self) -> None:
@@ -711,7 +720,7 @@ class _Button:
     ADDCOMMAND = 0
     RENAME = 1
     ADDQUEUE = 2
-    STARTQUEUE = 3
+    STARTWORKER = 3
 
     ANALYSIS = 5
     SHOWCOMMANDS = 6
