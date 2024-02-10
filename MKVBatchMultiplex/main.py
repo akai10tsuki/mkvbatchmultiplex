@@ -615,32 +615,20 @@ def abort():
 def mainApp():
     """Main function"""
 
-
-    #app = QApplication(sys.argv)
-    #config.init(app=app)
-
-    # will create a poor mans dark theme for the app enable it for Linux
-    # and Windows for now won't look for an option to switch to light
-    # dark according to the os no clear way of changing tho font size
-    # TODO: lightPalette
-
     if platform.system() == "Windows":
         # with this the icon in the task bar will change to the one set
         # for the application myAppID is an arbitrary string
         myAppID = "akai10tsuki.MKVBatchMultiplex.mkv.3.0.0"
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myAppID)
+        # setup dark mode
         sys.argv += ['-platform', 'windows:darkmode=2']
 
     app = QApplication(sys.argv)
     config.init(app=app)
     MainWindow()
 
+    # set Fusion style palette adjust for Linux disable button text
     setAppStyle(app)
-    #app.setStyle("Fusion")
-    #app.setPalette( get_darkModePalette( app ) )
-    #darkPalette(app)
-    #config.data.set(config.ConfigKey.DarkMode, True)
-    #QOutputTextWidget.isDarkMode = True
 
     app.exec()
 
