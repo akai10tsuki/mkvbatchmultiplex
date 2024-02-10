@@ -1,6 +1,6 @@
 # Changelog
 
-## <ins>(Unreleased)</ins>
+## <ins>3.0.0 - 2024-02-10</ins>
 
 ### Added
 
@@ -11,6 +11,9 @@
   shared library version.
 
 ### Changed
+
+- PySide6 has better support for Dark/Light Windows theme now the program will adjust
+  to use a light or dark mode following the OS setup.
 
 ### Fixed
 
