@@ -1,15 +1,15 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
     <qresource>
-        <file>images/Itsue256x256.png</file>
         <file>images/copy.png</file>
+		<file>images/cross.png</file>
         <file>images/cut.png</file>
+        <file>images/exit.png</file>
+        <file>images/Itsue256x256.png</file>
         <file>images/new.png</file>
+		<file>images/mkvtoolnix_logo.png</file>
         <file>images/open.png</file>
         <file>images/paste.png</file>
         <file>images/save.png</file>
-        <file>images/exit.png</file>
-		<file>images/cross.png</file>
-		<file>images/mkvtoolnix_logo.png</file>
     </qresource>
 </RCC>
