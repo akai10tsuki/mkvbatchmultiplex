@@ -18,6 +18,7 @@ from .. import config
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
+
 def runAnalysis(**kwargs: str) -> None:
     """List the source files found"""
 
@@ -30,8 +31,8 @@ def runAnalysis(**kwargs: str) -> None:
     if output is None:
         if log:
             MODULELOG.error(
-                f"[CommandWidgetHelpers.showCommands] "
-                f"No output callback function")
+                "[CommandWidgetHelpers.runAnalysis] "
+                "No output callback function")
         return "No output callback function"
 
     if (command is not None) and (appDir is not None):
@@ -53,25 +54,33 @@ def runAnalysis(**kwargs: str) -> None:
             verify = oCommand
             print("runAnalysis old oCommand")
 
-        for e in verify.analysis:
-            if e.find(r"chk:") >= 0:
-                output.command.emit(
-                    f"{e}",
-                    {LineOutput.Color: SvgColor.green,
-                     LineOutput.AppendEnd: True},
-                )
-            else:
-                output.command.emit(
-                    f"{e}",
-                    {LineOutput.Color: SvgColor.red,
-                     LineOutput.AppendEnd: True},
-                )
-        output.command.emit("\n", {LineOutput.AppendEnd: True})
+        if verify.analysis:
+            for e in verify.analysis:
+                if e.find(r"chk:") >= 0:
+                    output.command.emit(
+                        f"{e}",
+                        {LineOutput.Color: SvgColor.green,
+                        LineOutput.AppendEnd: True},
+                    )
+                else:
+                    output.command.emit(
+                        f"{e}",
+                        {LineOutput.Color: SvgColor.red,
+                        LineOutput.AppendEnd: True},
+                    )
+            output.command.emit("\n", {LineOutput.AppendEnd: True})
+        else:
+            output.command.emit(
+                "No analysis to display.\n",  {LineOutput.AppendEnd: True})
+            if log:
+                MODULELOG.error(
+                    "[CommandWidgetHelpers.runAnalysis] "
+                    "No output callback function")
     else:
         if log:
             MODULELOG.error(
-                f"[CommandWidgetHelpers.runAnalysis] "
-                f"wrong parameters.")
+                "[CommandWidgetHelpers.runAnalysis] "
+                "wrong parameters.")
 
 
 def showCommands(**kwargs: str):
