@@ -10,7 +10,7 @@ import logging
 from collections import deque
 from typing import Optional
 
-from PySide6.QtCore import Qt, Signal, Slot
+from PySide6.QtCore import QEvent, Qt, Signal, Slot
 from PySide6.QtWidgets import (
     QApplication,
     QFormLayout,
@@ -65,7 +65,7 @@ class CommandWidget(QWidget):
     cliValidateSignal = Signal(bool)
     clearCommandSignal = Signal()
 
-    # region initialization
+    # region initialization/
 
     def __init__(
             self,
@@ -89,6 +89,7 @@ class CommandWidget(QWidget):
         self._initControls()
         self._initHelper()
         self._initUI()
+        self._installEventFilter()
 
         # log updates outputWindow.log
         self.log = log
@@ -110,7 +111,7 @@ class CommandWidget(QWidget):
         # command line
         #
         self.frmCommandLine = QFormLayout()
-        self.commandLine = QLineEdit()
+        self.commandLine = QLineEdit(objectName=_ObjectName.commandLine)
         # Increase command line buffer to 64k default is 32k
         self.commandLine.setMaxLength(65536)
         self.commandWidget = QWidget()
@@ -145,6 +146,7 @@ class CommandWidget(QWidget):
             function=lambda: qtRunFunctionInThread(self.pasteClipboard),
             margins="  ",
             toolTip=Text.txt0165,
+            objectName=_ObjectName.btnPasteClipboard,
         )
 
         self.frmCommandLine.addRow(btnPasteClipboard, self.commandLine)
@@ -164,6 +166,7 @@ class CommandWidget(QWidget):
             function=lambda: self.addCommand(JobStatus.Waiting),
             margins=" ",
             toolTip=Text.txt0161,
+            objectName=_ObjectName.btnAddCommand,
         )
         #    function=self.parent.renameWidget.setAsCurrentTab,
         btnRename = QPushButtonWidget(
@@ -171,19 +174,22 @@ class CommandWidget(QWidget):
             function=self.rename.setAsCurrentTab,
             margins=" ",
             toolTip=Text.txt0183,
+            objectName=_ObjectName.btnRename,
         )
         btnAddQueue = QPushButtonWidget(
             Text.txt0166,
             function=lambda: self.addCommand(JobStatus.AddToQueue),
             margins=" ",
             toolTip=Text.txt0167,
+            objectName=_ObjectName.btnAddQueue
         )
         # function=self.parent.jobsQueue.run,
-        btnStartQueue = QPushButtonWidget(
+        btnStartWorker = QPushButtonWidget(
             Text.txt0126,
             function=self.startWorker,
             margins=" ",
             toolTip=Text.txt0169,
+            objectName=_ObjectName.btnStartWorker,
         )
         # runAnalysis
         btnAnalysis = QPushButtonWidget(
@@ -198,6 +204,7 @@ class CommandWidget(QWidget):
             ),
             margins=" ",
             toolTip=Text.txt0171,
+            objectName=_ObjectName.btnAnalysis,
         )
         # showCommands
         btnShowCommands = QPushButtonWidget(
@@ -209,9 +216,11 @@ class CommandWidget(QWidget):
                 oCommand=self.oCommand,
                 appDir=self.parent.appDirectory,
                 log=self.log,
+
             ),
             margins=" ",
             toolTip=Text.txt0173,
+            objectName=_ObjectName.btnShowCommands,
         )
         # checkFiles
         btnCheckFiles = QPushButtonWidget(
@@ -226,6 +235,7 @@ class CommandWidget(QWidget):
             ),
             margins=" ",
             toolTip=Text.txt0175,
+            objectName=_ObjectName.btnCheckFiles,
         )
         # source tree
         btnFilesTree = QPushButtonWidget(
@@ -240,25 +250,27 @@ class CommandWidget(QWidget):
             ),
             margins=" ",
             toolTip=Text.txt0175,
+            objectName=_ObjectName.btnFilesTree,
         )
-
         btnClear = QPushButtonWidget(
             Text.txt0162,
             function=self.clearOutputWindow,
             margins=" ",
             toolTip=Text.txt0177,
+            objectName=_ObjectName.btnClear
         )
         btnReset = QPushButtonWidget(
             Text.txt0178,
             function=self.reset,
             margins=" ",
             toolTip=Text.txt0179,
+            objectName=_ObjectName.btnReset
         )
 
         self.btnGrid.addWidget(btnAddCommand, 0, 0)
         self.btnGrid.addWidget(btnRename, 0, 1)
         self.btnGrid.addWidget(btnAddQueue, 1, 0)
-        self.btnGrid.addWidget(btnStartQueue, 1, 1)
+        self.btnGrid.addWidget(btnStartWorker, 1, 1)
         self.btnGrid.addWidget(HorizontalLine(), 2, 0, 1, 2)
         self.btnGrid.addWidget(btnAnalysis, 3, 0)
         self.btnGrid.addWidget(btnShowCommands, 3, 1)
@@ -308,6 +320,18 @@ class CommandWidget(QWidget):
 
         # button at end of line to clear it
         self.commandLine.setClearButtonEnabled(True)
+        self.commandLine.setObjectName(_ObjectName.commandLine)
+        commandLine = self.getButton(_Button.COMMANDLINE)
+        commandLine.setObjectName(_ObjectName.commandLine)
+        commandLine.installEventFilter(self)
+
+        pasteButton = self.getButton(_Button.PASTE)
+        pasteButton.installEventFilter(self)
+
+        #pasteButton.setDefault(True)
+        #pasteButton.setFocus()
+        #pasteButton.grabKeyboard()
+
         # command line related signals
         self.updateCommandSignal.connect(self.updateCommand)
         self.cliValidateSignal.connect(self.cliValidate)
@@ -360,6 +384,26 @@ class CommandWidget(QWidget):
         grid.addWidget(self.outputWindow, 2, 1, 10, 1)
 
         self.setLayout(grid)
+
+    def _installEventFilter(self) -> None:
+
+        for b in [
+            _Button.PASTE,
+            _Button.COMMANDLINE,
+            _Button.ADDCOMMAND,
+            _Button.RENAME,
+            _Button.ADDQUEUE,
+            _Button.STARTWORKER,
+            _Button.ANALYSIS,
+            _Button.SHOWCOMMANDS,
+            _Button.CHECKFILES,
+            _Button.FILESTREE,
+            _Button.CLEAR,
+            _Button.RESET,
+        ]:
+            button = self.getButton(b)
+            button.installEventFilter(self)
+
     # endregion Initialization
 
     # region Logging setup
@@ -436,6 +480,8 @@ class CommandWidget(QWidget):
         self.__output = value
     # endregion properties
 
+    # region buttons
+
     # region buttons slots
     @Slot(bool)
     def cliButtonsState(self, validateOK: bool) -> None:
@@ -458,10 +504,12 @@ class CommandWidget(QWidget):
                 button.setEnabled(validateOK)
                 if b == _Button.ADDQUEUE:
                     if validateOK:
-                        button.setFocus(Qt.FocusReason.OtherFocusReason)
-                        button.setDefault(True)
+                        #button.setFocus(Qt.FocusReason.OtherFocusReason)
+                        #button.setDefault(True)
+                        pass
                     else:
-                        button.setDefault(False)
+                        #button.setDefault(False)
+                        pass
 
     # Slot for the update command signal
     @Slot(bool)
@@ -490,10 +538,10 @@ class CommandWidget(QWidget):
 
         if state and not isThreadRunning(config.WORKERTHREADNAME):
             self.btnGrid.itemAt(_Button.STARTWORKER).widget().setEnabled(True)
-            self.btnGrid.itemAt(_Button.STARTWORKER).widget().setDefault(True)
+            #self.btnGrid.itemAt(_Button.STARTWORKER).widget().setDefault(True)
         else:
             self.btnGrid.itemAt(_Button.STARTWORKER).widget().setEnabled(False)
-            self.btnGrid.itemAt(_Button.STARTWORKER).widget().setDefault(False)
+            #self.btnGrid.itemAt(_Button.STARTWORKER).widget().setDefault(False)
 
     @Slot()
     def setDefaultAlgorithm(self) -> None:
@@ -589,7 +637,6 @@ class CommandWidget(QWidget):
         self.commandLine.clear()
         self.commandLine.setText(command)
         self.commandLine.setCursorPosition(0)
-    # endregion button slots
 
     @Slot(list)
     def applyRename(self, renameFiles):
@@ -599,6 +646,7 @@ class CommandWidget(QWidget):
 
         if self.oCommand:
             self.oCommand.renameOutputFiles(renameFiles)
+    # endregion button slots
 
     def pasteClipboard(self) -> None:
         """Paste clipboard to command QLineEdit"""
@@ -709,13 +757,51 @@ class CommandWidget(QWidget):
 
     # endregion buttons
 
+    # region events
+    def eventFilter(self, source, event):
+        """Work with the setDefault of Buttons"""
+
+        objectName = source.objectName()
+
+        if event.type() == QEvent.FocusIn:
+            print('filter-focus-in:', objectName)
+            if objectName == _ObjectName.commandLine:
+                button = self.getButton(_Button.PASTE)
+                #button.releaseKeyboard()
+                #button.setDefault(False)
+            elif objectName == _ObjectName.btnPasteClipboard:
+                button = self.getButton(_Button.PASTE)
+                #button.setDefault(True)
+        elif event.type() == QEvent.FocusOut:
+            print('filter-focus-out:', objectName)
+            if objectName == _ObjectName.btnPasteClipboard:
+                button = self.getButton(_Button.PASTE)
+                #button.setDefault(False)
+
+        return super().eventFilter(source, event)
+    # end region events
+
+    def getButton(self, whichWidget) -> QWidget:
+
+        if whichWidget in [_Button.PASTE, _Button.COMMANDLINE]:
+            if widget := self.frmCommandLine.itemAt(whichWidget).widget():
+                return widget
+        else:
+            if button := self.btnGrid.itemAt(whichWidget).widget():
+                return button
+
+        return None
+
 
 class _Button:
     """
-    Index of the buttons in btnGrid to enable/disable them
+    Index of the buttons (Yes COMMANDLINE is not a button)
     """
 
+    DEFAULTALGORITHM = 5
+
     PASTE = 0
+    COMMANDLINE = 1
 
     ADDCOMMAND = 0
     RENAME = 1
@@ -729,6 +815,22 @@ class _Button:
 
     CLEAR = 10
     RESET = 11
+
+class _ObjectName:
+
+    btnPasteClipboard = "btnPasteClipboard"
+    commandLine = "commandLine"
+    btnDefaultAlgorithm = "btnDefaultAlgorithm"
+    btnAddCommand = "btnAddCommand"
+    btnRename = "btnRename"
+    btnAddQueue = "btnAddQueue"
+    btnStartWorker = "btnStartWorker"
+    btnAnalysis = "btnAnalysis"
+    btnShowCommands = "btnShowCommands"
+    btnCheckFiles = "btnCheckFiles"
+    btnFilesTree = "btnFilesTree"
+    btnClear = "btnClear"
+    btnReset = "btnReset"
 
 
 # This if for Pylance _() is not defined
