@@ -373,6 +373,7 @@ class RenameWidget(TabWidgetExtension, QWidget):
         else:
             self.btnGrid.itemAt(ButtonIndex.Clear).widget().setEnabled(False)
             self.btnGrid.itemAt(ButtonIndex.CalculateCRC).widget().setEnabled(False)
+
     @Slot()
     def undoButtonState(self):
         if not self._bFilesDropped:
