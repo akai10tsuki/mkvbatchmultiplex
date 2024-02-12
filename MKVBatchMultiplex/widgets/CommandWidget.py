@@ -44,6 +44,8 @@ from .CommandWidgetsHelpers import (
     showCommands,
     sourceTree
 )
+from .RenameWidget import RenameWidget
+
 # endregion imports
 
 MODULELOG = logging.getLogger(__name__)
@@ -71,7 +73,7 @@ class CommandWidget(QWidget):
             self,
             parent: Optional[QWidget] = None,
             proxyModel: Optional[QWidget] = None,
-            rename: Optional[QWidget] = None,
+            rename: Optional[RenameWidget] = None,
             controlQueue: Optional[deque] = None,
             log: Optional[bool] = None) -> None:
         super().__init__(parent=parent)
@@ -289,6 +291,7 @@ class CommandWidget(QWidget):
             Text.txt0094,
             textSuffix=":  ",
         )
+        self.lblAlgorithm.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.rbZero = QRadioButton("0", self)
         self.rbOne = QRadioButton("1", self)
         self.rbTwo = QRadioButton("2", self)
@@ -358,8 +361,9 @@ class CommandWidget(QWidget):
         self.btnGrid.itemAt(_Button.CLEAR).widget().setEnabled(False)
         self.btnGrid.itemAt(_Button.RESET).widget().setEnabled(False)
 
-        # connect text windows textChanged to clearButtonState function
+        # connect text windows textChanged to clearButtonState and resetButtonState
         self.outputWindow.textChanged.connect(self.clearButtonState)
+        #self.output.jobOutput.textChanged.connect(self.resetButtonState)
 
         # connect command line textChanged to analysisButtonState function
         self.commandLine.textChanged.connect(self.analysisButtonState)
@@ -386,8 +390,7 @@ class CommandWidget(QWidget):
         self.setLayout(grid)
 
     def _installEventFilter(self) -> None:
-
-        for b in [
+        """
             _Button.PASTE,
             _Button.COMMANDLINE,
             _Button.ADDCOMMAND,
@@ -400,9 +403,24 @@ class CommandWidget(QWidget):
             _Button.FILESTREE,
             _Button.CLEAR,
             _Button.RESET,
+        """
+
+        for w in [
+            _ObjectName.btnPaste,
+            _ObjectName.commandLine,
+            _ObjectName.btnAddCommand,
+            _ObjectName.btnRename,
+            _ObjectName.btnAddQueue,
+            _ObjectName.btnStartWorker,
+            _ObjectName.btnAnalysis,
+            _ObjectName.btnShowCommands,
+            _ObjectName.btnCheckFiles,
+            _ObjectName.btnFilesTree,
+            _ObjectName.btnClearOutput,
+            _ObjectName.btnReset,
         ]:
             #button = self.getButton(b)
-            widget = self.getWidget(b)
+            widget = self.getWidget(w)
             widget.installEventFilter(self)
 
     # endregion Initialization
@@ -464,12 +482,12 @@ class CommandWidget(QWidget):
 
     # region properties
     @property
-    def rename(self) -> QWidget:
+    def rename(self) -> RenameWidget:
         return self.__rename
 
     @rename.setter
-    def rename(self, value: QWidget) -> None:
-        if isinstance(value, QWidget):
+    def rename(self, value: RenameWidget) -> None:
+        if isinstance(value, RenameWidget):
             self.__rename = value
 
     @property
@@ -478,7 +496,10 @@ class CommandWidget(QWidget):
 
     @output.setter
     def output(self, value: OutputWindows) -> None:
-        self.__output = value
+        if isinstance(value, OutputWindows):
+            self.__output = value
+            # connect text windows textChanged to clearButtonState and resetButtonState
+            self.output.jobOutput.textChanged.connect(self.resetButtonState)
     # endregion properties
 
     # region buttons
@@ -505,14 +526,13 @@ class CommandWidget(QWidget):
                 button.setEnabled(validateOK)
                 if b == _Button.ADDQUEUE:
                     if validateOK:
-                        #button.setFocus(Qt.FocusReason.OtherFocusReason)
-                        #button.setDefault(True)
+                        button.setFocus(Qt.FocusReason.OtherFocusReason)
+                        button.setDefault(True)
                         pass
                     else:
-                        #button.setDefault(False)
+                        button.setDefault(False)
                         pass
 
-    # Slot for the update command signal
     @Slot(bool)
     def cliValidate(self, validateOK: bool) -> None:
         """
@@ -539,10 +559,8 @@ class CommandWidget(QWidget):
 
         if state and not isThreadRunning(config.WORKERTHREADNAME):
             self.btnGrid.itemAt(_Button.STARTWORKER).widget().setEnabled(True)
-            #self.btnGrid.itemAt(_Button.STARTWORKER).widget().setDefault(True)
         else:
             self.btnGrid.itemAt(_Button.STARTWORKER).widget().setEnabled(False)
-            #self.btnGrid.itemAt(_Button.STARTWORKER).widget().setDefault(False)
 
     @Slot()
     def setDefaultAlgorithm(self) -> None:
@@ -568,15 +586,14 @@ class CommandWidget(QWidget):
         """
 
         for index in range(self.frmCommandLine.rowCount()):
-            widget = self.frmCommandLine.itemAt(
-                index, QFormLayout.LabelRole).widget()
+            widget = self.frmCommandLine.itemAt(index).widget()
             if isinstance(widget, QPushButtonWidget):
                 widget.translate()
 
         widgetGroups = [self.btnGrid, self.algorithmHBox, self.crcHBox]
-        for gWidget in widgetGroups:
-            for index in range(gWidget.count()):
-                widget = gWidget.itemAt(index).widget()
+        for widgetGroup in widgetGroups:
+            for index in range(widgetGroup.count()):
+                widget = widgetGroup.itemAt(index).widget()
                 if isinstance(
                     widget,
                     (
@@ -688,7 +705,7 @@ class CommandWidget(QWidget):
             # Clear output window?
             title = _(Text.txt0178)
             msg = "¿" if language == "es" else ""
-            msg += f"{_(Text.txt00176)}?"
+            msg += f"{_(Text.txt0176)}?"
             bAnswer = yesNoDialog(self, msg, title)
 
             if bAnswer:
@@ -700,6 +717,14 @@ class CommandWidget(QWidget):
 
         else:
             messageBox(self, _(Text.txt0178), f"{_(Text.txt0089)}..")
+
+    def resetButtonState(self):
+        """Set clear button state"""
+
+        if self.output.jobOutput.toPlainText() != "":
+            self.btnGrid.itemAt(_Button.RESET).widget().setEnabled(True)
+        else:
+            self.btnGrid.itemAt(_Button.RESET).widget().setEnabled(False)
 
     def toggledRadioButton(self) -> None:
         for index, rb in enumerate(self.radioButtons):
@@ -727,11 +752,9 @@ class CommandWidget(QWidget):
             self.btnGrid.itemAt(_Button.CLEAR).widget().setEnabled(True)
         else:
             self.btnGrid.itemAt(_Button.CLEAR).widget().setEnabled(False)
-
     # endregion buttons
 
     # region events
-
     def eventFilter(self, source: QWidget, event: QEvent) -> None:
         """Work with the setDefault of Buttons"""
 
@@ -749,18 +772,14 @@ class CommandWidget(QWidget):
         return super().eventFilter(source, event)
     # end region events
 
-    def getWidget(self, whichWidget: int | str) -> QWidget:
-        """Retrieve widget by index or by object name"""
+    def getWidget(self, whichWidget: str) -> QWidget:
+        """
+        Retrieve widget by object name
+        using _ObjectType look up table
+        to get the widget type
+        """
 
-        if isinstance(whichWidget, int):
-            if whichWidget in [_Button.PASTE, _Button.COMMANDLINE]:
-                if widget := self.frmCommandLine.itemAt(whichWidget).widget():
-                    return widget
-            else:
-                if widget := self.btnGrid.itemAt(whichWidget).widget():
-                    return widget
-
-        elif isinstance(whichWidget, str):
+        if isinstance(whichWidget, str):
             if objectType := _ObjectType(whichWidget):
                 if widget := self.findChild(objectType, whichWidget):
                     return widget
@@ -770,7 +789,7 @@ class CommandWidget(QWidget):
 
 class _Button:
     """
-    Index of the buttons (Yes COMMANDLINE is not a button)
+    Index of the widgets in respective layout groups
     """
 
     DEFAULTALGORITHM = 5
@@ -815,8 +834,8 @@ def focusIn(widget: QWidget):
 
     if objectName in [
             _ObjectName.btnPaste,
-            _ObjectName.btnAnalysis,
-            _ObjectName.btnClearOutput,
+            _ObjectName.btnAddQueue,
+            _ObjectName.btnStartWorker,
         ]:
 
         widget.setDefault(True)
@@ -827,8 +846,8 @@ def focusOut(widget: QWidget):
 
     if objectName in [
             _ObjectName.btnPaste,
-            _ObjectName.btnAnalysis,
-            _ObjectName.btnClearOutput
+            _ObjectName.btnAddQueue,
+            _ObjectName.btnStartWorker,
         ]:
 
         widget.setDefault(False)
