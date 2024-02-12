@@ -18,6 +18,7 @@
 ### Fixed
 
 - Translation of interface on the fly seems ok now
+- Reset button always disabled
 
 ## <ins>3.0.0b1.dev0 - 2024-01-25</ins>
 
