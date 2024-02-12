@@ -27,8 +27,9 @@ from PySide6.QtGui import(
     QColor,
     QFont,
     QIcon,
-    QPalette,
     QPixmap,
+    QStyleHints,
+    QGuiApplication,
 )
 from PySide6.QtWidgets import (
     QApplication,
@@ -47,7 +48,6 @@ from vsutillib.pyside6 import (
     checkColor,
     darkPalette,
     DualProgressBar,
-    HorizontalLine,
     QActionWidget,
     QActivityIndicator,
     QFormatLabel,
