@@ -182,7 +182,6 @@ class MainWindow(QMainWindow):
         # Log view
         self.logViewer = LogViewerWidget()
 
-        # self.output = None
         # Set output to contain output windows objects
         self.output = OutputWindows(
             self.commandEntry.outputWindow,
