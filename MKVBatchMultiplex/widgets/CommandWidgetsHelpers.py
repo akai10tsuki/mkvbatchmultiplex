@@ -31,7 +31,7 @@ def runAnalysis(**kwargs: str) -> None:
     if output is None:
         if log:
             MODULELOG.error(
-                "[CommandWidgetHelpers.runAnalysis] "
+                "[runAnalysis] "
                 "No output callback function")
         return "No output callback function"
 
@@ -71,15 +71,15 @@ def runAnalysis(**kwargs: str) -> None:
             output.command.emit("\n", {LineOutput.AppendEnd: True})
         else:
             output.command.emit(
-                "No analysis to display.\n",  {LineOutput.AppendEnd: True})
+                "No analysis to display.\n", {LineOutput.AppendEnd: True})
             if log:
-                MODULELOG.error(
-                    "[CommandWidgetHelpers.runAnalysis] "
-                    "No output callback function")
+                MODULELOG.warning(
+                    "[runAnalysis] "
+                    "No analysis to display.")
     else:
         if log:
             MODULELOG.error(
-                "[CommandWidgetHelpers.runAnalysis] "
+                "[runAnalysis] "
                 "wrong parameters.")
 
 
