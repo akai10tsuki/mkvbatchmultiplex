@@ -125,6 +125,7 @@ class ConfigKey:  # pylint: disable=too-few-public-methods
     InterfaceLanguages: ClassVar[str] = "InterfaceLanguages"
     Language: ClassVar[str] = "Language"
     Logging: ClassVar[str] = "Logging"
+    LogWithCaller: ClassVar[str] = "LogWithCaller"
     SimulateRun: ClassVar[str] = "SimulateRun"
     SimulateRunIterations: ClassVar[str] = "SimulateRunIterations"
     SystemDB: ClassVar[str] = "SystemDB"
@@ -208,8 +209,10 @@ def init(
     #
     if FORCELOG:
         data.set(ConfigKey.Logging, True)
+        data.set(ConfigKey.LogWithCaller, True)
 
     data.set(ConfigKey.LogViewer, data.get(ConfigKey.LogViewer) or False)
+    data.set(ConfigKey.LogWithCaller, data.get(ConfigKey.LogWithCaller) or False)
 
     if logFile is None:
         loggingFile = Path(filesPath, LOGFILE)

@@ -524,6 +524,8 @@ class MainWindow(QMainWindow):
     def enableLogging(self, state):
         """Activate logging"""
 
+        QOutputTextWidget.logWithCaller = config.data.get(config.ConfigKey.LogWithCaller)
+
         self.log = state
         self.commandEntry.log = state
         self.jobsOutput.log = state
