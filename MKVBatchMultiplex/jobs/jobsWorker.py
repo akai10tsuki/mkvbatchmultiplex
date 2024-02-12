@@ -159,10 +159,16 @@ def jobsWorker(
 
             dt = datetime.fromtimestamp(job.startTime)
 
-            msg = "*******************\n"
-            msg += "Job ID: {} started at {} using algorithm {}.\n\n".format(
-                job.jobRow[JobKey.ID], dt.isoformat(), algorithm
+            #msg = "*******************\n"
+            #msg += "Job ID: {} started at {} using algorithm {}.\n\n".format(
+            #    job.jobRow[JobKey.ID], dt.isoformat(), algorithm
+            #)
+            msg = (
+                "*******************\n"
+                f"Job ID: {job.jobRow[JobKey.ID]} started at "
+                f"{dt.isoformat()} using algorithm {algorithm}.\n\n"
             )
+
             trayIconMessageSignal.emit(
                 "Information - MKVBatchMultiplex",
                 f"Job ID: {job.jobRow[JobKey.ID]} started.",
@@ -173,9 +179,9 @@ def jobsWorker(
             job.output.append([msg, msgArgs])
             exitStatus = "ended"
 
-            if log:
-                MODULELOG.debug("RJB0005: Job ID: %s started.",
-                                job.jobRow[JobKey.ID])
+            #if log:
+            #    MODULELOG.debug("RJB0005: Job ID: %s started.",
+            #                    job.jobRow[JobKey.ID])
 
             updateStatus = True
 
@@ -229,15 +235,20 @@ def jobsWorker(
                 iVerify.verifyStructure(job.oCommand, index)
 
                 if log:
+                    #msg = (
+                    #    "Command: {}  Base Files: {} "
+                    #    "Source Files: {} Destination File: {}"
+                    #)
+                    #msg = msg.format(
+                    #    cmd,
+                    #    baseFiles,
+                    #    sourceFiles,
+                    #    destinationFile)
                     msg = (
-                        "Command: {}  Base Files: {} "
-                        "Source Files: {} Destination File: {}"
+                        f"Command: {cmd}  Base Files: {baseFiles} "
+                        f"Source Files: {sourceFiles} "
+                        f"Destination File: {destinationFile}"
                     )
-                    msg = msg.format(
-                        cmd,
-                        baseFiles,
-                        sourceFiles,
-                        destinationFile)
                     MODULELOG.debug("RJB0006: %s", msg)
 
                 #
@@ -276,7 +287,8 @@ def jobsWorker(
 
                         msgArgs = {
                             "color": SvgColor.yellowgreen,
-                            "appendEnd": True}
+                            "appendEnd": True,
+                            "log": False}
                         output.job.emit(msg, msgArgs)
                         output.error.emit(
                             msg + "\n", msgArgs
@@ -295,12 +307,17 @@ def jobsWorker(
                     ###
                     # Execute cmd
                     ###
+                    #msg = (
+                    #    "Command: {}\nBaseFiles: {}\n"
+                    #    "Source Files: {}\nDestination Files: {}\n"
+                    #)
+                    #msg = msg.format(cmd, baseFiles, sourceFiles, destinationFile)
                     msg = (
-                        "Command: {}\nBase Files: {}\n"
-                        "Source Files: {}\nDestination Files: {}\n"
+                        f"Command: {cmd}\nBaseFiles: {baseFiles}\n"
+                        f"Source Files: {sourceFiles}\n"
+                        f"Destination Files: {destinationFile}\n"
                     )
-                    msg = msg.format(cmd, baseFiles, sourceFiles, destinationFile)
-                    msgArgs = {"appendEnd": True}
+                    msgArgs = {"appendEnd": True, "log": False}
                     output.job.emit(msg, msgArgs)
 
                     if log:
@@ -322,9 +339,7 @@ def jobsWorker(
                     if not errorOutputOpen:
                         markErrorOutput(job, output, start=True)
                         errorOutputOpen = True
-                    msg = "Destination File: {}\nFailed adjustment\n\n".format(
-                        destinationFile
-                    )
+                    msg = f"Destination File: {destinationFile}\nFailed adjustment\n\n"
                     msgArgs = {"color": SvgColor.red, "appendEnd": True}
                     output.job.emit(msg, msgArgs)
                     job.output.append([msg, msgArgs])
@@ -385,11 +400,9 @@ def jobsWorker(
             msgArgs = {"color": SvgColor.cyan, "appendEnd": True}
             output.job.emit(msg, msgArgs)
             job.output.append([msg, msgArgs])
-            msg = "Job ID: {} {}\nruntime {}"
-            msg = msg.format(
-                job.jobRow[JobKey.ID],
-                exitStatus,
-                strFormatTimeDelta(dtDuration),
+            msg = (
+                f"Job ID: {job.jobRow[JobKey.ID]} {exitStatus}\n"
+                f"runtime {strFormatTimeDelta(dtDuration)}"
             )
             trayIconMessageSignal.emit(
                 "Information - MKVBatchMultiplex",
@@ -403,14 +416,16 @@ def jobsWorker(
             model.dataset.data[job.jobRowNumber][JobKey.Status].obj = job
             if updateStatus:
                 jobsQueue.statusUpdateSignal.emit(job, JobStatus.Done)
-            if log:
-                MODULELOG.debug("RJB0009: Job ID: %s finished.",
-                                job.jobRow[JobKey.ID])
+            #if log:
+            #    MODULELOG.debug("RJB0009: Job ID: %s finished.",
+            #                    job.jobRow[JobKey.ID])
         else:
             totalErrors += 1
             funcProgress.lblSetValue.emit(4, totalErrors)
-            msg = "Job ID: {} cannot execute command.\n\nCommand: {}\n"
-            msg = msg.format(job.jobRow[JobKey.ID], job.oCommand.command)
+            msg = (
+                f"Job ID: {job.jobRow[JobKey.ID]} cannot execute command.\n\n"
+                f"Command: {job.oCommand.command}\n"
+            )
             msgArgs = {"color": SvgColor.red}
             output.error.emit(msg, msgArgs)
             job.errors.append([msg, msgArgs])
@@ -489,15 +504,17 @@ def markErrorOutput(job, output, start=True):
     dt = datetime.fromtimestamp(time())
 
     if start:
-        msg = "---------------------\n"
-        msg += "Messages for Job ID: {} started at {}.\n\n".format(
-            job.jobRow[JobKey.ID], dt.isoformat()
+        msg = (
+            "---------------------\n"
+            f"Messages for Job ID: {job.jobRow[JobKey.ID]} "
+            f"started at {dt.isoformat()}.\n\n"
         )
     else:
-        msg = "Messages for Job ID: {} ended at {}.\n".format(
-            job.jobRow[JobKey.ID], dt.isoformat()
+        msg = (
+            f"Messages for Job ID: {job.jobRow[JobKey.ID]} "
+            f"ended at {dt.isoformat()}.\n"
+            "---------------------\n"
         )
-        msg += "---------------------\n"
 
     msgArgs = {"color": SvgColor.yellow, "appendEnd": True}
     output.error.emit(msg, msgArgs)
