@@ -135,11 +135,14 @@ class MainWindow(QMainWindow):
         if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
             # Running in a pyinstaller bundle
             self.appDirectory = Path(os.path.dirname(__file__)).parent
+            print(f"sys._MEIPASS=attribute={getattr(sys, '_MEIPASS')}");
         elif "__compiled__" in globals():
             # Running in a Nuitka bundle
             self.appDirectory = Path(os.path.dirname(__file__)).parent
         else:
             self.appDirectory = Path(os.path.realpath(__file__)).parent
+
+        print(f"appDirectory={self.appDirectory}")
 
         self.trayIcon = QSystemTrayIconWidget(self, self.windowIcon())
 
@@ -149,7 +152,11 @@ class MainWindow(QMainWindow):
 
         self.controlQueue = deque()
 
-        self.jobsQueue = JobQueue(self, controlQueue=self.controlQueue, appDir=self.appDirectory)
+        self.jobsQueue = JobQueue(
+            self,
+            controlQueue=self.controlQueue,
+            appDir=self.appDirectory
+        )
 
         # mkvmerge executables
 
