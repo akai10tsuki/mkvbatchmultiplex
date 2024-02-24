@@ -27,12 +27,13 @@ from vsutillib.process import isThreadRunning
 from vsutillib.pyside6 import (
     HorizontalLine,
     LineOutput,
+    messageBox,
     QCheckBoxWidget,
     QLabelWidget,
     QOutputTextWidget,
     QPushButtonWidget,
-    messageBox,
-    qtRunFunctionInThread
+    qtRunFunctionInThread,
+    TabWidgetExtension,
 )
 
 from .. import config
@@ -42,7 +43,7 @@ from .CommandWidgetsHelpers import (
     checkFiles,
     runAnalysis,
     showCommands,
-    sourceTree
+    sourceTree,
 )
 from .RenameWidget import RenameWidget
 
@@ -52,7 +53,7 @@ MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
 
 
-class CommandWidget(QWidget):
+class CommandWidget(TabWidgetExtension, QWidget):
     """
     Receives and analyze the command from mkvtoolnix-gui
     """
@@ -67,7 +68,7 @@ class CommandWidget(QWidget):
     cliValidateSignal = Signal(bool)
     clearCommandSignal = Signal()
 
-    # region initialization/
+    # region initialization
 
     def __init__(
             self,
