@@ -1,6 +1,6 @@
 # Changelog
 
-## <ins>3.0.0 - 2024-02-10</ins>
+## <ins>3.0.0 - 2024-02-28</ins>
 
 ### Added
 
@@ -10,6 +10,8 @@
 - MKVToolnix is embedded to help on some Linux distributions that have problems with
   shared library version.
 
+- On Linux MediaInfo is also embedded no need to install it.
+
 ### Changed
 
 - PySide6 has better support for Dark/Light Windows theme now the program will adjust
@@ -17,8 +19,8 @@
 
 ### Fixed
 
-- Translation of interface on the fly seems ok now
-- Reset button always disabled
+- Translation of interface on the fly was not fully working
+- Reset button was always disabled
 
 ## <ins>3.0.0b1.dev0 - 2024-01-25</ins>
 
