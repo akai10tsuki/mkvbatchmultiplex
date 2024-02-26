@@ -28,8 +28,6 @@ from PySide6.QtGui import(
     QFont,
     QIcon,
     QPixmap,
-    QStyleHints,
-    QGuiApplication,
 )
 from PySide6.QtWidgets import (
     QApplication,
@@ -46,7 +44,6 @@ from vsutillib.mkv import getMKVMerge, getMKVMergeEmbedded, getMKVMergeVersion
 from vsutillib.pyside6 import (
     centerWidget,
     checkColor,
-    darkPalette,
     DualProgressBar,
     QActionWidget,
     QActivityIndicator,
@@ -135,19 +132,16 @@ class MainWindow(QMainWindow):
         if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
             # Running in a pyinstaller bundle
             self.appDirectory = Path(os.path.dirname(__file__)).parent
-            print(f"sys._MEIPASS=attribute={getattr(sys, '_MEIPASS')}");
         elif "__compiled__" in globals():
             # Running in a Nuitka bundle
             self.appDirectory = Path(os.path.dirname(__file__)).parent
         else:
             self.appDirectory = Path(os.path.realpath(__file__)).parent
 
-        print(f"appDirectory={self.appDirectory}")
-
         self.trayIcon = QSystemTrayIconWidget(self, self.windowIcon())
 
         self.setPreferences = PreferencesDialogWidget(self)
-        self.translateInterface.addSlot(self.setPreferences.retranslateUi)
+        #self.translateInterface.addFunction(self.setPreferences.retranslateUi)
         self.activitySpinner = QActivityIndicator(self)
 
         self.controlQueue = deque()
@@ -233,10 +227,11 @@ class MainWindow(QMainWindow):
         self.jobsQueue.proxyModel = self.proxyModel
 
         # Translation
-        self.translateInterface.addSlot(self.commandEntry.translate)
-        self.translateInterface.addSlot(self.jobsTableView.translate)
-        self.translateInterface.addSlot(self.rename.translate)
-        self.translateInterface.addSlot(self.tabs.translate)
+        self.translateInterface.addFunction(self.setPreferences.retranslateUi)
+        self.translateInterface.addFunction(self.commandEntry.translate)
+        self.translateInterface.addFunction(self.jobsTableView.translate)
+        self.translateInterface.addFunction(self.rename.translate)
+        self.translateInterface.addFunction(self.tabs.translate)
 
         # Tabs
         tabsList = []
@@ -419,11 +414,11 @@ class MainWindow(QMainWindow):
             triggered=QApplication.aboutQt
         )
 
-        self.translateInterface.addSlot(self.actPreferences.translate)
-        self.translateInterface.addSlot(self.actExit.translate)
-        self.translateInterface.addSlot(self.actAbort.translate)
-        self.translateInterface.addSlot(self.actAbout.translate)
-        self.translateInterface.addSlot(self.actAboutQt.translate)
+        self.translateInterface.addFunction(self.actPreferences.translate)
+        self.translateInterface.addFunction(self.actExit.translate)
+        self.translateInterface.addFunction(self.actAbort.translate)
+        self.translateInterface.addFunction(self.actAbout.translate)
+        self.translateInterface.addFunction(self.actAboutQt.translate)
 
     def createMenus(self) -> None:
         """Create the application menus"""
@@ -452,7 +447,7 @@ class MainWindow(QMainWindow):
         self.fileMenu.addAction(self.actAbort)
 
         menuBar.addMenu(self.fileMenu)
-        self.translateInterface.addSlot(self.fileMenu.translate)
+        self.translateInterface.addFunction(self.fileMenu.translate)
 
         #
         # Help menu
@@ -462,7 +457,7 @@ class MainWindow(QMainWindow):
         self.helpMenu.addAction(self.actAboutQt)
 
         menuBar.addMenu(self.helpMenu)
-        self.translateInterface.addSlot(self.helpMenu.translate)
+        self.translateInterface.addFunction(self.helpMenu.translate)
 
         # Attach menu
         self.setMenuBar(menuBar)
@@ -486,7 +481,6 @@ class MainWindow(QMainWindow):
     # endregion Interface
 
     # region Configuration
-
     def configuration(self, action: str) -> None:
         """
         Read/Write configuration
@@ -553,7 +547,7 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle(_(Text.txt0001))
 
-        self.translateInterface.signal()
+        self.translateInterface.emitSignal()
 
     def setAppFont(self, font):
         """
