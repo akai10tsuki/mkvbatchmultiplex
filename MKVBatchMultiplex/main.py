@@ -19,6 +19,7 @@ from typing import Optional
 from PySide6.QtCore import (
     QByteArray,
     QEvent,
+    QObject,
     Qt,
     Signal,
     Slot,
@@ -31,10 +32,14 @@ from PySide6.QtGui import(
 )
 from PySide6.QtWidgets import (
     QApplication,
+    QDialog,
+    QLabel,
     QMainWindow,
+    QMenu,
     QMenuBar,
     QMessageBox,
     QStatusBar,
+    QSystemTrayIcon,
     QToolTip,
     QVBoxLayout,
     QWidget,
@@ -60,7 +65,12 @@ from vsutillib.pyside6 import (
 from . import config
 from .dataset import TableData, tableHeaders
 from .jobs import JobQueue
-from .models import TableProxyModel, JobsTableModel
+from .models import (
+    TableProxyModel,
+    JobsTableModel,
+    TableModel,
+    TableProxyModel,
+)
 from .utils import (
     icons,
     configMessagesCatalog,
@@ -94,13 +104,13 @@ class MainWindow(QMainWindow):
     def __init__(self, parent: Optional[QWidget] = None) -> None:
         super().__init__(parent)
 
-        self.parent = parent
+        self.parent: QWidget = parent
 
         self.setWindowIcon(QIcon(QPixmap(":/images/Itsue256x256.png")))
 
         # Language setup has to be early so _() is defined
-        self.translateInterface = Translate()
-        self.uiTranslateInterface = UiSetMessagesCatalog(self)
+        self.translateInterface: QObject = Translate()
+        self.uiTranslateInterface: UiSetMessagesCatalog = UiSetMessagesCatalog(self)
         configMessagesCatalog(self)
 
         self._initVars()
@@ -126,27 +136,27 @@ class MainWindow(QMainWindow):
         # Where am I running from
         #
 
-        self.log = False
+        self.log: bool = False
 
         # if getattr(sys, "frozen", False):
         if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
             # Running in a pyinstaller bundle
-            self.appDirectory = Path(os.path.dirname(__file__)).parent
+            self.appDirectory: Path = Path(os.path.dirname(__file__)).parent
         elif "__compiled__" in globals():
             # Running in a Nuitka bundle
-            self.appDirectory = Path(os.path.dirname(__file__)).parent
+            self.appDirectory: Path = Path(os.path.dirname(__file__)).parent
         else:
-            self.appDirectory = Path(os.path.realpath(__file__)).parent
+            self.appDirectory: Path = Path(os.path.realpath(__file__)).parent
 
-        self.trayIcon = QSystemTrayIconWidget(self, self.windowIcon())
+        self.trayIcon: QSystemTrayIcon = QSystemTrayIconWidget(self, self.windowIcon())
 
-        self.setPreferences = PreferencesDialogWidget(self)
+        self.setPreferences: QDialog = PreferencesDialogWidget(self)
         #self.translateInterface.addFunction(self.setPreferences.retranslateUi)
-        self.activitySpinner = QActivityIndicator(self)
+        self.activitySpinner: QWidget = QActivityIndicator(self)
 
-        self.controlQueue = deque()
+        self.controlQueue: deque = deque()
 
-        self.jobsQueue = JobQueue(
+        self.jobsQueue: QObject = JobQueue(
             self,
             controlQueue=self.controlQueue,
             appDir=self.appDirectory
@@ -154,24 +164,26 @@ class MainWindow(QMainWindow):
 
         # mkvmerge executables
 
-        self.mkvmerge = getMKVMerge()
-        self.mkvmergeEmbedded = getMKVMergeEmbedded(self.appDirectory)
+        self.mkvmerge: Path = getMKVMerge()
+        self.mkvmergeEmbedded: Path = getMKVMergeEmbedded(self.appDirectory)
 
         # Model view
-        headers = tableHeaders()
-        self.tableData = TableData(headerList=headers, dataList=[])
-        self.model = JobsTableModel(self.tableData, self.jobsQueue)
-        self.proxyModel = TableProxyModel(self.model)
+        headers: list[list] = tableHeaders()
+        self.tableData: TableData = TableData(headerList=headers, dataList=[])
+        self.model: TableModel = JobsTableModel(self.tableData, self.jobsQueue)
+        self.proxyModel: TableProxyModel = TableProxyModel(self.model)
 
         # renameWidget is referenced in CommandWidget
-        self.rename = RenameWidget(self)
+        self.rename: QWidget = RenameWidget(self)
 
-        self.commandEntry = CommandWidget(self, self.proxyModel, self.rename)
-        self.jobsOutput = JobsOutputWidget(self)
-        self.errorOutput = JobsOutputErrorsWidget(self, log=False)
+        self.commandEntry: QWidget = CommandWidget(
+            self, self.proxyModel, self.rename
+        )
+        self.jobsOutput: QWidget = JobsOutputWidget(self)
+        self.errorOutput: QWidget = JobsOutputErrorsWidget(self, log=False)
 
         # Widgets for tabs
-        self.jobsTableView = JobsTableViewWidget(
+        self.jobsTableView: QWidget = JobsTableViewWidget(
             self, self.proxyModel, self.controlQueue, _(Text.txt0130)
         )
 
@@ -181,26 +193,26 @@ class MainWindow(QMainWindow):
         # self.historyWidget.tableView.sortByColumn(0, Qt.DescendingOrder)
 
         # Log view
-        self.logViewer = LogViewerWidget()
+        self.logViewer: QWidget = LogViewerWidget()
 
         # Set output to contain output windows objects
-        self.output = OutputWindows(
+        self.output: OutputWindows = OutputWindows(
             self.commandEntry.outputWindow,
             self.jobsOutput,
             self.errorOutput,
         )
 
-        self.tabs = TabWidget(self)
+        self.tabs: TabWidget = TabWidget(self)
 
         # Progress information setup
-        self.progressBar = DualProgressBar(self, align=Qt.Horizontal)
-        self.jobsLabel = QFormatLabel(
+        self.progressBar: QWidget = DualProgressBar(self, align=Qt.Horizontal)
+        self.jobsLabel: QLabel = QFormatLabel(
             Text.txt0085,
             init=[0, 0, 0, 0, 0],
         )
-        self.progress = Progress(self, self.progressBar, self.jobsLabel)
+        self.progress: Progress = Progress(self, self.progressBar, self.jobsLabel)
 
-        self.progressSpin = QProgressIndicator(self)
+        self.progressSpin: QWidget = QProgressIndicator(self)
 
     def _initHelper(self) -> None:
         # work in progress spin
@@ -315,7 +327,7 @@ class MainWindow(QMainWindow):
         #    self.commandWidget.updateAlgorithm
         #)
 
-    def _initUI(self):
+    def _initUI(self) -> None:
 
         # Create Widgets
         widget = QWidget()
@@ -351,7 +363,7 @@ class MainWindow(QMainWindow):
 
     # region Overrides
 
-    def setVisible(self, visible):
+    def setVisible(self, visible: bool) -> None:
         """ Override setVisible """
 
         self.trayIcon.setMenuEnabled(visible)
@@ -423,12 +435,12 @@ class MainWindow(QMainWindow):
     def createMenus(self) -> None:
         """Create the application menus"""
 
-        menuBar = QMenuBar()
+        menuBar: QMenuBar = QMenuBar()
 
         #
         # File menu
         #
-        self.fileMenu = QMenuWidget(Text.txt0020)
+        self.fileMenu: QMenu = QMenuWidget(Text.txt0020)
 
         #self.fileMenu.setStyleSheet(
         #    """
@@ -452,7 +464,7 @@ class MainWindow(QMainWindow):
         #
         # Help menu
         #
-        self.helpMenu = QMenuWidget(Text.txt0060)
+        self.helpMenu: QMenu = QMenuWidget(Text.txt0060)
         self.helpMenu.addAction(self.actAbout)
         self.helpMenu.addAction(self.actAboutQt)
 
