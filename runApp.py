@@ -6,7 +6,7 @@ from MKVBatchMultiplex import mainApp
 
 def main():
     """
-    Entry point for jobsTable
+    Entry point for application
     """
 
     mainApp()

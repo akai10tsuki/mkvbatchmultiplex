@@ -2,13 +2,15 @@
 
 
 
-[![image](https://img.shields.io/pypi/v/mkvbatchmultiplex.svg)](https://pypi.org/project/mkvbatchmultiplex) [![image](https://img.shields.io/pypi/pyversions/mkvbatchmultiplex.svg)](https://pypi.org/project/mkvbatchmultiplex) [![image](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)  [![Documentation Status](https://readthedocs.org/projects/mkvbatchmultiplex/badge/?version=latest)](https://mkvbatchmultiplex.readthedocs.io/en/latest/?badge=latest)
+[![image](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
 
-Re-start the development.
 
-This project went into a heavy rewrite for version 3. Working on some
-issues expect to start releases the weekend of 01/27/2024. The only
-major changes are the use of Python 3.12 and PySide6.
+Changes since version 2.0.0
+
+- The applications has been ported to [Python 3.12](https://www.python.org/downloads/release/python-3120/) and [PySide6](https://doc.qt.io/qtforpython-6/).
+- Added option to compute the CRC-32 of the output files and add it to the end of the file name.
+- [MKVToolnix](https://mkvtoolnix.download/) is now embedded to help with the Linux .version
+- [MediaInfo](https://mediaarea.net/en/MediaInfo) is now also embedded. [Pymediainfo](https://pymediainfo.readthedocs.io/en/stable/) was providing the library for Windows in the more recent versions of the package.
 
 ## Description
 
@@ -58,7 +60,7 @@ python setup.py generate_catalog
 > -   [MediaInfo](https://mediaarea.net/en/MediaInfo) tested with
 >     versions 17.10-\>23.11.1
 > -   [MKVToolNix](https://mkvtoolnix.download/) tested with versions
->     17.00-\>51.0.0
+>     17.00-\>82.0.0
 
 ## Usage
 
@@ -147,5 +149,3 @@ forseeable future.
 
 If the the program generates any interest any further changes and
 additions will **also** depend on user base needs.
-
-See <https://mkvbatchmultiplex.readthedocs.io> for more information.

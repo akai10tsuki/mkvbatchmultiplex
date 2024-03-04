@@ -1,0 +1,415 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Changelog &mdash; mkvbatchmultiplex 2.1.0b1.dev5 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Contributing to MKVBatchMultiplex" href="CONTRIBUTING.html" />
+    <link rel="prev" title="Using mkvbatchmultiplex" href="using.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> mkvbatchmultiplex
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">mkvbatchmultiplex Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gettingstarted.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="using.html">Using mkvbatchmultiplex</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#unreleased">(Unreleased)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#a1-dev4-2021-01-10">2.1.0a1.dev4 - 2021-01-10</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#added">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#changed">Changed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fixed">Fixed</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#a1-dev3-2020-12-16">2.1.0a1.dev3 - 2020-12-16</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">Changed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">Fixed</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#b1-dev2-2020-10-1">2.1.0b1.dev2 - 2020-10-1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#a1-dev1-2020-9-16">2.1.0a1.dev1 - 2020-9-16</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id4">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">Changed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id6">Fixed</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id7">2.0.0 - 2000-8-23</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id8">Changed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id9">Fixed</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#b1-2020-8-8">2.0.0b1 - 2020-8-8</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id10">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id11">Changed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id12">Fixed</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#a1-2019-12-5">2.0.0a1 - 2019-12-5</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="CONTRIBUTING.html">Contributing to MKVBatchMultiplex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CODE_OF_CONDUCT.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgements.html">Acknowledgements</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">mkvbatchmultiplex</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Changelog</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="changelog">
+<h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="unreleased">
+<h2>(Unreleased)<a class="headerlink" href="#unreleased" title="Permalink to this headline">¶</a></h2>
+<p>New Save Jobs tab ready for first release.  This is useful for saving test jobs.
+Also repetitive Jobs when source files stay on same location and go through
+modifications up to a final release.  Don’t have to use mkvtoolix-gui for each
+iteration.</p>
+</div>
+<div class="section" id="a1-dev4-2021-01-10">
+<h2>2.1.0a1.dev4 - 2021-01-10<a class="headerlink" href="#a1-dev4-2021-01-10" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="added">
+<h3>Added<a class="headerlink" href="#added" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Save Jobs tab to work with saved Jobs can be activated in Preferences</p></li>
+<li><p>Option to save jobs with context menu on Jobs Table</p></li>
+</ul>
+</div>
+<div class="section" id="changed">
+<h3>Changed<a class="headerlink" href="#changed" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="fixed">
+<h3>Fixed<a class="headerlink" href="#fixed" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>BUG #10 Algorithm 1 and 2 failed with external subs files
+- Subs using UTF-8 with BOM don’t generate track information on situations
+where the subs have file with and without BOM structure test failed</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="a1-dev3-2020-12-16">
+<h2>2.1.0a1.dev3 - 2020-12-16<a class="headerlink" href="#a1-dev3-2020-12-16" title="Permalink to this headline">¶</a></h2>
+<p>Started working on request to save Jobs in order to reschedule it.</p>
+<div class="section" id="id1">
+<h3>Added<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>new jobs history tab</p></li>
+</ul>
+</div>
+<div class="section" id="id2">
+<h3>Changed<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Algorithm 1</strong> changed when comparing tracks for substitution and
+<strong>only one</strong> track is needed.  If for a particular type (Video, Audio, Text)
+<strong>only one</strong> track exits if the language in the comparison has one as
+undetermined the track will be selected. This occurrence is quite common
+on the target cases trying to solve.  This of course is valid for
+<strong>Algorithm 2</strong>.  The language will be set as in the base source.</p></li>
+<li><p>Better handling of files with special characters</p></li>
+</ul>
+</div>
+<div class="section" id="id3">
+<h3>Fixed<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Fix BUG #7 “Remove” in context menu on Jobs Table was not working</p></li>
+<li><p>Fix BUG #8 Problem handling tracks titles</p></li>
+<li><p>menu items status tip was not working</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="b1-dev2-2020-10-1">
+<h2>2.1.0b1.dev2 - 2020-10-1<a class="headerlink" href="#b1-dev2-2020-10-1" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Jobs were executed even when removed from the Jobs Table via context menu</p></li>
+</ul>
+</div>
+<div class="section" id="a1-dev1-2020-9-16">
+<h2>2.1.0a1.dev1 - 2020-9-16<a class="headerlink" href="#a1-dev1-2020-9-16" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id4">
+<h3>Added<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>New algorithms:</p>
+<ul>
+<li><p><strong>Algorithm 0</strong> current behavior the resulting file will have the same
+structure as the destination file on the command line.  Any difference in
+structure of the files the command will not execute.  The resulting file is
+very likely to be the expected result as specified on the command line.
+Random checks  will be sufficient.</p></li>
+<li><p><strong>Algorithm 1</strong> will try to find the tracks that best matches the base file
+and adjust the command accordingly. Any track not used in the command will
+be ignored. If no suitable track found no command will execute. Resulting
+file structure if the save as in the command line but is not as likely to be
+the desired file as in Algorithm 0.  Flagged files should be checked.</p></li>
+<li><p><strong>Algorithm 2</strong> if Algorithm 1 fails tracks without match will be ignored
+and and the command still will execute.  The resulting file will not be like
+the destination file in the original command.  It may even be unusable.  Any
+flagged has to be check to see if is usable.</p></li>
+</ul>
+</li>
+<li><p>Synchronized scroll in Rename tab (<strong>Original Names:</strong> with <strong>Rename to:</strong>
+text boxes)</p></li>
+<li><p>Add support for one track file multiplexing,  this is usually done for
+subtitles (mks) files. The program will accept commands with only one track
+one source.  The destination file will have correct extension mkv, mka or mks.</p></li>
+</ul>
+</div>
+<div class="section" id="id5">
+<h3>Changed<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="id6">
+<h3>Fixed<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Don’t count bad structure match for unused tracks</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="id7">
+<h2>2.0.0 - 2000-8-23<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id8">
+<h3>Changed<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>locale updates</p></li>
+<li><p>Check Files displays files read from the source directory.  Also the contents
+of the destination directory for debug purposes.</p></li>
+</ul>
+</div>
+<div class="section" id="id9">
+<h3>Fixed<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>python wheel distribution not working</p></li>
+<li><p>system tray icon not showing on macOS</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="b1-2020-8-8">
+<h2>2.0.0b1 - 2020-8-8<a class="headerlink" href="#b1-2020-8-8" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id10">
+<h3>Added<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>show progress bar on Windows taskbar icon</p></li>
+<li><p>view log on optional tab</p></li>
+</ul>
+</div>
+<div class="section" id="id11">
+<h3>Changed<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>configuration now is a dialog for better compatibility with macOS</p></li>
+<li><p>use natural sort when reading directories</p></li>
+</ul>
+</div>
+<div class="section" id="id12">
+<h3>Fixed<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Fix BUG #1 force escape quotes for mkvmerge executable in Windows</p></li>
+<li><p>Fix BUG #3 title of first episode propagating to all episodes</p></li>
+<li><p>dummy progress bar icon function on macOS was not working</p></li>
+<li><p>removing configuration elements not always working</p></li>
+<li><p>spanish locale fixes</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="a1-2019-12-5">
+<h2>2.0.0a1 - 2019-12-5<a class="headerlink" href="#a1-2019-12-5" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>First release version 2.0</p></li>
+<li><p>Re-write of MKVBatchMultiplex</p></li>
+<li><p>Use a dark theme on Windows 10</p></li>
+<li><p>Add rename for output files</p></li>
+<li><p>Jobs table with jobs management</p></li>
+<li><p>Add Spanish Interface</p></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="CONTRIBUTING.html" class="btn btn-neutral float-right" title="Contributing to MKVBatchMultiplex" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="using.html" class="btn btn-neutral float-left" title="Using mkvbatchmultiplex" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2018-2020, Efrain Vergara
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

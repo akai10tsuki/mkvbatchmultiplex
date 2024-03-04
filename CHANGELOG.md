@@ -1,5 +1,26 @@
 # Changelog
 
+## <ins>3.0.0 - 2024-02-28</ins>
+
+### Added
+
+- On rename tab dropping files in the Original files box you can rename and
+  add CRC labels to files in the system
+
+- MKVToolnix is embedded to help on some Linux distributions that have problems with
+  shared library version.
+
+- On Linux MediaInfo is also embedded no need to install it.
+
+### Changed
+
+- PySide6 has better support for Dark/Light Windows theme now the program will adjust
+  to use a light or dark mode following the OS setup.
+
+### Fixed
+
+- Translation of interface on the fly was not fully working
+- Reset button was always disabled
 
 ## <ins>3.0.0b1.dev0 - 2024-01-25</ins>
 
@@ -111,7 +132,7 @@ Started working on request to save Jobs in order to reschedule it.
 ### Changed
 
 - locale updates
-- Check Files displays files read from the source directory. Also the  contents of the 
+- Check Files displays files read from the source directory. Also the  contents of the
   destination directory for debug purposes.
 
 ### Fixed

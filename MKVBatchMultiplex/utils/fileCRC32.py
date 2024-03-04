@@ -33,9 +33,9 @@ def computeCRC32(**kwargs: str) -> None:
             output.command.emit(msg,
                                 {LineOutput.AppendEnd: True})
             if log:
-                    MODULELOG.debug(
-                        "File: %s -> Renamed: %s",
-                        str(fileName), newName)
+                MODULELOG.debug(
+                    "File: %s -> Renamed: %s",
+                    str(fileName), newName)
         else:
             output.command.emit(f"Problem adding CRC to file:\n{fileName}\n",
                                 {LineOutput.AppendEnd: True})

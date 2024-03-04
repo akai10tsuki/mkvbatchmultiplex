@@ -106,3 +106,11 @@ def tableHistoryHeaders():
     ]
 
     return data
+
+
+# This if for Pylance _() is not defined
+def _(dummy):
+    return dummy
+
+
+del _

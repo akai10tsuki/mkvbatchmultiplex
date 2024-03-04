@@ -2,7 +2,7 @@ r"""
 Configuration system
 """
 
-# CFGG005
+# Logging 005
 
 import logging
 import os
@@ -18,7 +18,7 @@ from vsutillib.files import ConfigurationSettings
 from vsutillib.log import LogRotateFileHandler
 from vsutillib.pyside6 import QSignalLogHandler
 
-__VERSION__: tuple = (3, 0, "0b1", "dev0")
+__VERSION__: tuple = (3, 0, "0b2", "dev0")
 __version__: str = ".".join(map(str, __VERSION__))
 
 APPNAME: str = "MKVBatchMultiplex"
@@ -109,7 +109,7 @@ class Action:
 class CheckBoxState:
 
     UnChecked: ClassVar[int] = 0
-    NoChaneg: ClassVar[int] = 1
+    NoChange: ClassVar[int] = 1
     Checked: ClassVar[int] = 2
 
 class ConfigKey:  # pylint: disable=too-few-public-methods
@@ -125,7 +125,9 @@ class ConfigKey:  # pylint: disable=too-few-public-methods
     InterfaceLanguages: ClassVar[str] = "InterfaceLanguages"
     Language: ClassVar[str] = "Language"
     Logging: ClassVar[str] = "Logging"
+    LogWithCaller: ClassVar[str] = "LogWithCaller"
     SimulateRun: ClassVar[str] = "SimulateRun"
+    SimulateRunIterations: ClassVar[str] = "SimulateRunIterations"
     SystemDB: ClassVar[str] = "SystemDB"
     SystemFont: ClassVar[str] = "SystemFont"
 
@@ -145,6 +147,7 @@ class ConfigKey:  # pylint: disable=too-few-public-methods
     Tab: ClassVar[str] = "Tab"
     TabText: ClassVar[str] = "TabText"
     TextSuffix: ClassVar[str] = "TextSuffix"
+    UseEmbedded: ClassVar[str] = "UseEmbedded"
 
 
 class Key:
@@ -178,7 +181,7 @@ def init(
         **name** (str, optional): name of application. Defaults to
         [MKVBatchMultiplex].
 
-        **version** (str, optional): appplication version . Defaults to
+        **version** (str, optional): application version . Defaults to
         [vsutillib version].
     """
 
@@ -206,21 +209,24 @@ def init(
     #
     if FORCELOG:
         data.set(ConfigKey.Logging, True)
+        data.set(ConfigKey.LogWithCaller, True)
 
     data.set(ConfigKey.LogViewer, data.get(ConfigKey.LogViewer) or False)
+    data.set(ConfigKey.LogWithCaller, data.get(ConfigKey.LogWithCaller) or False)
 
     if logFile is None:
         loggingFile = Path(filesPath, LOGFILE)
     else:
         loggingFile = Path(filesPath, logFile)
 
-    loghandler = LogRotateFileHandler(
+    logHandler = LogRotateFileHandler(
         loggingFile, backupCount=10, encoding="utf-8")
     formatter = logging.Formatter(
         "%(asctime)s %(levelname)-8s %(name)s %(message)s")
-    loghandler.setFormatter(formatter)
+    logHandler.setFormatter(formatter)
+    # logViewer will be use with LogViewerWidget
     logViewer.setFormatter(formatter)
-    logging.getLogger("").addHandler(loghandler)
+    logging.getLogger("").addHandler(logHandler)
     logging.getLogger("").addHandler(logViewer)
     logging.getLogger("").setLevel(logging.DEBUG)
 
@@ -290,8 +296,15 @@ def init(
         ),
     )
 
+    data.set(ConfigKey.UseEmbedded,
+             data.get(ConfigKey.UseEmbedded) or False)
+
+    # For fast testing of interface
+    data.set(ConfigKey.SimulateRun, True)
+    data.set(ConfigKey.SimulateRunIterations, 500)
+
     #
-    # Temporalily disable uncomment statements
+    # Temporarily disable uncomment statements
     #
     # data.set(ConfigKey.JobHistoryDisabled, True)
     # data.set(ConfigKey.JobHistory, False)

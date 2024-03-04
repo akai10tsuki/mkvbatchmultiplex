@@ -5,8 +5,10 @@
 
 import copy
 import logging
+
 from collections import deque
 from datetime import datetime
+from pathlib import Path
 from time import time
 from typing import Optional
 
@@ -48,6 +50,7 @@ class JobInfo:  # pylint: disable=too-many-instance-attributes
         algorithm: Optional[int] = None,
         errors: Optional[list] = None,
         output: Optional[list] = None,
+        appDir: Optional[Path] = None,
         log: Optional[bool] = False
     ) -> None:
 
@@ -59,7 +62,13 @@ class JobInfo:  # pylint: disable=too-many-instance-attributes
         )
         if (not self.oCommand) or (not self.oCommand.command):
             command = tableModel.dataset[jobRowNumber, JobKey.Command]
-            self.oCommand = MKVCommandParser(command, log=log)
+            # TODO: check this code more carefully
+            useEmbedded = config.data.get(config.ConfigKey.UseEmbedded)
+            self.oCommand = MKVCommandParser(
+                command,
+                appDir=appDir,
+                useEmbedded=useEmbedded,
+                log=log)
             if log:
                 MODULELOG.debug(
                     "JBQ0001: Job %s- Bad MKVCommandParser object.", jobRow[JobKey.ID]
@@ -129,7 +138,7 @@ class JobQueue(QObject):
         Some status conditions are routed through here to Stop, Skip or Abort Jobs.
         Defaults to None.
 
-        **log** (bool, optional): Logging can be cotrolled using this parameter.
+        **log** (bool, optional): Logging can be controlled using this parameter.
         Defaults to None.
     """
 
@@ -153,6 +162,7 @@ class JobQueue(QObject):
         funcProgress=None,
         jobWorkQueue=None,
         controlQueue=None,
+        appDir=None,
         log=None,
     ):
         super(JobQueue, self).__init__(parent)
@@ -166,6 +176,7 @@ class JobQueue(QObject):
         self.proxyModel = proxyModel
         self.progress = funcProgress
         self.controlQueue = controlQueue
+        self.appDir = appDir
 
         if jobWorkQueue is None:
             self._workQueue = deque()
@@ -307,17 +318,13 @@ class JobQueue(QObject):
             bool: True if append successful False otherwise
         """
 
-        status = self.model.dataset[
-            jobRow,
-        ][JobKey.Status]
+        status = self.model.dataset[jobRow, ][JobKey.Status]
         if status != JobStatus.AddToQueue:
             if status == JobStatus.Waiting:
                 self.addWaitingItemSignal.emit()
             return False
 
-        jobID = self.model.dataset[
-            jobRow,
-        ][JobKey.ID]
+        jobID = self.model.dataset[jobRow, ][JobKey.ID]
 
         jobIndex = self.model.index(jobRow, JobKey.ID)
 
@@ -333,6 +340,7 @@ class JobQueue(QObject):
             ],
             self.model,
             algorithm=algorithm,
+            appDir=self.appDir,
             log=self.log,
         )
 

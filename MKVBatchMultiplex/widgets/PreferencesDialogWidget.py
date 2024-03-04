@@ -42,7 +42,7 @@ class PreferencesDialogWidget(QDialog):
 
     def _initUI(self):
         """
-        Initialize widget members with systemconfiguration for the elements
+        Initialize widget members with systemConfiguration for the elements
         """
         #
         # Interface Language
@@ -104,13 +104,23 @@ class PreferencesDialogWidget(QDialog):
             else:
                 self.ui.chkBoxComputeCRC.setChecked(False)
 
+        #
+        # Use embedded mkvmerge
+        #
+        if config.data.get(config.ConfigKey.UseEmbedded) is not None:
+            useEmbedded = config.data.get(config.ConfigKey.UseEmbedded)
+            if (useEmbedded == 2):
+                self.ui.chkBoxUseEmbedded.setChecked(True)
+            else:
+                self.ui.chkBoxUseEmbedded.setChecked(False)
+
 
 
         # region History
         #
         # Enable History
         #
-        # Temporalily disable History
+        # Temporarily disable History
         #
         #if config.data.get(config.ConfigKey.JobHistoryDisabled):
         #    self.ui.chkBoxEnableJobHistory.setEnabled(False)
@@ -132,6 +142,7 @@ class PreferencesDialogWidget(QDialog):
         # Restore Windows Size
         #
         self.ui.chkBoxRestoreWindowSize.setChecked(False)
+
         #
         # Algorithm
         #
@@ -173,6 +184,13 @@ class PreferencesDialogWidget(QDialog):
         #
         self.ui.chkBoxComputeCRC.stateChanged.connect(
             self.__pref.enableCRCComputeStateChanged
+        )
+
+        #
+        # useEmbedded
+        #
+        self.ui.chkBoxUseEmbedded.stateChanged.connect(
+            self.__pref.useEmbeddedStateChange
         )
 
         #
@@ -248,7 +266,7 @@ class PreferencesDialogWidget(QDialog):
             if self.preferences.language is not None:
                 config.data.set(config.ConfigKey.Language,
                                 self.preferences.language)
-                self.translateInterfaceSignal.emit()
+                self.parent.translate()
             #
             # Font & Size
             #
@@ -275,7 +293,6 @@ class PreferencesDialogWidget(QDialog):
                     config.ConfigKey.Logging, self.preferences.enableLogging
                 )
                 self.parent.enableLogging(self.preferences.enableLogging)
-
             #
             # LogViewer
             #
@@ -307,6 +324,15 @@ class PreferencesDialogWidget(QDialog):
                     else:
                         config.data.set(config.ConfigKey.CRC32, 0)
                     self.stateChangedCRC.emit()
+            #
+            # useEmbedded
+            #
+            if self.preferences.useEmbedded is not None:
+                if config.data.get(config.ConfigKey.UseEmbedded) is not None:
+                    if self.preferences.useEmbedded:
+                        config.data.set(config.ConfigKey.UseEmbedded, 2)
+                    else:
+                        config.data.set(config.ConfigKey.UseEmbedded, 0)
 
             #
             # Job History
@@ -382,6 +408,7 @@ class Preferences(QObject):
         self.fontSize = None
         self.language = None
         self.restoreWindowSize = None
+        self.useEmbedded = None
         self.__changedData = False
 
     def __bool__(self):
@@ -395,7 +422,6 @@ class Preferences(QObject):
         Args:
             index (int): index in language combo box
         """
-
         language = self.parent.ui.cmbBoxInterfaceLanguage.itemText(index)
         if language:
             languageDictionary = config.data.get(
@@ -448,6 +474,12 @@ class Preferences(QObject):
     #    self.enableJobHistory = bool(value)
     #    if not self.__changedData:
     #        self.__changedData = True
+
+    @Slot(int)
+    def useEmbeddedStateChange(self, value):
+        self.useEmbedded = bool(value)
+        if not self.__changedData:
+            self.__changedData = True
 
     @Slot(int)
     def restoreWindowSizeStateChanged(self, value):

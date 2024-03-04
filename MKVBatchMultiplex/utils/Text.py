@@ -54,6 +54,7 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0065 = S_("Show the application's About box")
     txt0066 = S_("Show the Qt library's About box")
     txt0067 = S_("MKVMERGE")
+    txt0068 = S_("MKVMERGE Embedded")
 
     # Dialogs & others
     # 80
@@ -169,6 +170,8 @@ class Text:  # pylint: disable=too-few-public-methods
     txt0212 = S_("Clear")
     txt0213 = S_("Clear names start over")
     txt0214 = S_("Invalid regex")
+    txt0215 = S_("Calculate CRC")
+    txt0216 = S_("Calculate the CRC 32 for the files")
 
 
     # JobHistoryWidget

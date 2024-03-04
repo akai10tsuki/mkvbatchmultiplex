@@ -2,6 +2,7 @@
 JobsTableWidget
 """
 
+# region imports
 import logging
 
 # try:
@@ -11,7 +12,7 @@ import logging
 # import zlib
 
 
-from PySide6.QtCore import Qt, Slot
+from PySide6.QtCore import Qt, Signal, Slot
 from PySide6.QtWidgets import (
     QWidget,
     QHBoxLayout,
@@ -29,6 +30,7 @@ from ..delegates import StatusComboBoxDelegate
 from ..utils import Text, yesNoDialog
 
 from .JobsTableView import JobsTableView
+# endregion imports
 
 MODULELOG = logging.getLogger(__name__)
 MODULELOG.addHandler(logging.NullHandler())
@@ -46,8 +48,12 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
     # Class logging state
     __log = False
 
-    def __init__(self, parent, proxyModel, controlQueue, title=None, log=None):
-        super(JobsTableViewWidget, self).__init__(parent=parent, tabWidgetChild=self)
+    # signals
+    jobRemovedSignal = Signal()
+
+    # region initialization
+    def __init__(self, parent, proxyModel, controlQueue, title=None, appDir=None, log=None):
+        super().__init__(parent=parent)
 
         self.__output = None
         self.__log = None
@@ -57,7 +63,8 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
         self.proxyModel = proxyModel
         self.model = proxyModel.sourceModel()
         self.controlQueue = controlQueue
-        self.tableView = JobsTableView(self, proxyModel, title)
+        self.appDir = appDir
+        self.tableView = JobsTableView(self, proxyModel, title, appDir=appDir)
         self.delegates = {}
 
         self._initUI(title)
@@ -167,6 +174,7 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
         self.parent.jobsQueue.runJobs.finishedSignal.connect(
             lambda: self.jobStatus(False)
         )
+        #self.tableView.jobRemovedSignal.connect()
 
         # Default button state
         self.btnGrid.itemAt(_Button.ADDWAITING).widget().setEnabled(False)
@@ -174,7 +182,9 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
         self.btnGrid.itemAt(_Button.CLEARQUEUE).widget().setEnabled(False)
         self.btnGrid.itemAt(_Button.ABORTCURRENTJOB).widget().setEnabled(False)
         self.btnGrid.itemAt(_Button.ABORTJOBS).widget().setEnabled(False)
+    # endregion initialization
 
+    # region Logging setup
     @classmethod
     def classLog(cls, setLogging=None):
         """
@@ -220,7 +230,9 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
         """set instance log variable"""
         if isinstance(value, bool) or value is None:
             self.__log = value
+    # endregion Logging setup
 
+    # region properties
     @property
     def output(self):
         return self.__output
@@ -228,6 +240,18 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
     @output.setter
     def output(self, value):
         self.__output = value
+
+    @property
+    def hasWaitingStatus(self):
+        return hasWaitingStatus(self.model)
+
+    @property
+    def hasQueueStatus(self):
+        return hasQueueStatus(self.model)
+    # endregion properties
+
+    #def hasWaitingStatus(self):
+    #    return hasWaitingStatus(self.model)
 
     def abortCurrentJob(self):
         self.controlQueue.append(JobStatus.AbortJob)
@@ -276,7 +300,7 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
             # else:
             #    print("Nothing here")
 
-    def setLanguage(self):
+    def translate(self):
         """
         setLanguage set labels according to locale
         """
@@ -284,7 +308,7 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
         for index in range(self.btnGrid.count()):
             widget = self.btnGrid.itemAt(index).widget()
             if isinstance(widget, QPushButtonWidget):
-                widget.setLanguage()
+                widget.translate()
                 # widget.setText("  " + _(widget.originalText) + "  ")
                 # widget.setToolTip(_(widget.toolTip))
 
@@ -332,7 +356,7 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
     def jobAddWaitingState(self):
 
         self.btnGrid.itemAt(_Button.ADDWAITING).widget().setEnabled(
-            hasWaiting(self.model)
+            hasWaitingStatus(self.model)
         )
 
     @Slot(bool)
@@ -369,8 +393,37 @@ class JobsTableViewWidget(TabWidgetExtension, QWidget):
         if rowStatus == JobStatus.Abort:
             self.controlQueue.append(JobStatus.AbortJob)
 
+    @Slot()
+    def jobStatusCheck(self):
+        if self.hasWaitingStatus:
+            self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(False)
+        else:
+            self.btnGrid.itemAt(_Button.STARTQUEUE).widget().setEnabled(True)
 
-def hasWaiting(model):
+    def checkButtonsState(self):
+
+        # Status of Start Worker button
+        if checkForStatus(self.model, JobStatus.Queue):
+            self.jobStartQueueState(True)
+        else:
+            self.jobStartQueueState(False)
+
+        # Status of Clear Queue button
+        if checkForStatus(self.model, JobStatus.Queue):
+            self.jobClearQueueState(True)
+        else:
+            self.jobClearQueueState(False)
+
+        # Status Queue Waiting Jobs
+        if checkForStatus(self.model, JobStatus.Waiting):
+            self.jobAddWaitingState(True)
+        else:
+            self.jobAddWaitingState(False)
+
+        # Abort
+
+
+def hasWaitingStatus(model):
     """
     hasWaiting looks for a Waiting status
 
@@ -383,6 +436,61 @@ def hasWaiting(model):
 
     for r in range(0, len(model.dataset)):
         if model.dataset[r, JobKey.Status] == JobStatus.Waiting:
+            return True
+
+    return False
+
+
+def hasQueueStatus(model):
+    """
+    hasWaiting looks for a Waiting status
+
+    Args:
+        model (TableModel): a table model
+
+    Returns:
+        bool: True if Waiting status found. False otherwise.
+    """
+
+    for r in range(0, len(model.dataset)):
+        if model.dataset[r, JobKey.Status] == JobStatus.Queue:
+            return True
+
+    return False
+
+
+def hasAbortStatus(model):
+    """
+    hasWaiting looks for a Waiting status
+
+    Args:
+        model (TableModel): a table model
+
+    Returns:
+        bool: True if Waiting status found. False otherwise.
+    """
+
+    for r in range(0, len(model.dataset)):
+        if model.dataset[r, JobKey.Status] == JobStatus.Abort:
+            return True
+
+    return False
+
+
+def checkForStatus(model, status):
+    """
+    hasWaiting looks for a Waiting status
+
+    Args:
+        model (TableModel): a table model
+        status (JobStatus): a possible status of a job
+
+    Returns:
+        bool: True if specified status found. False otherwise.
+    """
+
+    for r in range(0, len(model.dataset)):
+        if model.dataset[r, JobKey.Status] == status:
             return True
 
     return False

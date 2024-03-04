@@ -13,49 +13,42 @@ import re
 import sys
 
 from collections import deque
-from ctypes import wintypes
 from pathlib import Path
 from typing import Optional
 
 from PySide6.QtCore import (
     QByteArray,
     QEvent,
-    QFile,
-    QFileInfo,
-    QSaveFile,
-    QSettings,
+    QObject,
     Qt,
-    QTextStream,
     Signal,
-    Slot
+    Slot,
 )
 from PySide6.QtGui import(
-    QAction,
     QColor,
     QFont,
     QIcon,
-    QKeySequence,
-    QPixmap
+    QPixmap,
 )
 from PySide6.QtWidgets import (
     QApplication,
-    QFileDialog,
+    QDialog,
+    QLabel,
     QMainWindow,
+    QMenu,
     QMenuBar,
     QMessageBox,
     QStatusBar,
-    QStyle,
-    QTextEdit,
+    QSystemTrayIcon,
     QToolTip,
     QVBoxLayout,
-    QWidget
+    QWidget,
 )
 
-from vsutillib.mkv import getMKVMerge
+from vsutillib.mkv import getMKVMerge, getMKVMergeEmbedded, getMKVMergeVersion
 from vsutillib.pyside6 import (
     centerWidget,
     checkColor,
-    darkPalette,
     DualProgressBar,
     QActionWidget,
     QActivityIndicator,
@@ -64,6 +57,7 @@ from vsutillib.pyside6 import (
     QOutputTextWidget,
     QProgressIndicator,
     QSystemTrayIconWidget,
+    setAppStyle,
     TabWidget,
     VerticalLine,
 )
@@ -71,16 +65,23 @@ from vsutillib.pyside6 import (
 from . import config
 from .dataset import TableData, tableHeaders
 from .jobs import JobQueue
-from .models import TableProxyModel, JobsTableModel
+from .models import (
+    TableProxyModel,
+    JobsTableModel,
+    TableModel,
+    TableProxyModel,
+)
 from .utils import (
     icons,
     configMessagesCatalog,
+    executeMKVToolnix,
     OutputWindows,
     Progress,
     Text,
     Translate,
     UiSetMessagesCatalog,
-    yesNoDialog)
+    yesNoDialog,
+)
 from .widgets import (
     CommandWidget,
     JobsOutputErrorsWidget,
@@ -88,7 +89,7 @@ from .widgets import (
     JobsTableViewWidget,
     LogViewerWidget,
     PreferencesDialogWidget,
-    RenameWidget
+    RenameWidget,
 )
 # endregion imports
 
@@ -103,13 +104,13 @@ class MainWindow(QMainWindow):
     def __init__(self, parent: Optional[QWidget] = None) -> None:
         super().__init__(parent)
 
-        self.parent = parent
+        self.parent: QWidget = parent
 
         self.setWindowIcon(QIcon(QPixmap(":/images/Itsue256x256.png")))
 
         # Language setup has to be early so _() is defined
-        self.translateInterface = Translate()
-        self.uiTranslateInterface = UiSetMessagesCatalog(self)
+        self.translateInterface: QObject = Translate()
+        self.uiTranslateInterface: UiSetMessagesCatalog = UiSetMessagesCatalog(self)
         configMessagesCatalog(self)
 
         self._initVars()
@@ -135,40 +136,54 @@ class MainWindow(QMainWindow):
         # Where am I running from
         #
 
-        self.log = False
+        self.log: bool = False
 
         # if getattr(sys, "frozen", False):
         if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
             # Running in a pyinstaller bundle
-            self.appDirectory = Path(os.path.dirname(__file__))
+            self.appDirectory: Path = Path(os.path.dirname(__file__)).parent
+        elif "__compiled__" in globals():
+            # Running in a Nuitka bundle
+            self.appDirectory: Path = Path(os.path.dirname(__file__)).parent
         else:
-            self.appDirectory = Path(os.path.realpath(__file__))
+            self.appDirectory: Path = Path(os.path.realpath(__file__)).parent
 
-        self.trayIcon = QSystemTrayIconWidget(self, self.windowIcon())
+        self.trayIcon: QSystemTrayIcon = QSystemTrayIconWidget(self, self.windowIcon())
 
-        self.setPreferences = PreferencesDialogWidget(self)
-        self.translateInterface.addSlot(self.setPreferences.retranslateUi)
-        self.activitySpinner = QActivityIndicator(self)
+        self.setPreferences: QDialog = PreferencesDialogWidget(self)
+        #self.translateInterface.addFunction(self.setPreferences.retranslateUi)
+        self.activitySpinner: QWidget = QActivityIndicator(self)
 
-        self.controlQueue = deque()
+        self.controlQueue: deque = deque()
 
-        self.jobsQueue = JobQueue(self, controlQueue=self.controlQueue)
+        self.jobsQueue: QObject = JobQueue(
+            self,
+            controlQueue=self.controlQueue,
+            appDir=self.appDirectory
+        )
+
+        # mkvmerge executables
+
+        self.mkvmerge: Path = getMKVMerge()
+        self.mkvmergeEmbedded: Path = getMKVMergeEmbedded(self.appDirectory)
 
         # Model view
-        headers = tableHeaders()
-        self.tableData = TableData(headerList=headers, dataList=[])
-        self.model = JobsTableModel(self.tableData, self.jobsQueue)
-        self.proxyModel = TableProxyModel(self.model)
+        headers: list[list] = tableHeaders()
+        self.tableData: TableData = TableData(headerList=headers, dataList=[])
+        self.model: TableModel = JobsTableModel(self.tableData, self.jobsQueue)
+        self.proxyModel: TableProxyModel = TableProxyModel(self.model)
 
         # renameWidget is referenced in CommandWidget
-        self.renameWidget = RenameWidget(self)
+        self.rename: QWidget = RenameWidget(self)
 
-        self.commandEntry = CommandWidget(self, self.proxyModel)
-        self.jobsOutput = JobsOutputWidget(self)
-        self.errorOutput = JobsOutputErrorsWidget(self)
+        self.commandEntry: QWidget = CommandWidget(
+            self, self.proxyModel, self.rename
+        )
+        self.jobsOutput: QWidget = JobsOutputWidget(self)
+        self.errorOutput: QWidget = JobsOutputErrorsWidget(self, log=False)
 
         # Widgets for tabs
-        self.jobsTableView = JobsTableViewWidget(
+        self.jobsTableView: QWidget = JobsTableViewWidget(
             self, self.proxyModel, self.controlQueue, _(Text.txt0130)
         )
 
@@ -178,27 +193,26 @@ class MainWindow(QMainWindow):
         # self.historyWidget.tableView.sortByColumn(0, Qt.DescendingOrder)
 
         # Log view
-        self.logViewer = LogViewerWidget()
+        self.logViewer: QWidget = LogViewerWidget()
 
-        # self.output = None
         # Set output to contain output windows objects
-        self.output = OutputWindows(
+        self.output: OutputWindows = OutputWindows(
             self.commandEntry.outputWindow,
             self.jobsOutput,
             self.errorOutput,
         )
 
-        self.tabs = TabWidget(self)
+        self.tabs: TabWidget = TabWidget(self)
 
         # Progress information setup
-        self.progressBar = DualProgressBar(self, align=Qt.Horizontal)
-        self.jobsLabel = QFormatLabel(
+        self.progressBar: QWidget = DualProgressBar(self, align=Qt.Horizontal)
+        self.jobsLabel: QLabel = QFormatLabel(
             Text.txt0085,
             init=[0, 0, 0, 0, 0],
         )
-        self.progress = Progress(self, self.progressBar, self.jobsLabel)
+        self.progress: Progress = Progress(self, self.progressBar, self.jobsLabel)
 
-        self.progressSpin = QProgressIndicator(self)
+        self.progressSpin: QWidget = QProgressIndicator(self)
 
     def _initHelper(self) -> None:
         # work in progress spin
@@ -225,7 +239,11 @@ class MainWindow(QMainWindow):
         self.jobsQueue.proxyModel = self.proxyModel
 
         # Translation
-        self.translateInterface.addSlot(self.commandEntry.translate)
+        self.translateInterface.addFunction(self.setPreferences.retranslateUi)
+        self.translateInterface.addFunction(self.commandEntry.translate)
+        self.translateInterface.addFunction(self.jobsTableView.translate)
+        self.translateInterface.addFunction(self.rename.translate)
+        self.translateInterface.addFunction(self.tabs.translate)
 
         # Tabs
         tabsList = []
@@ -259,8 +277,8 @@ class MainWindow(QMainWindow):
         )
         tabsList.append(
             [
-                self.renameWidget,
-                _(Text.txt0143),
+                self.rename,
+                _(Text.txt0143) + "+",
                 _(Text.txt0147),
             ]
         )
@@ -309,7 +327,7 @@ class MainWindow(QMainWindow):
         #    self.commandWidget.updateAlgorithm
         #)
 
-    def _initUI(self):
+    def _initUI(self) -> None:
 
         # Create Widgets
         widget = QWidget()
@@ -345,7 +363,7 @@ class MainWindow(QMainWindow):
 
     # region Overrides
 
-    def setVisible(self, visible):
+    def setVisible(self, visible: bool) -> None:
         """ Override setVisible """
 
         self.trayIcon.setMenuEnabled(visible)
@@ -366,7 +384,8 @@ class MainWindow(QMainWindow):
             triggered=self.setPreferences.getPreferences
         )
 
-        icon = QIcon(QPixmap(":/images/exit.png"))
+        icon = QIcon(QPixmap(":/images/cross.png"))
+        #icon = QIcon(QPixmap(":/images/exit.png"))
         # exitIcon = self.style().standardIcon(QStyle.SP_DialogCloseButton)
         self.actExit = QActionWidget(
             icon,
@@ -375,6 +394,15 @@ class MainWindow(QMainWindow):
             shortcut=Text.txt0022,
             statusTip=Text.txt0023,
             triggered=self.close
+        )
+
+        icon = QIcon(QPixmap(":/images/mkvtoolnix_logo.png"))
+        self.actMKVToolnix = QActionWidget(
+            icon,
+            " ",
+            self,
+            statusTip=_("Execute embedded mkvtoolnix-gui."),
+            triggered=lambda: executeMKVToolnix(self.appDirectory, output=self.output, log=self.log)
         )
 
         self.actAbort = QActionWidget(
@@ -398,21 +426,31 @@ class MainWindow(QMainWindow):
             triggered=QApplication.aboutQt
         )
 
-        self.translateInterface.addSlot(self.actPreferences.translate)
-        self.translateInterface.addSlot(self.actExit.translate)
-        self.translateInterface.addSlot(self.actAbort.translate)
-        self.translateInterface.addSlot(self.actAbout.translate)
-        self.translateInterface.addSlot(self.actAboutQt.translate)
+        self.translateInterface.addFunction(self.actPreferences.translate)
+        self.translateInterface.addFunction(self.actExit.translate)
+        self.translateInterface.addFunction(self.actAbort.translate)
+        self.translateInterface.addFunction(self.actAbout.translate)
+        self.translateInterface.addFunction(self.actAboutQt.translate)
 
     def createMenus(self) -> None:
         """Create the application menus"""
 
-        menuBar = QMenuBar()
+        menuBar: QMenuBar = QMenuBar()
 
         #
         # File menu
         #
-        self.fileMenu = QMenuWidget(Text.txt0020)
+        self.fileMenu: QMenu = QMenuWidget(Text.txt0020)
+
+        #self.fileMenu.setStyleSheet(
+        #    """
+        #    QMenuWidget::item-line:separator {
+
+        #        color: white;
+
+        #    }
+        #    """
+        #)
 
         self.fileMenu.addAction(self.actPreferences)
         self.fileMenu.addSeparator()
@@ -421,24 +459,24 @@ class MainWindow(QMainWindow):
         self.fileMenu.addAction(self.actAbort)
 
         menuBar.addMenu(self.fileMenu)
-        self.translateInterface.addSlot(self.fileMenu.translate)
+        self.translateInterface.addFunction(self.fileMenu.translate)
 
         #
         # Help menu
         #
-        self.helpMenu = QMenuWidget(Text.txt0060)
+        self.helpMenu: QMenu = QMenuWidget(Text.txt0060)
         self.helpMenu.addAction(self.actAbout)
         self.helpMenu.addAction(self.actAboutQt)
 
         menuBar.addMenu(self.helpMenu)
-        self.translateInterface.addSlot(self.helpMenu.translate)
+        self.translateInterface.addFunction(self.helpMenu.translate)
 
         # Attach menu
         self.setMenuBar(menuBar)
 
     def createToolbars(self) -> None:
-        pass
-        #self.fileToolbar = self.addToolBar("File")
+        self.fileToolbar = self.addToolBar("File")
+        self.fileToolbar.addAction(self.actMKVToolnix)
         #self.fileToolbar.addAction(self.actExit)
 
     def createStatusbar(self) -> None:
@@ -455,7 +493,6 @@ class MainWindow(QMainWindow):
     # endregion Interface
 
     # region Configuration
-
     def configuration(self, action: str) -> None:
         """
         Read/Write configuration
@@ -499,10 +536,11 @@ class MainWindow(QMainWindow):
     def enableLogging(self, state):
         """Activate logging"""
 
+        QOutputTextWidget.logWithCaller = config.data.get(config.ConfigKey.LogWithCaller)
+
         self.log = state
         self.commandEntry.log = state
         self.jobsOutput.log = state
-        self.errorOutput.log = state
         self.jobsQueue.log = state
         self.jobsTableView.log = state
         msg = "MAI0001: Start Logging." if state else "MAI0002: Stop Logging."
@@ -546,23 +584,26 @@ class MainWindow(QMainWindow):
         QToolTip.setFont(font)
         config.data.set(config.ConfigKey.Font, font.toString())
 
-    # endregion
+    # endregion Configuration
 
     def about(self) -> None:
         """About"""
 
         rePythonVersion = re.compile(r"^(.*?) (.*?) (.*?) ")
         pythonVersion = sys.version
+
         if tmpMatch := rePythonVersion.match(sys.version):
             pythonVersion = tmpMatch[1]
 
-        mkvmergeVersion = getMKVMerge()
+        mkvSystem = getMKVMergeVersion(self.mkvmerge)
+        mkvEmbedded = getMKVMergeVersion(self.mkvmergeEmbedded)
 
-        aboutMsg = (f"{config.APPNAME}: {config.VERSION}\n\n"
+        aboutMsg = (f"{config.APPNAME}: {config.VERSION}                   \n\n"
                     f"{_(Text.txt0002)}: {config.AUTHOR}\n"
                     f"{_(Text.txt0003)}: {config.EMAIL}\n\n"
                     f"{_(Text.txt0004)}: {pythonVersion}\n\n"
-                    f"{_(Text.txt0067)}: {mkvmergeVersion}           \n")
+                    f"{_(Text.txt0067)}: {mkvSystem}\n"
+                    f"{_(Text.txt0068)}: {mkvEmbedded}\n")
 
         QMessageBox.about(self, config.APPNAME, aboutMsg)
 
@@ -577,6 +618,7 @@ def tabChange(index):
 
     config.data.set("Tab", index)
 
+
 def abort():
     """Force Quit"""
 
@@ -587,28 +629,24 @@ def abort():
 def mainApp():
     """Main function"""
 
-    app = QApplication(sys.argv)
-    config.init(app=app)
-
-    # will create a poor mans dark theme for the app enable it for Linux
-    # and Windows for now won't look for an option to switch to light
-    # dark according to the os no clear way of changing tho font size
-    # TODO: lightPalette
-    darkPalette(app)
-    config.data.set(config.ConfigKey.DarkMode, True)
-    QOutputTextWidget.isDarkMode = True
-
     if platform.system() == "Windows":
         # with this the icon in the task bar will change to the one set
         # for the application myAppID is an arbitrary string
         myAppID = "akai10tsuki.MKVBatchMultiplex.mkv.3.0.0"
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myAppID)
+        # setup dark mode
+        sys.argv += ['-platform', 'windows:darkmode=2']
 
+    app = QApplication(sys.argv)
+    config.init(app=app)
     MainWindow()
+
+    # set Fusion style palette adjust for Linux disable button text
+    setAppStyle(app)
+
     app.exec()
 
     config.close()
-
 
 # This if for Pylance _() is not defined
 def _(dummy):

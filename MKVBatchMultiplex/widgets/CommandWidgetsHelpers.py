@@ -1,6 +1,9 @@
 """
 CommandWidget helper functions attach to buttons
 """
+
+import logging
+
 from threading import Lock
 
 from PySide6.QtCore import Qt
@@ -9,71 +12,112 @@ import vsutillib.mkv as mkv
 from vsutillib.files import DisplayPath
 from vsutillib.pyside6 import LineOutput, SvgColor
 
+from .. import config
+
+
+MODULELOG = logging.getLogger(__name__)
+MODULELOG.addHandler(logging.NullHandler())
+
 
 def runAnalysis(**kwargs: str) -> None:
     """List the source files found"""
 
-    output = kwargs.pop("output", None)
-    command = kwargs.pop("command", None)
-    log = kwargs.pop("log", False)
+    output = kwargs.pop(MKVParseKey.output, None)
+    command = kwargs.pop(MKVParseKey.command, None)
+    oCommand= kwargs.pop(MKVParseKey.oCommand, None)
+    appDir = kwargs.pop(MKVParseKey.appDir, None)
+    log = kwargs.pop(MKVParseKey.log, False)
 
-    if command:
+    if output is None:
+        if log:
+            MODULELOG.error(
+                "[runAnalysis] "
+                "No output callback function")
+        return "No output callback function"
+
+    if (command is not None) and (appDir is not None):
         output.command.emit("Analysis of command line:\n",
                             {LineOutput.AppendEnd: True})
-        verify = mkv.MKVCommandParser(command, log=log)
-        verify.generateCommands()
-        for e in verify.analysis:
-            if e.find(r"chk:") >= 0:
-                output.command.emit(
-                    f"{e}",
-                    {LineOutput.Color: SvgColor.green, LineOutput.AppendEnd: True},
-                )
-            else:
-                output.command.emit(
-                    f"{e}",
-                    {LineOutput.Color: SvgColor.red, LineOutput.AppendEnd: True},
-                )
-        output.command.emit("\n", {LineOutput.AppendEnd: True})
 
+        useEmbedded = config.data.get(config.ConfigKey.UseEmbedded)
+        # Creating a new MKVCommandParser object
+        # TODO: check if using CommandWidget is ok
+        if oCommand is None:
+            verify = mkv.MKVCommandParser(
+                command,
+                appDir=appDir,
+                useEmbedded=useEmbedded,
+                log=log)
+            verify.generateCommands()
+            print("runAnalysis new oCommand")
+        else:
+            verify = oCommand
+            print("runAnalysis old oCommand")
 
-def runAnalysisOld(**kwargs):
-    """List the source files found"""
-
-    output = kwargs.pop("output", None)
-    command = kwargs.pop("command", None)
-    log = kwargs.pop("log", False)
-    verify = mkv.VerifyMKVCommand(command, log=log)
-    output.command.emit("Analysis of command line:\n",
-                        {LineOutput.AppendEnd: True})
-
-    for e in verify.analysis:
-        if e.find(r"chk:") >= 0:
-            output.command.emit(
-                f"{e}",
-                {LineOutput.Color: SvgColor.darkgreen, LineOutput.AppendEnd: True},
-            )
+        if verify.analysis:
+            for e in verify.analysis:
+                if e.find(r"chk:") >= 0:
+                    output.command.emit(
+                        f"{e}",
+                        {LineOutput.Color: SvgColor.green,
+                        LineOutput.AppendEnd: True},
+                    )
+                else:
+                    output.command.emit(
+                        f"{e}",
+                        {LineOutput.Color: SvgColor.red,
+                        LineOutput.AppendEnd: True},
+                    )
+            output.command.emit("\n", {LineOutput.AppendEnd: True})
         else:
             output.command.emit(
-                f"{e}",
-                {LineOutput.Color: SvgColor.red, LineOutput.AppendEnd: True},
-            )
-
-    output.command.emit("\n", {LineOutput.AppendEnd: True})
+                "No analysis to display.\n", {LineOutput.AppendEnd: True})
+            if log:
+                MODULELOG.warning(
+                    "[runAnalysis] "
+                    "No analysis to display.")
+    else:
+        if log:
+            MODULELOG.error(
+                "[runAnalysis] "
+                "wrong parameters.")
 
 
 def showCommands(**kwargs: str):
     """List the commands to be executed"""
 
-    output = kwargs.pop("output", None)
-    command = kwargs.pop("command", None)
-    oCommand = kwargs.pop("oCommand", None)
-    log = kwargs.pop("log", False)
+    output = kwargs.pop(MKVParseKey.output, None)
+    command = kwargs.pop(MKVParseKey.command, None)
+    oCommand = kwargs.pop(MKVParseKey.oCommand, None)
+    appDir = kwargs.pop(MKVParseKey.appDir, None)
+    log = kwargs.pop(MKVParseKey.log, False)
     index = 1
 
-    oCommand = mkv.MKVCommandParser(command, log=log)
-
     if output is None:
+        if log:
+            MODULELOG.error(
+                f"[CommandWidgetHelpers.showCommands] "
+                f"No output callback function")
         return "No output callback function"
+
+    output.command.emit(
+        f"Show Commands Working...\n",
+        {LineOutput.AppendEnd: True}
+    )
+
+    useEmbedded = config.data.get(config.ConfigKey.UseEmbedded)
+
+    if (oCommand is None):
+        oCommand = mkv.MKVCommandParser(
+            command,
+            appDir=appDir,
+            useEmbedded=useEmbedded,
+            log=log)
+        print("new oCommand")
+    else:
+        oCommand.command = command
+        oCommand.useEmbedded = useEmbedded
+        print("old oCommand")
 
     output.command.emit(
         f"Shell:\n\n{oCommand.command}\n", {LineOutput.AppendEnd: True}
@@ -110,13 +154,33 @@ def showCommands(**kwargs: str):
 def checkFiles(**kwargs: str) -> str:
     """Check file structure against primary source file"""
 
-    output = kwargs.pop("output", None)
-    command = kwargs.pop("command", None)
-    oCommand = kwargs.pop("oCommand", None)
-    log = kwargs.pop("log", False)
+    output = kwargs.pop(MKVParseKey.output, None)
+    command = kwargs.pop(MKVParseKey.command, None)
+    oCommand= kwargs.pop(MKVParseKey.oCommand, None)
+    appDir = kwargs.pop(MKVParseKey.appDir, None)
+    log = kwargs.pop(MKVParseKey.log, False)
+
+    if output is None:
+        if log:
+            MODULELOG.error(
+                f"[CommandWidgetHelpers.chkFiles] "
+                f"No output callback function")
+        return "No output callback function"
+
     lock = Lock()
 
-    oCommand = mkv.MKVCommandParser(command, log=log)
+    if oCommand is None:
+        useEmbedded = config.data.get(config.ConfigKey.UseEmbedded)
+        verify = mkv.MKVCommandParser(
+            command,
+            appDir=appDir,
+            useEmbedded=useEmbedded,
+            log=log)
+        verify.generateCommands()
+        print("checkFiles new oCommand")
+    else:
+        verify = oCommand
+        print("checkFiles old oCommand")
 
     dictStats = {}
     errorFound = False
@@ -237,12 +301,37 @@ def checkFiles(**kwargs: str) -> str:
 def sourceTree(**kwargs: str) -> None:
     """Check file structure against primary source file"""
 
-    output = kwargs.pop("output", None)
-    command = kwargs.pop("command", None)
-    oCommand = kwargs.pop("oCommand", None)
-    log = kwargs.pop("log", False)
+    output = kwargs.pop(MKVParseKey.output, None)
+    command = kwargs.pop(MKVParseKey.command, None)
+    oCommand= kwargs.pop(MKVParseKey.oCommand, None)
+    appDir = kwargs.pop(MKVParseKey.appDir, None)
+    log = kwargs.pop(MKVParseKey.log, False)
 
-    oCommand = mkv.MKVCommandParser(command, log=log)
+    if output is None:
+        if log:
+            MODULELOG.error(
+                f"[CommandWidgetHelpers.showCommands] "
+                f"No output callback function")
+        return "No output callback function"
+
+    output.command.emit(
+        f"Show Commands Working...\n",
+        {LineOutput.AppendEnd: True}
+    )
+
+    useEmbedded = config.data.get(config.ConfigKey.UseEmbedded)
+
+    if (oCommand is None):
+        oCommand = mkv.MKVCommandParser(
+            command,
+            appDir=appDir,
+            useEmbedded=useEmbedded,
+            log=log)
+        print("sourceTree new oCommand")
+    else:
+        #oCommand.useEmbedded = useEmbedded
+        #oCommand.command = command
+        print("sourceTree old oCommand")
 
     if not oCommand.commandsGenerated:
         output.command.emit("Generating Commands...\n", {
@@ -322,3 +411,8 @@ class MKVParseKey:
     chaptersFile = "<CHAPTERS>"
     outputFile = "<OUTPUTFILE>"
     title = "<TITLE>"
+    output = "output"
+    command = "command"
+    oCommand = "oCommand"
+    appDir = "appDir"
+    log = "log"

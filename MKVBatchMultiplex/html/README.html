@@ -1,0 +1,353 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mkvbatchmultiplex: MKVMERGE batch multiplexing &mdash; mkvbatchmultiplex 2.1.0b1.dev5 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> mkvbatchmultiplex
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">mkvbatchmultiplex Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gettingstarted.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="using.html">Using mkvbatchmultiplex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CHANGELOG.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CONTRIBUTING.html">Contributing to MKVBatchMultiplex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CODE_OF_CONDUCT.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgements.html">Acknowledgements</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">mkvbatchmultiplex</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>mkvbatchmultiplex: MKVMERGE batch multiplexing</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="mkvbatchmultiplex-mkvmerge-batch-multiplexing">
+<h1>mkvbatchmultiplex: MKVMERGE batch multiplexing<a class="headerlink" href="#mkvbatchmultiplex-mkvmerge-batch-multiplexing" title="Permalink to this headline">¶</a></h1>
+<a class="reference external image-reference" href="https://pypi.org/project/mkvbatchmultiplex"><img alt="https://img.shields.io/pypi/v/mkvbatchmultiplex.svg" src="https://img.shields.io/pypi/v/mkvbatchmultiplex.svg" /></a>
+<a class="reference external image-reference" href="https://pypi.org/project/mkvbatchmultiplex"><img alt="https://img.shields.io/pypi/pyversions/mkvbatchmultiplex.svg" src="https://img.shields.io/pypi/pyversions/mkvbatchmultiplex.svg" /></a>
+<a class="reference external image-reference" href="CODE_OF_CONDUCT.md"><img alt="https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg" src="https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg" /></a>
+<a class="reference external image-reference" href="https://mkvbatchmultiplex.readthedocs.io/en/latest/?badge=latest"><img alt="Documentation Status" src="https://readthedocs.org/projects/mkvbatchmultiplex/badge/?version=latest" /></a>
+<p>This project went into a rewrite for version 2. Rename module was added to
+help maintain output file names <a class="reference external" href="https://www.plex.tv/">Plex</a> friendly.</p>
+<p><strong>New algorithm will try to solve some mismatches in file structure.</strong></p>
+<p>For release 2.1.0:</p>
+<p>Option o save Jobs when they need to be repeated with the source files in the
+same location.  Algorithm revisions to work in more cases.</p>
+<div class="section" id="development-version">
+<h2>Development version<a class="headerlink" href="#development-version" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="b1-dev4">
+<h3>2.1.0b1.dev4<a class="headerlink" href="#b1-dev4" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="https://github.com/akai10tsuki/mkvbatchmultiplex/releases/download/v2.1.0b1.dev4/MKVBatchMultiplex-2.1.0b1.dev4-iss-AMD64.exe">Windows 10 development version</a> (64-bit).</p>
+</div>
+</div>
+<div class="section" id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<p>mkvbatchmultiplex program is for processing <strong>mkvmerge</strong> command line and use
+it as a template to apply the multiplex instructions to all the files found
+in the directory. The command line is expected to be taken from
+<strong>mkvtoolnix-gui</strong>:</p>
+<p><em>Multiplexer-&gt;Show command line</em></p>
+<p><strong>mkvmerge</strong> and <strong>mkvtoolnix-gui</strong> are part of the <a class="reference external" href="https://mkvtoolnix.download/">MKVToolNix</a> set of tools
+to work with <a class="reference external" href="https://www.matroska.org/">Matroska</a> media container files.</p>
+<p>Works with Windows (cmd.exe) or Linux/unix shells (bash, zsh, etc.)</p>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install mkvbatchmultiplex
+</pre></div>
+</div>
+<p>It is been developed on Windows the media server is Windows based.
+Made light testing on ubuntu and macOS 10.14 Mojave and ubuntu 18.04.
+On macOS MKVToolNix must be version 30.0.0 or higher if working with
+Dark Theme.</p>
+<p>If working with the source to execute the application first create the
+locale files.  On the source directory execute:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python setup.py generate_catalog
+</pre></div>
+</div>
+<div class="section" id="dependencies">
+<h3>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://www.python.org/downloads/">Python</a> 3.8.1 or greater</p>
+<ul>
+<li><p><a class="reference external" href="https://lxml.de/">lxml</a> 4.5.2 or greater</p></li>
+<li><p><a class="reference external" href="https://github.com/SethMMorton/natsort">natsort</a> 7.0.1 or greater</p></li>
+<li><p><a class="reference external" href="https://pypi.org/project/pymediainfo/">pymediainfo</a> 4.2.1 or greater</p></li>
+<li><p><a class="reference external" href="https://wiki.qt.io/Qt_for_Python">PySide2</a> 5.14 or greater</p></li>
+</ul>
+</li>
+<li><p><a class="reference external" href="https://mediaarea.net/en/MediaInfo">MediaInfo</a> tested with versions 17.10-&gt;20.08</p></li>
+<li><p><a class="reference external" href="https://mkvtoolnix.download/">MKVToolNix</a> tested with versions 17.00-&gt;51.0.0</p></li>
+</ul>
+</div></blockquote>
+<p>In macOS 10.14 Dark theme MKVToolNix has to be version 30.0.0+ to use it.</p>
+</div>
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>It assumed you have working knowledge of using MKVToolNix.  Select a
+file make any operations needed copy command to clipboard. Remember to
+select and output directory:</p>
+<blockquote>
+<div><p><em>Multiplexer-&gt;Show command line</em></p>
+</div></blockquote>
+<p>Paste command on mkvbatchmultiplex push &lt;Add Queue&gt; is there are no more jobs
+push &lt;Start Worker&gt; button and wait.</p>
+<p>Step by step examples are in the github repository <a class="reference external" href="https://github.com/akai10tsuki/mkvbatchmultiplex/wiki">wiki</a>.</p>
+</div>
+<div class="section" id="algorithms-explained">
+<h2>Algorithms explained<a class="headerlink" href="#algorithms-explained" title="Permalink to this headline">¶</a></h2>
+<p>When the worker is processing a job before starting to work on a set of files
+the structure will be checked. If the structure is the same as in the pasted
+command the files are processed.  If it doesn’t match the program will behave
+according to the algorithm selected.</p>
+<p>New algorithms:</p>
+<p>With all Algorithms any file that is not flagged with and invalid structure
+the results are the same.  They are different when the files are flagged with
+and invalid structure on what they do.</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p><strong>Algorithm 0</strong> current behavior. If the structure check fails no command
+will be executed files have to be logically equal. The resulting file will
+have the same structure as the destination file on the command line.  The
+resulting file is very likely to be the expected result as specified on the
+command line. If no file is flagged random checks usually are sufficient.
+Any flagged file has to be check to fix any problem and maybe run the
+command with MKVToolNix for that file.</p></li>
+<li><p><strong>Algorithm 1</strong> if structure check fails it will try to find the tracks
+that best matches the base file and adjust the command accordingly. Any
+track not used in the command will be ignored. If no suitable track found
+no command will not execute. Resulting file structure if the same as in the
+command line but is not as likely to be the desired file as in Algorithm 0.
+Flagged files should be checked to see if the file is ok.</p></li>
+<li><p><strong>Algorithm 2</strong> if Algorithm 1 fails tracks without match will be ignored
+and and the command still will execute.  The resulting file <strong>will not</strong> be
+like the destination file in the original command.  It may even be
+unusable. Any flagged has to be check to see if is usable.</p></li>
+</ol>
+</div></blockquote>
+<p>Since in some occasions <strong>Algorithm 1</strong> will produce the correct file it will
+be set as the default. The original files should never be erased until all the
+new files are watched or at least check with a player that the all the tracks
+are muxed as needed.</p>
+<p>One case in which <strong>Algorithm 2</strong> applies is when some episodes have commentary
+audio tracks.  <strong>Algorithm 1</strong> will fail because on files with missing
+commentary tracks there will not be enough audio tracks to produce a file with
+a structure logically equal. There are more tracks needed than tracks available.
+<strong>Algorithm 2</strong> will ignore this and proceed. Additional files with commentary
+tracks will be muxed with it.</p>
+<p>Other important difference to the current behavior is that text and audio tracks
+are match by language not format. For example:</p>
+<blockquote>
+<div><p>In the original source the audio is English with flac format and in the
+current file is English with ac3.  This track will be used for muxing the
+files.</p>
+</div></blockquote>
+<p>For video tracks the language is always ignored in the testing.</p>
+<p>Personally I still used <strong>Algorithm 0</strong> because if I close the program without
+checking the flagged files just looking in the directory any missing file will
+exactly correspond to a flagged file. For more meticulous users <strong>Algorithm 1</strong>
+is the better one.</p>
+</div>
+<div class="section" id="roadmap">
+<h2>Roadmap<a class="headerlink" href="#roadmap" title="Permalink to this headline">¶</a></h2>
+<p>This is just the base for the project.  The roadmap is:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Work on rename module to fetch metadata</p></li>
+<li><p>Work on the Spanish interface translation</p></li>
+<li><p><strike> Easier installation for linux </strike></p></li>
+</ul>
+</div></blockquote>
+<p>For linux installations the AppImage binary format will be used for the
+forseeable future.</p>
+<p>If the the program generates any interest any further changes and additions
+will <strong>also</strong> depend on user base needs.</p>
+<p>See <a class="reference external" href="https://mkvbatchmultiplex.readthedocs.io">https://mkvbatchmultiplex.readthedocs.io</a> for more information.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2018-2020, Efrain Vergara
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

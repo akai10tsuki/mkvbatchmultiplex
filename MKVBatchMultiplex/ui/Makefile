@@ -3,6 +3,7 @@
 #
 UI2PY=pyside6-uic
 I18N=pyside6-lupdate
+I18NR=pyside6-lrelease
 
 all: Ui_PreferencesDialog.py Ui_ProjectInfoDialog.py Ui_ProjectInfoOkDialog.py Ui_SearchTextDialog.py
 
@@ -17,3 +18,12 @@ Ui_ProjectInfoOkDialog.py: ProjectInfoOkDialog.ui
 
 Ui_SearchTextDialog.py: SearchTextDialog.ui
 	$(UI2PY) SearchTextDialog.ui > Ui_SearchTextDialog.py
+
+translation:
+	$(I18N) -extensions ui . -ts i18n/ui_en.ts  i18n/ui_es.ts
+
+release:
+	$(I18NR) i18n/ui_en.ts  i18n/ui_es.ts
+	cp i18n/ui_es.qm ../locale/es/LC_MESSAGES/
+	cp i18n/ui_en.qm ../locale/en/LC_MESSAGES/
+	

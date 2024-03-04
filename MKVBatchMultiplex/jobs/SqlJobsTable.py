@@ -512,6 +512,6 @@ def updateTables(database, fromVersion, toVersion):
             PRAGMA foreign_keys=on; """
 
     if sqlScript:
-        print("Updating database...")
+        #print("Updating database...")
         cursor = database.connection.cursor()
         cursor.executescript(sqlScript)

@@ -45,8 +45,8 @@ coverage.xml
 *,cover
 .hypothesis/
 
-# Translations
-*.mo
+# Translation source
+*.po
 *.pot
 
 # Backcup translations
@@ -62,8 +62,10 @@ docs/_build/
 target/
 
 # MKVBatchMultiplex
+embed/
 MKVBatchMultiplexPySide2/
 tests/NewFiles/
+tests/feature/
 tests/generatecommand.1.py
 tests/crcTests.py
 tests/NewFiles.7z
@@ -78,7 +80,7 @@ test.py
 teste.py
 .DS_Store
 .gitchangelog.rc
-html
+#html
 *.code-workspace
 /runReference.py
 images/

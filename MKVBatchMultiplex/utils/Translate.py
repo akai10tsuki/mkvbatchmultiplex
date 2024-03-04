@@ -22,12 +22,10 @@ class Translate(QObject):
         super().__init__(parent)
 
         self.parent = parent
-        self.translateSlots = []
 
-    def addSlot(self, function: Callable[[str | None], None]) -> None:
+    def addFunction(self, function: Callable[[str | None], None]) -> None:
 
         self.translateSignal.connect(function)
-        self.translateSlots.append(function)
 
     def emitSignal(self, language: Optional[str] = None) -> None:
 
