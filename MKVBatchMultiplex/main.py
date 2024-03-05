@@ -156,7 +156,7 @@ class MainWindow(QMainWindow):
 
         self.controlQueue: deque = deque()
 
-        self.jobsQueue: QObject = JobQueue(
+        self.jobsQueue: JobQueue = JobQueue(
             self,
             controlQueue=self.controlQueue,
             appDir=self.appDirectory

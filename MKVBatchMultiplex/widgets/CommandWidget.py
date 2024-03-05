@@ -762,11 +762,11 @@ class CommandWidget(TabWidgetExtension, QWidget):
         objectName = source.objectName()
 
         if event.type() == QEvent.FocusIn:
-            print('filter-focus-in:', objectName)
+            #print('filter-focus-in:', objectName)
             widget = self.getWidget(objectName)
             focusIn(widget)
         elif event.type() == QEvent.FocusOut:
-            print('filter-focus-out:', objectName)
+            #print('filter-focus-out:', objectName)
             widget = self.getWidget(objectName)
             focusOut(widget)
 
