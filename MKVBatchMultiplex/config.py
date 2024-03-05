@@ -300,8 +300,10 @@ def init(
              data.get(ConfigKey.UseEmbedded) or False)
 
     # For fast testing of interface
-    data.set(ConfigKey.SimulateRun, True)
-    data.set(ConfigKey.SimulateRunIterations, 500)
+    data.set(ConfigKey.SimulateRun,
+             data.get(ConfigKey.SimulateRun) or False)
+    data.set(ConfigKey.SimulateRunIterations,
+             data.get(ConfigKey.SimulateRunIterations) or 500)
 
     #
     # Temporarily disable uncomment statements
