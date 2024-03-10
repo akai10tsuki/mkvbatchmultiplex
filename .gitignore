@@ -64,11 +64,6 @@ target/
 # MKVBatchMultiplex
 embed/
 MKVBatchMultiplexPySide2/
-tests/NewFiles/
-tests/feature/
-tests/generatecommand.1.py
-tests/crcTests.py
-tests/NewFiles.7z
 .vscode/
 tmp/
 docs2/
@@ -84,3 +79,10 @@ teste.py
 *.code-workspace
 /runReference.py
 images/
+
+# tests directory
+tests/*
+!tests/MediaFiles/
+!tests/Rename/
+!tests/TrackAnalysis/
+!tests/generatecommand.py
