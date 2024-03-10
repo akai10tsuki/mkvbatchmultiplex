@@ -81,12 +81,6 @@ teste.py
 images/
 
 # tests directory
-#tests/NewFiles/
-#tests/feature/
-#tests/generatecommand.1.py
-#tests/crcTests.py
-#tests/NewFiles.7z
-
 tests/*
 !tests/MediaFiles/
 !tests/Rename/
