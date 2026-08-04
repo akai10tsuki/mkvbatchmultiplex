@@ -26,7 +26,7 @@ def computeCRC32(**kwargs: str) -> None:
         if fileName.is_file():
             crc = crc32(fileName.resolve())
             newName = (str(fileName.parent.resolve()) + "/" +
-                fileName.stem + r" [" + crc + r"]" + fileName.suffix)
+                fileName.stem + r" - [" + crc + r"]" + fileName.suffix)
             newFileName = PurePath(newName)
             fileName.rename(newFileName)
             msg = f"       File: {fileName.resolve()}\nRenamed: {newFileName}\n"
