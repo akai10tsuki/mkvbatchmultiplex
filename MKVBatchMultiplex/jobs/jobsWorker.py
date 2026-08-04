@@ -479,13 +479,14 @@ def crc(destinationFile, output, log):
     """
     if config.data.get(config.ConfigKey.CRC32) is not None:
         doCRC = config.data.get(config.ConfigKey.CRC32)
-        crcWorker = ThreadWorker(
-            computeCRC32,
-            output=output,
-            sourceFile=destinationFile,
-            log=log
-        )
-        crcWorker.start()
+        if doCRC:
+            crcWorker = ThreadWorker(
+                computeCRC32,
+                output=output,
+                sourceFile=destinationFile,
+                log=log
+            )
+            crcWorker.start()
 
 
 def markErrorOutput(job, output, start=True):
