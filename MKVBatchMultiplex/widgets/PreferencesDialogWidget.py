@@ -99,7 +99,7 @@ class PreferencesDialogWidget(QDialog):
         #
         if config.data.get(config.ConfigKey.CRC32) is not None:
             doCRC = config.data.get(config.ConfigKey.CRC32)
-            if (doCRC == 2):
+            if (doCRC):
                 self.ui.chkBoxComputeCRC.setChecked(True)
             else:
                 self.ui.chkBoxComputeCRC.setChecked(False)
@@ -320,9 +320,9 @@ class PreferencesDialogWidget(QDialog):
             if self.preferences.enableCRCCompute is not None:
                 if config.data.get(config.ConfigKey.CRC32) is not None:
                     if (self.preferences.enableCRCCompute):
-                        config.data.set(config.ConfigKey.CRC32, 2)
+                        config.data.set(config.ConfigKey.CRC32, True)
                     else:
-                        config.data.set(config.ConfigKey.CRC32, 0)
+                        config.data.set(config.ConfigKey.CRC32, False)
                     self.stateChangedCRC.emit()
             #
             # useEmbedded
