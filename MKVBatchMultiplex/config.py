@@ -262,7 +262,8 @@ def init(
              data.get(ConfigKey.Algorithm) or 1)
 
     data.set(ConfigKey.CRC32,
-             data.get(ConfigKey.CRC32) or CheckBoxState.UnChecked)
+             data.get(ConfigKey.CRC32) or False)
+#             data.get(ConfigKey.CRC32) or CheckBoxState.UnChecked)
 
     data.set(ConfigKey.DbVersion,
              data.get(ConfigKey.DbVersion) or DATABASEVERSION)
