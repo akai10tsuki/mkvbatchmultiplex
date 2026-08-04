@@ -250,50 +250,50 @@ class MainWindow(QMainWindow):
         tabsList.append(
             [
                 self.commandEntry,
-                _(Text.txt0133),
-                _(Text.txt0148),
+                Text.txt0133,
+                Text.txt0148,
             ]
         )
         tabsList.append(
             [
                 self.jobsTableView,
-                _(Text.txt0140),
-                _(Text.txt0144),
+                Text.txt0140,
+                Text.txt0144,
             ]
         )
         tabsList.append(
             [
                 self.jobsOutput,
-                _(Text.txt0141),
-                _(Text.txt0145),
+                Text.txt0141,
+                Text.txt0145,
             ]
         )
         tabsList.append(
             [
                 self.errorOutput,
-                _(Text.txt0152),
-                _(Text.txt0146),
+                Text.txt0152,
+                Text.txt0146,
             ]
         )
         tabsList.append(
             [
                 self.rename,
-                _(Text.txt0143) + "+",
-                _(Text.txt0147),
+                Text.txt0143 + "+",
+                Text.txt0147,
             ]
         )
         if config.data.get(config.ConfigKey.LogViewer):
             tabsList.append(
                 [
                     self.logViewer,
-                    _(Text.txt0149),
-                    _(Text.txt0151),
+                    Text.txt0149,
+                    Text.txt0151,
                 ]
             )
         else:
             self.logViewer.tab = -1
             self.logViewer.tabWidget = self.tabs
-            self.logViewer.title = _(Text.txt0149)
+            self.logViewer.title = Text.txt0149
         self.tabs.addTabs(tabsList)
 
         # Signal connections
